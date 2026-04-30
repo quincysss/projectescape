@@ -1,0 +1,272 @@
+{
+  "source_sheet": "K:\\ProjectEscape\\project-escape\\assets\\map\\safe\\sheets\\safe_house_active_sheet_01.png",
+  "notes": "Older safe house concept sheet split for archival reuse. Use safe_house_active_sheet_02 split assets for production.",
+  "assets": [
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\safe\\concept_parts\\safe_house_concept_01.png",
+      "source_box_xyxy": [
+        24,
+        30,
+        631,
+        512
+      ],
+      "width": 607,
+      "height": 482,
+      "detected_area": 241135,
+      "id": "safe_house_concept_01",
+      "role": "concept_reference"
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\safe\\concept_parts\\safe_house_concept_02.png",
+      "source_box_xyxy": [
+        639,
+        34,
+        1208,
+        541
+      ],
+      "width": 569,
+      "height": 507,
+      "detected_area": 246491,
+      "id": "safe_house_concept_02",
+      "role": "concept_reference"
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\safe\\concept_parts\\safe_house_concept_03.png",
+      "source_box_xyxy": [
+        1241,
+        56,
+        1485,
+        504
+      ],
+      "width": 244,
+      "height": 448,
+      "detected_area": 7118,
+      "id": "safe_house_concept_03",
+      "role": "concept_part"
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\safe\\concept_parts\\safe_house_concept_04.png",
+      "source_box_xyxy": [
+        44,
+        547,
+        217,
+        780
+      ],
+      "width": 173,
+      "height": 233,
+      "detected_area": 31242,
+      "id": "safe_house_concept_04",
+      "role": "concept_part"
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\safe\\concept_parts\\safe_house_concept_05.png",
+      "source_box_xyxy": [
+        500,
+        551,
+        623,
+        740
+      ],
+      "width": 123,
+      "height": 189,
+      "detected_area": 15853,
+      "id": "safe_house_concept_05",
+      "role": "concept_part"
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\safe\\concept_parts\\safe_house_concept_06.png",
+      "source_box_xyxy": [
+        668,
+        559,
+        853,
+        740
+      ],
+      "width": 185,
+      "height": 181,
+      "detected_area": 25834,
+      "id": "safe_house_concept_06",
+      "role": "concept_part"
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\safe\\concept_parts\\safe_house_concept_07.png",
+      "source_box_xyxy": [
+        254,
+        560,
+        447,
+        744
+      ],
+      "width": 193,
+      "height": 184,
+      "detected_area": 24581,
+      "id": "safe_house_concept_07",
+      "role": "concept_part"
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\safe\\concept_parts\\safe_house_concept_08.png",
+      "source_box_xyxy": [
+        891,
+        582,
+        970,
+        715
+      ],
+      "width": 79,
+      "height": 133,
+      "detected_area": 6014,
+      "id": "safe_house_concept_08",
+      "role": "concept_part"
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\safe\\concept_parts\\safe_house_concept_09.png",
+      "source_box_xyxy": [
+        990,
+        582,
+        1093,
+        714
+      ],
+      "width": 103,
+      "height": 132,
+      "detected_area": 5836,
+      "id": "safe_house_concept_09",
+      "role": "concept_part"
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\safe\\concept_parts\\safe_house_concept_10.png",
+      "source_box_xyxy": [
+        1302,
+        594,
+        1445,
+        709
+      ],
+      "width": 143,
+      "height": 115,
+      "detected_area": 11243,
+      "id": "safe_house_concept_10",
+      "role": "concept_part"
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\safe\\concept_parts\\safe_house_concept_11.png",
+      "source_box_xyxy": [
+        1122,
+        599,
+        1265,
+        713
+      ],
+      "width": 143,
+      "height": 114,
+      "detected_area": 11457,
+      "id": "safe_house_concept_11",
+      "role": "concept_part"
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\safe\\concept_parts\\safe_house_concept_12.png",
+      "source_box_xyxy": [
+        1264,
+        770,
+        1493,
+        976
+      ],
+      "width": 229,
+      "height": 206,
+      "detected_area": 39151,
+      "id": "safe_house_concept_12",
+      "role": "concept_part"
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\safe\\concept_parts\\safe_house_concept_13.png",
+      "source_box_xyxy": [
+        427,
+        792,
+        591,
+        965
+      ],
+      "width": 164,
+      "height": 173,
+      "detected_area": 14115,
+      "id": "safe_house_concept_13",
+      "role": "concept_part"
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\safe\\concept_parts\\safe_house_concept_14.png",
+      "source_box_xyxy": [
+        36,
+        797,
+        213,
+        932
+      ],
+      "width": 177,
+      "height": 135,
+      "detected_area": 18432,
+      "id": "safe_house_concept_14",
+      "role": "concept_part"
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\safe\\concept_parts\\safe_house_concept_15.png",
+      "source_box_xyxy": [
+        223,
+        797,
+        420,
+        939
+      ],
+      "width": 197,
+      "height": 142,
+      "detected_area": 22261,
+      "id": "safe_house_concept_15",
+      "role": "concept_part"
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\safe\\concept_parts\\safe_house_concept_16.png",
+      "source_box_xyxy": [
+        599,
+        806,
+        753,
+        930
+      ],
+      "width": 154,
+      "height": 124,
+      "detected_area": 14774,
+      "id": "safe_house_concept_16",
+      "role": "concept_part"
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\safe\\concept_parts\\safe_house_concept_17.png",
+      "source_box_xyxy": [
+        928,
+        814,
+        1091,
+        937
+      ],
+      "width": 163,
+      "height": 123,
+      "detected_area": 14816,
+      "id": "safe_house_concept_17",
+      "role": "concept_part"
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\safe\\concept_parts\\safe_house_concept_18.png",
+      "source_box_xyxy": [
+        1102,
+        833,
+        1248,
+        924
+      ],
+      "width": 146,
+      "height": 91,
+      "detected_area": 9597,
+      "id": "safe_house_concept_18",
+      "role": "concept_part"
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\safe\\concept_parts\\safe_house_concept_19.png",
+      "source_box_xyxy": [
+        772,
+        835,
+        916,
+        926
+      ],
+      "width": 144,
+      "height": 91,
+      "detected_area": 9202,
+      "id": "safe_house_concept_19",
+      "role": "concept_part"
+    }
+  ]
+}

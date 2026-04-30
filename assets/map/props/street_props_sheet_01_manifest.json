@@ -1,0 +1,286 @@
+{
+  "source_sheet": "K:\\ProjectEscape\\project-escape\\assets\\map\\props\\sheets\\street_props_sheet_01.png",
+  "notes": "Street props split for standalone placement. Props that block movement should receive explicit collision shapes where used; do not rely on alpha.",
+  "metadata": {},
+  "assets": [
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\props\\placement\\streetlamp_warm_01.png",
+      "source_box_xyxy": [
+        261,
+        18,
+        452,
+        386
+      ],
+      "width": 191,
+      "height": 368,
+      "id": "streetlamp_warm_01",
+      "detected_area": 16098
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\props\\placement\\streetlamp_broken_01.png",
+      "source_box_xyxy": [
+        35,
+        21,
+        211,
+        388
+      ],
+      "width": 176,
+      "height": 367,
+      "id": "streetlamp_broken_01",
+      "detected_area": 17011
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\props\\placement\\planter_box_rect_01.png",
+      "source_box_xyxy": [
+        803,
+        95,
+        1070,
+        375
+      ],
+      "width": 267,
+      "height": 280,
+      "id": "planter_box_rect_01",
+      "detected_area": 40651
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\props\\placement\\flower_bed_round_01.png",
+      "source_box_xyxy": [
+        470,
+        131,
+        769,
+        375
+      ],
+      "width": 299,
+      "height": 244,
+      "id": "flower_bed_round_01",
+      "detected_area": 41355
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\props\\placement\\trash_bin_metal_01.png",
+      "source_box_xyxy": [
+        1113,
+        139,
+        1264,
+        369
+      ],
+      "width": 151,
+      "height": 230,
+      "id": "trash_bin_metal_01",
+      "detected_area": 24647
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\props\\placement\\trash_bin_overturned_01.png",
+      "source_box_xyxy": [
+        1287,
+        192,
+        1501,
+        386
+      ],
+      "width": 214,
+      "height": 194,
+      "id": "trash_bin_overturned_01",
+      "detected_area": 25030
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\props\\placement\\fence_segment_black_01.png",
+      "source_box_xyxy": [
+        403,
+        406,
+        673,
+        636
+      ],
+      "width": 270,
+      "height": 230,
+      "id": "fence_segment_black_01",
+      "detected_area": 22433
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\props\\placement\\chain_link_fence_01.png",
+      "source_box_xyxy": [
+        703,
+        406,
+        888,
+        658
+      ],
+      "width": 185,
+      "height": 252,
+      "id": "chain_link_fence_01",
+      "detected_area": 17714
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\props\\placement\\fence_corner_chain_link_01.png",
+      "source_box_xyxy": [
+        1270,
+        412,
+        1486,
+        661
+      ],
+      "width": 216,
+      "height": 249,
+      "id": "fence_corner_chain_link_01",
+      "detected_area": 27479
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\props\\placement\\barricade_wood_metal_01.png",
+      "source_box_xyxy": [
+        20,
+        418,
+        355,
+        634
+      ],
+      "width": 335,
+      "height": 216,
+      "id": "barricade_wood_metal_01",
+      "detected_area": 28224
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\props\\placement\\broken_signboard_blank_01.png",
+      "source_box_xyxy": [
+        912,
+        426,
+        1218,
+        637
+      ],
+      "width": 306,
+      "height": 211,
+      "id": "broken_signboard_blank_01",
+      "detected_area": 44990
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\props\\placement\\utility_pole_01.png",
+      "source_box_xyxy": [
+        296,
+        644,
+        420,
+        1012
+      ],
+      "width": 124,
+      "height": 368,
+      "id": "utility_pole_01",
+      "detected_area": 20830
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\props\\placement\\curb_ramp_01.png",
+      "source_box_xyxy": [
+        957,
+        747,
+        1148,
+        880
+      ],
+      "width": 191,
+      "height": 133,
+      "id": "curb_ramp_01",
+      "detected_area": 4982,
+      "notes": "Manually recut to remove neighboring prop pixels from dense cone/guardrail area."
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\props\\placement\\stairs_wide_01.png",
+      "source_box_xyxy": [
+        640,
+        705,
+        912,
+        962
+      ],
+      "width": 272,
+      "height": 257,
+      "id": "stairs_wide_01",
+      "detected_area": 48832
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\props\\placement\\road_cone_01.png",
+      "source_box_xyxy": [
+        1163,
+        762,
+        1266,
+        895
+      ],
+      "width": 103,
+      "height": 133,
+      "id": "road_cone_01",
+      "detected_area": 5639,
+      "notes": "Manually recut to remove neighboring prop pixels from dense cone/guardrail area."
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\props\\placement\\stairs_short_01.png",
+      "source_box_xyxy": [
+        438,
+        709,
+        617,
+        943
+      ],
+      "width": 179,
+      "height": 234,
+      "id": "stairs_short_01",
+      "detected_area": 27707
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\props\\placement\\bench_wood_01.png",
+      "source_box_xyxy": [
+        15,
+        735,
+        274,
+        915
+      ],
+      "width": 259,
+      "height": 180,
+      "id": "bench_wood_01",
+      "detected_area": 23779
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\props\\placement\\road_cone_cluster_01.png",
+      "source_box_xyxy": [
+        1163,
+        713,
+        1510,
+        896
+      ],
+      "width": 347,
+      "height": 183,
+      "id": "road_cone_cluster_01",
+      "detected_area": 16109,
+      "notes": "Second manual recut to remove neighboring cone/guardrail pixels from dense bottom-right sheet area."
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\props\\placement\\road_cone_fallen_01.png",
+      "source_box_xyxy": [
+        1292,
+        819,
+        1425,
+        904
+      ],
+      "width": 133,
+      "height": 85,
+      "id": "road_cone_fallen_01",
+      "detected_area": 6396,
+      "notes": "Second manual recut to remove neighboring cone/guardrail pixels from dense bottom-right sheet area."
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\props\\placement\\road_cone_02.png",
+      "source_box_xyxy": [
+        1418,
+        713,
+        1510,
+        838
+      ],
+      "width": 92,
+      "height": 125,
+      "id": "road_cone_02",
+      "detected_area": 7527,
+      "notes": "Manually recut to remove neighboring prop pixels from dense cone/guardrail area."
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\props\\placement\\bent_guardrail_segment_01.png",
+      "source_box_xyxy": [
+        976,
+        908,
+        1504,
+        1016
+      ],
+      "width": 528,
+      "height": 108,
+      "id": "bent_guardrail_segment_01",
+      "detected_area": 26630,
+      "notes": "Manually recut to remove neighboring prop pixels from dense cone/guardrail area."
+    }
+  ]
+}

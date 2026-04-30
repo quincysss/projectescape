@@ -1,0 +1,187 @@
+[gd_scene load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://scripts/debug/debug_core_loop.gd" id="1_debug"]
+[ext_resource type="Script" path="res://scripts/run/run_director.gd" id="2_director"]
+[ext_resource type="Script" path="res://scripts/run/run_state_machine.gd" id="3_state_machine"]
+[ext_resource type="Script" path="res://scripts/run/spawn_point.gd" id="4_spawn_point"]
+[ext_resource type="Script" path="res://scripts/outpost/outpost_candidate_point.gd" id="5_outpost_candidate"]
+
+[node name="DebugCoreLoop" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+script = ExtResource("1_debug")
+
+[node name="RunDirector" type="Node" parent="."]
+script = ExtResource("2_director")
+
+[node name="RunStateMachine" type="Node" parent="RunDirector"]
+script = ExtResource("3_state_machine")
+
+[node name="DebugWorld" type="Node2D" parent="."]
+
+[node name="PlayerSpawn" type="Marker2D" parent="DebugWorld"]
+script = ExtResource("4_spawn_point")
+spawn_id = "DebugPlayerSpawn"
+
+[node name="OutpostCandidates" type="Node2D" parent="DebugWorld"]
+
+[node name="First" type="Node2D" parent="DebugWorld/OutpostCandidates"]
+
+[node name="OutpostA_01" type="Marker2D" parent="DebugWorld/OutpostCandidates/First"]
+position = Vector2(160, -80)
+script = ExtResource("5_outpost_candidate")
+outpost_tier = "first"
+candidate_id = "OutpostA_01"
+
+[node name="OutpostA_02" type="Marker2D" parent="DebugWorld/OutpostCandidates/First"]
+position = Vector2(220, 0)
+script = ExtResource("5_outpost_candidate")
+outpost_tier = "first"
+candidate_id = "OutpostA_02"
+
+[node name="OutpostA_03" type="Marker2D" parent="DebugWorld/OutpostCandidates/First"]
+position = Vector2(160, 80)
+script = ExtResource("5_outpost_candidate")
+outpost_tier = "first"
+candidate_id = "OutpostA_03"
+
+[node name="Second" type="Node2D" parent="DebugWorld/OutpostCandidates"]
+
+[node name="OutpostB_01" type="Marker2D" parent="DebugWorld/OutpostCandidates/Second"]
+position = Vector2(440, -140)
+script = ExtResource("5_outpost_candidate")
+outpost_tier = "second"
+candidate_id = "OutpostB_01"
+
+[node name="OutpostB_02" type="Marker2D" parent="DebugWorld/OutpostCandidates/Second"]
+position = Vector2(520, -20)
+script = ExtResource("5_outpost_candidate")
+outpost_tier = "second"
+candidate_id = "OutpostB_02"
+
+[node name="OutpostB_03" type="Marker2D" parent="DebugWorld/OutpostCandidates/Second"]
+position = Vector2(440, 120)
+script = ExtResource("5_outpost_candidate")
+outpost_tier = "second"
+candidate_id = "OutpostB_03"
+
+[node name="OutpostB_04" type="Marker2D" parent="DebugWorld/OutpostCandidates/Second"]
+position = Vector2(600, 140)
+script = ExtResource("5_outpost_candidate")
+outpost_tier = "second"
+candidate_id = "OutpostB_04"
+
+[node name="Margin" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 16.0
+offset_top = 16.0
+offset_right = -16.0
+offset_bottom = -16.0
+
+[node name="RootVBox" type="VBoxContainer" parent="Margin"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="Title" type="Label" parent="Margin/RootVBox"]
+layout_mode = 2
+text = "Project Escape - V0.1 Core Loop Debug"
+
+[node name="PhaseLabel" type="Label" parent="Margin/RootVBox"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Phase: NONE"
+
+[node name="ButtonGrid" type="GridContainer" parent="Margin/RootVBox"]
+layout_mode = 2
+columns = 4
+
+[node name="StartNewRun" type="Button" parent="Margin/RootVBox/ButtonGrid"]
+layout_mode = 2
+text = "Start New Run"
+
+[node name="LeaveHome" type="Button" parent="Margin/RootVBox/ButtonGrid"]
+layout_mode = 2
+text = "Leave Home"
+
+[node name="CameraDone" type="Button" parent="Margin/RootVBox/ButtonGrid"]
+layout_mode = 2
+text = "Camera Done"
+
+[node name="EnterSafeZone" type="Button" parent="Margin/RootVBox/ButtonGrid"]
+layout_mode = 2
+text = "Enter Safe"
+
+[node name="ExitSafeZone" type="Button" parent="Margin/RootVBox/ButtonGrid"]
+layout_mode = 2
+text = "Exit Safe"
+
+[node name="RepairOutpostA" type="Button" parent="Margin/RootVBox/ButtonGrid"]
+layout_mode = 2
+text = "Repair A"
+
+[node name="RepairOutpostB" type="Button" parent="Margin/RootVBox/ButtonGrid"]
+layout_mode = 2
+text = "Repair B"
+
+[node name="StartExtract" type="Button" parent="Margin/RootVBox/ButtonGrid"]
+layout_mode = 2
+text = "Start Extract"
+
+[node name="CompleteExtract" type="Button" parent="Margin/RootVBox/ButtonGrid"]
+layout_mode = 2
+text = "Complete Extract"
+
+[node name="InterruptExtract" type="Button" parent="Margin/RootVBox/ButtonGrid"]
+layout_mode = 2
+text = "Interrupt Extract"
+
+[node name="KillPlayer" type="Button" parent="Margin/RootVBox/ButtonGrid"]
+layout_mode = 2
+text = "Kill Player"
+
+[node name="RunSuccessPath" type="Button" parent="Margin/RootVBox/ButtonGrid"]
+layout_mode = 2
+text = "Auto Success"
+
+[node name="RunDeathPath" type="Button" parent="Margin/RootVBox/ButtonGrid"]
+layout_mode = 2
+text = "Auto Death"
+
+[node name="ContextTitle" type="Label" parent="Margin/RootVBox"]
+layout_mode = 2
+text = "Run Context"
+
+[node name="ContextLabel" type="Label" parent="Margin/RootVBox"]
+unique_name_in_owner = true
+layout_mode = 2
+autowrap_mode = 3
+text = "{}"
+
+[node name="LogTitle" type="Label" parent="Margin/RootVBox"]
+layout_mode = 2
+text = "Log"
+
+[node name="LogLabel" type="RichTextLabel" parent="Margin/RootVBox"]
+unique_name_in_owner = true
+layout_mode = 2
+custom_minimum_size = Vector2(0, 220)
+fit_content = true
+
+[connection signal="pressed" from="Margin/RootVBox/ButtonGrid/StartNewRun" to="." method="_on_start_new_run_pressed"]
+[connection signal="pressed" from="Margin/RootVBox/ButtonGrid/LeaveHome" to="." method="_on_leave_home_pressed"]
+[connection signal="pressed" from="Margin/RootVBox/ButtonGrid/CameraDone" to="." method="_on_camera_done_pressed"]
+[connection signal="pressed" from="Margin/RootVBox/ButtonGrid/EnterSafeZone" to="." method="_on_enter_safe_zone_pressed"]
+[connection signal="pressed" from="Margin/RootVBox/ButtonGrid/ExitSafeZone" to="." method="_on_exit_safe_zone_pressed"]
+[connection signal="pressed" from="Margin/RootVBox/ButtonGrid/RepairOutpostA" to="." method="_on_repair_outpost_a_pressed"]
+[connection signal="pressed" from="Margin/RootVBox/ButtonGrid/RepairOutpostB" to="." method="_on_repair_outpost_b_pressed"]
+[connection signal="pressed" from="Margin/RootVBox/ButtonGrid/StartExtract" to="." method="_on_start_extract_pressed"]
+[connection signal="pressed" from="Margin/RootVBox/ButtonGrid/CompleteExtract" to="." method="_on_complete_extract_pressed"]
+[connection signal="pressed" from="Margin/RootVBox/ButtonGrid/InterruptExtract" to="." method="_on_interrupt_extract_pressed"]
+[connection signal="pressed" from="Margin/RootVBox/ButtonGrid/KillPlayer" to="." method="_on_kill_player_pressed"]
+[connection signal="pressed" from="Margin/RootVBox/ButtonGrid/RunSuccessPath" to="." method="_on_run_success_path_pressed"]
+[connection signal="pressed" from="Margin/RootVBox/ButtonGrid/RunDeathPath" to="." method="_on_run_death_path_pressed"]

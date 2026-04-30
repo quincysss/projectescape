@@ -1,0 +1,166 @@
+{
+  "source_sheet": "K:\\ProjectEscape\\project-escape\\assets\\map\\roads\\sheets\\road_ground_tiles_sheet_01.png",
+  "notes": "Road assets split from sheet. Road widths should be enforced in map layout: main 5-7 units, secondary 3-4, alley 2-3, transition >=3, plaza >=8x8.",
+  "metadata": {
+    "doc": "03_????????/02_?????????.md"
+  },
+  "assets": [
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\roads\\tiles\\road_straight_main_01.png",
+      "source_box_xyxy": [
+        301,
+        42,
+        727,
+        447
+      ],
+      "width": 426,
+      "height": 405,
+      "id": "road_straight_main_01",
+      "detected_area": 131696
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\roads\\tiles\\road_cross_intersection_01.png",
+      "source_box_xyxy": [
+        50,
+        43,
+        268,
+        446
+      ],
+      "width": 218,
+      "height": 403,
+      "id": "road_cross_intersection_01",
+      "detected_area": 77522
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\roads\\tiles\\road_t_junction_01.png",
+      "source_box_xyxy": [
+        750,
+        43,
+        1132,
+        447
+      ],
+      "width": 382,
+      "height": 404,
+      "id": "road_t_junction_01",
+      "detected_area": 110997,
+      "notes": "Recut with tighter right edge to remove stray bottom-right fragment from sheet padding."
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\roads\\tiles\\road_corner_01.png",
+      "source_box_xyxy": [
+        1198,
+        49,
+        1476,
+        376
+      ],
+      "width": 278,
+      "height": 327,
+      "id": "road_corner_01",
+      "detected_area": 78299
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\roads\\tiles\\plaza_concrete_01.png",
+      "source_box_xyxy": [
+        1123,
+        423,
+        1479,
+        768
+      ],
+      "width": 356,
+      "height": 345,
+      "id": "plaza_concrete_01",
+      "detected_area": 111116
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\roads\\tiles\\alley_path_01.png",
+      "source_box_xyxy": [
+        71,
+        475,
+        237,
+        771
+      ],
+      "width": 166,
+      "height": 296,
+      "id": "alley_path_01",
+      "detected_area": 41747
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\roads\\tiles\\sidewalk_tile_01.png",
+      "source_box_xyxy": [
+        315,
+        486,
+        615,
+        768
+      ],
+      "width": 300,
+      "height": 282,
+      "id": "sidewalk_tile_01",
+      "detected_area": 74908
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\roads\\tiles\\crosswalk_tile_01.png",
+      "source_box_xyxy": [
+        685,
+        489,
+        1067,
+        768
+      ],
+      "width": 382,
+      "height": 279,
+      "id": "crosswalk_tile_01",
+      "detected_area": 95284
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\roads\\tiles\\manhole_tile_01.png",
+      "source_box_xyxy": [
+        918,
+        811,
+        1075,
+        968
+      ],
+      "width": 157,
+      "height": 157,
+      "id": "manhole_tile_01",
+      "detected_area": 19680
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\roads\\details\\puddle_asphalt_01.png",
+      "source_box_xyxy": [
+        1113,
+        816,
+        1482,
+        963
+      ],
+      "width": 369,
+      "height": 147,
+      "id": "puddle_asphalt_01",
+      "detected_area": 34465
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\roads\\details\\broken_curb_segment_01.png",
+      "source_box_xyxy": [
+        62,
+        846,
+        449,
+        941
+      ],
+      "width": 387,
+      "height": 95,
+      "id": "broken_curb_segment_01",
+      "detected_area": 26373
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\roads\\details\\drainage_gutter_strip_01.png",
+      "source_box_xyxy": [
+        495,
+        849,
+        881,
+        933
+      ],
+      "width": 386,
+      "height": 84,
+      "id": "drainage_gutter_strip_01",
+      "detected_area": 24772
+    }
+  ]
+}

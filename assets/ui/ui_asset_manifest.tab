@@ -20,4 +20,6 @@ ui_expedition_prep_sheet_01	UI-17	prep	sheet	res://assets/ui/prep/sheets/ui_expe
 ui_system_icons_sheet_01	UI-18	icons	sheet	res://assets/ui/icons/sheets/ui_system_icons_sheet_01.png	true	Transparent general system icon sheet
 ui_system_icons_sheet_01_slices	UI-18	icons	slice_manifest	res://assets/ui/icons/ui_system_icons_sheet_01_slices.tab	false	72 Godot-ready individual icon slices under res://assets/ui/icons/sliced/
 ui_system_icons_sheet_01_slices_preview	UI-18	icons	preview	res://assets/ui/icons/ui_system_icons_sheet_01_slices_preview.png	false	Contact sheet for reviewing the sliced icon batch
+ui_slice_manifest	QA	ui_slice_manifest	slice_manifest	res://assets/ui/ui_slice_manifest.tab	false	Aggregate manifest for all Godot-ready UI sheet slices
+ui_slice_batch_preview_01	QA	ui_preview	preview	res://assets/ui/ui_slice_batch_preview_01.png	false	Contact sheet covering all sliced UI production batches
 ui_asset_batch_preview_01	QA	ui_preview	preview	res://assets/ui/_mockups/ui_asset_batch_preview_01.png	false	Generated contact sheet for quick review only

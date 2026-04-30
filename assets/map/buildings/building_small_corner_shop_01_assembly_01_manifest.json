@@ -1,0 +1,486 @@
+{
+  "source_sheet": "K:\\ProjectEscape\\project-escape\\assets\\map\\buildings\\sheets\\building_small_corner_shop_assembly_01.png",
+  "notes": "Building assembly sheet split. Ordinary buildings are non-enterable obstacles and must use explicit CollisionShape2D; do not depend on alpha pixels.",
+  "metadata": {
+    "doc": "03_????????/03_?????????.md",
+    "building_id": "building_small_corner_shop_01",
+    "building_type": "small_shop",
+    "size_units": "8x6"
+  },
+  "assets": [
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\buildings\\assembled\\building_small_corner_shop_01.png",
+      "source_box_xyxy": [
+        160,
+        25,
+        599,
+        451
+      ],
+      "width": 439,
+      "height": 426,
+      "id": "building_small_corner_shop_01",
+      "role": "assembled",
+      "building_type": "small_shop",
+      "size_units": "8x6"
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\buildings\\parts\\building_small_corner_shop_01_part_01.png",
+      "source_box_xyxy": [
+        707,
+        481,
+        1113,
+        569
+      ],
+      "width": 406,
+      "height": 88,
+      "id": "building_small_corner_shop_01_part_01",
+      "role": "assembly_part",
+      "building_id": "building_small_corner_shop_01",
+      "building_type": "small_shop",
+      "size_units": "8x6",
+      "detected_area": 23662
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\buildings\\parts\\building_small_corner_shop_01_part_02.png",
+      "source_box_xyxy": [
+        31,
+        482,
+        368,
+        818
+      ],
+      "width": 337,
+      "height": 336,
+      "id": "building_small_corner_shop_01_part_02",
+      "role": "assembly_part",
+      "building_id": "building_small_corner_shop_01",
+      "building_type": "small_shop",
+      "size_units": "8x6",
+      "detected_area": 101307
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\buildings\\parts\\building_small_corner_shop_01_part_03.png",
+      "source_box_xyxy": [
+        378,
+        482,
+        706,
+        759
+      ],
+      "width": 328,
+      "height": 277,
+      "id": "building_small_corner_shop_01_part_03",
+      "role": "assembly_part",
+      "building_id": "building_small_corner_shop_01",
+      "building_type": "small_shop",
+      "size_units": "8x6",
+      "detected_area": 79959
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\buildings\\parts\\building_small_corner_shop_01_part_04.png",
+      "source_box_xyxy": [
+        1130,
+        483,
+        1242,
+        567
+      ],
+      "width": 112,
+      "height": 84,
+      "id": "building_small_corner_shop_01_part_04",
+      "role": "assembly_part",
+      "building_id": "building_small_corner_shop_01",
+      "building_type": "small_shop",
+      "size_units": "8x6",
+      "detected_area": 6362
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\buildings\\parts\\building_small_corner_shop_01_part_05.png",
+      "source_box_xyxy": [
+        1266,
+        483,
+        1343,
+        572
+      ],
+      "width": 77,
+      "height": 89,
+      "id": "building_small_corner_shop_01_part_05",
+      "role": "assembly_part",
+      "building_id": "building_small_corner_shop_01",
+      "building_type": "small_shop",
+      "size_units": "8x6",
+      "detected_area": 4311
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\buildings\\parts\\building_small_corner_shop_01_part_06.png",
+      "source_box_xyxy": [
+        1374,
+        483,
+        1456,
+        573
+      ],
+      "width": 82,
+      "height": 90,
+      "id": "building_small_corner_shop_01_part_06",
+      "role": "assembly_part",
+      "building_id": "building_small_corner_shop_01",
+      "building_type": "small_shop",
+      "size_units": "8x6",
+      "detected_area": 4019
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\buildings\\parts\\building_small_corner_shop_01_part_07.png",
+      "source_box_xyxy": [
+        706,
+        566,
+        755,
+        656
+      ],
+      "width": 49,
+      "height": 90,
+      "id": "building_small_corner_shop_01_part_07",
+      "role": "assembly_part",
+      "building_id": "building_small_corner_shop_01",
+      "building_type": "small_shop",
+      "size_units": "8x6",
+      "detected_area": 2355
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\buildings\\parts\\building_small_corner_shop_01_part_08.png",
+      "source_box_xyxy": [
+        1064,
+        566,
+        1114,
+        656
+      ],
+      "width": 50,
+      "height": 90,
+      "id": "building_small_corner_shop_01_part_08",
+      "role": "assembly_part",
+      "building_id": "building_small_corner_shop_01",
+      "building_type": "small_shop",
+      "size_units": "8x6",
+      "detected_area": 2441
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\buildings\\parts\\building_small_corner_shop_01_part_09.png",
+      "source_box_xyxy": [
+        753,
+        569,
+        1065,
+        651
+      ],
+      "width": 312,
+      "height": 82,
+      "id": "building_small_corner_shop_01_part_09",
+      "role": "assembly_part",
+      "building_id": "building_small_corner_shop_01",
+      "building_type": "small_shop",
+      "size_units": "8x6",
+      "detected_area": 19050
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\buildings\\parts\\building_small_corner_shop_01_part_10.png",
+      "source_box_xyxy": [
+        1130,
+        570,
+        1242,
+        656
+      ],
+      "width": 112,
+      "height": 86,
+      "id": "building_small_corner_shop_01_part_10",
+      "role": "assembly_part",
+      "building_id": "building_small_corner_shop_01",
+      "building_type": "small_shop",
+      "size_units": "8x6",
+      "detected_area": 6443
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\buildings\\parts\\building_small_corner_shop_01_part_11.png",
+      "source_box_xyxy": [
+        1264,
+        571,
+        1343,
+        655
+      ],
+      "width": 79,
+      "height": 84,
+      "id": "building_small_corner_shop_01_part_11",
+      "role": "assembly_part",
+      "building_id": "building_small_corner_shop_01",
+      "building_type": "small_shop",
+      "size_units": "8x6",
+      "detected_area": 3666
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\buildings\\parts\\building_small_corner_shop_01_part_12.png",
+      "source_box_xyxy": [
+        1373,
+        571,
+        1455,
+        655
+      ],
+      "width": 82,
+      "height": 84,
+      "id": "building_small_corner_shop_01_part_12",
+      "role": "assembly_part",
+      "building_id": "building_small_corner_shop_01",
+      "building_type": "small_shop",
+      "size_units": "8x6",
+      "detected_area": 3919
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\buildings\\parts\\building_small_corner_shop_01_part_13.png",
+      "source_box_xyxy": [
+        708,
+        652,
+        1114,
+        829
+      ],
+      "width": 406,
+      "height": 177,
+      "id": "building_small_corner_shop_01_part_13",
+      "role": "assembly_part",
+      "building_id": "building_small_corner_shop_01",
+      "building_type": "small_shop",
+      "size_units": "8x6",
+      "detected_area": 59468
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\buildings\\parts\\building_small_corner_shop_01_part_14.png",
+      "source_box_xyxy": [
+        1119,
+        655,
+        1311,
+        829
+      ],
+      "width": 192,
+      "height": 174,
+      "id": "building_small_corner_shop_01_part_14",
+      "role": "assembly_part",
+      "building_id": "building_small_corner_shop_01",
+      "building_type": "small_shop",
+      "size_units": "8x6",
+      "detected_area": 26787
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\buildings\\parts\\building_small_corner_shop_01_part_15.png",
+      "source_box_xyxy": [
+        1312,
+        657,
+        1459,
+        834
+      ],
+      "width": 147,
+      "height": 177,
+      "id": "building_small_corner_shop_01_part_15",
+      "role": "assembly_part",
+      "building_id": "building_small_corner_shop_01",
+      "building_type": "small_shop",
+      "size_units": "8x6",
+      "detected_area": 19342
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\buildings\\parts\\building_small_corner_shop_01_part_16.png",
+      "source_box_xyxy": [
+        381,
+        748,
+        694,
+        848
+      ],
+      "width": 313,
+      "height": 100,
+      "id": "building_small_corner_shop_01_part_16",
+      "role": "assembly_part",
+      "building_id": "building_small_corner_shop_01",
+      "building_type": "small_shop",
+      "size_units": "8x6",
+      "detected_area": 21727
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\buildings\\parts\\building_small_corner_shop_01_part_17.png",
+      "source_box_xyxy": [
+        760,
+        836,
+        815,
+        972
+      ],
+      "width": 55,
+      "height": 136,
+      "id": "building_small_corner_shop_01_part_17",
+      "role": "assembly_part",
+      "building_id": "building_small_corner_shop_01",
+      "building_type": "small_shop",
+      "size_units": "8x6",
+      "detected_area": 3033
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\buildings\\parts\\building_small_corner_shop_01_part_18.png",
+      "source_box_xyxy": [
+        953,
+        854,
+        1093,
+        967
+      ],
+      "width": 140,
+      "height": 113,
+      "id": "building_small_corner_shop_01_part_18",
+      "role": "assembly_part",
+      "building_id": "building_small_corner_shop_01",
+      "building_type": "small_shop",
+      "size_units": "8x6",
+      "detected_area": 8138
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\buildings\\parts\\building_small_corner_shop_01_part_19.png",
+      "source_box_xyxy": [
+        1108,
+        854,
+        1193,
+        967
+      ],
+      "width": 85,
+      "height": 113,
+      "id": "building_small_corner_shop_01_part_19",
+      "role": "assembly_part",
+      "building_id": "building_small_corner_shop_01",
+      "building_type": "small_shop",
+      "size_units": "8x6",
+      "detected_area": 5957
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\buildings\\parts\\building_small_corner_shop_01_part_20.png",
+      "source_box_xyxy": [
+        356,
+        856,
+        471,
+        974
+      ],
+      "width": 115,
+      "height": 118,
+      "id": "building_small_corner_shop_01_part_20",
+      "role": "assembly_part",
+      "building_id": "building_small_corner_shop_01",
+      "building_type": "small_shop",
+      "size_units": "8x6",
+      "detected_area": 9439
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\buildings\\parts\\building_small_corner_shop_01_part_21.png",
+      "source_box_xyxy": [
+        492,
+        861,
+        601,
+        972
+      ],
+      "width": 109,
+      "height": 111,
+      "id": "building_small_corner_shop_01_part_21",
+      "role": "assembly_part",
+      "building_id": "building_small_corner_shop_01",
+      "building_type": "small_shop",
+      "size_units": "8x6",
+      "detected_area": 8443
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\buildings\\parts\\building_small_corner_shop_01_part_22.png",
+      "source_box_xyxy": [
+        225,
+        862,
+        325,
+        974
+      ],
+      "width": 100,
+      "height": 112,
+      "id": "building_small_corner_shop_01_part_22",
+      "role": "assembly_part",
+      "building_id": "building_small_corner_shop_01",
+      "building_type": "small_shop",
+      "size_units": "8x6",
+      "detected_area": 7657
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\buildings\\parts\\building_small_corner_shop_01_part_23.png",
+      "source_box_xyxy": [
+        621,
+        876,
+        739,
+        973
+      ],
+      "width": 118,
+      "height": 97,
+      "id": "building_small_corner_shop_01_part_23",
+      "role": "assembly_part",
+      "building_id": "building_small_corner_shop_01",
+      "building_type": "small_shop",
+      "size_units": "8x6",
+      "detected_area": 6318
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\buildings\\parts\\building_small_corner_shop_01_part_24.png",
+      "source_box_xyxy": [
+        837,
+        878,
+        926,
+        961
+      ],
+      "width": 89,
+      "height": 83,
+      "id": "building_small_corner_shop_01_part_24",
+      "role": "assembly_part",
+      "building_id": "building_small_corner_shop_01",
+      "building_type": "small_shop",
+      "size_units": "8x6",
+      "detected_area": 4653
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\buildings\\parts\\building_small_corner_shop_01_part_25.png",
+      "source_box_xyxy": [
+        1385,
+        880,
+        1456,
+        953
+      ],
+      "width": 71,
+      "height": 73,
+      "id": "building_small_corner_shop_01_part_25",
+      "role": "assembly_part",
+      "building_id": "building_small_corner_shop_01",
+      "building_type": "small_shop",
+      "size_units": "8x6",
+      "detected_area": 1821
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\buildings\\parts\\building_small_corner_shop_01_part_26.png",
+      "source_box_xyxy": [
+        44,
+        889,
+        203,
+        943
+      ],
+      "width": 159,
+      "height": 54,
+      "id": "building_small_corner_shop_01_part_26",
+      "role": "assembly_part",
+      "building_id": "building_small_corner_shop_01",
+      "building_type": "small_shop",
+      "size_units": "8x6",
+      "detected_area": 5372
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\buildings\\parts\\building_small_corner_shop_01_part_27.png",
+      "source_box_xyxy": [
+        1198,
+        900,
+        1365,
+        972
+      ],
+      "width": 167,
+      "height": 72,
+      "id": "building_small_corner_shop_01_part_27",
+      "role": "assembly_part",
+      "building_id": "building_small_corner_shop_01",
+      "building_type": "small_shop",
+      "size_units": "8x6",
+      "detected_area": 5883
+    }
+  ]
+}

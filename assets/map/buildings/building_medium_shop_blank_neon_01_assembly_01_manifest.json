@@ -1,0 +1,435 @@
+{
+  "source_sheet": "K:\\ProjectEscape\\project-escape\\assets\\map\\buildings\\sheets\\building_medium_shop_blank_neon_assembly_01.png",
+  "notes": "Building assembly sheet split. Ordinary buildings are non-enterable obstacles and must use explicit CollisionShape2D; do not depend on alpha pixels.",
+  "metadata": {
+    "doc": "03_????????/03_?????????.md",
+    "building_id": "building_medium_shop_blank_neon_01",
+    "building_type": "shop",
+    "size_units": "12x8_or_16x6"
+  },
+  "assets": [
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\buildings\\assembled\\building_medium_shop_blank_neon_01.png",
+      "source_box_xyxy": [
+        79,
+        13,
+        710,
+        402
+      ],
+      "width": 631,
+      "height": 389,
+      "id": "building_medium_shop_blank_neon_01",
+      "role": "assembled",
+      "building_type": "shop",
+      "size_units": "12x8_or_16x6"
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\buildings\\parts\\building_medium_shop_blank_neon_01_part_01.png",
+      "source_box_xyxy": [
+        28,
+        399,
+        112,
+        525
+      ],
+      "width": 84,
+      "height": 126,
+      "id": "building_medium_shop_blank_neon_01_part_01",
+      "role": "assembly_part",
+      "building_id": "building_medium_shop_blank_neon_01",
+      "building_type": "shop",
+      "size_units": "12x8_or_16x6",
+      "detected_area": 6768
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\buildings\\parts\\building_medium_shop_blank_neon_01_part_02.png",
+      "source_box_xyxy": [
+        123,
+        399,
+        594,
+        599
+      ],
+      "width": 471,
+      "height": 200,
+      "id": "building_medium_shop_blank_neon_01_part_02",
+      "role": "assembly_part",
+      "building_id": "building_medium_shop_blank_neon_01",
+      "building_type": "shop",
+      "size_units": "12x8_or_16x6",
+      "detected_area": 82144
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\buildings\\parts\\building_medium_shop_blank_neon_01_part_03.png",
+      "source_box_xyxy": [
+        1213,
+        402,
+        1291,
+        571
+      ],
+      "width": 78,
+      "height": 169,
+      "id": "building_medium_shop_blank_neon_01_part_03",
+      "role": "assembly_part",
+      "building_id": "building_medium_shop_blank_neon_01",
+      "building_type": "shop",
+      "size_units": "12x8_or_16x6",
+      "detected_area": 9070
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\buildings\\parts\\building_medium_shop_blank_neon_01_part_04.png",
+      "source_box_xyxy": [
+        1388,
+        402,
+        1470,
+        572
+      ],
+      "width": 82,
+      "height": 170,
+      "id": "building_medium_shop_blank_neon_01_part_04",
+      "role": "assembly_part",
+      "building_id": "building_medium_shop_blank_neon_01",
+      "building_type": "shop",
+      "size_units": "12x8_or_16x6",
+      "detected_area": 9277
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\buildings\\parts\\building_medium_shop_blank_neon_01_part_05.png",
+      "source_box_xyxy": [
+        600,
+        408,
+        1173,
+        559
+      ],
+      "width": 573,
+      "height": 151,
+      "id": "building_medium_shop_blank_neon_01_part_05",
+      "role": "assembly_part",
+      "building_id": "building_medium_shop_blank_neon_01",
+      "building_type": "shop",
+      "size_units": "12x8_or_16x6",
+      "detected_area": 72349
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\buildings\\parts\\building_medium_shop_blank_neon_01_part_06.png",
+      "source_box_xyxy": [
+        28,
+        576,
+        109,
+        729
+      ],
+      "width": 81,
+      "height": 153,
+      "id": "building_medium_shop_blank_neon_01_part_06",
+      "role": "assembly_part",
+      "building_id": "building_medium_shop_blank_neon_01",
+      "building_type": "shop",
+      "size_units": "12x8_or_16x6",
+      "detected_area": 8074
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\buildings\\parts\\building_medium_shop_blank_neon_01_part_07.png",
+      "source_box_xyxy": [
+        112,
+        576,
+        694,
+        733
+      ],
+      "width": 582,
+      "height": 157,
+      "id": "building_medium_shop_blank_neon_01_part_07",
+      "role": "assembly_part",
+      "building_id": "building_medium_shop_blank_neon_01",
+      "building_type": "shop",
+      "size_units": "12x8_or_16x6",
+      "detected_area": 60097
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\buildings\\parts\\building_medium_shop_blank_neon_01_part_08.png",
+      "source_box_xyxy": [
+        735,
+        576,
+        797,
+        663
+      ],
+      "width": 62,
+      "height": 87,
+      "id": "building_medium_shop_blank_neon_01_part_08",
+      "role": "assembly_part",
+      "building_id": "building_medium_shop_blank_neon_01",
+      "building_type": "shop",
+      "size_units": "12x8_or_16x6",
+      "detected_area": 3101
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\buildings\\parts\\building_medium_shop_blank_neon_01_part_09.png",
+      "source_box_xyxy": [
+        1398,
+        576,
+        1475,
+        729
+      ],
+      "width": 77,
+      "height": 153,
+      "id": "building_medium_shop_blank_neon_01_part_09",
+      "role": "assembly_part",
+      "building_id": "building_medium_shop_blank_neon_01",
+      "building_type": "shop",
+      "size_units": "12x8_or_16x6",
+      "detected_area": 7975
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\buildings\\parts\\building_medium_shop_blank_neon_01_part_10.png",
+      "source_box_xyxy": [
+        796,
+        580,
+        1340,
+        663
+      ],
+      "width": 544,
+      "height": 83,
+      "id": "building_medium_shop_blank_neon_01_part_10",
+      "role": "assembly_part",
+      "building_id": "building_medium_shop_blank_neon_01",
+      "building_type": "shop",
+      "size_units": "12x8_or_16x6",
+      "detected_area": 33839
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\buildings\\parts\\building_medium_shop_blank_neon_01_part_11.png",
+      "source_box_xyxy": [
+        735,
+        654,
+        1353,
+        736
+      ],
+      "width": 618,
+      "height": 82,
+      "id": "building_medium_shop_blank_neon_01_part_11",
+      "role": "assembly_part",
+      "building_id": "building_medium_shop_blank_neon_01",
+      "building_type": "shop",
+      "size_units": "12x8_or_16x6",
+      "detected_area": 32114
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\buildings\\parts\\building_medium_shop_blank_neon_01_part_12.png",
+      "source_box_xyxy": [
+        446,
+        727,
+        599,
+        915
+      ],
+      "width": 153,
+      "height": 188,
+      "id": "building_medium_shop_blank_neon_01_part_12",
+      "role": "assembly_part",
+      "building_id": "building_medium_shop_blank_neon_01",
+      "building_type": "shop",
+      "size_units": "12x8_or_16x6",
+      "detected_area": 17096
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\buildings\\parts\\building_medium_shop_blank_neon_01_part_13.png",
+      "source_box_xyxy": [
+        68,
+        731,
+        205,
+        879
+      ],
+      "width": 137,
+      "height": 148,
+      "id": "building_medium_shop_blank_neon_01_part_13",
+      "role": "assembly_part",
+      "building_id": "building_medium_shop_blank_neon_01",
+      "building_type": "shop",
+      "size_units": "12x8_or_16x6",
+      "detected_area": 15237
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\buildings\\parts\\building_medium_shop_blank_neon_01_part_14.png",
+      "source_box_xyxy": [
+        221,
+        731,
+        422,
+        879
+      ],
+      "width": 201,
+      "height": 148,
+      "id": "building_medium_shop_blank_neon_01_part_14",
+      "role": "assembly_part",
+      "building_id": "building_medium_shop_blank_neon_01",
+      "building_type": "shop",
+      "size_units": "12x8_or_16x6",
+      "detected_area": 23591
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\buildings\\parts\\building_medium_shop_blank_neon_01_part_15.png",
+      "source_box_xyxy": [
+        621,
+        737,
+        892,
+        855
+      ],
+      "width": 271,
+      "height": 118,
+      "id": "building_medium_shop_blank_neon_01_part_15",
+      "role": "assembly_part",
+      "building_id": "building_medium_shop_blank_neon_01",
+      "building_type": "shop",
+      "size_units": "12x8_or_16x6",
+      "detected_area": 16484
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\buildings\\parts\\building_medium_shop_blank_neon_01_part_16.png",
+      "source_box_xyxy": [
+        1153,
+        743,
+        1439,
+        862
+      ],
+      "width": 286,
+      "height": 119,
+      "id": "building_medium_shop_blank_neon_01_part_16",
+      "role": "assembly_part",
+      "building_id": "building_medium_shop_blank_neon_01",
+      "building_type": "shop",
+      "size_units": "12x8_or_16x6",
+      "detected_area": 23462
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\buildings\\parts\\building_medium_shop_blank_neon_01_part_17.png",
+      "source_box_xyxy": [
+        896,
+        754,
+        1142,
+        857
+      ],
+      "width": 246,
+      "height": 103,
+      "id": "building_medium_shop_blank_neon_01_part_17",
+      "role": "assembly_part",
+      "building_id": "building_medium_shop_blank_neon_01",
+      "building_type": "shop",
+      "size_units": "12x8_or_16x6",
+      "detected_area": 18977
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\buildings\\parts\\building_medium_shop_blank_neon_01_part_18.png",
+      "source_box_xyxy": [
+        740,
+        871,
+        855,
+        996
+      ],
+      "width": 115,
+      "height": 125,
+      "id": "building_medium_shop_blank_neon_01_part_18",
+      "role": "assembly_part",
+      "building_id": "building_medium_shop_blank_neon_01",
+      "building_type": "shop",
+      "size_units": "12x8_or_16x6",
+      "detected_area": 3901
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\buildings\\parts\\building_medium_shop_blank_neon_01_part_19.png",
+      "source_box_xyxy": [
+        873,
+        877,
+        1086,
+        995
+      ],
+      "width": 213,
+      "height": 118,
+      "id": "building_medium_shop_blank_neon_01_part_19",
+      "role": "assembly_part",
+      "building_id": "building_medium_shop_blank_neon_01",
+      "building_type": "shop",
+      "size_units": "12x8_or_16x6",
+      "detected_area": 14834
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\buildings\\parts\\building_medium_shop_blank_neon_01_part_20.png",
+      "source_box_xyxy": [
+        1112,
+        880,
+        1178,
+        989
+      ],
+      "width": 66,
+      "height": 109,
+      "id": "building_medium_shop_blank_neon_01_part_20",
+      "role": "assembly_part",
+      "building_id": "building_medium_shop_blank_neon_01",
+      "building_type": "shop",
+      "size_units": "12x8_or_16x6",
+      "detected_area": 3387
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\buildings\\parts\\building_medium_shop_blank_neon_01_part_21.png",
+      "source_box_xyxy": [
+        281,
+        881,
+        428,
+        999
+      ],
+      "width": 147,
+      "height": 118,
+      "id": "building_medium_shop_blank_neon_01_part_21",
+      "role": "assembly_part",
+      "building_id": "building_medium_shop_blank_neon_01",
+      "building_type": "shop",
+      "size_units": "12x8_or_16x6",
+      "detected_area": 10601
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\buildings\\parts\\building_medium_shop_blank_neon_01_part_22.png",
+      "source_box_xyxy": [
+        1247,
+        882,
+        1317,
+        993
+      ],
+      "width": 70,
+      "height": 111,
+      "id": "building_medium_shop_blank_neon_01_part_22",
+      "role": "assembly_part",
+      "building_id": "building_medium_shop_blank_neon_01",
+      "building_type": "shop",
+      "size_units": "12x8_or_16x6",
+      "detected_area": 3718
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\buildings\\parts\\building_medium_shop_blank_neon_01_part_23.png",
+      "source_box_xyxy": [
+        126,
+        883,
+        226,
+        989
+      ],
+      "width": 100,
+      "height": 106,
+      "id": "building_medium_shop_blank_neon_01_part_23",
+      "role": "assembly_part",
+      "building_id": "building_medium_shop_blank_neon_01",
+      "building_type": "shop",
+      "size_units": "12x8_or_16x6",
+      "detected_area": 6584
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\buildings\\parts\\building_medium_shop_blank_neon_01_part_24.png",
+      "source_box_xyxy": [
+        493,
+        922,
+        690,
+        985
+      ],
+      "width": 197,
+      "height": 63,
+      "id": "building_medium_shop_blank_neon_01_part_24",
+      "role": "assembly_part",
+      "building_id": "building_medium_shop_blank_neon_01",
+      "building_type": "shop",
+      "size_units": "12x8_or_16x6",
+      "detected_area": 4499
+    }
+  ]
+}

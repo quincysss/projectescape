@@ -1,0 +1,84 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://scripts/run/run_director.gd" id="1_run_director"]
+[ext_resource type="Script" path="res://scripts/run/run_state_machine.gd" id="2_state_machine"]
+[ext_resource type="Script" path="res://scripts/run/spawn_point.gd" id="3_spawn_point"]
+[ext_resource type="Script" path="res://scripts/outpost/outpost_candidate_point.gd" id="4_outpost_candidate"]
+
+[node name="RunScene" type="Node2D"]
+
+[node name="WorldRoot" type="Node2D" parent="."]
+
+[node name="TileMapRoot" type="Node2D" parent="WorldRoot"]
+
+[node name="PlayerRoot" type="Node2D" parent="WorldRoot"]
+
+[node name="PlayerSpawn" type="Marker2D" parent="WorldRoot/PlayerRoot"]
+script = ExtResource("3_spawn_point")
+spawn_id = "PlayerSpawn"
+
+[node name="ContainerRoot" type="Node2D" parent="WorldRoot"]
+
+[node name="OutpostRoot" type="Node2D" parent="WorldRoot"]
+
+[node name="OutpostCandidates" type="Node2D" parent="WorldRoot/OutpostRoot"]
+
+[node name="First" type="Node2D" parent="WorldRoot/OutpostRoot/OutpostCandidates"]
+
+[node name="OutpostA_01" type="Marker2D" parent="WorldRoot/OutpostRoot/OutpostCandidates/First"]
+position = Vector2(240, -80)
+script = ExtResource("4_outpost_candidate")
+outpost_tier = "first"
+candidate_id = "OutpostA_01"
+
+[node name="OutpostA_02" type="Marker2D" parent="WorldRoot/OutpostRoot/OutpostCandidates/First"]
+position = Vector2(320, 120)
+script = ExtResource("4_outpost_candidate")
+outpost_tier = "first"
+candidate_id = "OutpostA_02"
+
+[node name="OutpostA_03" type="Marker2D" parent="WorldRoot/OutpostRoot/OutpostCandidates/First"]
+position = Vector2(180, 220)
+script = ExtResource("4_outpost_candidate")
+outpost_tier = "first"
+candidate_id = "OutpostA_03"
+
+[node name="Second" type="Node2D" parent="WorldRoot/OutpostRoot/OutpostCandidates"]
+
+[node name="OutpostB_01" type="Marker2D" parent="WorldRoot/OutpostRoot/OutpostCandidates/Second"]
+position = Vector2(620, -260)
+script = ExtResource("4_outpost_candidate")
+outpost_tier = "second"
+candidate_id = "OutpostB_01"
+
+[node name="OutpostB_02" type="Marker2D" parent="WorldRoot/OutpostRoot/OutpostCandidates/Second"]
+position = Vector2(760, 40)
+script = ExtResource("4_outpost_candidate")
+outpost_tier = "second"
+candidate_id = "OutpostB_02"
+
+[node name="OutpostB_03" type="Marker2D" parent="WorldRoot/OutpostRoot/OutpostCandidates/Second"]
+position = Vector2(560, 300)
+script = ExtResource("4_outpost_candidate")
+outpost_tier = "second"
+candidate_id = "OutpostB_03"
+
+[node name="OutpostB_04" type="Marker2D" parent="WorldRoot/OutpostRoot/OutpostCandidates/Second"]
+position = Vector2(880, 260)
+script = ExtResource("4_outpost_candidate")
+outpost_tier = "second"
+candidate_id = "OutpostB_04"
+
+[node name="ExtractionRoot" type="Node2D" parent="WorldRoot"]
+
+[node name="EffectRoot" type="Node2D" parent="WorldRoot"]
+
+[node name="CameraRoot" type="Node2D" parent="."]
+
+[node name="RunUIRoot" type="CanvasLayer" parent="."]
+
+[node name="RunDirector" type="Node" parent="."]
+script = ExtResource("1_run_director")
+
+[node name="RunStateMachine" type="Node" parent="RunDirector"]
+script = ExtResource("2_state_machine")

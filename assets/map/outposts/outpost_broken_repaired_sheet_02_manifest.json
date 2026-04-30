@@ -1,0 +1,759 @@
+{
+  "source_sheet": "K:\\ProjectEscape\\project-escape\\assets\\map\\outposts\\sheets\\outpost_broken_repaired_sheet_02.png",
+  "notes": "Recommended outpost production sheet split. Broken/repaired assembled sprites preserve replacement paths; parts are for reconstruction or variant work.",
+  "metadata": {
+    "doc": "03_????????/03_?????????.md; 05_??????????.md"
+  },
+  "assets": [
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\outposts\\assembled\\outpost_broken_01.png",
+      "source_box_xyxy": [
+        34,
+        11,
+        538,
+        404
+      ],
+      "width": 504,
+      "height": 393,
+      "id": "outpost_broken_01",
+      "state": "broken",
+      "role": "assembled",
+      "size_units": "10x8_or_12x8"
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\outposts\\assembled\\outpost_repaired_01.png",
+      "source_box_xyxy": [
+        970,
+        13,
+        1456,
+        404
+      ],
+      "width": 486,
+      "height": 391,
+      "id": "outpost_repaired_01",
+      "state": "repaired",
+      "role": "assembled",
+      "size_units": "10x8_or_12x8"
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\outposts\\parts\\outpost_shared_part_01.png",
+      "source_box_xyxy": [
+        1400,
+        397,
+        1466,
+        492
+      ],
+      "width": 66,
+      "height": 95,
+      "id": "outpost_shared_part_01",
+      "role": "repair_state_part",
+      "size_units": "10x8_or_12x8",
+      "detected_area": 3626
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\outposts\\parts\\outpost_shared_part_02.png",
+      "source_box_xyxy": [
+        17,
+        399,
+        83,
+        491
+      ],
+      "width": 66,
+      "height": 92,
+      "id": "outpost_shared_part_02",
+      "role": "repair_state_part",
+      "size_units": "10x8_or_12x8",
+      "detected_area": 3498
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\outposts\\parts\\outpost_shared_part_03.png",
+      "source_box_xyxy": [
+        513,
+        399,
+        577,
+        492
+      ],
+      "width": 64,
+      "height": 93,
+      "id": "outpost_shared_part_03",
+      "role": "repair_state_part",
+      "size_units": "10x8_or_12x8",
+      "detected_area": 3362
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\outposts\\parts\\outpost_shared_part_04.png",
+      "source_box_xyxy": [
+        942,
+        399,
+        1010,
+        492
+      ],
+      "width": 68,
+      "height": 93,
+      "id": "outpost_shared_part_04",
+      "role": "repair_state_part",
+      "size_units": "10x8_or_12x8",
+      "detected_area": 3666
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\outposts\\parts\\outpost_shared_part_05.png",
+      "source_box_xyxy": [
+        1028,
+        412,
+        1191,
+        495
+      ],
+      "width": 163,
+      "height": 83,
+      "id": "outpost_shared_part_05",
+      "role": "repair_state_part",
+      "size_units": "10x8_or_12x8",
+      "detected_area": 9127
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\outposts\\parts\\outpost_shared_part_06.png",
+      "source_box_xyxy": [
+        1200,
+        412,
+        1383,
+        493
+      ],
+      "width": 183,
+      "height": 81,
+      "id": "outpost_shared_part_06",
+      "role": "repair_state_part",
+      "size_units": "10x8_or_12x8",
+      "detected_area": 10349
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\outposts\\parts\\outpost_shared_part_07.png",
+      "source_box_xyxy": [
+        305,
+        413,
+        487,
+        494
+      ],
+      "width": 182,
+      "height": 81,
+      "id": "outpost_shared_part_07",
+      "role": "repair_state_part",
+      "size_units": "10x8_or_12x8",
+      "detected_area": 8445
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\outposts\\parts\\outpost_shared_part_08.png",
+      "source_box_xyxy": [
+        99,
+        414,
+        297,
+        494
+      ],
+      "width": 198,
+      "height": 80,
+      "id": "outpost_shared_part_08",
+      "role": "repair_state_part",
+      "size_units": "10x8_or_12x8",
+      "detected_area": 9567
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\outposts\\parts\\outpost_shared_part_09.png",
+      "source_box_xyxy": [
+        586,
+        427,
+        937,
+        690
+      ],
+      "width": 351,
+      "height": 263,
+      "id": "outpost_shared_part_09",
+      "role": "repair_state_part",
+      "size_units": "10x8_or_12x8",
+      "detected_area": 76386
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\outposts\\parts\\outpost_shared_part_10.png",
+      "source_box_xyxy": [
+        15,
+        490,
+        63,
+        598
+      ],
+      "width": 48,
+      "height": 108,
+      "id": "outpost_shared_part_10",
+      "role": "repair_state_part",
+      "size_units": "10x8_or_12x8",
+      "detected_area": 2602
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\outposts\\parts\\outpost_shared_part_11.png",
+      "source_box_xyxy": [
+        74,
+        490,
+        298,
+        589
+      ],
+      "width": 224,
+      "height": 99,
+      "id": "outpost_shared_part_11",
+      "role": "repair_state_part",
+      "size_units": "10x8_or_12x8",
+      "detected_area": 14318
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\outposts\\parts\\outpost_shared_part_12.png",
+      "source_box_xyxy": [
+        305,
+        491,
+        517,
+        583
+      ],
+      "width": 212,
+      "height": 92,
+      "id": "outpost_shared_part_12",
+      "role": "repair_state_part",
+      "size_units": "10x8_or_12x8",
+      "detected_area": 13904
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\outposts\\parts\\outpost_shared_part_13.png",
+      "source_box_xyxy": [
+        528,
+        491,
+        577,
+        600
+      ],
+      "width": 49,
+      "height": 109,
+      "id": "outpost_shared_part_13",
+      "role": "repair_state_part",
+      "size_units": "10x8_or_12x8",
+      "detected_area": 2618
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\outposts\\parts\\outpost_shared_part_14.png",
+      "source_box_xyxy": [
+        942,
+        491,
+        987,
+        599
+      ],
+      "width": 45,
+      "height": 108,
+      "id": "outpost_shared_part_14",
+      "role": "repair_state_part",
+      "size_units": "10x8_or_12x8",
+      "detected_area": 2387
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\outposts\\parts\\outpost_shared_part_15.png",
+      "source_box_xyxy": [
+        996,
+        491,
+        1190,
+        586
+      ],
+      "width": 194,
+      "height": 95,
+      "id": "outpost_shared_part_15",
+      "role": "repair_state_part",
+      "size_units": "10x8_or_12x8",
+      "detected_area": 13374
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\outposts\\parts\\outpost_shared_part_16.png",
+      "source_box_xyxy": [
+        1197,
+        491,
+        1411,
+        588
+      ],
+      "width": 214,
+      "height": 97,
+      "id": "outpost_shared_part_16",
+      "role": "repair_state_part",
+      "size_units": "10x8_or_12x8",
+      "detected_area": 14676
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\outposts\\parts\\outpost_shared_part_17.png",
+      "source_box_xyxy": [
+        1421,
+        492,
+        1467,
+        600
+      ],
+      "width": 46,
+      "height": 108,
+      "id": "outpost_shared_part_17",
+      "role": "repair_state_part",
+      "size_units": "10x8_or_12x8",
+      "detected_area": 2438
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\outposts\\parts\\outpost_shared_part_18.png",
+      "source_box_xyxy": [
+        77,
+        583,
+        518,
+        684
+      ],
+      "width": 441,
+      "height": 101,
+      "id": "outpost_shared_part_18",
+      "role": "repair_state_part",
+      "size_units": "10x8_or_12x8",
+      "detected_area": 29286
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\outposts\\parts\\outpost_shared_part_19.png",
+      "source_box_xyxy": [
+        991,
+        585,
+        1409,
+        691
+      ],
+      "width": 418,
+      "height": 106,
+      "id": "outpost_shared_part_19",
+      "role": "repair_state_part",
+      "size_units": "10x8_or_12x8",
+      "detected_area": 29222
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\outposts\\parts\\outpost_shared_part_20.png",
+      "source_box_xyxy": [
+        15,
+        596,
+        72,
+        673
+      ],
+      "width": 57,
+      "height": 77,
+      "id": "outpost_shared_part_20",
+      "role": "repair_state_part",
+      "size_units": "10x8_or_12x8",
+      "detected_area": 2053
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\outposts\\parts\\outpost_shared_part_21.png",
+      "source_box_xyxy": [
+        522,
+        597,
+        579,
+        674
+      ],
+      "width": 57,
+      "height": 77,
+      "id": "outpost_shared_part_21",
+      "role": "repair_state_part",
+      "size_units": "10x8_or_12x8",
+      "detected_area": 2054
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\outposts\\parts\\outpost_shared_part_22.png",
+      "source_box_xyxy": [
+        939,
+        597,
+        992,
+        676
+      ],
+      "width": 53,
+      "height": 79,
+      "id": "outpost_shared_part_22",
+      "role": "repair_state_part",
+      "size_units": "10x8_or_12x8",
+      "detected_area": 1985
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\outposts\\parts\\outpost_shared_part_23.png",
+      "source_box_xyxy": [
+        1410,
+        597,
+        1466,
+        675
+      ],
+      "width": 56,
+      "height": 78,
+      "id": "outpost_shared_part_23",
+      "role": "repair_state_part",
+      "size_units": "10x8_or_12x8",
+      "detected_area": 2046
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\outposts\\parts\\outpost_shared_part_24.png",
+      "source_box_xyxy": [
+        15,
+        678,
+        76,
+        740
+      ],
+      "width": 61,
+      "height": 62,
+      "id": "outpost_shared_part_24",
+      "role": "repair_state_part",
+      "size_units": "10x8_or_12x8",
+      "detected_area": 1925
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\outposts\\parts\\outpost_shared_part_25.png",
+      "source_box_xyxy": [
+        515,
+        678,
+        576,
+        740
+      ],
+      "width": 61,
+      "height": 62,
+      "id": "outpost_shared_part_25",
+      "role": "repair_state_part",
+      "size_units": "10x8_or_12x8",
+      "detected_area": 1921
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\outposts\\parts\\outpost_shared_part_26.png",
+      "source_box_xyxy": [
+        939,
+        681,
+        997,
+        743
+      ],
+      "width": 58,
+      "height": 62,
+      "id": "outpost_shared_part_26",
+      "role": "repair_state_part",
+      "size_units": "10x8_or_12x8",
+      "detected_area": 1838
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\outposts\\parts\\outpost_shared_part_27.png",
+      "source_box_xyxy": [
+        1402,
+        681,
+        1461,
+        742
+      ],
+      "width": 59,
+      "height": 61,
+      "id": "outpost_shared_part_27",
+      "role": "repair_state_part",
+      "size_units": "10x8_or_12x8",
+      "detected_area": 1856
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\outposts\\parts\\outpost_shared_part_28.png",
+      "source_box_xyxy": [
+        82,
+        686,
+        298,
+        740
+      ],
+      "width": 216,
+      "height": 54,
+      "id": "outpost_shared_part_28",
+      "role": "repair_state_part",
+      "size_units": "10x8_or_12x8",
+      "detected_area": 5741
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\outposts\\parts\\outpost_shared_part_29.png",
+      "source_box_xyxy": [
+        302,
+        686,
+        511,
+        740
+      ],
+      "width": 209,
+      "height": 54,
+      "id": "outpost_shared_part_29",
+      "role": "repair_state_part",
+      "size_units": "10x8_or_12x8",
+      "detected_area": 5564
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\outposts\\parts\\outpost_shared_part_30.png",
+      "source_box_xyxy": [
+        997,
+        689,
+        1192,
+        743
+      ],
+      "width": 195,
+      "height": 54,
+      "id": "outpost_shared_part_30",
+      "role": "repair_state_part",
+      "size_units": "10x8_or_12x8",
+      "detected_area": 5432
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\outposts\\parts\\outpost_shared_part_31.png",
+      "source_box_xyxy": [
+        1197,
+        689,
+        1401,
+        743
+      ],
+      "width": 204,
+      "height": 54,
+      "id": "outpost_shared_part_31",
+      "role": "repair_state_part",
+      "size_units": "10x8_or_12x8",
+      "detected_area": 5908
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\outposts\\parts\\outpost_shared_part_32.png",
+      "source_box_xyxy": [
+        427,
+        736,
+        523,
+        889
+      ],
+      "width": 96,
+      "height": 153,
+      "id": "outpost_shared_part_32",
+      "role": "repair_state_part",
+      "size_units": "10x8_or_12x8",
+      "detected_area": 4565
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\outposts\\parts\\outpost_shared_part_33.png",
+      "source_box_xyxy": [
+        319,
+        738,
+        422,
+        890
+      ],
+      "width": 103,
+      "height": 152,
+      "id": "outpost_shared_part_33",
+      "role": "repair_state_part",
+      "size_units": "10x8_or_12x8",
+      "detected_area": 5813
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\outposts\\parts\\outpost_shared_part_34.png",
+      "source_box_xyxy": [
+        528,
+        750,
+        660,
+        886
+      ],
+      "width": 132,
+      "height": 136,
+      "id": "outpost_shared_part_34",
+      "role": "repair_state_part",
+      "size_units": "10x8_or_12x8",
+      "detected_area": 12524
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\outposts\\parts\\outpost_shared_part_35.png",
+      "source_box_xyxy": [
+        772,
+        750,
+        908,
+        885
+      ],
+      "width": 136,
+      "height": 135,
+      "id": "outpost_shared_part_35",
+      "role": "repair_state_part",
+      "size_units": "10x8_or_12x8",
+      "detected_area": 14080
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\outposts\\parts\\outpost_shared_part_36.png",
+      "source_box_xyxy": [
+        914,
+        750,
+        997,
+        873
+      ],
+      "width": 83,
+      "height": 123,
+      "id": "outpost_shared_part_36",
+      "role": "repair_state_part",
+      "size_units": "10x8_or_12x8",
+      "detected_area": 2538
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\outposts\\parts\\outpost_shared_part_37.png",
+      "source_box_xyxy": [
+        19,
+        751,
+        261,
+        884
+      ],
+      "width": 242,
+      "height": 133,
+      "id": "outpost_shared_part_37",
+      "role": "repair_state_part",
+      "size_units": "10x8_or_12x8",
+      "detected_area": 22034
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\outposts\\parts\\outpost_shared_part_38.png",
+      "source_box_xyxy": [
+        665,
+        752,
+        746,
+        872
+      ],
+      "width": 81,
+      "height": 120,
+      "id": "outpost_shared_part_38",
+      "role": "repair_state_part",
+      "size_units": "10x8_or_12x8",
+      "detected_area": 2402
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\outposts\\parts\\outpost_shared_part_39.png",
+      "source_box_xyxy": [
+        1001,
+        753,
+        1134,
+        887
+      ],
+      "width": 133,
+      "height": 134,
+      "id": "outpost_shared_part_39",
+      "role": "repair_state_part",
+      "size_units": "10x8_or_12x8",
+      "detected_area": 13451
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\outposts\\parts\\outpost_shared_part_40.png",
+      "source_box_xyxy": [
+        1320,
+        753,
+        1455,
+        882
+      ],
+      "width": 135,
+      "height": 129,
+      "id": "outpost_shared_part_40",
+      "role": "repair_state_part",
+      "size_units": "10x8_or_12x8",
+      "detected_area": 13147
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\outposts\\parts\\outpost_shared_part_41.png",
+      "source_box_xyxy": [
+        1152,
+        754,
+        1296,
+        884
+      ],
+      "width": 144,
+      "height": 130,
+      "id": "outpost_shared_part_41",
+      "role": "repair_state_part",
+      "size_units": "10x8_or_12x8",
+      "detected_area": 14250
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\outposts\\parts\\outpost_shared_part_42.png",
+      "source_box_xyxy": [
+        403,
+        885,
+        487,
+        991
+      ],
+      "width": 84,
+      "height": 106,
+      "id": "outpost_shared_part_42",
+      "role": "repair_state_part",
+      "size_units": "10x8_or_12x8",
+      "detected_area": 4322
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\outposts\\parts\\outpost_shared_part_43.png",
+      "source_box_xyxy": [
+        15,
+        891,
+        237,
+        996
+      ],
+      "width": 222,
+      "height": 105,
+      "id": "outpost_shared_part_43",
+      "role": "repair_state_part",
+      "size_units": "10x8_or_12x8",
+      "detected_area": 12334
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\outposts\\parts\\outpost_shared_part_44.png",
+      "source_box_xyxy": [
+        514,
+        891,
+        621,
+        990
+      ],
+      "width": 107,
+      "height": 99,
+      "id": "outpost_shared_part_44",
+      "role": "repair_state_part",
+      "size_units": "10x8_or_12x8",
+      "detected_area": 6278
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\outposts\\parts\\outpost_shared_part_45.png",
+      "source_box_xyxy": [
+        257,
+        898,
+        366,
+        992
+      ],
+      "width": 109,
+      "height": 94,
+      "id": "outpost_shared_part_45",
+      "role": "repair_state_part",
+      "size_units": "10x8_or_12x8",
+      "detected_area": 4715
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\outposts\\parts\\outpost_shared_part_46.png",
+      "source_box_xyxy": [
+        744,
+        904,
+        851,
+        986
+      ],
+      "width": 107,
+      "height": 82,
+      "id": "outpost_shared_part_46",
+      "role": "repair_state_part",
+      "size_units": "10x8_or_12x8",
+      "detected_area": 5608
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\outposts\\parts\\outpost_shared_part_47.png",
+      "source_box_xyxy": [
+        868,
+        905,
+        954,
+        986
+      ],
+      "width": 86,
+      "height": 81,
+      "id": "outpost_shared_part_47",
+      "role": "repair_state_part",
+      "size_units": "10x8_or_12x8",
+      "detected_area": 4094
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\outposts\\parts\\outpost_shared_part_48.png",
+      "source_box_xyxy": [
+        652,
+        911,
+        705,
+        982
+      ],
+      "width": 53,
+      "height": 71,
+      "id": "outpost_shared_part_48",
+      "role": "repair_state_part",
+      "size_units": "10x8_or_12x8",
+      "detected_area": 1883
+    }
+  ]
+}

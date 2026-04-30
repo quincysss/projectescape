@@ -1,0 +1,486 @@
+{
+  "source_sheet": "K:\\ProjectEscape\\project-escape\\assets\\map\\buildings\\sheets\\building_narrow_alley_assembly_01.png",
+  "notes": "Building assembly sheet split. Ordinary buildings are non-enterable obstacles and must use explicit CollisionShape2D; do not depend on alpha pixels.",
+  "metadata": {
+    "doc": "03_????????/03_?????????.md",
+    "building_id": "building_narrow_alley_01",
+    "building_type": "shop",
+    "size_units": "6x12_or_8x12"
+  },
+  "assets": [
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\buildings\\assembled\\building_narrow_alley_01.png",
+      "source_box_xyxy": [
+        294,
+        1,
+        502,
+        472
+      ],
+      "width": 208,
+      "height": 471,
+      "id": "building_narrow_alley_01",
+      "role": "assembled",
+      "building_type": "shop",
+      "size_units": "6x12_or_8x12"
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\buildings\\parts\\building_narrow_alley_01_part_01.png",
+      "source_box_xyxy": [
+        269,
+        468,
+        511,
+        579
+      ],
+      "width": 242,
+      "height": 111,
+      "id": "building_narrow_alley_01_part_01",
+      "role": "assembly_part",
+      "building_id": "building_narrow_alley_01",
+      "building_type": "shop",
+      "size_units": "6x12_or_8x12",
+      "detected_area": 19171
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\buildings\\parts\\building_narrow_alley_01_part_02.png",
+      "source_box_xyxy": [
+        69,
+        472,
+        125,
+        562
+      ],
+      "width": 56,
+      "height": 90,
+      "id": "building_narrow_alley_01_part_02",
+      "role": "assembly_part",
+      "building_id": "building_narrow_alley_01",
+      "building_type": "shop",
+      "size_units": "6x12_or_8x12",
+      "detected_area": 2523
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\buildings\\parts\\building_narrow_alley_01_part_03.png",
+      "source_box_xyxy": [
+        655,
+        472,
+        712,
+        563
+      ],
+      "width": 57,
+      "height": 91,
+      "id": "building_narrow_alley_01_part_03",
+      "role": "assembly_part",
+      "building_id": "building_narrow_alley_01",
+      "building_type": "shop",
+      "size_units": "6x12_or_8x12",
+      "detected_area": 2585
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\buildings\\parts\\building_narrow_alley_01_part_04.png",
+      "source_box_xyxy": [
+        1052,
+        473,
+        1174,
+        664
+      ],
+      "width": 122,
+      "height": 191,
+      "id": "building_narrow_alley_01_part_04",
+      "role": "assembly_part",
+      "building_id": "building_narrow_alley_01",
+      "building_type": "shop",
+      "size_units": "6x12_or_8x12",
+      "detected_area": 12458
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\buildings\\parts\\building_narrow_alley_01_part_05.png",
+      "source_box_xyxy": [
+        753,
+        480,
+        1019,
+        561
+      ],
+      "width": 266,
+      "height": 81,
+      "id": "building_narrow_alley_01_part_05",
+      "role": "assembly_part",
+      "building_id": "building_narrow_alley_01",
+      "building_type": "shop",
+      "size_units": "6x12_or_8x12",
+      "detected_area": 12222
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\buildings\\parts\\building_narrow_alley_01_part_06.png",
+      "source_box_xyxy": [
+        1366,
+        483,
+        1436,
+        650
+      ],
+      "width": 70,
+      "height": 167,
+      "id": "building_narrow_alley_01_part_06",
+      "role": "assembly_part",
+      "building_id": "building_narrow_alley_01",
+      "building_type": "shop",
+      "size_units": "6x12_or_8x12",
+      "detected_area": 4091
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\buildings\\parts\\building_narrow_alley_01_part_07.png",
+      "source_box_xyxy": [
+        1226,
+        490,
+        1326,
+        582
+      ],
+      "width": 100,
+      "height": 92,
+      "id": "building_narrow_alley_01_part_07",
+      "role": "assembly_part",
+      "building_id": "building_narrow_alley_01",
+      "building_type": "shop",
+      "size_units": "6x12_or_8x12",
+      "detected_area": 5889
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\buildings\\parts\\building_narrow_alley_01_part_08.png",
+      "source_box_xyxy": [
+        744,
+        552,
+        929,
+        917
+      ],
+      "width": 185,
+      "height": 365,
+      "id": "building_narrow_alley_01_part_08",
+      "role": "assembly_part",
+      "building_id": "building_narrow_alley_01",
+      "building_type": "shop",
+      "size_units": "6x12_or_8x12",
+      "detected_area": 57076
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\buildings\\parts\\building_narrow_alley_01_part_09.png",
+      "source_box_xyxy": [
+        85,
+        555,
+        235,
+        919
+      ],
+      "width": 150,
+      "height": 364,
+      "id": "building_narrow_alley_01_part_09",
+      "role": "assembly_part",
+      "building_id": "building_narrow_alley_01",
+      "building_type": "shop",
+      "size_units": "6x12_or_8x12",
+      "detected_area": 44982
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\buildings\\parts\\building_narrow_alley_01_part_10.png",
+      "source_box_xyxy": [
+        962,
+        556,
+        1018,
+        917
+      ],
+      "width": 56,
+      "height": 361,
+      "id": "building_narrow_alley_01_part_10",
+      "role": "assembly_part",
+      "building_id": "building_narrow_alley_01",
+      "building_type": "shop",
+      "size_units": "6x12_or_8x12",
+      "detected_area": 9026
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\buildings\\parts\\building_narrow_alley_01_part_11.png",
+      "source_box_xyxy": [
+        541,
+        571,
+        599,
+        901
+      ],
+      "width": 58,
+      "height": 330,
+      "id": "building_narrow_alley_01_part_11",
+      "role": "assembly_part",
+      "building_id": "building_narrow_alley_01",
+      "building_type": "shop",
+      "size_units": "6x12_or_8x12",
+      "detected_area": 12707
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\buildings\\parts\\building_narrow_alley_01_part_12.png",
+      "source_box_xyxy": [
+        630,
+        571,
+        689,
+        900
+      ],
+      "width": 59,
+      "height": 329,
+      "id": "building_narrow_alley_01_part_12",
+      "role": "assembly_part",
+      "building_id": "building_narrow_alley_01",
+      "building_type": "shop",
+      "size_units": "6x12_or_8x12",
+      "detected_area": 13047
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\buildings\\parts\\building_narrow_alley_01_part_13.png",
+      "source_box_xyxy": [
+        268,
+        577,
+        521,
+        759
+      ],
+      "width": 253,
+      "height": 182,
+      "id": "building_narrow_alley_01_part_13",
+      "role": "assembly_part",
+      "building_id": "building_narrow_alley_01",
+      "building_type": "shop",
+      "size_units": "6x12_or_8x12",
+      "detected_area": 36100
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\buildings\\parts\\building_narrow_alley_01_part_14.png",
+      "source_box_xyxy": [
+        1198,
+        597,
+        1355,
+        651
+      ],
+      "width": 157,
+      "height": 54,
+      "id": "building_narrow_alley_01_part_14",
+      "role": "assembly_part",
+      "building_id": "building_narrow_alley_01",
+      "building_type": "shop",
+      "size_units": "6x12_or_8x12",
+      "detected_area": 3467
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\buildings\\parts\\building_narrow_alley_01_part_15.png",
+      "source_box_xyxy": [
+        1208,
+        665,
+        1306,
+        760
+      ],
+      "width": 98,
+      "height": 95,
+      "id": "building_narrow_alley_01_part_15",
+      "role": "assembly_part",
+      "building_id": "building_narrow_alley_01",
+      "building_type": "shop",
+      "size_units": "6x12_or_8x12",
+      "detected_area": 6095
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\buildings\\parts\\building_narrow_alley_01_part_16.png",
+      "source_box_xyxy": [
+        1336,
+        665,
+        1429,
+        758
+      ],
+      "width": 93,
+      "height": 93,
+      "id": "building_narrow_alley_01_part_16",
+      "role": "assembly_part",
+      "building_id": "building_narrow_alley_01",
+      "building_type": "shop",
+      "size_units": "6x12_or_8x12",
+      "detected_area": 5615
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\buildings\\parts\\building_narrow_alley_01_part_17.png",
+      "source_box_xyxy": [
+        1057,
+        674,
+        1146,
+        748
+      ],
+      "width": 89,
+      "height": 74,
+      "id": "building_narrow_alley_01_part_17",
+      "role": "assembly_part",
+      "building_id": "building_narrow_alley_01",
+      "building_type": "shop",
+      "size_units": "6x12_or_8x12",
+      "detected_area": 4036
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\buildings\\parts\\building_narrow_alley_01_part_18.png",
+      "source_box_xyxy": [
+        270,
+        754,
+        513,
+        918
+      ],
+      "width": 243,
+      "height": 164,
+      "id": "building_narrow_alley_01_part_18",
+      "role": "assembly_part",
+      "building_id": "building_narrow_alley_01",
+      "building_type": "shop",
+      "size_units": "6x12_or_8x12",
+      "detected_area": 30586
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\buildings\\parts\\building_narrow_alley_01_part_19.png",
+      "source_box_xyxy": [
+        1056,
+        759,
+        1147,
+        823
+      ],
+      "width": 91,
+      "height": 64,
+      "id": "building_narrow_alley_01_part_19",
+      "role": "assembly_part",
+      "building_id": "building_narrow_alley_01",
+      "building_type": "shop",
+      "size_units": "6x12_or_8x12",
+      "detected_area": 3500
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\buildings\\parts\\building_narrow_alley_01_part_20.png",
+      "source_box_xyxy": [
+        1191,
+        766,
+        1317,
+        897
+      ],
+      "width": 126,
+      "height": 131,
+      "id": "building_narrow_alley_01_part_20",
+      "role": "assembly_part",
+      "building_id": "building_narrow_alley_01",
+      "building_type": "shop",
+      "size_units": "6x12_or_8x12",
+      "detected_area": 11252
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\buildings\\parts\\building_narrow_alley_01_part_21.png",
+      "source_box_xyxy": [
+        1328,
+        770,
+        1434,
+        892
+      ],
+      "width": 106,
+      "height": 122,
+      "id": "building_narrow_alley_01_part_21",
+      "role": "assembly_part",
+      "building_id": "building_narrow_alley_01",
+      "building_type": "shop",
+      "size_units": "6x12_or_8x12",
+      "detected_area": 8626
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\buildings\\parts\\building_narrow_alley_01_part_22.png",
+      "source_box_xyxy": [
+        1050,
+        834,
+        1179,
+        922
+      ],
+      "width": 129,
+      "height": 88,
+      "id": "building_narrow_alley_01_part_22",
+      "role": "assembly_part",
+      "building_id": "building_narrow_alley_01",
+      "building_type": "shop",
+      "size_units": "6x12_or_8x12",
+      "detected_area": 6254
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\buildings\\parts\\building_narrow_alley_01_part_23.png",
+      "source_box_xyxy": [
+        647,
+        899,
+        711,
+        989
+      ],
+      "width": 64,
+      "height": 90,
+      "id": "building_narrow_alley_01_part_23",
+      "role": "assembly_part",
+      "building_id": "building_narrow_alley_01",
+      "building_type": "shop",
+      "size_units": "6x12_or_8x12",
+      "detected_area": 2825
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\buildings\\parts\\building_narrow_alley_01_part_24.png",
+      "source_box_xyxy": [
+        55,
+        902,
+        121,
+        991
+      ],
+      "width": 66,
+      "height": 89,
+      "id": "building_narrow_alley_01_part_24",
+      "role": "assembly_part",
+      "building_id": "building_narrow_alley_01",
+      "building_type": "shop",
+      "size_units": "6x12_or_8x12",
+      "detected_area": 2856
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\buildings\\parts\\building_narrow_alley_01_part_25.png",
+      "source_box_xyxy": [
+        748,
+        913,
+        1016,
+        1014
+      ],
+      "width": 268,
+      "height": 101,
+      "id": "building_narrow_alley_01_part_25",
+      "role": "assembly_part",
+      "building_id": "building_narrow_alley_01",
+      "building_type": "shop",
+      "size_units": "6x12_or_8x12",
+      "detected_area": 15049
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\buildings\\parts\\building_narrow_alley_01_part_26.png",
+      "source_box_xyxy": [
+        272,
+        915,
+        513,
+        996
+      ],
+      "width": 241,
+      "height": 81,
+      "id": "building_narrow_alley_01_part_26",
+      "role": "assembly_part",
+      "building_id": "building_narrow_alley_01",
+      "building_type": "shop",
+      "size_units": "6x12_or_8x12",
+      "detected_area": 12844
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\buildings\\parts\\building_narrow_alley_01_part_27.png",
+      "source_box_xyxy": [
+        1067,
+        919,
+        1413,
+        979
+      ],
+      "width": 346,
+      "height": 60,
+      "id": "building_narrow_alley_01_part_27",
+      "role": "assembly_part",
+      "building_id": "building_narrow_alley_01",
+      "building_type": "shop",
+      "size_units": "6x12_or_8x12",
+      "detected_area": 12690
+    }
+  ]
+}

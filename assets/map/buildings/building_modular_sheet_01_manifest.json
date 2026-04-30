@@ -1,0 +1,137 @@
+{
+  "source_sheet": "K:\\ProjectEscape\\project-escape\\assets\\map\\buildings\\sheets\\building_modular_sheet_01.png",
+  "notes": "Mixed building concept sheet split into whole placeable building/structure variants. Prefer *_assembly_01 sheets for reconstruction-grade parts.",
+  "metadata": {},
+  "assets": [
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\buildings\\assembled\\building_small_shop_variant_01.png",
+      "source_box_xyxy": [
+        613,
+        10,
+        1018,
+        410
+      ],
+      "width": 405,
+      "height": 400,
+      "id": "building_small_shop_variant_01",
+      "detected_area": 134365
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\buildings\\assembled\\building_medium_apartment_variant_01.png",
+      "source_box_xyxy": [
+        1037,
+        70,
+        1494,
+        418
+      ],
+      "width": 457,
+      "height": 348,
+      "id": "building_medium_apartment_variant_01",
+      "detected_area": 130263
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\buildings\\assembled\\building_small_residential_variant_01.png",
+      "source_box_xyxy": [
+        335,
+        84,
+        594,
+        401
+      ],
+      "width": 259,
+      "height": 317,
+      "id": "building_small_residential_variant_01",
+      "detected_area": 60257
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\buildings\\assembled\\building_small_corner_shop_variant_01.png",
+      "source_box_xyxy": [
+        40,
+        99,
+        321,
+        397
+      ],
+      "width": 281,
+      "height": 298,
+      "id": "building_small_corner_shop_variant_01",
+      "detected_area": 64105
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\buildings\\assembled\\building_narrow_alley_variant_01.png",
+      "source_box_xyxy": [
+        57,
+        425,
+        232,
+        758
+      ],
+      "width": 175,
+      "height": 333,
+      "id": "building_narrow_alley_variant_01",
+      "detected_area": 42644
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\buildings\\assembled\\building_large_ruined_market_variant_01.png",
+      "source_box_xyxy": [
+        484,
+        430,
+        1094,
+        773
+      ],
+      "width": 610,
+      "height": 343,
+      "id": "building_large_ruined_market_variant_01",
+      "detected_area": 169881
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\buildings\\assembled\\building_medium_shop_variant_01.png",
+      "source_box_xyxy": [
+        1132,
+        489,
+        1480,
+        765
+      ],
+      "width": 348,
+      "height": 276,
+      "id": "building_medium_shop_variant_01",
+      "detected_area": 75282
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\buildings\\assembled\\building_rooftop_utility_variant_01.png",
+      "source_box_xyxy": [
+        280,
+        522,
+        438,
+        739
+      ],
+      "width": 158,
+      "height": 217,
+      "id": "building_rooftop_utility_variant_01",
+      "detected_area": 26567
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\buildings\\assembled\\building_stair_module_variant_01.png",
+      "source_box_xyxy": [
+        842,
+        794,
+        1035,
+        1007
+      ],
+      "width": 193,
+      "height": 213,
+      "id": "building_stair_module_variant_01",
+      "detected_area": 28151
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\buildings\\assembled\\building_tin_shed_variant_01.png",
+      "source_box_xyxy": [
+        428,
+        799,
+        607,
+        993
+      ],
+      "width": 179,
+      "height": 194,
+      "id": "building_tin_shed_variant_01",
+      "detected_area": 26019
+    }
+  ]
+}

@@ -1,0 +1,1367 @@
+{
+  "source_sheet": "K:\\ProjectEscape\\project-escape\\assets\\map\\decals\\sheets\\ground_decals_debris_sheet_01.png",
+  "notes": "Ground decals split as individual transparent overlays. They are visual overlays and should not define collision.",
+  "metadata": {
+    "road_doc": "03_????????/02_?????????.md"
+  },
+  "assets": [
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\decals\\overlays\\ground_decal_overlay_001.png",
+      "source_box_xyxy": [
+        46,
+        34,
+        349,
+        284
+      ],
+      "width": 303,
+      "height": 250,
+      "id": "ground_decal_overlay_001",
+      "role": "ground_overlay",
+      "detected_area": 46236
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\decals\\overlays\\ground_decal_overlay_002.png",
+      "source_box_xyxy": [
+        881,
+        38,
+        1109,
+        217
+      ],
+      "width": 228,
+      "height": 179,
+      "id": "ground_decal_overlay_002",
+      "role": "ground_overlay",
+      "detected_area": 21455
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\decals\\overlays\\ground_decal_overlay_003.png",
+      "source_box_xyxy": [
+        1260,
+        49,
+        1311,
+        92
+      ],
+      "width": 51,
+      "height": 43,
+      "id": "ground_decal_overlay_003",
+      "role": "ground_overlay",
+      "detected_area": 695
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\decals\\overlays\\ground_decal_overlay_004.png",
+      "source_box_xyxy": [
+        1132,
+        50,
+        1179,
+        91
+      ],
+      "width": 47,
+      "height": 41,
+      "id": "ground_decal_overlay_004",
+      "role": "ground_overlay",
+      "detected_area": 694
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\decals\\overlays\\ground_decal_overlay_005.png",
+      "source_box_xyxy": [
+        1069,
+        59,
+        1106,
+        93
+      ],
+      "width": 37,
+      "height": 34,
+      "id": "ground_decal_overlay_005",
+      "role": "ground_overlay",
+      "detected_area": 377
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\decals\\overlays\\ground_decal_overlay_006.png",
+      "source_box_xyxy": [
+        416,
+        68,
+        559,
+        261
+      ],
+      "width": 143,
+      "height": 193,
+      "id": "ground_decal_overlay_006",
+      "role": "ground_overlay",
+      "detected_area": 2210
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\decals\\overlays\\ground_decal_overlay_007.png",
+      "source_box_xyxy": [
+        1206,
+        71,
+        1444,
+        258
+      ],
+      "width": 238,
+      "height": 187,
+      "id": "ground_decal_overlay_007",
+      "role": "ground_overlay",
+      "detected_area": 19118
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\decals\\overlays\\ground_decal_overlay_008.png",
+      "source_box_xyxy": [
+        1111,
+        72,
+        1140,
+        99
+      ],
+      "width": 29,
+      "height": 27,
+      "id": "ground_decal_overlay_008",
+      "role": "ground_overlay",
+      "detected_area": 182
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\decals\\overlays\\ground_decal_overlay_009.png",
+      "source_box_xyxy": [
+        656,
+        73,
+        772,
+        242
+      ],
+      "width": 116,
+      "height": 169,
+      "id": "ground_decal_overlay_009",
+      "role": "ground_overlay",
+      "detected_area": 1788
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\decals\\overlays\\ground_decal_overlay_010.png",
+      "source_box_xyxy": [
+        760,
+        77,
+        827,
+        181
+      ],
+      "width": 67,
+      "height": 104,
+      "id": "ground_decal_overlay_010",
+      "role": "ground_overlay",
+      "detected_area": 603
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\decals\\overlays\\ground_decal_overlay_011.png",
+      "source_box_xyxy": [
+        1220,
+        84,
+        1265,
+        121
+      ],
+      "width": 45,
+      "height": 37,
+      "id": "ground_decal_overlay_011",
+      "role": "ground_overlay",
+      "detected_area": 237
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\decals\\overlays\\ground_decal_overlay_012.png",
+      "source_box_xyxy": [
+        1374,
+        84,
+        1404,
+        115
+      ],
+      "width": 30,
+      "height": 31,
+      "id": "ground_decal_overlay_012",
+      "role": "ground_overlay",
+      "detected_area": 182
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\decals\\overlays\\ground_decal_overlay_013.png",
+      "source_box_xyxy": [
+        1416,
+        95,
+        1456,
+        130
+      ],
+      "width": 40,
+      "height": 35,
+      "id": "ground_decal_overlay_013",
+      "role": "ground_overlay",
+      "detected_area": 231
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\decals\\overlays\\ground_decal_overlay_014.png",
+      "source_box_xyxy": [
+        1393,
+        97,
+        1430,
+        127
+      ],
+      "width": 37,
+      "height": 30,
+      "id": "ground_decal_overlay_014",
+      "role": "ground_overlay",
+      "detected_area": 185
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\decals\\overlays\\ground_decal_overlay_015.png",
+      "source_box_xyxy": [
+        1112,
+        98,
+        1173,
+        156
+      ],
+      "width": 61,
+      "height": 58,
+      "id": "ground_decal_overlay_015",
+      "role": "ground_overlay",
+      "detected_area": 1578
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\decals\\overlays\\ground_decal_overlay_016.png",
+      "source_box_xyxy": [
+        1408,
+        121,
+        1441,
+        152
+      ],
+      "width": 33,
+      "height": 31,
+      "id": "ground_decal_overlay_016",
+      "role": "ground_overlay",
+      "detected_area": 218
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\decals\\overlays\\ground_decal_overlay_017.png",
+      "source_box_xyxy": [
+        567,
+        123,
+        600,
+        156
+      ],
+      "width": 33,
+      "height": 33,
+      "id": "ground_decal_overlay_017",
+      "role": "ground_overlay",
+      "detected_area": 219
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\decals\\overlays\\ground_decal_overlay_018.png",
+      "source_box_xyxy": [
+        657,
+        128,
+        687,
+        156
+      ],
+      "width": 30,
+      "height": 28,
+      "id": "ground_decal_overlay_018",
+      "role": "ground_overlay",
+      "detected_area": 210
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\decals\\overlays\\ground_decal_overlay_019.png",
+      "source_box_xyxy": [
+        1422,
+        132,
+        1474,
+        169
+      ],
+      "width": 52,
+      "height": 37,
+      "id": "ground_decal_overlay_019",
+      "role": "ground_overlay",
+      "detected_area": 449
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\decals\\overlays\\ground_decal_overlay_020.png",
+      "source_box_xyxy": [
+        1118,
+        159,
+        1151,
+        191
+      ],
+      "width": 33,
+      "height": 32,
+      "id": "ground_decal_overlay_020",
+      "role": "ground_overlay",
+      "detected_area": 311
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\decals\\overlays\\ground_decal_overlay_021.png",
+      "source_box_xyxy": [
+        1437,
+        161,
+        1471,
+        188
+      ],
+      "width": 34,
+      "height": 27,
+      "id": "ground_decal_overlay_021",
+      "role": "ground_overlay",
+      "detected_area": 191
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\decals\\overlays\\ground_decal_overlay_022.png",
+      "source_box_xyxy": [
+        1418,
+        169,
+        1451,
+        203
+      ],
+      "width": 33,
+      "height": 34,
+      "id": "ground_decal_overlay_022",
+      "role": "ground_overlay",
+      "detected_area": 236
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\decals\\overlays\\ground_decal_overlay_023.png",
+      "source_box_xyxy": [
+        57,
+        184,
+        87,
+        215
+      ],
+      "width": 30,
+      "height": 31,
+      "id": "ground_decal_overlay_023",
+      "role": "ground_overlay",
+      "detected_area": 205
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\decals\\overlays\\ground_decal_overlay_024.png",
+      "source_box_xyxy": [
+        1439,
+        185,
+        1481,
+        219
+      ],
+      "width": 42,
+      "height": 34,
+      "id": "ground_decal_overlay_024",
+      "role": "ground_overlay",
+      "detected_area": 206
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\decals\\overlays\\ground_decal_overlay_025.png",
+      "source_box_xyxy": [
+        1205,
+        186,
+        1249,
+        229
+      ],
+      "width": 44,
+      "height": 43,
+      "id": "ground_decal_overlay_025",
+      "role": "ground_overlay",
+      "detected_area": 324
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\decals\\overlays\\ground_decal_overlay_026.png",
+      "source_box_xyxy": [
+        1079,
+        189,
+        1128,
+        233
+      ],
+      "width": 49,
+      "height": 44,
+      "id": "ground_decal_overlay_026",
+      "role": "ground_overlay",
+      "detected_area": 811
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\decals\\overlays\\ground_decal_overlay_027.png",
+      "source_box_xyxy": [
+        755,
+        191,
+        811,
+        230
+      ],
+      "width": 56,
+      "height": 39,
+      "id": "ground_decal_overlay_027",
+      "role": "ground_overlay",
+      "detected_area": 276
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\decals\\overlays\\ground_decal_overlay_028.png",
+      "source_box_xyxy": [
+        513,
+        192,
+        542,
+        229
+      ],
+      "width": 29,
+      "height": 37,
+      "id": "ground_decal_overlay_028",
+      "role": "ground_overlay",
+      "detected_area": 150
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\decals\\overlays\\ground_decal_overlay_029.png",
+      "source_box_xyxy": [
+        1011,
+        202,
+        1063,
+        251
+      ],
+      "width": 52,
+      "height": 49,
+      "id": "ground_decal_overlay_029",
+      "role": "ground_overlay",
+      "detected_area": 1002
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\decals\\overlays\\ground_decal_overlay_030.png",
+      "source_box_xyxy": [
+        76,
+        210,
+        104,
+        236
+      ],
+      "width": 28,
+      "height": 26,
+      "id": "ground_decal_overlay_030",
+      "role": "ground_overlay",
+      "detected_area": 170
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\decals\\overlays\\ground_decal_overlay_031.png",
+      "source_box_xyxy": [
+        930,
+        210,
+        975,
+        250
+      ],
+      "width": 45,
+      "height": 40,
+      "id": "ground_decal_overlay_031",
+      "role": "ground_overlay",
+      "detected_area": 653
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\decals\\overlays\\ground_decal_overlay_032.png",
+      "source_box_xyxy": [
+        506,
+        211,
+        599,
+        286
+      ],
+      "width": 93,
+      "height": 75,
+      "id": "ground_decal_overlay_032",
+      "role": "ground_overlay",
+      "detected_area": 1042
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\decals\\overlays\\ground_decal_overlay_033.png",
+      "source_box_xyxy": [
+        1355,
+        220,
+        1399,
+        259
+      ],
+      "width": 44,
+      "height": 39,
+      "id": "ground_decal_overlay_033",
+      "role": "ground_overlay",
+      "detected_area": 450
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\decals\\overlays\\ground_decal_overlay_034.png",
+      "source_box_xyxy": [
+        1404,
+        220,
+        1445,
+        257
+      ],
+      "width": 41,
+      "height": 37,
+      "id": "ground_decal_overlay_034",
+      "role": "ground_overlay",
+      "detected_area": 345
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\decals\\overlays\\ground_decal_overlay_035.png",
+      "source_box_xyxy": [
+        1296,
+        224,
+        1334,
+        256
+      ],
+      "width": 38,
+      "height": 32,
+      "id": "ground_decal_overlay_035",
+      "role": "ground_overlay",
+      "detected_area": 187
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\decals\\overlays\\ground_decal_overlay_036.png",
+      "source_box_xyxy": [
+        1098,
+        227,
+        1127,
+        254
+      ],
+      "width": 29,
+      "height": 27,
+      "id": "ground_decal_overlay_036",
+      "role": "ground_overlay",
+      "detected_area": 191
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\decals\\overlays\\ground_decal_overlay_037.png",
+      "source_box_xyxy": [
+        1055,
+        271,
+        1161,
+        378
+      ],
+      "width": 106,
+      "height": 107,
+      "id": "ground_decal_overlay_037",
+      "role": "ground_overlay",
+      "detected_area": 5594
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\decals\\overlays\\ground_decal_overlay_038.png",
+      "source_box_xyxy": [
+        948,
+        275,
+        1027,
+        350
+      ],
+      "width": 79,
+      "height": 75,
+      "id": "ground_decal_overlay_038",
+      "role": "ground_overlay",
+      "detected_area": 2598
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\decals\\overlays\\ground_decal_overlay_039.png",
+      "source_box_xyxy": [
+        832,
+        279,
+        979,
+        458
+      ],
+      "width": 147,
+      "height": 179,
+      "id": "ground_decal_overlay_039",
+      "role": "ground_overlay",
+      "detected_area": 13862
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\decals\\overlays\\ground_decal_overlay_040.png",
+      "source_box_xyxy": [
+        1353,
+        282,
+        1412,
+        315
+      ],
+      "width": 59,
+      "height": 33,
+      "id": "ground_decal_overlay_040",
+      "role": "ground_overlay",
+      "detected_area": 613
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\decals\\overlays\\ground_decal_overlay_041.png",
+      "source_box_xyxy": [
+        1188,
+        287,
+        1490,
+        461
+      ],
+      "width": 302,
+      "height": 174,
+      "id": "ground_decal_overlay_041",
+      "role": "ground_overlay",
+      "detected_area": 21902
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\decals\\overlays\\ground_decal_overlay_042.png",
+      "source_box_xyxy": [
+        71,
+        312,
+        140,
+        394
+      ],
+      "width": 69,
+      "height": 82,
+      "id": "ground_decal_overlay_042",
+      "role": "ground_overlay",
+      "detected_area": 587
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\decals\\overlays\\ground_decal_overlay_043.png",
+      "source_box_xyxy": [
+        129,
+        314,
+        359,
+        435
+      ],
+      "width": 230,
+      "height": 121,
+      "id": "ground_decal_overlay_043",
+      "role": "ground_overlay",
+      "detected_area": 5144
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\decals\\overlays\\ground_decal_overlay_044.png",
+      "source_box_xyxy": [
+        608,
+        323,
+        757,
+        434
+      ],
+      "width": 149,
+      "height": 111,
+      "id": "ground_decal_overlay_044",
+      "role": "ground_overlay",
+      "detected_area": 2061
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\decals\\overlays\\ground_decal_overlay_045.png",
+      "source_box_xyxy": [
+        999,
+        340,
+        1082,
+        444
+      ],
+      "width": 83,
+      "height": 104,
+      "id": "ground_decal_overlay_045",
+      "role": "ground_overlay",
+      "detected_area": 3583
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\decals\\overlays\\ground_decal_overlay_046.png",
+      "source_box_xyxy": [
+        438,
+        352,
+        493,
+        388
+      ],
+      "width": 55,
+      "height": 36,
+      "id": "ground_decal_overlay_046",
+      "role": "ground_overlay",
+      "detected_area": 235
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\decals\\overlays\\ground_decal_overlay_047.png",
+      "source_box_xyxy": [
+        333,
+        355,
+        434,
+        408
+      ],
+      "width": 101,
+      "height": 53,
+      "id": "ground_decal_overlay_047",
+      "role": "ground_overlay",
+      "detected_area": 573
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\decals\\overlays\\ground_decal_overlay_048.png",
+      "source_box_xyxy": [
+        1080,
+        377,
+        1161,
+        450
+      ],
+      "width": 81,
+      "height": 73,
+      "id": "ground_decal_overlay_048",
+      "role": "ground_overlay",
+      "detected_area": 2191
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\decals\\overlays\\ground_decal_overlay_049.png",
+      "source_box_xyxy": [
+        1212,
+        414,
+        1244,
+        439
+      ],
+      "width": 32,
+      "height": 25,
+      "id": "ground_decal_overlay_049",
+      "role": "ground_overlay",
+      "detected_area": 205
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\decals\\overlays\\ground_decal_overlay_050.png",
+      "source_box_xyxy": [
+        102,
+        464,
+        142,
+        489
+      ],
+      "width": 40,
+      "height": 25,
+      "id": "ground_decal_overlay_050",
+      "role": "ground_overlay",
+      "detected_area": 218
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\decals\\overlays\\ground_decal_overlay_051.png",
+      "source_box_xyxy": [
+        437,
+        465,
+        692,
+        623
+      ],
+      "width": 255,
+      "height": 158,
+      "id": "ground_decal_overlay_051",
+      "role": "ground_overlay",
+      "detected_area": 21785
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\decals\\overlays\\ground_decal_overlay_052.png",
+      "source_box_xyxy": [
+        1252,
+        476,
+        1512,
+        649
+      ],
+      "width": 260,
+      "height": 173,
+      "id": "ground_decal_overlay_052",
+      "role": "ground_overlay",
+      "detected_area": 14342
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\decals\\overlays\\ground_decal_overlay_053.png",
+      "source_box_xyxy": [
+        712,
+        482,
+        931,
+        620
+      ],
+      "width": 219,
+      "height": 138,
+      "id": "ground_decal_overlay_053",
+      "role": "ground_overlay",
+      "detected_area": 14570
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\decals\\overlays\\ground_decal_overlay_054.png",
+      "source_box_xyxy": [
+        74,
+        483,
+        117,
+        515
+      ],
+      "width": 43,
+      "height": 32,
+      "id": "ground_decal_overlay_054",
+      "role": "ground_overlay",
+      "detected_area": 270
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\decals\\overlays\\ground_decal_overlay_055.png",
+      "source_box_xyxy": [
+        295,
+        490,
+        353,
+        527
+      ],
+      "width": 58,
+      "height": 37,
+      "id": "ground_decal_overlay_055",
+      "role": "ground_overlay",
+      "detected_area": 621
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\decals\\overlays\\ground_decal_overlay_056.png",
+      "source_box_xyxy": [
+        959,
+        494,
+        1041,
+        587
+      ],
+      "width": 82,
+      "height": 93,
+      "id": "ground_decal_overlay_056",
+      "role": "ground_overlay",
+      "detected_area": 2483
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\decals\\overlays\\ground_decal_overlay_057.png",
+      "source_box_xyxy": [
+        987,
+        494,
+        1160,
+        625
+      ],
+      "width": 173,
+      "height": 131,
+      "id": "ground_decal_overlay_057",
+      "role": "ground_overlay",
+      "detected_area": 7116
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\decals\\overlays\\ground_decal_overlay_058.png",
+      "source_box_xyxy": [
+        1080,
+        495,
+        1224,
+        625
+      ],
+      "width": 144,
+      "height": 130,
+      "id": "ground_decal_overlay_058",
+      "role": "ground_overlay",
+      "detected_area": 4566
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\decals\\overlays\\ground_decal_overlay_059.png",
+      "source_box_xyxy": [
+        201,
+        503,
+        254,
+        540
+      ],
+      "width": 53,
+      "height": 37,
+      "id": "ground_decal_overlay_059",
+      "role": "ground_overlay",
+      "detected_area": 563
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\decals\\overlays\\ground_decal_overlay_060.png",
+      "source_box_xyxy": [
+        121,
+        512,
+        183,
+        554
+      ],
+      "width": 62,
+      "height": 42,
+      "id": "ground_decal_overlay_060",
+      "role": "ground_overlay",
+      "detected_area": 815
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\decals\\overlays\\ground_decal_overlay_061.png",
+      "source_box_xyxy": [
+        58,
+        515,
+        119,
+        560
+      ],
+      "width": 61,
+      "height": 45,
+      "id": "ground_decal_overlay_061",
+      "role": "ground_overlay",
+      "detected_area": 776
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\decals\\overlays\\ground_decal_overlay_062.png",
+      "source_box_xyxy": [
+        295,
+        531,
+        330,
+        557
+      ],
+      "width": 35,
+      "height": 26,
+      "id": "ground_decal_overlay_062",
+      "role": "ground_overlay",
+      "detected_area": 187
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\decals\\overlays\\ground_decal_overlay_063.png",
+      "source_box_xyxy": [
+        163,
+        536,
+        198,
+        565
+      ],
+      "width": 35,
+      "height": 29,
+      "id": "ground_decal_overlay_063",
+      "role": "ground_overlay",
+      "detected_area": 200
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\decals\\overlays\\ground_decal_overlay_064.png",
+      "source_box_xyxy": [
+        201,
+        537,
+        247,
+        567
+      ],
+      "width": 46,
+      "height": 30,
+      "id": "ground_decal_overlay_064",
+      "role": "ground_overlay",
+      "detected_area": 327
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\decals\\overlays\\ground_decal_overlay_065.png",
+      "source_box_xyxy": [
+        331,
+        538,
+        390,
+        580
+      ],
+      "width": 59,
+      "height": 42,
+      "id": "ground_decal_overlay_065",
+      "role": "ground_overlay",
+      "detected_area": 727
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\decals\\overlays\\ground_decal_overlay_066.png",
+      "source_box_xyxy": [
+        235,
+        554,
+        297,
+        591
+      ],
+      "width": 62,
+      "height": 37,
+      "id": "ground_decal_overlay_066",
+      "role": "ground_overlay",
+      "detected_area": 560
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\decals\\overlays\\ground_decal_overlay_067.png",
+      "source_box_xyxy": [
+        371,
+        561,
+        405,
+        589
+      ],
+      "width": 34,
+      "height": 28,
+      "id": "ground_decal_overlay_067",
+      "role": "ground_overlay",
+      "detected_area": 177
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\decals\\overlays\\ground_decal_overlay_068.png",
+      "source_box_xyxy": [
+        287,
+        562,
+        318,
+        591
+      ],
+      "width": 31,
+      "height": 29,
+      "id": "ground_decal_overlay_068",
+      "role": "ground_overlay",
+      "detected_area": 193
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\decals\\overlays\\ground_decal_overlay_069.png",
+      "source_box_xyxy": [
+        157,
+        564,
+        218,
+        605
+      ],
+      "width": 61,
+      "height": 41,
+      "id": "ground_decal_overlay_069",
+      "role": "ground_overlay",
+      "detected_area": 787
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\decals\\overlays\\ground_decal_overlay_070.png",
+      "source_box_xyxy": [
+        89,
+        571,
+        129,
+        599
+      ],
+      "width": 40,
+      "height": 28,
+      "id": "ground_decal_overlay_070",
+      "role": "ground_overlay",
+      "detected_area": 241
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\decals\\overlays\\ground_decal_overlay_071.png",
+      "source_box_xyxy": [
+        207,
+        579,
+        240,
+        608
+      ],
+      "width": 33,
+      "height": 29,
+      "id": "ground_decal_overlay_071",
+      "role": "ground_overlay",
+      "detected_area": 195
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\decals\\overlays\\ground_decal_overlay_072.png",
+      "source_box_xyxy": [
+        1192,
+        579,
+        1227,
+        610
+      ],
+      "width": 35,
+      "height": 31,
+      "id": "ground_decal_overlay_072",
+      "role": "ground_overlay",
+      "detected_area": 234
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\decals\\overlays\\ground_decal_overlay_073.png",
+      "source_box_xyxy": [
+        1173,
+        591,
+        1216,
+        625
+      ],
+      "width": 43,
+      "height": 34,
+      "id": "ground_decal_overlay_073",
+      "role": "ground_overlay",
+      "detected_area": 319
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\decals\\overlays\\ground_decal_overlay_074.png",
+      "source_box_xyxy": [
+        52,
+        643,
+        160,
+        745
+      ],
+      "width": 108,
+      "height": 102,
+      "id": "ground_decal_overlay_074",
+      "role": "ground_overlay",
+      "detected_area": 2228
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\decals\\overlays\\ground_decal_overlay_075.png",
+      "source_box_xyxy": [
+        754,
+        646,
+        922,
+        789
+      ],
+      "width": 168,
+      "height": 143,
+      "id": "ground_decal_overlay_075",
+      "role": "ground_overlay",
+      "detected_area": 17267
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\decals\\overlays\\ground_decal_overlay_076.png",
+      "source_box_xyxy": [
+        515,
+        647,
+        700,
+        787
+      ],
+      "width": 185,
+      "height": 140,
+      "id": "ground_decal_overlay_076",
+      "role": "ground_overlay",
+      "detected_area": 9927
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\decals\\overlays\\ground_decal_overlay_077.png",
+      "source_box_xyxy": [
+        41,
+        652,
+        78,
+        683
+      ],
+      "width": 37,
+      "height": 31,
+      "id": "ground_decal_overlay_077",
+      "role": "ground_overlay",
+      "detected_area": 338
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\decals\\overlays\\ground_decal_overlay_078.png",
+      "source_box_xyxy": [
+        983,
+        663,
+        1147,
+        778
+      ],
+      "width": 164,
+      "height": 115,
+      "id": "ground_decal_overlay_078",
+      "role": "ground_overlay",
+      "detected_area": 9439
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\decals\\overlays\\ground_decal_overlay_079.png",
+      "source_box_xyxy": [
+        1196,
+        667,
+        1520,
+        768
+      ],
+      "width": 324,
+      "height": 101,
+      "id": "ground_decal_overlay_079",
+      "role": "ground_overlay",
+      "detected_area": 6407
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\decals\\overlays\\ground_decal_overlay_080.png",
+      "source_box_xyxy": [
+        243,
+        670,
+        431,
+        775
+      ],
+      "width": 188,
+      "height": 105,
+      "id": "ground_decal_overlay_080",
+      "role": "ground_overlay",
+      "detected_area": 7836
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\decals\\overlays\\ground_decal_overlay_081.png",
+      "source_box_xyxy": [
+        156,
+        700,
+        187,
+        728
+      ],
+      "width": 31,
+      "height": 28,
+      "id": "ground_decal_overlay_081",
+      "role": "ground_overlay",
+      "detected_area": 192
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\decals\\overlays\\ground_decal_overlay_083.png",
+      "source_box_xyxy": [
+        1141,
+        714,
+        1180,
+        745
+      ],
+      "width": 39,
+      "height": 31,
+      "id": "ground_decal_overlay_083",
+      "role": "ground_overlay",
+      "detected_area": 285
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\decals\\overlays\\ground_decal_overlay_084.png",
+      "source_box_xyxy": [
+        132,
+        722,
+        175,
+        757
+      ],
+      "width": 43,
+      "height": 35,
+      "id": "ground_decal_overlay_084",
+      "role": "ground_overlay",
+      "detected_area": 488
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\decals\\overlays\\ground_decal_overlay_085.png",
+      "source_box_xyxy": [
+        1430,
+        742,
+        1462,
+        766
+      ],
+      "width": 32,
+      "height": 24,
+      "id": "ground_decal_overlay_085",
+      "role": "ground_overlay",
+      "detected_area": 161
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\decals\\overlays\\ground_decal_overlay_086.png",
+      "source_box_xyxy": [
+        1122,
+        743,
+        1150,
+        768
+      ],
+      "width": 28,
+      "height": 25,
+      "id": "ground_decal_overlay_086",
+      "role": "ground_overlay",
+      "detected_area": 152
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\decals\\overlays\\ground_decal_overlay_087.png",
+      "source_box_xyxy": [
+        340,
+        791,
+        566,
+        990
+      ],
+      "width": 226,
+      "height": 199,
+      "id": "ground_decal_overlay_087",
+      "role": "ground_overlay",
+      "detected_area": 11807
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\decals\\overlays\\ground_decal_overlay_088.png",
+      "source_box_xyxy": [
+        35,
+        794,
+        305,
+        979
+      ],
+      "width": 270,
+      "height": 185,
+      "id": "ground_decal_overlay_088",
+      "role": "ground_overlay",
+      "detected_area": 16854
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\decals\\overlays\\ground_decal_overlay_089.png",
+      "source_box_xyxy": [
+        602,
+        795,
+        746,
+        976
+      ],
+      "width": 144,
+      "height": 181,
+      "id": "ground_decal_overlay_089",
+      "role": "ground_overlay",
+      "detected_area": 5500
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\decals\\overlays\\ground_decal_overlay_090.png",
+      "source_box_xyxy": [
+        240,
+        804,
+        268,
+        854
+      ],
+      "width": 28,
+      "height": 50,
+      "id": "ground_decal_overlay_090",
+      "role": "ground_overlay",
+      "detected_area": 156
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\decals\\overlays\\ground_decal_overlay_091.png",
+      "source_box_xyxy": [
+        998,
+        809,
+        1166,
+        985
+      ],
+      "width": 168,
+      "height": 176,
+      "id": "ground_decal_overlay_091",
+      "role": "ground_overlay",
+      "detected_area": 21637
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\decals\\overlays\\ground_decal_overlay_092.png",
+      "source_box_xyxy": [
+        1174,
+        809,
+        1261,
+        965
+      ],
+      "width": 87,
+      "height": 156,
+      "id": "ground_decal_overlay_092",
+      "role": "ground_overlay",
+      "detected_area": 7099
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\decals\\overlays\\ground_decal_overlay_093.png",
+      "source_box_xyxy": [
+        1268,
+        809,
+        1384,
+        982
+      ],
+      "width": 116,
+      "height": 173,
+      "id": "ground_decal_overlay_093",
+      "role": "ground_overlay",
+      "detected_area": 13549
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\decals\\overlays\\ground_decal_overlay_094.png",
+      "source_box_xyxy": [
+        1392,
+        813,
+        1502,
+        983
+      ],
+      "width": 110,
+      "height": 170,
+      "id": "ground_decal_overlay_094",
+      "role": "ground_overlay",
+      "detected_area": 12558
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\decals\\overlays\\ground_decal_overlay_095.png",
+      "source_box_xyxy": [
+        792,
+        829,
+        972,
+        990
+      ],
+      "width": 180,
+      "height": 161,
+      "id": "ground_decal_overlay_095",
+      "role": "ground_overlay",
+      "detected_area": 9454
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\decals\\overlays\\ground_decal_overlay_096.png",
+      "source_box_xyxy": [
+        354,
+        850,
+        417,
+        888
+      ],
+      "width": 63,
+      "height": 38,
+      "id": "ground_decal_overlay_096",
+      "role": "ground_overlay",
+      "detected_area": 325
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\decals\\overlays\\ground_decal_overlay_097.png",
+      "source_box_xyxy": [
+        1204,
+        935,
+        1260,
+        984
+      ],
+      "width": 56,
+      "height": 49,
+      "id": "ground_decal_overlay_097",
+      "role": "ground_overlay",
+      "detected_area": 852
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\decals\\overlays\\ground_decal_overlay_098.png",
+      "source_box_xyxy": [
+        72,
+        942,
+        107,
+        968
+      ],
+      "width": 35,
+      "height": 26,
+      "id": "ground_decal_overlay_098",
+      "role": "ground_overlay",
+      "detected_area": 212
+    }
+  ]
+}

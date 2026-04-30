@@ -1,0 +1,93 @@
+{
+  "source_sheet": "K:\\ProjectEscape\\project-escape\\assets\\sprites\\player\\sheets\\player_male_idle_4dir_sheet_01.png",
+  "source_chroma_sheet": "K:\\ProjectEscape\\project-escape\\assets\\sprites\\player\\sheets\\player_male_idle_4dir_sheet_01_chroma.png",
+  "source_transparent_sheet": "K:\\ProjectEscape\\project-escape\\assets\\sprites\\player\\sheets\\player_male_idle_4dir_sheet_source_01.png",
+  "notes": "Male protagonist four-direction idle sprite sheet. Generated from the provided boy reference images, keyed from flat chroma green, normalized to 256x256 frames, and split into individual direction sprites for Godot.",
+  "metadata": {
+    "asset_type": "character_sprite",
+    "character": "player_male",
+    "animation": "idle",
+    "frame_size": [
+      256,
+      256
+    ],
+    "sheet_layout": "2x2",
+    "direction_order": [
+      "down",
+      "up",
+      "left",
+      "right"
+    ],
+    "style": "dark hand-drawn manga line art, dirty grayscale wasteland survivor, tiny purple and blue electronic accents"
+  },
+  "assets": [
+    {
+      "id": "player_male_idle_down_01",
+      "direction": "down",
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\sprites\\player\\player_male_idle_down_01.png",
+      "frame_box_xywh": [
+        0,
+        0,
+        256,
+        256
+      ],
+      "visible_bbox_xyxy": [
+        90,
+        28,
+        165,
+        244
+      ]
+    },
+    {
+      "id": "player_male_idle_up_01",
+      "direction": "up",
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\sprites\\player\\player_male_idle_up_01.png",
+      "frame_box_xywh": [
+        256,
+        0,
+        256,
+        256
+      ],
+      "visible_bbox_xyxy": [
+        90,
+        30,
+        165,
+        244
+      ]
+    },
+    {
+      "id": "player_male_idle_left_01",
+      "direction": "left",
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\sprites\\player\\player_male_idle_left_01.png",
+      "frame_box_xywh": [
+        0,
+        256,
+        256,
+        256
+      ],
+      "visible_bbox_xyxy": [
+        93,
+        14,
+        163,
+        244
+      ]
+    },
+    {
+      "id": "player_male_idle_right_01",
+      "direction": "right",
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\sprites\\player\\player_male_idle_right_01.png",
+      "frame_box_xywh": [
+        256,
+        256,
+        256,
+        256
+      ],
+      "visible_bbox_xyxy": [
+        93,
+        14,
+        162,
+        244
+      ]
+    }
+  ]
+}

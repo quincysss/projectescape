@@ -1,0 +1,228 @@
+{
+  "source_sheet": "K:\\ProjectEscape\\project-escape\\assets\\map\\outposts\\sheets\\outpost_broken_repaired_sheet_01.png",
+  "notes": "Older outpost concept sheet split for archival reuse. Use sheet_02 assets for production.",
+  "metadata": {},
+  "assets": [
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\outposts\\concept_parts\\outpost_concept_01.png",
+      "source_box_xyxy": [
+        63,
+        14,
+        738,
+        520
+      ],
+      "width": 675,
+      "height": 506,
+      "id": "outpost_concept_01",
+      "role": "concept_reference"
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\outposts\\concept_parts\\outpost_concept_02.png",
+      "source_box_xyxy": [
+        751,
+        16,
+        1430,
+        519
+      ],
+      "width": 679,
+      "height": 503,
+      "id": "outpost_concept_02",
+      "role": "concept_reference"
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\outposts\\concept_parts\\outpost_concept_03.png",
+      "source_box_xyxy": [
+        709,
+        505,
+        812,
+        657
+      ],
+      "width": 103,
+      "height": 152,
+      "id": "outpost_concept_03",
+      "role": "concept_part"
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\outposts\\concept_parts\\outpost_concept_04.png",
+      "source_box_xyxy": [
+        559,
+        510,
+        664,
+        657
+      ],
+      "width": 105,
+      "height": 147,
+      "id": "outpost_concept_04",
+      "role": "concept_part"
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\outposts\\concept_parts\\outpost_concept_05.png",
+      "source_box_xyxy": [
+        1120,
+        530,
+        1369,
+        673
+      ],
+      "width": 249,
+      "height": 143,
+      "id": "outpost_concept_05",
+      "role": "concept_part"
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\outposts\\concept_parts\\outpost_concept_06.png",
+      "source_box_xyxy": [
+        849,
+        535,
+        1099,
+        668
+      ],
+      "width": 250,
+      "height": 133,
+      "id": "outpost_concept_06",
+      "role": "concept_part"
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\outposts\\concept_parts\\outpost_concept_07.png",
+      "source_box_xyxy": [
+        22,
+        538,
+        537,
+        923
+      ],
+      "width": 515,
+      "height": 385,
+      "id": "outpost_concept_07",
+      "role": "concept_part"
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\outposts\\concept_parts\\outpost_concept_08.png",
+      "source_box_xyxy": [
+        978,
+        680,
+        1073,
+        795
+      ],
+      "width": 95,
+      "height": 115,
+      "id": "outpost_concept_08",
+      "role": "concept_part"
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\outposts\\concept_parts\\outpost_concept_09.png",
+      "source_box_xyxy": [
+        1298,
+        681,
+        1487,
+        810
+      ],
+      "width": 189,
+      "height": 129,
+      "id": "outpost_concept_09",
+      "role": "concept_part"
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\outposts\\concept_parts\\outpost_concept_10.png",
+      "source_box_xyxy": [
+        1111,
+        682,
+        1274,
+        812
+      ],
+      "width": 163,
+      "height": 130,
+      "id": "outpost_concept_10",
+      "role": "concept_part"
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\outposts\\concept_parts\\outpost_concept_11.png",
+      "source_box_xyxy": [
+        557,
+        690,
+        681,
+        785
+      ],
+      "width": 124,
+      "height": 95,
+      "id": "outpost_concept_11",
+      "role": "concept_part"
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\outposts\\concept_parts\\outpost_concept_12.png",
+      "source_box_xyxy": [
+        856,
+        694,
+        959,
+        785
+      ],
+      "width": 103,
+      "height": 91,
+      "id": "outpost_concept_12",
+      "role": "concept_part"
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\outposts\\concept_parts\\outpost_concept_13.png",
+      "source_box_xyxy": [
+        706,
+        698,
+        834,
+        784
+      ],
+      "width": 128,
+      "height": 86,
+      "id": "outpost_concept_13",
+      "role": "concept_part"
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\outposts\\concept_parts\\outpost_concept_14.png",
+      "source_box_xyxy": [
+        670,
+        814,
+        810,
+        980
+      ],
+      "width": 140,
+      "height": 166,
+      "id": "outpost_concept_14",
+      "role": "concept_part"
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\outposts\\concept_parts\\outpost_concept_15.png",
+      "source_box_xyxy": [
+        515,
+        815,
+        665,
+        980
+      ],
+      "width": 150,
+      "height": 165,
+      "id": "outpost_concept_15",
+      "role": "concept_part"
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\outposts\\concept_parts\\outpost_concept_16.png",
+      "source_box_xyxy": [
+        821,
+        828,
+        955,
+        977
+      ],
+      "width": 134,
+      "height": 149,
+      "id": "outpost_concept_16",
+      "role": "concept_part"
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\outposts\\concept_parts\\outpost_concept_17.png",
+      "source_box_xyxy": [
+        962,
+        828,
+        1099,
+        982
+      ],
+      "width": 137,
+      "height": 154,
+      "id": "outpost_concept_17",
+      "role": "concept_part"
+    }
+  ]
+}

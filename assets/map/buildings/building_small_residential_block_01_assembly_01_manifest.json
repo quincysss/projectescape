@@ -1,0 +1,486 @@
+{
+  "source_sheet": "K:\\ProjectEscape\\project-escape\\assets\\map\\buildings\\sheets\\building_small_residential_block_assembly_01.png",
+  "notes": "Building assembly sheet split. Ordinary buildings are non-enterable obstacles and must use explicit CollisionShape2D; do not depend on alpha pixels.",
+  "metadata": {
+    "doc": "03_????????/03_?????????.md",
+    "building_id": "building_small_residential_block_01",
+    "building_type": "small_house",
+    "size_units": "8x6_or_10x8"
+  },
+  "assets": [
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\buildings\\assembled\\building_small_residential_block_01.png",
+      "source_box_xyxy": [
+        149,
+        8,
+        666,
+        394
+      ],
+      "width": 517,
+      "height": 386,
+      "id": "building_small_residential_block_01",
+      "role": "assembled",
+      "building_type": "small_house",
+      "size_units": "8x6_or_10x8"
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\buildings\\parts\\building_small_residential_block_01_part_01.png",
+      "source_box_xyxy": [
+        30,
+        398,
+        91,
+        486
+      ],
+      "width": 61,
+      "height": 88,
+      "id": "building_small_residential_block_01_part_01",
+      "role": "assembly_part",
+      "building_id": "building_small_residential_block_01",
+      "building_type": "small_house",
+      "size_units": "8x6_or_10x8",
+      "detected_area": 3087
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\buildings\\parts\\building_small_residential_block_01_part_02.png",
+      "source_box_xyxy": [
+        563,
+        403,
+        975,
+        536
+      ],
+      "width": 412,
+      "height": 133,
+      "id": "building_small_residential_block_01_part_02",
+      "role": "assembly_part",
+      "building_id": "building_small_residential_block_01",
+      "building_type": "small_house",
+      "size_units": "8x6_or_10x8",
+      "detected_area": 41797
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\buildings\\parts\\building_small_residential_block_01_part_03.png",
+      "source_box_xyxy": [
+        1430,
+        404,
+        1497,
+        490
+      ],
+      "width": 67,
+      "height": 86,
+      "id": "building_small_residential_block_01_part_03",
+      "role": "assembly_part",
+      "building_id": "building_small_residential_block_01",
+      "building_type": "small_house",
+      "size_units": "8x6_or_10x8",
+      "detected_area": 3497
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\buildings\\parts\\building_small_residential_block_01_part_04.png",
+      "source_box_xyxy": [
+        106,
+        408,
+        543,
+        708
+      ],
+      "width": 437,
+      "height": 300,
+      "id": "building_small_residential_block_01_part_04",
+      "role": "assembly_part",
+      "building_id": "building_small_residential_block_01",
+      "building_type": "small_house",
+      "size_units": "8x6_or_10x8",
+      "detected_area": 117419
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\buildings\\parts\\building_small_residential_block_01_part_05.png",
+      "source_box_xyxy": [
+        996,
+        410,
+        1401,
+        489
+      ],
+      "width": 405,
+      "height": 79,
+      "id": "building_small_residential_block_01_part_05",
+      "role": "assembly_part",
+      "building_id": "building_small_residential_block_01",
+      "building_type": "small_house",
+      "size_units": "8x6_or_10x8",
+      "detected_area": 22462
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\buildings\\parts\\building_small_residential_block_01_part_06.png",
+      "source_box_xyxy": [
+        26,
+        492,
+        89,
+        600
+      ],
+      "width": 63,
+      "height": 108,
+      "id": "building_small_residential_block_01_part_06",
+      "role": "assembly_part",
+      "building_id": "building_small_residential_block_01",
+      "building_type": "small_house",
+      "size_units": "8x6_or_10x8",
+      "detected_area": 4022
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\buildings\\parts\\building_small_residential_block_01_part_07.png",
+      "source_box_xyxy": [
+        1428,
+        492,
+        1495,
+        601
+      ],
+      "width": 67,
+      "height": 109,
+      "id": "building_small_residential_block_01_part_07",
+      "role": "assembly_part",
+      "building_id": "building_small_residential_block_01",
+      "building_type": "small_house",
+      "size_units": "8x6_or_10x8",
+      "detected_area": 4517
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\buildings\\parts\\building_small_residential_block_01_part_08.png",
+      "source_box_xyxy": [
+        995,
+        493,
+        1394,
+        601
+      ],
+      "width": 399,
+      "height": 108,
+      "id": "building_small_residential_block_01_part_08",
+      "role": "assembly_part",
+      "building_id": "building_small_residential_block_01",
+      "building_type": "small_house",
+      "size_units": "8x6_or_10x8",
+      "detected_area": 32881
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\buildings\\parts\\building_small_residential_block_01_part_09.png",
+      "source_box_xyxy": [
+        557,
+        533,
+        976,
+        715
+      ],
+      "width": 419,
+      "height": 182,
+      "id": "building_small_residential_block_01_part_09",
+      "role": "assembly_part",
+      "building_id": "building_small_residential_block_01",
+      "building_type": "small_house",
+      "size_units": "8x6_or_10x8",
+      "detected_area": 65749
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\buildings\\parts\\building_small_residential_block_01_part_10.png",
+      "source_box_xyxy": [
+        22,
+        600,
+        93,
+        707
+      ],
+      "width": 71,
+      "height": 107,
+      "id": "building_small_residential_block_01_part_10",
+      "role": "assembly_part",
+      "building_id": "building_small_residential_block_01",
+      "building_type": "small_house",
+      "size_units": "8x6_or_10x8",
+      "detected_area": 4285
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\buildings\\parts\\building_small_residential_block_01_part_11.png",
+      "source_box_xyxy": [
+        1425,
+        601,
+        1498,
+        710
+      ],
+      "width": 73,
+      "height": 109,
+      "id": "building_small_residential_block_01_part_11",
+      "role": "assembly_part",
+      "building_id": "building_small_residential_block_01",
+      "building_type": "small_house",
+      "size_units": "8x6_or_10x8",
+      "detected_area": 4666
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\buildings\\parts\\building_small_residential_block_01_part_12.png",
+      "source_box_xyxy": [
+        993,
+        603,
+        1400,
+        711
+      ],
+      "width": 407,
+      "height": 108,
+      "id": "building_small_residential_block_01_part_12",
+      "role": "assembly_part",
+      "building_id": "building_small_residential_block_01",
+      "building_type": "small_house",
+      "size_units": "8x6_or_10x8",
+      "detected_area": 33284
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\buildings\\parts\\building_small_residential_block_01_part_13.png",
+      "source_box_xyxy": [
+        867,
+        724,
+        989,
+        869
+      ],
+      "width": 122,
+      "height": 145,
+      "id": "building_small_residential_block_01_part_13",
+      "role": "assembly_part",
+      "building_id": "building_small_residential_block_01",
+      "building_type": "small_house",
+      "size_units": "8x6_or_10x8",
+      "detected_area": 13281
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\buildings\\parts\\building_small_residential_block_01_part_14.png",
+      "source_box_xyxy": [
+        110,
+        728,
+        297,
+        847
+      ],
+      "width": 187,
+      "height": 119,
+      "id": "building_small_residential_block_01_part_14",
+      "role": "assembly_part",
+      "building_id": "building_small_residential_block_01",
+      "building_type": "small_house",
+      "size_units": "8x6_or_10x8",
+      "detected_area": 17348
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\buildings\\parts\\building_small_residential_block_01_part_15.png",
+      "source_box_xyxy": [
+        335,
+        728,
+        525,
+        847
+      ],
+      "width": 190,
+      "height": 119,
+      "id": "building_small_residential_block_01_part_15",
+      "role": "assembly_part",
+      "building_id": "building_small_residential_block_01",
+      "building_type": "small_house",
+      "size_units": "8x6_or_10x8",
+      "detected_area": 17621
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\buildings\\parts\\building_small_residential_block_01_part_16.png",
+      "source_box_xyxy": [
+        561,
+        728,
+        677,
+        849
+      ],
+      "width": 116,
+      "height": 121,
+      "id": "building_small_residential_block_01_part_16",
+      "role": "assembly_part",
+      "building_id": "building_small_residential_block_01",
+      "building_type": "small_house",
+      "size_units": "8x6_or_10x8",
+      "detected_area": 10307
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\buildings\\parts\\building_small_residential_block_01_part_17.png",
+      "source_box_xyxy": [
+        706,
+        728,
+        830,
+        849
+      ],
+      "width": 124,
+      "height": 121,
+      "id": "building_small_residential_block_01_part_17",
+      "role": "assembly_part",
+      "building_id": "building_small_residential_block_01",
+      "building_type": "small_house",
+      "size_units": "8x6_or_10x8",
+      "detected_area": 11192
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\buildings\\parts\\building_small_residential_block_01_part_18.png",
+      "source_box_xyxy": [
+        1023,
+        730,
+        1154,
+        848
+      ],
+      "width": 131,
+      "height": 118,
+      "id": "building_small_residential_block_01_part_18",
+      "role": "assembly_part",
+      "building_id": "building_small_residential_block_01",
+      "building_type": "small_house",
+      "size_units": "8x6_or_10x8",
+      "detected_area": 10671
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\buildings\\parts\\building_small_residential_block_01_part_19.png",
+      "source_box_xyxy": [
+        1185,
+        741,
+        1410,
+        838
+      ],
+      "width": 225,
+      "height": 97,
+      "id": "building_small_residential_block_01_part_19",
+      "role": "assembly_part",
+      "building_id": "building_small_residential_block_01",
+      "building_type": "small_house",
+      "size_units": "8x6_or_10x8",
+      "detected_area": 11848
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\buildings\\parts\\building_small_residential_block_01_part_20.png",
+      "source_box_xyxy": [
+        116,
+        840,
+        234,
+        992
+      ],
+      "width": 118,
+      "height": 152,
+      "id": "building_small_residential_block_01_part_20",
+      "role": "assembly_part",
+      "building_id": "building_small_residential_block_01",
+      "building_type": "small_house",
+      "size_units": "8x6_or_10x8",
+      "detected_area": 9932
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\buildings\\parts\\building_small_residential_block_01_part_21.png",
+      "source_box_xyxy": [
+        663,
+        866,
+        717,
+        998
+      ],
+      "width": 54,
+      "height": 132,
+      "id": "building_small_residential_block_01_part_21",
+      "role": "assembly_part",
+      "building_id": "building_small_residential_block_01",
+      "building_type": "small_house",
+      "size_units": "8x6_or_10x8",
+      "detected_area": 2508
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\buildings\\parts\\building_small_residential_block_01_part_22.png",
+      "source_box_xyxy": [
+        947,
+        870,
+        1039,
+        997
+      ],
+      "width": 92,
+      "height": 127,
+      "id": "building_small_residential_block_01_part_22",
+      "role": "assembly_part",
+      "building_id": "building_small_residential_block_01",
+      "building_type": "small_house",
+      "size_units": "8x6_or_10x8",
+      "detected_area": 7769
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\buildings\\parts\\building_small_residential_block_01_part_23.png",
+      "source_box_xyxy": [
+        1072,
+        871,
+        1279,
+        994
+      ],
+      "width": 207,
+      "height": 123,
+      "id": "building_small_residential_block_01_part_23",
+      "role": "assembly_part",
+      "building_id": "building_small_residential_block_01",
+      "building_type": "small_house",
+      "size_units": "8x6_or_10x8",
+      "detected_area": 6255
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\buildings\\parts\\building_small_residential_block_01_part_24.png",
+      "source_box_xyxy": [
+        1319,
+        872,
+        1402,
+        992
+      ],
+      "width": 83,
+      "height": 120,
+      "id": "building_small_residential_block_01_part_24",
+      "role": "assembly_part",
+      "building_id": "building_small_residential_block_01",
+      "building_type": "small_house",
+      "size_units": "8x6_or_10x8",
+      "detected_area": 3249
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\buildings\\parts\\building_small_residential_block_01_part_25.png",
+      "source_box_xyxy": [
+        775,
+        875,
+        909,
+        995
+      ],
+      "width": 134,
+      "height": 120,
+      "id": "building_small_residential_block_01_part_25",
+      "role": "assembly_part",
+      "building_id": "building_small_residential_block_01",
+      "building_type": "small_house",
+      "size_units": "8x6_or_10x8",
+      "detected_area": 11935
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\buildings\\parts\\building_small_residential_block_01_part_26.png",
+      "source_box_xyxy": [
+        462,
+        876,
+        583,
+        992
+      ],
+      "width": 121,
+      "height": 116,
+      "id": "building_small_residential_block_01_part_26",
+      "role": "assembly_part",
+      "building_id": "building_small_residential_block_01",
+      "building_type": "small_house",
+      "size_units": "8x6_or_10x8",
+      "detected_area": 7860
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\buildings\\parts\\building_small_residential_block_01_part_27.png",
+      "source_box_xyxy": [
+        286,
+        882,
+        402,
+        988
+      ],
+      "width": 116,
+      "height": 106,
+      "id": "building_small_residential_block_01_part_27",
+      "role": "assembly_part",
+      "building_id": "building_small_residential_block_01",
+      "building_type": "small_house",
+      "size_units": "8x6_or_10x8",
+      "detected_area": 7858
+    }
+  ]
+}

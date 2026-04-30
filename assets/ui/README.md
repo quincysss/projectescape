@@ -33,6 +33,7 @@ Mockups define layout and visual hierarchy.
 Sprite sheets are transparent, grid-based, one element per cell, and ready for slicing.
 Sliced UI elements should follow ui_[system]_[element]_[state].png.
 Single icon slices should follow ui_icon_[element]_[state]_01.png.
+Per-sheet slice manifests should follow ui_[sheet_name]_slices.tab.
 ```
 
 First production batch:
@@ -50,6 +51,7 @@ Generated batch manifest:
 
 ```text
 assets/ui/ui_asset_manifest.tab
+assets/ui/ui_slice_manifest.tab
 ```
 
 Preview contact sheet:
@@ -64,4 +66,20 @@ Sliced icon batch:
 assets/ui/icons/ui_system_icons_sheet_01_slices.tab
 assets/ui/icons/ui_system_icons_sheet_01_slices_preview.png
 assets/ui/icons/sliced/
+```
+
+Sliced production batch:
+
+```text
+assets/ui/hud/sliced/
+assets/ui/outlines/sliced/
+assets/ui/inventory/sliced/
+assets/ui/extraction/sliced/
+assets/ui/base_nav/sliced/
+assets/ui/warehouse/sliced/
+assets/ui/research/sliced/
+assets/ui/crafting/sliced/
+assets/ui/prep/sliced/
+assets/ui/icons/sliced/
+assets/ui/ui_slice_batch_preview_01.png
 ```

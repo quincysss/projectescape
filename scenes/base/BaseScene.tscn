@@ -1,0 +1,21 @@
+[gd_scene format=3]
+
+[node name="BaseScene" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+
+[node name="BaseUIRoot" type="Control" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+
+[node name="StartRunButton" type="Button" parent="BaseUIRoot"]
+layout_mode = 0
+offset_left = 24.0
+offset_top = 24.0
+offset_right = 164.0
+offset_bottom = 56.0
+text = "Start Run"

@@ -1,0 +1,571 @@
+{
+  "source_sheet": "K:\\ProjectEscape\\project-escape\\assets\\map\\buildings\\sheets\\building_large_ruined_market_assembly_01.png",
+  "notes": "Building assembly sheet split. Ordinary buildings are non-enterable obstacles and must use explicit CollisionShape2D; do not depend on alpha pixels.",
+  "metadata": {
+    "doc": "03_????????/03_?????????.md",
+    "building_id": "building_large_ruined_market_01",
+    "building_type": "factory_or_market",
+    "size_units": "18x12"
+  },
+  "assets": [
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\buildings\\assembled\\building_large_ruined_market_01.png",
+      "source_box_xyxy": [
+        37,
+        8,
+        758,
+        424
+      ],
+      "width": 721,
+      "height": 416,
+      "id": "building_large_ruined_market_01",
+      "role": "assembled",
+      "building_type": "factory_or_market",
+      "size_units": "18x12"
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\buildings\\parts\\building_large_ruined_market_01_part_01.png",
+      "source_box_xyxy": [
+        45,
+        419,
+        105,
+        518
+      ],
+      "width": 60,
+      "height": 99,
+      "id": "building_large_ruined_market_01_part_01",
+      "role": "assembly_part",
+      "building_id": "building_large_ruined_market_01",
+      "building_type": "factory_or_market",
+      "size_units": "18x12",
+      "detected_area": 3444
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\buildings\\parts\\building_large_ruined_market_01_part_02.png",
+      "source_box_xyxy": [
+        118,
+        423,
+        620,
+        647
+      ],
+      "width": 502,
+      "height": 224,
+      "id": "building_large_ruined_market_01_part_02",
+      "role": "assembly_part",
+      "building_id": "building_large_ruined_market_01",
+      "building_type": "factory_or_market",
+      "size_units": "18x12",
+      "detected_area": 98840
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\buildings\\parts\\building_large_ruined_market_01_part_03.png",
+      "source_box_xyxy": [
+        631,
+        424,
+        1418,
+        512
+      ],
+      "width": 787,
+      "height": 88,
+      "id": "building_large_ruined_market_01_part_03",
+      "role": "assembly_part",
+      "building_id": "building_large_ruined_market_01",
+      "building_type": "factory_or_market",
+      "size_units": "18x12",
+      "detected_area": 37944
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\buildings\\parts\\building_large_ruined_market_01_part_04.png",
+      "source_box_xyxy": [
+        1423,
+        428,
+        1488,
+        524
+      ],
+      "width": 65,
+      "height": 96,
+      "id": "building_large_ruined_market_01_part_04",
+      "role": "assembly_part",
+      "building_id": "building_large_ruined_market_01",
+      "building_type": "factory_or_market",
+      "size_units": "18x12",
+      "detected_area": 3643
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\buildings\\parts\\building_large_ruined_market_01_part_05.png",
+      "source_box_xyxy": [
+        690,
+        506,
+        1423,
+        664
+      ],
+      "width": 733,
+      "height": 158,
+      "id": "building_large_ruined_market_01_part_05",
+      "role": "assembly_part",
+      "building_id": "building_large_ruined_market_01",
+      "building_type": "factory_or_market",
+      "size_units": "18x12",
+      "detected_area": 86950
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\buildings\\parts\\building_large_ruined_market_01_part_06.png",
+      "source_box_xyxy": [
+        38,
+        511,
+        102,
+        646
+      ],
+      "width": 64,
+      "height": 135,
+      "id": "building_large_ruined_market_01_part_06",
+      "role": "assembly_part",
+      "building_id": "building_large_ruined_market_01",
+      "building_type": "factory_or_market",
+      "size_units": "18x12",
+      "detected_area": 5104
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\buildings\\parts\\building_large_ruined_market_01_part_07.png",
+      "source_box_xyxy": [
+        629,
+        513,
+        691,
+        648
+      ],
+      "width": 62,
+      "height": 135,
+      "id": "building_large_ruined_market_01_part_07",
+      "role": "assembly_part",
+      "building_id": "building_large_ruined_market_01",
+      "building_type": "factory_or_market",
+      "size_units": "18x12",
+      "detected_area": 5120
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\buildings\\parts\\building_large_ruined_market_01_part_08.png",
+      "source_box_xyxy": [
+        1429,
+        515,
+        1493,
+        651
+      ],
+      "width": 64,
+      "height": 136,
+      "id": "building_large_ruined_market_01_part_08",
+      "role": "assembly_part",
+      "building_id": "building_large_ruined_market_01",
+      "building_type": "factory_or_market",
+      "size_units": "18x12",
+      "detected_area": 5153
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\buildings\\parts\\building_large_ruined_market_01_part_09.png",
+      "source_box_xyxy": [
+        27,
+        643,
+        93,
+        723
+      ],
+      "width": 66,
+      "height": 80,
+      "id": "building_large_ruined_market_01_part_09",
+      "role": "assembly_part",
+      "building_id": "building_large_ruined_market_01",
+      "building_type": "factory_or_market",
+      "size_units": "18x12",
+      "detected_area": 2991
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\buildings\\parts\\building_large_ruined_market_01_part_10.png",
+      "source_box_xyxy": [
+        109,
+        645,
+        711,
+        723
+      ],
+      "width": 602,
+      "height": 78,
+      "id": "building_large_ruined_market_01_part_10",
+      "role": "assembly_part",
+      "building_id": "building_large_ruined_market_01",
+      "building_type": "factory_or_market",
+      "size_units": "18x12",
+      "detected_area": 29569
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\buildings\\parts\\building_large_ruined_market_01_part_11.png",
+      "source_box_xyxy": [
+        1433,
+        652,
+        1498,
+        732
+      ],
+      "width": 65,
+      "height": 80,
+      "id": "building_large_ruined_market_01_part_11",
+      "role": "assembly_part",
+      "building_id": "building_large_ruined_market_01",
+      "building_type": "factory_or_market",
+      "size_units": "18x12",
+      "detected_area": 2850
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\buildings\\parts\\building_large_ruined_market_01_part_12.png",
+      "source_box_xyxy": [
+        731,
+        667,
+        1039,
+        725
+      ],
+      "width": 308,
+      "height": 58,
+      "id": "building_large_ruined_market_01_part_12",
+      "role": "assembly_part",
+      "building_id": "building_large_ruined_market_01",
+      "building_type": "factory_or_market",
+      "size_units": "18x12",
+      "detected_area": 8846
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\buildings\\parts\\building_large_ruined_market_01_part_13.png",
+      "source_box_xyxy": [
+        1048,
+        669,
+        1422,
+        728
+      ],
+      "width": 374,
+      "height": 59,
+      "id": "building_large_ruined_market_01_part_13",
+      "role": "assembly_part",
+      "building_id": "building_large_ruined_market_01",
+      "building_type": "factory_or_market",
+      "size_units": "18x12",
+      "detected_area": 11393
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\buildings\\parts\\building_large_ruined_market_01_part_14.png",
+      "source_box_xyxy": [
+        32,
+        723,
+        404,
+        840
+      ],
+      "width": 372,
+      "height": 117,
+      "id": "building_large_ruined_market_01_part_14",
+      "role": "assembly_part",
+      "building_id": "building_large_ruined_market_01",
+      "building_type": "factory_or_market",
+      "size_units": "18x12",
+      "detected_area": 34765
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\buildings\\parts\\building_large_ruined_market_01_part_15.png",
+      "source_box_xyxy": [
+        420,
+        724,
+        781,
+        842
+      ],
+      "width": 361,
+      "height": 118,
+      "id": "building_large_ruined_market_01_part_15",
+      "role": "assembly_part",
+      "building_id": "building_large_ruined_market_01",
+      "building_type": "factory_or_market",
+      "size_units": "18x12",
+      "detected_area": 34805
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\buildings\\parts\\building_large_ruined_market_01_part_16.png",
+      "source_box_xyxy": [
+        784,
+        731,
+        1502,
+        851
+      ],
+      "width": 718,
+      "height": 120,
+      "id": "building_large_ruined_market_01_part_16",
+      "role": "assembly_part",
+      "building_id": "building_large_ruined_market_01",
+      "building_type": "factory_or_market",
+      "size_units": "18x12",
+      "detected_area": 23464
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\buildings\\parts\\building_large_ruined_market_01_part_17.png",
+      "source_box_xyxy": [
+        842,
+        794,
+        983,
+        888
+      ],
+      "width": 141,
+      "height": 94,
+      "id": "building_large_ruined_market_01_part_17",
+      "role": "assembly_part",
+      "building_id": "building_large_ruined_market_01",
+      "building_type": "factory_or_market",
+      "size_units": "18x12",
+      "detected_area": 9070
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\buildings\\parts\\building_large_ruined_market_01_part_18.png",
+      "source_box_xyxy": [
+        993,
+        797,
+        1123,
+        898
+      ],
+      "width": 130,
+      "height": 101,
+      "id": "building_large_ruined_market_01_part_18",
+      "role": "assembly_part",
+      "building_id": "building_large_ruined_market_01",
+      "building_type": "factory_or_market",
+      "size_units": "18x12",
+      "detected_area": 9374
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\buildings\\parts\\building_large_ruined_market_01_part_19.png",
+      "source_box_xyxy": [
+        1132,
+        799,
+        1250,
+        904
+      ],
+      "width": 118,
+      "height": 105,
+      "id": "building_large_ruined_market_01_part_19",
+      "role": "assembly_part",
+      "building_id": "building_large_ruined_market_01",
+      "building_type": "factory_or_market",
+      "size_units": "18x12",
+      "detected_area": 8759
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\buildings\\parts\\building_large_ruined_market_01_part_20.png",
+      "source_box_xyxy": [
+        1262,
+        807,
+        1442,
+        889
+      ],
+      "width": 180,
+      "height": 82,
+      "id": "building_large_ruined_market_01_part_20",
+      "role": "assembly_part",
+      "building_id": "building_large_ruined_market_01",
+      "building_type": "factory_or_market",
+      "size_units": "18x12",
+      "detected_area": 10117
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\buildings\\parts\\building_large_ruined_market_01_part_21.png",
+      "source_box_xyxy": [
+        28,
+        841,
+        271,
+        919
+      ],
+      "width": 243,
+      "height": 78,
+      "id": "building_large_ruined_market_01_part_21",
+      "role": "assembly_part",
+      "building_id": "building_large_ruined_market_01",
+      "building_type": "factory_or_market",
+      "size_units": "18x12",
+      "detected_area": 9892
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\buildings\\parts\\building_large_ruined_market_01_part_22.png",
+      "source_box_xyxy": [
+        509,
+        841,
+        695,
+        932
+      ],
+      "width": 186,
+      "height": 91,
+      "id": "building_large_ruined_market_01_part_22",
+      "role": "assembly_part",
+      "building_id": "building_large_ruined_market_01",
+      "building_type": "factory_or_market",
+      "size_units": "18x12",
+      "detected_area": 11913
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\buildings\\parts\\building_large_ruined_market_01_part_23.png",
+      "source_box_xyxy": [
+        275,
+        844,
+        498,
+        933
+      ],
+      "width": 223,
+      "height": 89,
+      "id": "building_large_ruined_market_01_part_23",
+      "role": "assembly_part",
+      "building_id": "building_large_ruined_market_01",
+      "building_type": "factory_or_market",
+      "size_units": "18x12",
+      "detected_area": 13067
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\buildings\\parts\\building_large_ruined_market_01_part_24.png",
+      "source_box_xyxy": [
+        708,
+        845,
+        810,
+        938
+      ],
+      "width": 102,
+      "height": 93,
+      "id": "building_large_ruined_market_01_part_24",
+      "role": "assembly_part",
+      "building_id": "building_large_ruined_market_01",
+      "building_type": "factory_or_market",
+      "size_units": "18x12",
+      "detected_area": 5550
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\buildings\\parts\\building_large_ruined_market_01_part_25.png",
+      "source_box_xyxy": [
+        998,
+        898,
+        1128,
+        1019
+      ],
+      "width": 130,
+      "height": 121,
+      "id": "building_large_ruined_market_01_part_25",
+      "role": "assembly_part",
+      "building_id": "building_large_ruined_market_01",
+      "building_type": "factory_or_market",
+      "size_units": "18x12",
+      "detected_area": 11229
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\buildings\\parts\\building_large_ruined_market_01_part_26.png",
+      "source_box_xyxy": [
+        837,
+        902,
+        977,
+        1010
+      ],
+      "width": 140,
+      "height": 108,
+      "id": "building_large_ruined_market_01_part_26",
+      "role": "assembly_part",
+      "building_id": "building_large_ruined_market_01",
+      "building_type": "factory_or_market",
+      "size_units": "18x12",
+      "detected_area": 9839
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\buildings\\parts\\building_large_ruined_market_01_part_27.png",
+      "source_box_xyxy": [
+        1264,
+        907,
+        1346,
+        1000
+      ],
+      "width": 82,
+      "height": 93,
+      "id": "building_large_ruined_market_01_part_27",
+      "role": "assembly_part",
+      "building_id": "building_large_ruined_market_01",
+      "building_type": "factory_or_market",
+      "size_units": "18x12",
+      "detected_area": 4264
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\buildings\\parts\\building_large_ruined_market_01_part_28.png",
+      "source_box_xyxy": [
+        54,
+        910,
+        133,
+        1004
+      ],
+      "width": 79,
+      "height": 94,
+      "id": "building_large_ruined_market_01_part_28",
+      "role": "assembly_part",
+      "building_id": "building_large_ruined_market_01",
+      "building_type": "factory_or_market",
+      "size_units": "18x12",
+      "detected_area": 4058
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\buildings\\parts\\building_large_ruined_market_01_part_29.png",
+      "source_box_xyxy": [
+        161,
+        912,
+        267,
+        1005
+      ],
+      "width": 106,
+      "height": 93,
+      "id": "building_large_ruined_market_01_part_29",
+      "role": "assembly_part",
+      "building_id": "building_large_ruined_market_01",
+      "building_type": "factory_or_market",
+      "size_units": "18x12",
+      "detected_area": 3633
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\buildings\\parts\\building_large_ruined_market_01_part_30.png",
+      "source_box_xyxy": [
+        454,
+        926,
+        542,
+        1015
+      ],
+      "width": 88,
+      "height": 89,
+      "id": "building_large_ruined_market_01_part_30",
+      "role": "assembly_part",
+      "building_id": "building_large_ruined_market_01",
+      "building_type": "factory_or_market",
+      "size_units": "18x12",
+      "detected_area": 4029
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\buildings\\parts\\building_large_ruined_market_01_part_31.png",
+      "source_box_xyxy": [
+        318,
+        929,
+        408,
+        1009
+      ],
+      "width": 90,
+      "height": 80,
+      "id": "building_large_ruined_market_01_part_31",
+      "role": "assembly_part",
+      "building_id": "building_large_ruined_market_01",
+      "building_type": "factory_or_market",
+      "size_units": "18x12",
+      "detected_area": 4367
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\buildings\\parts\\building_large_ruined_market_01_part_32.png",
+      "source_box_xyxy": [
+        590,
+        946,
+        810,
+        1002
+      ],
+      "width": 220,
+      "height": 56,
+      "id": "building_large_ruined_market_01_part_32",
+      "role": "assembly_part",
+      "building_id": "building_large_ruined_market_01",
+      "building_type": "factory_or_market",
+      "size_units": "18x12",
+      "detected_area": 6993
+    }
+  ]
+}

@@ -1,0 +1,241 @@
+{
+  "source_sheet": "K:\\ProjectEscape\\project-escape\\assets\\map\\interactables\\sheets\\containers_interactables_sheet_01.png",
+  "notes": "Interactable containers and gameplay props. Closed/open state names are preserved for data table alignment.",
+  "metadata": {},
+  "assets": [
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\interactables\\containers\\container_safe_closed.png",
+      "source_box_xyxy": [
+        1203,
+        11,
+        1486,
+        309
+      ],
+      "width": 283,
+      "height": 298,
+      "id": "container_safe_closed",
+      "detected_area": 60220
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\interactables\\containers\\container_safe_open.png",
+      "source_box_xyxy": [
+        49,
+        13,
+        292,
+        303
+      ],
+      "width": 243,
+      "height": 290,
+      "id": "container_safe_open",
+      "detected_area": 55090
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\interactables\\containers\\backpack_reinforced_loot_01.png",
+      "source_box_xyxy": [
+        327,
+        18,
+        644,
+        302
+      ],
+      "width": 317,
+      "height": 284,
+      "id": "backpack_reinforced_loot_01",
+      "detected_area": 63465
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\interactables\\containers\\storage_crate_closed_01.png",
+      "source_box_xyxy": [
+        664,
+        34,
+        873,
+        275
+      ],
+      "width": 209,
+      "height": 241,
+      "id": "storage_crate_closed_01",
+      "detected_area": 31304
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\interactables\\containers\\storage_crate_open_01.png",
+      "source_box_xyxy": [
+        887,
+        54,
+        1166,
+        287
+      ],
+      "width": 279,
+      "height": 233,
+      "id": "storage_crate_open_01",
+      "detected_area": 48121
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\interactables\\containers\\supply_box_rusty_01.png",
+      "source_box_xyxy": [
+        1246,
+        293,
+        1442,
+        563
+      ],
+      "width": 196,
+      "height": 270,
+      "id": "supply_box_rusty_01",
+      "detected_area": 40558
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\interactables\\containers\\container_electronic_rare_01.png",
+      "source_box_xyxy": [
+        340,
+        302,
+        604,
+        524
+      ],
+      "width": 264,
+      "height": 222,
+      "id": "container_electronic_rare_01",
+      "detected_area": 42015
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\interactables\\containers\\medical_supply_box_01.png",
+      "source_box_xyxy": [
+        908,
+        303,
+        1204,
+        525
+      ],
+      "width": 296,
+      "height": 222,
+      "id": "medical_supply_box_01",
+      "detected_area": 37485
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\interactables\\loot\\scrap_pile_01.png",
+      "source_box_xyxy": [
+        46,
+        314,
+        300,
+        520
+      ],
+      "width": 254,
+      "height": 206,
+      "id": "scrap_pile_01",
+      "detected_area": 38657
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\interactables\\props\\vending_machine_broken_blank_01.png",
+      "source_box_xyxy": [
+        641,
+        339,
+        883,
+        521
+      ],
+      "width": 242,
+      "height": 182,
+      "id": "vending_machine_broken_blank_01",
+      "detected_area": 30686
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\interactables\\props\\extraction_beacon_device_01.png",
+      "source_box_xyxy": [
+        61,
+        543,
+        246,
+        730
+      ],
+      "width": 185,
+      "height": 187,
+      "id": "extraction_beacon_device_01",
+      "detected_area": 10034
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\interactables\\barriers\\checkpoint_barrier_damaged_01.png",
+      "source_box_xyxy": [
+        260,
+        547,
+        666,
+        732
+      ],
+      "width": 406,
+      "height": 185,
+      "id": "checkpoint_barrier_damaged_01",
+      "detected_area": 23628
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\interactables\\barriers\\concrete_roadblock_01.png",
+      "source_box_xyxy": [
+        994,
+        548,
+        1485,
+        752
+      ],
+      "width": 491,
+      "height": 204,
+      "id": "concrete_roadblock_01",
+      "detected_area": 60471
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\interactables\\barriers\\rubble_barrier_stack_01.png",
+      "source_box_xyxy": [
+        696,
+        557,
+        971,
+        743
+      ],
+      "width": 275,
+      "height": 186,
+      "id": "rubble_barrier_stack_01",
+      "detected_area": 32096
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\interactables\\props\\pallet_stack_01.png",
+      "source_box_xyxy": [
+        486,
+        731,
+        643,
+        988
+      ],
+      "width": 157,
+      "height": 257,
+      "id": "pallet_stack_01",
+      "detected_area": 31071
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\interactables\\props\\oil_drum_01.png",
+      "source_box_xyxy": [
+        1039,
+        740,
+        1287,
+        991
+      ],
+      "width": 248,
+      "height": 251,
+      "id": "oil_drum_01",
+      "detected_area": 45292
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\interactables\\props\\barrel_broken_01.png",
+      "source_box_xyxy": [
+        93,
+        747,
+        408,
+        993
+      ],
+      "width": 315,
+      "height": 246,
+      "id": "barrel_broken_01",
+      "detected_area": 49902
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\interactables\\props\\wire_spool_01.png",
+      "source_box_xyxy": [
+        724,
+        767,
+        890,
+        983
+      ],
+      "width": 166,
+      "height": 216,
+      "id": "wire_spool_01",
+      "detected_area": 25085
+    }
+  ]
+}

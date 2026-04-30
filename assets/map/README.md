@@ -65,9 +65,28 @@ Style target:
 | `safe/assembled/` | Full assembled safe house reference copy. |
 | `safe/parts/` | Structural parts: floor, walls, doorway, windows, corner caps, parapet segments, wall patch. |
 | `safe/props/` | Interior props and gameplay markers: bed, desk, shelves, cabinet, lamps, devices, plant, rug, safe-area ring. |
+| `safe/concept_parts/` | Older `safe_house_active_sheet_01.png` split for archival reuse; prefer `_02` outputs for production. |
 | `safe/guides/` | Collision guide and split-preview sheet for review. |
 
 The split manifest is `safe/safe_house_active_02_manifest.json`.
+
+## Runtime Split Output
+
+The remaining sheets under `assets/map` have also been split into transparent PNGs. Source sheets stay in `*/sheets/`; generated manifests and previews stay beside their category as audit artifacts.
+
+| Category | Runtime folders | Standard notes |
+|---|---|---|
+| Roads | `roads/tiles/`, `roads/details/`, root aliases `road_straight_01.png`, `road_cross_01.png`, `road_t_junction_01.png`, `road_corner_01.png` | Follow `02_道路拓扑与通行碰撞.md`: main roads 5-7 units, secondary roads 3-4, alleys 2-3, transitions >=3, plazas >=8x8. |
+| Buildings | `buildings/assembled/`, `buildings/parts/`, root aliases for each `building_*_01.png` | Follow `03_建筑障碍与视觉遮挡.md`: ordinary buildings are non-enterable obstacles with explicit `CollisionShape2D`; do not rely on transparent pixels for collision. |
+| Props | `props/placement/` | Street props for placement; add collision only for props that block movement. |
+| Rooftop/Wall Details | `details/rooftop/`, `details/walls/` | Decorative or modular facade/roof equipment; attach to buildings as needed. |
+| Interactables | `interactables/containers/`, `interactables/loot/`, `interactables/props/`, `interactables/barriers/` | Container state naming preserves closed/open or role where available. |
+| Outposts | `outposts/assembled/`, `outposts/parts/`, root aliases `outpost_broken_01.png`, `outpost_repaired_01.png` | Use root aliases for `repair_state` switching; parts are for reconstruction/variants. |
+| Decals | `decals/overlays/` | Visual overlays only; do not define collision from decals. |
+
+Each split run writes:
+- `*_manifest.json` with source sheet, crop boxes, and metadata.
+- `guides/*_split_preview.png` for visual review.
 
 ## Building Assembly Notes
 

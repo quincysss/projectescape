@@ -1,0 +1,267 @@
+{
+  "source_sheet": "K:\\ProjectEscape\\project-escape\\assets\\map\\details\\sheets\\rooftop_wall_details_sheet_01.png",
+  "notes": "Rooftop and wall-detail assets split into standalone modules for buildings.",
+  "metadata": {},
+  "assets": [
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\details\\rooftop\\rooftop_pipe_cluster_01.png",
+      "source_box_xyxy": [
+        46,
+        28,
+        398,
+        239
+      ],
+      "width": 352,
+      "height": 211,
+      "id": "rooftop_pipe_cluster_01",
+      "detected_area": 43842
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\details\\rooftop\\straight_pipe_segment_01.png",
+      "source_box_xyxy": [
+        1034,
+        32,
+        1259,
+        243
+      ],
+      "width": 225,
+      "height": 211,
+      "id": "straight_pipe_segment_01",
+      "detected_area": 35710
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\details\\rooftop\\elbow_pipe_segment_01.png",
+      "source_box_xyxy": [
+        874,
+        43,
+        997,
+        222
+      ],
+      "width": 123,
+      "height": 179,
+      "id": "elbow_pipe_segment_01",
+      "detected_area": 14599
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\details\\rooftop\\roof_vent_01.png",
+      "source_box_xyxy": [
+        1282,
+        44,
+        1506,
+        238
+      ],
+      "width": 224,
+      "height": 194,
+      "id": "roof_vent_01",
+      "detected_area": 31262
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\details\\rooftop\\ventilation_fan_unit_01.png",
+      "source_box_xyxy": [
+        691,
+        45,
+        834,
+        192
+      ],
+      "width": 143,
+      "height": 147,
+      "id": "ventilation_fan_unit_01",
+      "detected_area": 10218
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\details\\rooftop\\external_ac_unit_01.png",
+      "source_box_xyxy": [
+        421,
+        56,
+        651,
+        139
+      ],
+      "width": 230,
+      "height": 83,
+      "id": "external_ac_unit_01",
+      "detected_area": 11311
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\details\\rooftop\\water_tank_01.png",
+      "source_box_xyxy": [
+        381,
+        258,
+        524,
+        475
+      ],
+      "width": 143,
+      "height": 217,
+      "id": "water_tank_01",
+      "detected_area": 18416
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\details\\rooftop\\satellite_dish_01.png",
+      "source_box_xyxy": [
+        62,
+        260,
+        272,
+        505
+      ],
+      "width": 210,
+      "height": 245,
+      "id": "satellite_dish_01",
+      "detected_area": 36136
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\details\\rooftop\\cable_bundle_01.png",
+      "source_box_xyxy": [
+        1277,
+        261,
+        1426,
+        511
+      ],
+      "width": 149,
+      "height": 250,
+      "id": "cable_bundle_01",
+      "detected_area": 11399
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\details\\rooftop\\rooftop_hatch_01.png",
+      "source_box_xyxy": [
+        584,
+        296,
+        936,
+        500
+      ],
+      "width": 352,
+      "height": 204,
+      "id": "rooftop_hatch_01",
+      "detected_area": 24998
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\details\\rooftop\\ladder_01.png",
+      "source_box_xyxy": [
+        980,
+        297,
+        1199,
+        483
+      ],
+      "width": 219,
+      "height": 186,
+      "id": "ladder_01",
+      "detected_area": 33355
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\details\\walls\\wall_panel_damaged_blank_01.png",
+      "source_box_xyxy": [
+        35,
+        522,
+        356,
+        729
+      ],
+      "width": 321,
+      "height": 207,
+      "id": "wall_panel_damaged_blank_01",
+      "detected_area": 57494
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\details\\walls\\graffiti_wall_panel_abstract_01.png",
+      "source_box_xyxy": [
+        401,
+        522,
+        744,
+        728
+      ],
+      "width": 343,
+      "height": 206,
+      "id": "graffiti_wall_panel_abstract_01",
+      "detected_area": 61713
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\details\\walls\\cracked_concrete_wall_segment_01.png",
+      "source_box_xyxy": [
+        772,
+        522,
+        1080,
+        734
+      ],
+      "width": 308,
+      "height": 212,
+      "id": "cracked_concrete_wall_segment_01",
+      "detected_area": 55815
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\details\\walls\\corrugated_metal_wall_segment_01.png",
+      "source_box_xyxy": [
+        1122,
+        525,
+        1468,
+        738
+      ],
+      "width": 346,
+      "height": 213,
+      "id": "corrugated_metal_wall_segment_01",
+      "detected_area": 63004
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\details\\walls\\window_broken_module_01.png",
+      "source_box_xyxy": [
+        492,
+        742,
+        841,
+        996
+      ],
+      "width": 349,
+      "height": 254,
+      "id": "window_broken_module_01",
+      "detected_area": 54390
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\details\\walls\\window_boarded_module_01.png",
+      "source_box_xyxy": [
+        38,
+        760,
+        223,
+        968
+      ],
+      "width": 185,
+      "height": 208,
+      "id": "window_boarded_module_01",
+      "detected_area": 31437
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\details\\walls\\hanging_tarp_sheet_01.png",
+      "source_box_xyxy": [
+        271,
+        760,
+        461,
+        967
+      ],
+      "width": 190,
+      "height": 207,
+      "id": "hanging_tarp_sheet_01",
+      "detected_area": 30641
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\details\\walls\\awning_small_01.png",
+      "source_box_xyxy": [
+        866,
+        779,
+        1149,
+        969
+      ],
+      "width": 283,
+      "height": 190,
+      "id": "awning_small_01",
+      "detected_area": 27688
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\details\\walls\\neon_lightbox_blank_01.png",
+      "source_box_xyxy": [
+        1187,
+        779,
+        1499,
+        970
+      ],
+      "width": 312,
+      "height": 191,
+      "id": "neon_lightbox_blank_01",
+      "detected_area": 38717
+    }
+  ]
+}
