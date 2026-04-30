@@ -229,6 +229,7 @@ CraftingManager
 EquipmentManager
 ConsumableManager
 AudioManager
+InteractionHighlightService
 SaveManager
 ```
 
@@ -241,6 +242,50 @@ Definition 保存静态配置。
 View 处理 UI 显示。
 Controller 处理输入和角色行为。
 Service 处理可复用计算。
+```
+
+---
+
+## 6.1 交互描边模块
+
+推荐模块：
+
+```text
+InteractionHighlightService
+InteractionHighlightView
+InteractableTarget
+InteractableOutlineShader
+InteractableOutlineMaterial
+```
+
+职责：
+
+```text
+InteractionHighlightService：根据交互对象状态和玩家距离，计算描边状态。
+InteractionHighlightView：负责把描边状态写入 Sprite 的 ShaderMaterial 或特殊 Overlay。
+InteractableTarget：由容器、前哨站等对象实现，提供 target_id、interactable_type、interaction_state。
+InteractableOutlineShader：根据 Sprite alpha 轮廓自动生成外描边。
+```
+
+第一版需要支持：
+
+```text
+容器描边。
+前哨站描边。
+进入范围高亮。
+读条中脉冲。
+修复完成暖光。
+倒计时危险闪烁。
+```
+
+规则：
+
+```text
+交互判定属于功能系统。
+描边颜色和资源属于 UI / VFX 系统。
+UI 不直接决定对象是否可交互。
+默认实现使用 Shader 自动描边，不为每种容器制作固定 PNG 边框。
+描边 sheet 只作为流光、扫描线、闪烁和风格参考资源。
 ```
 
 ---
@@ -541,4 +586,3 @@ UI View。
 ```
 
 这样能让每个模块可测试、可替换、可继续扩展。
-

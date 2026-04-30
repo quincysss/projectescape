@@ -106,6 +106,64 @@ Q版大头身。
 
 ---
 
+## 3.1 特殊安全建筑风格
+
+“家”和“修复后的前哨站”是特殊建筑，不完全遵守普通街区建筑的灰黑压抑风格。
+
+它们的视觉目标：
+
+```text
+一眼看出这是安全地点。
+一眼看出这里和普通建筑不同。
+能看到内部结构。
+有灯光。
+更干净。
+更有生活痕迹。
+有高饱和色彩点缀。
+```
+
+主色调：
+
+```text
+白色。
+浅灰。
+暖灰。
+少量木色。
+少量暖黄灯光。
+少量高饱和点缀色。
+```
+
+允许的高饱和点缀：
+
+```text
+暖黄色灯光。
+红色小毯子、标识、工具箱。
+蓝色屏幕、设备灯。
+紫色电子模块。
+绿色植物。
+橙色维修灯。
+```
+
+与普通建筑的区别：
+
+| 建筑类型 | 主色 | 彩色比例 | 内部结构 | 情绪 |
+|---|---|---|---|---|
+| 普通街区建筑 | 灰黑、炭黑 | 很少 | 通常不可见 | 压迫、危险、废弃 |
+| 家 | 白灰、暖灰 | 较多但受控 | 必须可见 | 安全、休息、可归属 |
+| 修复前前哨站 | 灰色、破损灰黑 | 很少 | 可部分可见但杂乱 | 未激活、废弃、等待修复 |
+| 修复后前哨站 | 白灰、暖灰 | 较多但受控 | 必须可见 | 临时安全、被点亮、可使用 |
+
+规则：
+
+```text
+家和修复后前哨站可以比普通建筑更明亮。
+家和修复后前哨站必须有清晰室内结构，如床、桌子、灯、储物柜、工作台、地毯、植物。
+修复后前哨站和家的视觉逻辑一致，但更临时、更工具化。
+修复前前哨站必须灰暗、破损、未点亮，不能提前表现得安全。
+```
+
+---
+
 ## 4. 资源生产策略
 
 ## 4.1 场景不直接生成整张地图
@@ -128,6 +186,7 @@ Q版大头身。
 拆集装箱。
 拆临时棚。
 拆容器。
+拆家。
 拆前哨。
 拆撤离点。
 ```
@@ -149,6 +208,7 @@ Godot 中更容易拼装地图。
 P0：
 
 ```text
+家 / 安全屋。
 道路直线块。
 十字路口。
 T 字路口。
@@ -164,6 +224,8 @@ T 字路口。
 P1：
 
 ```text
+前哨站修复前。
+前哨站修复后。
 大型楼房。
 楼梯。
 屋顶设备。
@@ -179,7 +241,6 @@ P1：
 P2：
 
 ```text
-前哨建筑。
 撤离点装置。
 稀有容器。
 音乐耳机相关装饰。
@@ -201,6 +262,8 @@ P2：
 | 小楼 | 512x512 | 单栋小建筑 |
 | 中楼 | 768x768 / 1024x1024 | 街区主建筑 |
 | 大楼 | 1024x1024 / 1536x1536 | 大型遮挡或地标 |
+| 家 / 安全屋 | 768x768 / 1024x1024 | 可见内部结构，安全地点 |
+| 前哨站 | 768x768 / 1024x1024 | 需要修复前与修复后两版 |
 | UI 图标 | 128x128 | 背包、装备、消耗品 |
 | 角色立绘参考 | 1024x1024 | 用于角色风格定义 |
 | 角色局内 sprite | 128x128 / 256x256 | 需后续拆动画 |
@@ -220,7 +283,63 @@ P2：
 
 ---
 
-## 5.2 角色规格
+## 5.2 家与前哨站规格
+
+家和前哨站是特殊建筑资产。
+
+家需要：
+
+```text
+俯视或轻微斜俯视。
+可见室内结构。
+白灰或暖灰主色。
+暖黄色灯光。
+高饱和小面积点缀。
+有明确安全感。
+可以看到床、桌子、柜子、灯、地毯、植物、储物区。
+与普通灰黑建筑形成强烈区分。
+```
+
+修复前前哨站需要：
+
+```text
+灰色为主。
+破损。
+未点亮或只有少量故障灯。
+内部结构可部分看到，但杂乱、残缺、不可用。
+有修复潜力，但不是安全状态。
+```
+
+修复后前哨站需要：
+
+```text
+与家的表现逻辑一致。
+白灰或暖灰主色。
+内部结构清晰。
+灯光点亮。
+有工具、补给箱、简易工作台、信号装置。
+高饱和点缀更多，用来表达被修复、被激活。
+```
+
+状态命名：
+
+```text
+safe_house_active
+outpost_broken
+outpost_repaired
+```
+
+资源路径建议：
+
+```text
+res://assets/map/safe/safe_house_active_01.png
+res://assets/map/outposts/outpost_broken_01.png
+res://assets/map/outposts/outpost_repaired_01.png
+```
+
+---
+
+## 5.3 角色规格
 
 角色概念图：
 
@@ -253,7 +372,7 @@ P2：
 
 ---
 
-## 5.3 图标规格
+## 5.4 图标规格
 
 推荐：
 
@@ -277,6 +396,9 @@ P2：
 ```text
 res://assets/map/buildings/building_small_shop_01.png
 res://assets/map/buildings/building_medium_apartment_01.png
+res://assets/map/safe/safe_house_active_01.png
+res://assets/map/outposts/outpost_broken_01.png
+res://assets/map/outposts/outpost_repaired_01.png
 res://assets/map/roads/road_straight_01.png
 res://assets/map/roads/road_cross_01.png
 res://assets/map/props/streetlamp_01.png
@@ -368,7 +490,60 @@ rooftop utility structure
 
 ---
 
-## 8.2 道路拆件
+## 8.2 家与前哨站拆件
+
+家和前哨站必须使用独立提示词，不要套普通楼房模板。
+
+### 家 / 安全屋
+
+```text
+Create a standalone safe house building asset for a 2D top-down wasteland extraction game.
+Subject: a small safe house with visible interior rooms, cozy survival shelter, bed, desk, storage cabinet, warm lamps, small rug, plants, supply shelves, repaired walls.
+View: top-down or slightly top-down, orthographic game asset, complete building visible.
+Style: hand-drawn manga line art, dense black ink outlines, rough sketch texture, but cleaner and brighter than the surrounding wasteland city.
+Color palette: white, light grey, warm grey as the main colors; warm yellow lights; controlled high-saturation accents such as red blanket, blue monitor lights, purple electronic module, green plants.
+Mood: clearly safe, warm, lived-in, protected, visually distinct from dark grey ruined buildings.
+Production requirement: standalone asset, transparent background, visible interior layout, clean cutout edges, suitable for Godot 2D map assembly, collision boundary easy to read.
+Avoid: dark ruined building, full city map, closed roof hiding the interior, photorealism, glossy 3D render, unreadable text, watermark, logo.
+```
+
+### 前哨站：修复前
+
+```text
+Create a standalone broken outpost building asset for a 2D top-down wasteland extraction game.
+Subject: an abandoned small outpost shelter before repair, partially visible interior, broken workbench, scattered supplies, damaged signal device, cracked walls, unlit lamps, messy floor.
+View: top-down or slightly top-down, orthographic game asset, complete building visible.
+Style: dark hand-drawn manga line art, dense black ink outlines, rough dirty texture, damaged urban survival shelter.
+Color palette: mostly grey, dark grey, dusty concrete, very little color, maybe one tiny broken red or blue indicator light.
+Mood: not safe yet, broken, inactive, waiting to be repaired.
+Production requirement: standalone asset, transparent background, visible but messy interior structure, clean cutout edges, suitable for Godot 2D map assembly.
+Avoid: warm safe house feeling, bright lights, clean white interior, full city map, photorealism, glossy 3D render, readable text, watermark.
+```
+
+### 前哨站：修复后
+
+```text
+Create a standalone repaired outpost building asset for a 2D top-down wasteland extraction game.
+Subject: the same small outpost shelter after repair, visible interior rooms, working lamps, repair workbench, supply boxes, signal device, clean floor patches, repaired walls, small colored markers.
+View: top-down or slightly top-down, orthographic game asset, complete building visible.
+Style: hand-drawn manga line art, dense black ink outlines, rough sketch texture, brighter and safer than normal wasteland buildings, but more temporary and utilitarian than the player's home.
+Color palette: white, light grey, warm grey as main colors; warm yellow lamps; high-saturation accents such as orange repair light, blue screen, purple signal module, red tool box, green medical pack.
+Mood: repaired, activated, temporarily safe, clearly different from grey ruined buildings.
+Production requirement: standalone asset, transparent background, visible interior layout, clean cutout edges, suitable for Godot 2D map assembly. It should share the same footprint and silhouette as the broken outpost version when possible.
+Avoid: dark abandoned state, closed roof hiding the interior, full city map, photorealism, glossy 3D render, readable text, watermark.
+```
+
+重要规则：
+
+```text
+修复前和修复后前哨站最好保持相同占地轮廓。
+修复后的前哨站可以更亮，但不能比家更豪华。
+家是长期安全，前哨是临时安全。
+```
+
+---
+
+## 8.3 道路拆件
 
 ```text
 Create a modular road tile asset for a 2D top-down wasteland city game.
@@ -395,7 +570,7 @@ plaza_concrete
 
 ---
 
-## 8.3 装饰件拆件
+## 8.4 装饰件拆件
 
 ```text
 Create a standalone street prop asset for a 2D top-down wasteland city game.
@@ -428,7 +603,7 @@ stairs_wide
 
 ---
 
-## 8.4 容器拆件
+## 8.5 容器拆件
 
 ```text
 Create a standalone loot container asset for a 2D top-down wasteland extraction game.
@@ -534,6 +709,16 @@ Avoid: glossy app icon, 3D render, bright color, complex illustration.
 8. 形成固定资产库后再批量扩展。
 ```
 
+安全建筑生产流程：
+
+```text
+1. 先生成家 / 安全屋，确定安全建筑视觉标准。
+2. 再生成修复前前哨站，保持灰色、破损、未点亮。
+3. 最后生成修复后前哨站，沿用家的安全逻辑，但更临时、更工具化。
+4. 确认修复前后前哨站的占地轮廓接近，便于 Godot 中直接替换状态。
+5. 把家和修复后前哨站放到灰黑街区中测试识别度。
+```
+
 不要：
 
 ```text
@@ -542,6 +727,8 @@ Avoid: glossy app icon, 3D render, bright color, complex illustration.
 混用不同透视角度。
 混用完全不同线稿密度。
 让装饰件自带不可控阴影和背景。
+让家和修复后前哨站看起来像普通废弃建筑。
+让修复前前哨站提前出现强安全灯光。
 ```
 
 ---
@@ -553,6 +740,8 @@ Avoid: glossy app icon, 3D render, bright color, complex illustration.
 ```text
 道路作为 TileMap 或大块 Sprite。
 建筑作为 StaticBody2D + Sprite2D。
+家作为特殊 SafeHouseScene。
+前哨站作为 OutpostScene，按 repair_state 切换 broken / repaired 资源。
 路灯、花坛、垃圾桶作为 Prop Scene。
 容器作为可交互 Scene。
 围栏、墙体作为碰撞边界。
@@ -600,6 +789,19 @@ DebugName，可选
 建筑底部边缘适合放置碰撞。
 ```
 
+家与前哨站额外检查：
+
+```text
+家必须一眼看出是安全屋。
+家必须能看到内部结构。
+家必须使用白灰或暖灰主色，而不是普通灰黑废楼。
+家必须有暖光和生活物件。
+修复前前哨站必须灰暗、破损、未激活。
+修复后前哨站必须与家的安全逻辑一致，但更像临时工作站。
+修复前后前哨站占地轮廓应尽量一致。
+修复后前哨站不能比家更豪华。
+```
+
 角色额外检查：
 
 ```text
@@ -638,8 +840,9 @@ data/map_assets.tab
 | 字段 | 说明 |
 |---|---|
 | id | 场景资产ID |
-| asset_type | building/road/prop/container/outpost/extract |
+| asset_type | building/road/prop/container/home/outpost/extract |
 | size_class | small/medium/large/tile |
+| state | normal/broken/repaired/active |
 | theme_tags | 风格标签 |
 | sprite_path | PNG路径 |
 | scene_path | Godot场景路径 |
@@ -657,6 +860,7 @@ data/map_assets.tab
 新参考图的灰黑漫画线稿更成熟，也更适合压迫感。
 少量霓虹点缀能强化废土科技感和可交互可读性。
 场景拆件方式比整图更适合实际游戏制作。
+家和修复后前哨站单独使用白灰、灯光和室内结构，可以在压抑地图中形成明确安全锚点。
 ```
 
 风险：
@@ -666,12 +870,15 @@ GPT-image-2.0 可能输出不可拆的大场景，需要反复强调 standalone 
 不同批次线稿密度可能不一致。
 道路块如果不是正交俯视，拼接会困难。
 建筑如果阴影太重，会遮挡角色和交互物。
+如果家和前哨站不够亮，玩家会难以快速识别安全点。
+如果修复前后前哨站轮廓差异过大，状态切换会产生拼装成本。
 ```
 
 建议：
 
 ```text
 先生成一套 P0 拆件：2 个小楼、2 个中楼、4 个道路块、3 个路灯/花坛/围栏。
+同时生成 1 个家、1 个修复前前哨、1 个修复后前哨，作为安全建筑风格锚点。
 先在 Godot 拼一个 1 屏测试街区。
 测试可读性后再批量生成。
 把通过验收的图片作为后续提示词参考图。
@@ -694,6 +901,8 @@ GPT-image-2.0 可能输出不可拆的大场景，需要反复强调 standalone 
 透明背景。
 无文字水印。
 适合 Godot 2D 拼装。
+家和修复后前哨站必须明显更安全、更明亮、可见内部。
+修复前前哨站必须灰暗破损，等待玩家修复。
 ```
 
 只有拆件可控，地图才能真正进入可迭代制作阶段。

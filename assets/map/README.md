@@ -14,7 +14,17 @@ Style target:
 |---|---|---|
 | `_concept/` | `scene_wasteland_city_modular_preview_01.png` | Overall modular city scene preview and art-direction target. |
 | `roads/sheets/` | `road_ground_tiles_sheet_01.png` | Road, intersection, sidewalk, curb, gutter, manhole, puddle, and pavement modules. |
-| `buildings/sheets/` | `building_modular_sheet_01.png` | Small shops, apartments, alley buildings, rooftop structures, shed, door, and stair modules. |
+| `buildings/sheets/` | `building_modular_sheet_01.png` | Concept mixed building sheet; keep as visual reference, not the preferred slicing source. |
+| `buildings/sheets/` | `building_small_corner_shop_assembly_01.png` | Recommended production assembly sheet for an 8x6-ish small corner shop road-boundary building. |
+| `buildings/sheets/` | `building_small_residential_block_assembly_01.png` | Recommended production assembly sheet for a small residential block. |
+| `buildings/sheets/` | `building_medium_apartment_rooftop_assembly_01.png` | Recommended production assembly sheet for a 12x12-ish apartment landmark with rooftop utilities. |
+| `buildings/sheets/` | `building_medium_shop_blank_neon_assembly_01.png` | Recommended production assembly sheet for a medium shop with blank lightbox/sign pieces. |
+| `buildings/sheets/` | `building_narrow_alley_assembly_01.png` | Recommended production assembly sheet for a narrow alley-forming building. |
+| `buildings/sheets/` | `building_large_ruined_market_assembly_01.png` | Recommended production assembly sheet for a large ruined market obstacle/landmark. |
+| `safe/sheets/` | `safe_house_active_sheet_01.png` | Player home / safe house concept sheet with visible interior, warm lights, living objects, and collision-footprint guide. |
+| `safe/sheets/` | `safe_house_active_sheet_02.png` | Recommended production assembly sheet: assembled home plus matching floor, walls, doorway, furniture, device, and safe-area pieces. |
+| `outposts/sheets/` | `outpost_broken_repaired_sheet_01.png` | Broken and repaired outpost concept state sheet with near-matching footprint for `repair_state` sprite switching. |
+| `outposts/sheets/` | `outpost_broken_repaired_sheet_02.png` | Recommended production assembly sheet: matching broken/repaired references plus paired construction pieces for state switching. |
 | `props/sheets/` | `street_props_sheet_01.png` | Streetlamps, planters, trash bins, fences, barricades, signboards, benches, poles, stairs, cones, and guardrail props. |
 | `details/sheets/` | `rooftop_wall_details_sheet_01.png` | Rooftop equipment, pipes, vents, AC units, wall panels, windows, awning, tarp, and blank lightbox modules. |
 | `interactables/sheets/` | `containers_interactables_sheet_01.png` | Loot containers, open/closed crates, backpack container, supply boxes, extraction beacon, barriers, barrels, and scrap props. |
@@ -29,9 +39,44 @@ Style target:
 - Suggested final paths include:
   - `res://assets/map/roads/road_straight_01.png`
   - `res://assets/map/buildings/building_small_shop_01.png`
+  - `res://assets/map/safe/safe_house_active_01.png`
+  - `res://assets/map/outposts/outpost_broken_01.png`
+  - `res://assets/map/outposts/outpost_repaired_01.png`
   - `res://assets/map/props/streetlamp_warm_01.png`
   - `res://assets/map/interactables/container_safe_closed.png`
   - `res://assets/map/decals/crack_concrete_01.png`
+
+## Safe Building Notes
+
+- `safe_house_active_sheet_02.png` is the recommended slicing source for the home because its separated pieces are intended to reconstruct the assembled reference on the same sheet.
+- `outpost_broken_repaired_sheet_02.png` is the recommended slicing source for outposts because its broken/repaired pieces are paired around the same footprint and state-switching silhouette.
+- `safe_house_active_sheet_01.png` and `outpost_broken_repaired_sheet_01.png` are retained as concept sheets.
+- Broken outposts should stay grey, damaged, and inactive.
+- Repaired outposts should be clearly activated, but more temporary and tool-focused than the player's home.
+- In Godot, use the home as a special `SafeHouseScene`; use the outpost sheet with `repair_state` switching between broken and repaired sprites.
+
+### Safe House Split Output
+
+`safe_house_active_sheet_02.png` has been split into transparent PNGs:
+
+| Folder | Purpose |
+|---|---|
+| `safe/safe_house_active_01.png` | Runtime-ready full assembled safe house at the document 17 recommended path. |
+| `safe/assembled/` | Full assembled safe house reference copy. |
+| `safe/parts/` | Structural parts: floor, walls, doorway, windows, corner caps, parapet segments, wall patch. |
+| `safe/props/` | Interior props and gameplay markers: bed, desk, shelves, cabinet, lamps, devices, plant, rug, safe-area ring. |
+| `safe/guides/` | Collision guide and split-preview sheet for review. |
+
+The split manifest is `safe/safe_house_active_02_manifest.json`.
+
+## Building Assembly Notes
+
+- Prefer the `*_assembly_01.png` building sheets for slicing because each sheet includes an assembled reference plus matching construction pieces.
+- `building_small_corner_shop_assembly_01.png` and `building_small_residential_block_assembly_01.png` cover small 8x6 to 10x8 road-boundary buildings.
+- `building_medium_apartment_rooftop_assembly_01.png` and `building_medium_shop_blank_neon_assembly_01.png` cover main street-block anchors and visual landmarks.
+- `building_narrow_alley_assembly_01.png` is for compressing route width and forming tight alley boundaries. Avoid placing it so close to another collider that it creates gaps under 2 map units.
+- `building_large_ruined_market_assembly_01.png` is for large obstacle masses and landmarks. Check that broken edges do not obscure critical points or produce unreadable collision.
+- Ordinary building assets should become `StaticBody2D + Sprite2D + CollisionShape2D`; do not depend on transparent pixels for collision.
 
 ## Source
 

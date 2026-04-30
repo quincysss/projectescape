@@ -1,0 +1,23 @@
+id	sheet_id	system	asset_type	sprite_path	has_alpha	notes
+ui_style_board_01	UI-00	style	mockup	res://assets/ui/_style/ui_style_board_01.png	false	UI visual language board based on Docs 20 and 21
+ui_hud_mockup_01	UI-01	hud	mockup	res://assets/ui/_mockups/ui_hud_mockup_01.png	false	In-run HUD layout reference
+ui_hud_sheet_01	UI-02	hud	sheet	res://assets/ui/hud/sheets/ui_hud_sheet_01.png	true	Transparent HUD sprite sheet; chroma source kept beside it
+ui_interaction_vfx_sheet_01	UI-03	outlines	sheet	res://assets/ui/outlines/sheets/ui_interaction_vfx_sheet_01.png	true	Transparent interactable outline and read-bar VFX sheet
+ui_inventory_container_storage_mockup_01	UI-04	inventory	mockup	res://assets/ui/_mockups/ui_inventory_container_storage_mockup_01.png	false	Shared backpack, loot container, and safe storage layout reference
+ui_inventory_container_storage_sheet_01	UI-05	inventory	sheet	res://assets/ui/inventory/sheets/ui_inventory_container_storage_sheet_01.png	true	Transparent shared grid, slot, button, and panel sheet
+ui_extraction_settlement_mockup_01	UI-06	extraction	mockup	res://assets/ui/_mockups/ui_extraction_settlement_mockup_01.png	false	Extraction success and settlement flow layout reference
+ui_extraction_settlement_sheet_01	UI-07	extraction	sheet	res://assets/ui/extraction/sheets/ui_extraction_settlement_sheet_01.png	true	Transparent extraction progress, settlement, and warning sheet
+ui_base_shell_mockup_01	UI-08	base_nav	mockup	res://assets/ui/_mockups/ui_base_shell_mockup_01.png	false	Out-of-run base shell layout reference
+ui_base_nav_panels_sheet_01	UI-09	base_nav	sheet	res://assets/ui/base_nav/sheets/ui_base_nav_panels_sheet_01.png	true	Transparent navigation tabs and common panel sheet
+ui_warehouse_mockup_01	UI-10	warehouse	mockup	res://assets/ui/_mockups/ui_warehouse_mockup_01.png	false	Warehouse screen layout reference
+ui_warehouse_sheet_01	UI-11	warehouse	sheet	res://assets/ui/warehouse/sheets/ui_warehouse_sheet_01.png	true	Transparent warehouse-specific controls sheet
+ui_research_mockup_01	UI-12	research	mockup	res://assets/ui/_mockups/ui_research_mockup_01.png	false	Research lab screen layout reference
+ui_research_sheet_01	UI-13	research	sheet	res://assets/ui/research/sheets/ui_research_sheet_01.png	true	Transparent research node and circuit UI sheet
+ui_crafting_mockup_01	UI-14	crafting	mockup	res://assets/ui/_mockups/ui_crafting_mockup_01.png	false	Crafting workshop layout reference
+ui_crafting_sheet_01	UI-15	crafting	sheet	res://assets/ui/crafting/sheets/ui_crafting_sheet_01.png	true	Transparent crafting controls and recipe sheet
+ui_expedition_prep_mockup_01	UI-16	prep	mockup	res://assets/ui/_mockups/ui_expedition_prep_mockup_01.png	false	Expedition preparation layout reference
+ui_expedition_prep_sheet_01	UI-17	prep	sheet	res://assets/ui/prep/sheets/ui_expedition_prep_sheet_01.png	true	Transparent expedition preparation controls sheet
+ui_system_icons_sheet_01	UI-18	icons	sheet	res://assets/ui/icons/sheets/ui_system_icons_sheet_01.png	true	Transparent general system icon sheet
+ui_system_icons_sheet_01_slices	UI-18	icons	slice_manifest	res://assets/ui/icons/ui_system_icons_sheet_01_slices.tab	false	72 Godot-ready individual icon slices under res://assets/ui/icons/sliced/
+ui_system_icons_sheet_01_slices_preview	UI-18	icons	preview	res://assets/ui/icons/ui_system_icons_sheet_01_slices_preview.png	false	Contact sheet for reviewing the sliced icon batch
+ui_asset_batch_preview_01	QA	ui_preview	preview	res://assets/ui/_mockups/ui_asset_batch_preview_01.png	false	Generated contact sheet for quick review only

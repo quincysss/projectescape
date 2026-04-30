@@ -1,0 +1,396 @@
+{
+  "source_sheet": "K:\\ProjectEscape\\project-escape\\assets\\map\\safe\\sheets\\safe_house_active_sheet_02.png",
+  "note": "Crops from safe_house_active_sheet_02.png. Chroma-key #00ff00 removed to transparency. Boxes are source pixel regions after manual visual review.",
+  "assets": [
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\safe\\assembled\\safe_house_active_01.png",
+      "source_sheet": "K:\\ProjectEscape\\project-escape\\assets\\map\\safe\\sheets\\safe_house_active_sheet_02.png",
+      "source_box_xyxy": [
+        138,
+        16,
+        636,
+        472
+      ],
+      "width": 498,
+      "height": 456,
+      "category": "assembled"
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\safe\\guides\\safe_house_collision_footprint_01.png",
+      "source_sheet": "K:\\ProjectEscape\\project-escape\\assets\\map\\safe\\sheets\\safe_house_active_sheet_02.png",
+      "source_box_xyxy": [
+        777,
+        39,
+        1305,
+        457
+      ],
+      "width": 528,
+      "height": 418,
+      "category": "guides"
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\safe\\parts\\safe_house_floor_base_01.png",
+      "source_sheet": "K:\\ProjectEscape\\project-escape\\assets\\map\\safe\\sheets\\safe_house_active_sheet_02.png",
+      "source_box_xyxy": [
+        59,
+        494,
+        422,
+        831
+      ],
+      "width": 363,
+      "height": 337,
+      "category": "parts"
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\safe\\parts\\safe_house_wall_north_window_01.png",
+      "source_sheet": "K:\\ProjectEscape\\project-escape\\assets\\map\\safe\\sheets\\safe_house_active_sheet_02.png",
+      "source_box_xyxy": [
+        444,
+        473,
+        758,
+        566
+      ],
+      "width": 314,
+      "height": 93,
+      "category": "parts"
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\safe\\parts\\safe_house_wall_west_window_01.png",
+      "source_sheet": "K:\\ProjectEscape\\project-escape\\assets\\map\\safe\\sheets\\safe_house_active_sheet_02.png",
+      "source_box_xyxy": [
+        422,
+        559,
+        486,
+        774
+      ],
+      "width": 64,
+      "height": 215,
+      "category": "parts"
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\safe\\parts\\safe_house_wall_east_window_01.png",
+      "source_sheet": "K:\\ProjectEscape\\project-escape\\assets\\map\\safe\\sheets\\safe_house_active_sheet_02.png",
+      "source_box_xyxy": [
+        717,
+        559,
+        783,
+        773
+      ],
+      "width": 66,
+      "height": 214,
+      "category": "parts"
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\safe\\parts\\safe_house_wall_south_doorway_01.png",
+      "source_sheet": "K:\\ProjectEscape\\project-escape\\assets\\map\\safe\\sheets\\safe_house_active_sheet_02.png",
+      "source_box_xyxy": [
+        430,
+        751,
+        774,
+        852
+      ],
+      "width": 344,
+      "height": 101,
+      "category": "parts"
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\safe\\parts\\safe_house_doorway_threshold_01.png",
+      "source_sheet": "K:\\ProjectEscape\\project-escape\\assets\\map\\safe\\sheets\\safe_house_active_sheet_02.png",
+      "source_box_xyxy": [
+        850,
+        574,
+        962,
+        629
+      ],
+      "width": 112,
+      "height": 55,
+      "category": "parts"
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\safe\\parts\\safe_house_door_module_01.png",
+      "source_sheet": "K:\\ProjectEscape\\project-escape\\assets\\map\\safe\\sheets\\safe_house_active_sheet_02.png",
+      "source_box_xyxy": [
+        979,
+        512,
+        1098,
+        619
+      ],
+      "width": 119,
+      "height": 107,
+      "category": "parts"
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\safe\\parts\\safe_house_window_frame_01.png",
+      "source_sheet": "K:\\ProjectEscape\\project-escape\\assets\\map\\safe\\sheets\\safe_house_active_sheet_02.png",
+      "source_box_xyxy": [
+        1128,
+        533,
+        1225,
+        623
+      ],
+      "width": 97,
+      "height": 90,
+      "category": "parts"
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\safe\\parts\\safe_house_window_frame_02.png",
+      "source_sheet": "K:\\ProjectEscape\\project-escape\\assets\\map\\safe\\sheets\\safe_house_active_sheet_02.png",
+      "source_box_xyxy": [
+        1225,
+        529,
+        1319,
+        623
+      ],
+      "width": 94,
+      "height": 94,
+      "category": "parts"
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\safe\\parts\\safe_house_repaired_wall_patch_01.png",
+      "source_sheet": "K:\\ProjectEscape\\project-escape\\assets\\map\\safe\\sheets\\safe_house_active_sheet_02.png",
+      "source_box_xyxy": [
+        1324,
+        528,
+        1413,
+        622
+      ],
+      "width": 89,
+      "height": 94,
+      "category": "parts"
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\safe\\parts\\safe_house_corner_wall_cap_01.png",
+      "source_sheet": "K:\\ProjectEscape\\project-escape\\assets\\map\\safe\\sheets\\safe_house_active_sheet_02.png",
+      "source_box_xyxy": [
+        50,
+        855,
+        106,
+        958
+      ],
+      "width": 56,
+      "height": 103,
+      "category": "parts"
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\safe\\parts\\safe_house_parapet_wall_segment_01.png",
+      "source_sheet": "K:\\ProjectEscape\\project-escape\\assets\\map\\safe\\sheets\\safe_house_active_sheet_02.png",
+      "source_box_xyxy": [
+        102,
+        872,
+        313,
+        957
+      ],
+      "width": 211,
+      "height": 85,
+      "category": "parts"
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\safe\\parts\\safe_house_corner_wall_cap_02.png",
+      "source_sheet": "K:\\ProjectEscape\\project-escape\\assets\\map\\safe\\sheets\\safe_house_active_sheet_02.png",
+      "source_box_xyxy": [
+        309,
+        861,
+        364,
+        958
+      ],
+      "width": 55,
+      "height": 97,
+      "category": "parts"
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\safe\\parts\\safe_house_corner_wall_cap_03.png",
+      "source_sheet": "K:\\ProjectEscape\\project-escape\\assets\\map\\safe\\sheets\\safe_house_active_sheet_02.png",
+      "source_box_xyxy": [
+        382,
+        858,
+        438,
+        960
+      ],
+      "width": 56,
+      "height": 102,
+      "category": "parts"
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\safe\\parts\\safe_house_parapet_wall_segment_02.png",
+      "source_sheet": "K:\\ProjectEscape\\project-escape\\assets\\map\\safe\\sheets\\safe_house_active_sheet_02.png",
+      "source_box_xyxy": [
+        427,
+        870,
+        678,
+        960
+      ],
+      "width": 251,
+      "height": 90,
+      "category": "parts"
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\safe\\parts\\safe_house_corner_wall_cap_04.png",
+      "source_sheet": "K:\\ProjectEscape\\project-escape\\assets\\map\\safe\\sheets\\safe_house_active_sheet_02.png",
+      "source_box_xyxy": [
+        678,
+        860,
+        734,
+        960
+      ],
+      "width": 56,
+      "height": 100,
+      "category": "parts"
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\safe\\props\\safe_house_bed_red_blanket_01.png",
+      "source_sheet": "K:\\ProjectEscape\\project-escape\\assets\\map\\safe\\sheets\\safe_house_active_sheet_02.png",
+      "source_box_xyxy": [
+        789,
+        637,
+        910,
+        833
+      ],
+      "width": 121,
+      "height": 196,
+      "category": "props"
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\safe\\props\\safe_house_work_desk_monitor_01.png",
+      "source_sheet": "K:\\ProjectEscape\\project-escape\\assets\\map\\safe\\sheets\\safe_house_active_sheet_02.png",
+      "source_box_xyxy": [
+        924,
+        650,
+        1083,
+        783
+      ],
+      "width": 159,
+      "height": 133,
+      "category": "props"
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\safe\\props\\safe_house_storage_cabinet_01.png",
+      "source_sheet": "K:\\ProjectEscape\\project-escape\\assets\\map\\safe\\sheets\\safe_house_active_sheet_02.png",
+      "source_box_xyxy": [
+        1101,
+        654,
+        1173,
+        789
+      ],
+      "width": 72,
+      "height": 135,
+      "category": "props"
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\safe\\props\\safe_house_supply_shelves_01.png",
+      "source_sheet": "K:\\ProjectEscape\\project-escape\\assets\\map\\safe\\sheets\\safe_house_active_sheet_02.png",
+      "source_box_xyxy": [
+        1201,
+        643,
+        1306,
+        796
+      ],
+      "width": 105,
+      "height": 153,
+      "category": "props"
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\safe\\props\\safe_house_floor_lamp_01.png",
+      "source_sheet": "K:\\ProjectEscape\\project-escape\\assets\\map\\safe\\sheets\\safe_house_active_sheet_02.png",
+      "source_box_xyxy": [
+        1350,
+        672,
+        1391,
+        776
+      ],
+      "width": 41,
+      "height": 104,
+      "category": "props"
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\safe\\props\\safe_house_small_bottle_lamp_01.png",
+      "source_sheet": "K:\\ProjectEscape\\project-escape\\assets\\map\\safe\\sheets\\safe_house_active_sheet_02.png",
+      "source_box_xyxy": [
+        1417,
+        695,
+        1455,
+        756
+      ],
+      "width": 38,
+      "height": 61,
+      "category": "props"
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\safe\\props\\safe_house_plant_pot_01.png",
+      "source_sheet": "K:\\ProjectEscape\\project-escape\\assets\\map\\safe\\sheets\\safe_house_active_sheet_02.png",
+      "source_box_xyxy": [
+        757,
+        850,
+        848,
+        965
+      ],
+      "width": 91,
+      "height": 115,
+      "category": "props"
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\safe\\props\\safe_house_blue_monitor_device_01.png",
+      "source_sheet": "K:\\ProjectEscape\\project-escape\\assets\\map\\safe\\sheets\\safe_house_active_sheet_02.png",
+      "source_box_xyxy": [
+        858,
+        871,
+        958,
+        959
+      ],
+      "width": 100,
+      "height": 88,
+      "category": "props"
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\safe\\props\\safe_house_purple_electronic_module_01.png",
+      "source_sheet": "K:\\ProjectEscape\\project-escape\\assets\\map\\safe\\sheets\\safe_house_active_sheet_02.png",
+      "source_box_xyxy": [
+        968,
+        855,
+        1044,
+        962
+      ],
+      "width": 76,
+      "height": 107,
+      "category": "props"
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\safe\\props\\safe_house_storage_crate_01.png",
+      "source_sheet": "K:\\ProjectEscape\\project-escape\\assets\\map\\safe\\sheets\\safe_house_active_sheet_02.png",
+      "source_box_xyxy": [
+        1059,
+        854,
+        1127,
+        961
+      ],
+      "width": 68,
+      "height": 107,
+      "category": "props"
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\safe\\props\\safe_house_small_rug_01.png",
+      "source_sheet": "K:\\ProjectEscape\\project-escape\\assets\\map\\safe\\sheets\\safe_house_active_sheet_02.png",
+      "source_box_xyxy": [
+        1150,
+        871,
+        1241,
+        962
+      ],
+      "width": 91,
+      "height": 91,
+      "category": "props"
+    },
+    {
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\map\\safe\\props\\safe_house_safe_area_marker_ring_01.png",
+      "source_sheet": "K:\\ProjectEscape\\project-escape\\assets\\map\\safe\\sheets\\safe_house_active_sheet_02.png",
+      "source_box_xyxy": [
+        1274,
+        820,
+        1457,
+        985
+      ],
+      "width": 183,
+      "height": 165,
+      "category": "props"
+    }
+  ]
+}
