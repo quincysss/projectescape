@@ -1,84 +1,1055 @@
-[gd_scene load_steps=5 format=3]
+[gd_scene format=3 uid="uid://bbxao5r4lyx1d"]
 
-[ext_resource type="Script" path="res://scripts/run/run_director.gd" id="1_run_director"]
-[ext_resource type="Script" path="res://scripts/run/run_state_machine.gd" id="2_state_machine"]
-[ext_resource type="Script" path="res://scripts/run/spawn_point.gd" id="3_spawn_point"]
-[ext_resource type="Script" path="res://scripts/outpost/outpost_candidate_point.gd" id="4_outpost_candidate"]
+[ext_resource type="Script" uid="uid://dafpycg0ad5iu" path="res://scripts/run/whitebox_run_scene.gd" id="0_run_scene"]
+[ext_resource type="Script" uid="uid://b8pmhv7r3q7yw" path="res://scripts/run/run_director.gd" id="1_run_director"]
+[ext_resource type="Script" uid="uid://b6x1qaptybfy0" path="res://scripts/run/run_state_machine.gd" id="2_state_machine"]
+[ext_resource type="Script" uid="uid://diq20cvnrpqvm" path="res://scripts/run/spawn_point.gd" id="3_spawn_point"]
+[ext_resource type="Script" uid="uid://cokewsl0yxcdg" path="res://scripts/outpost/outpost_candidate_point.gd" id="4_outpost_candidate"]
+[ext_resource type="Script" uid="uid://c88nr3qmv1tt3" path="res://scripts/run/home_safe_zone.gd" id="5_home_safe_zone"]
+[ext_resource type="Script" uid="uid://bpabgosaxqljl" path="res://scripts/player/stability_component.gd" id="6_stability"]
+[ext_resource type="Script" uid="uid://bnsjxisb7pl3v" path="res://scripts/vision/vision_controller.gd" id="7_vision"]
+[ext_resource type="Script" uid="uid://cbyio7dyjynp4" path="res://scripts/camera/run_camera_controller.gd" id="8_camera"]
+[ext_resource type="Script" uid="uid://cbymcmii4cal7" path="res://scripts/inventory/inventory_component.gd" id="9_inventory"]
+[ext_resource type="Script" uid="uid://cxkt7ynvfc2xq" path="res://scripts/inventory/weight_component.gd" id="10_weight"]
+[ext_resource type="Script" uid="uid://lyioyvael0ho" path="res://scripts/inventory/home_storage_component.gd" id="11_home_storage"]
+[ext_resource type="Script" uid="uid://djluasuolovxg" path="res://scripts/map/whitebox_map_rect.gd" id="12_map_rect"]
+[ext_resource type="Script" uid="uid://ddmr5koxxcwn5" path="res://scripts/map/whitebox_map_point.gd" id="13_map_point"]
 
-[node name="RunScene" type="Node2D"]
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_home_safe_zone"]
+size = Vector2(768, 640)
 
-[node name="WorldRoot" type="Node2D" parent="."]
+[node name="RunScene" type="Node2D" unique_id=282431199]
+script = ExtResource("0_run_scene")
 
-[node name="TileMapRoot" type="Node2D" parent="WorldRoot"]
+[node name="WorldRoot" type="Node2D" parent="." unique_id=176377243]
 
-[node name="PlayerRoot" type="Node2D" parent="WorldRoot"]
+[node name="TileMapRoot" type="Node2D" parent="WorldRoot" unique_id=1942119462]
 
-[node name="PlayerSpawn" type="Marker2D" parent="WorldRoot/PlayerRoot"]
+[node name="MapLayout" type="Node2D" parent="WorldRoot" unique_id=1744224353]
+
+[node name="Roads" type="Node2D" parent="WorldRoot/MapLayout" unique_id=1497275522]
+
+[node name="HomePlaza_16x14" type="Node2D" parent="WorldRoot/MapLayout/Roads" unique_id=1455212820]
+position = Vector2(-1536, 0)
+script = ExtResource("12_map_rect")
+rect_kind = "plaza"
+rect_id = "HomePlaza_16x14"
+size_units = Vector2(16, 14)
+subtype = "plaza"
+walkable = true
+
+[node name="HomeDoor_East_18x6" type="Node2D" parent="WorldRoot/MapLayout/Roads"]
+position = Vector2(-576, 0)
+script = ExtResource("12_map_rect")
+rect_id = "HomeDoor_East_18x6"
+size_units = Vector2(18, 6)
+subtype = "transition"
+walkable = true
+
+[node name="HomeDoor_West_16x6" type="Node2D" parent="WorldRoot/MapLayout/Roads"]
+position = Vector2(-2432, 0)
+script = ExtResource("12_map_rect")
+rect_id = "HomeDoor_West_16x6"
+size_units = Vector2(16, 6)
+subtype = "transition"
+walkable = true
+
+[node name="HomeDoor_North_6x10" type="Node2D" parent="WorldRoot/MapLayout/Roads"]
+position = Vector2(-1536, -512)
+script = ExtResource("12_map_rect")
+rect_id = "HomeDoor_North_6x10"
+size_units = Vector2(6, 10)
+subtype = "transition"
+walkable = true
+
+[node name="HomeDoor_South_6x10" type="Node2D" parent="WorldRoot/MapLayout/Roads"]
+position = Vector2(-1536, 512)
+script = ExtResource("12_map_rect")
+rect_id = "HomeDoor_South_6x10"
+size_units = Vector2(6, 10)
+subtype = "transition"
+walkable = true
+
+[node name="InnerLoop_N_Main_36x4" type="Node2D" parent="WorldRoot/MapLayout/Roads" unique_id=2104884876]
+position = Vector2(-1536, -768)
+script = ExtResource("12_map_rect")
+rect_id = "InnerLoop_N_Main_36x4"
+size_units = Vector2(36, 4)
+subtype = "secondary"
+walkable = true
+
+[node name="InnerLoop_S_Main_36x4" type="Node2D" parent="WorldRoot/MapLayout/Roads" unique_id=878059520]
+position = Vector2(-1536, 768)
+script = ExtResource("12_map_rect")
+rect_id = "InnerLoop_S_Main_36x4"
+size_units = Vector2(36, 4)
+subtype = "secondary"
+walkable = true
+
+[node name="InnerLoop_W_Main_4x28" type="Node2D" parent="WorldRoot/MapLayout/Roads" unique_id=1777454062]
+position = Vector2(-2688, 0)
+script = ExtResource("12_map_rect")
+rect_id = "InnerLoop_W_Main_4x28"
+size_units = Vector2(4, 28)
+subtype = "secondary"
+walkable = true
+
+[node name="InnerLoop_E_Main_4x28" type="Node2D" parent="WorldRoot/MapLayout/Roads" unique_id=1897970431]
+position = Vector2(-384, 0)
+script = ExtResource("12_map_rect")
+rect_id = "InnerLoop_E_Main_4x28"
+size_units = Vector2(4, 28)
+subtype = "secondary"
+walkable = true
+
+[node name="MainRoad_West_48x6" type="Node2D" parent="WorldRoot/MapLayout/Roads" unique_id=1907999777]
+position = Vector2(-4480, 0)
+script = ExtResource("12_map_rect")
+rect_id = "MainRoad_West_48x6"
+size_units = Vector2(48, 6)
+ring = "middle"
+walkable = true
+
+[node name="MainRoad_East_76x6" type="Node2D" parent="WorldRoot/MapLayout/Roads" unique_id=563528856]
+position = Vector2(1536, 0)
+script = ExtResource("12_map_rect")
+rect_id = "MainRoad_East_76x6"
+size_units = Vector2(76, 6)
+ring = "middle"
+walkable = true
+
+[node name="MainRoad_Outer_68x6" type="Node2D" parent="WorldRoot/MapLayout/Roads" unique_id=1075313483]
+position = Vector2(5632, 0)
+script = ExtResource("12_map_rect")
+rect_id = "MainRoad_Outer_68x6"
+size_units = Vector2(68, 6)
+ring = "outer"
+walkable = true
+
+[node name="NorthSpine_A_6x64" type="Node2D" parent="WorldRoot/MapLayout/Roads" unique_id=1313088671]
+position = Vector2(2176, -2176)
+script = ExtResource("12_map_rect")
+rect_id = "NorthSpine_A_6x64"
+size_units = Vector2(6, 64)
+ring = "middle"
+walkable = true
+
+[node name="NorthConnector_A_74x4" type="Node2D" parent="WorldRoot/MapLayout/Roads" unique_id=57804064]
+position = Vector2(2176, -1792)
+script = ExtResource("12_map_rect")
+rect_id = "NorthConnector_A_74x4"
+size_units = Vector2(74, 4)
+subtype = "secondary"
+ring = "middle"
+walkable = true
+
+[node name="SouthSpine_A_6x54" type="Node2D" parent="WorldRoot/MapLayout/Roads" unique_id=163088078]
+position = Vector2(3328, 2176)
+script = ExtResource("12_map_rect")
+rect_id = "SouthSpine_A_6x54"
+size_units = Vector2(6, 54)
+ring = "middle"
+walkable = true
+
+[node name="SouthConnector_A_72x4" type="Node2D" parent="WorldRoot/MapLayout/Roads" unique_id=1041060985]
+position = Vector2(2048, 2048)
+script = ExtResource("12_map_rect")
+rect_id = "SouthConnector_A_72x4"
+size_units = Vector2(72, 4)
+subtype = "secondary"
+ring = "middle"
+walkable = true
+
+[node name="OuterVertical_E_6x150" type="Node2D" parent="WorldRoot/MapLayout/Roads" unique_id=966731715]
+position = Vector2(7680, 0)
+script = ExtResource("12_map_rect")
+rect_id = "OuterVertical_E_6x150"
+size_units = Vector2(6, 150)
+ring = "outer"
+walkable = true
+
+[node name="OuterVertical_Mid_6x144" type="Node2D" parent="WorldRoot/MapLayout/Roads" unique_id=1433328532]
+position = Vector2(4992, 0)
+script = ExtResource("12_map_rect")
+rect_id = "OuterVertical_Mid_6x144"
+size_units = Vector2(6, 144)
+ring = "outer"
+walkable = true
+
+[node name="OuterTop_Bypass_84x4" type="Node2D" parent="WorldRoot/MapLayout/Roads" unique_id=1283402818]
+position = Vector2(5120, -4864)
+script = ExtResource("12_map_rect")
+rect_id = "OuterTop_Bypass_84x4"
+size_units = Vector2(84, 4)
+subtype = "secondary"
+ring = "outer"
+walkable = true
+
+[node name="OuterBottom_Bypass_84x4" type="Node2D" parent="WorldRoot/MapLayout/Roads" unique_id=577139218]
+position = Vector2(5504, 4608)
+script = ExtResource("12_map_rect")
+rect_id = "OuterBottom_Bypass_84x4"
+size_units = Vector2(84, 4)
+subtype = "secondary"
+ring = "outer"
+walkable = true
+
+[node name="TopConnector_4x52" type="Node2D" parent="WorldRoot/MapLayout/Roads" unique_id=1740559039]
+position = Vector2(3712, -3328)
+script = ExtResource("12_map_rect")
+rect_id = "TopConnector_4x52"
+size_units = Vector2(4, 52)
+subtype = "secondary"
+ring = "middle"
+walkable = true
+
+[node name="BottomConnector_4x48" type="Node2D" parent="WorldRoot/MapLayout/Roads" unique_id=1034963008]
+position = Vector2(4096, 3200)
+script = ExtResource("12_map_rect")
+rect_id = "BottomConnector_4x48"
+size_units = Vector2(4, 48)
+subtype = "secondary"
+ring = "middle"
+walkable = true
+
+[node name="Alley_NorthCut_2p5x52" type="Node2D" parent="WorldRoot/MapLayout/Roads" unique_id=589824773]
+position = Vector2(512, -3200)
+script = ExtResource("12_map_rect")
+rect_id = "Alley_NorthCut_2p5x52"
+size_units = Vector2(2.5, 52)
+subtype = "alley"
+ring = "middle"
+walkable = true
+
+[node name="Alley_SouthCut_2p5x50" type="Node2D" parent="WorldRoot/MapLayout/Roads" unique_id=1873832338]
+position = Vector2(896, 3200)
+script = ExtResource("12_map_rect")
+rect_id = "Alley_SouthCut_2p5x50"
+size_units = Vector2(2.5, 50)
+subtype = "alley"
+ring = "middle"
+walkable = true
+
+[node name="B01Spur_6x58" type="Node2D" parent="WorldRoot/MapLayout/Roads" unique_id=556829890]
+position = Vector2(6144, -3200)
+script = ExtResource("12_map_rect")
+rect_id = "B01Spur_6x58"
+size_units = Vector2(6, 58)
+subtype = "secondary"
+ring = "outer"
+walkable = true
+
+[node name="B04Spur_18x4" type="Node2D" parent="WorldRoot/MapLayout/Roads" unique_id=1812002886]
+position = Vector2(7168, -5248)
+script = ExtResource("12_map_rect")
+rect_id = "B04Spur_18x4"
+size_units = Vector2(18, 4)
+subtype = "secondary"
+ring = "outer"
+walkable = true
+
+[node name="B03Spur_20x4" type="Node2D" parent="WorldRoot/MapLayout/Roads" unique_id=1481457104]
+position = Vector2(5504, 4224)
+script = ExtResource("12_map_rect")
+rect_id = "B03Spur_20x4"
+size_units = Vector2(20, 4)
+subtype = "secondary"
+ring = "outer"
+walkable = true
+
+[node name="B02Plaza_10x10" type="Node2D" parent="WorldRoot/MapLayout/Roads" unique_id=776433619]
+position = Vector2(7552, 768)
+script = ExtResource("12_map_rect")
+rect_kind = "plaza"
+rect_id = "B02Plaza_10x10"
+size_units = Vector2(10, 10)
+subtype = "plaza"
+ring = "outer"
+walkable = true
+
+[node name="Buildings" type="Node2D" parent="WorldRoot/MapLayout" unique_id=419648086]
+
+[node name="House_Home_NW_8x6" type="Node2D" parent="WorldRoot/MapLayout/Buildings" unique_id=810747454]
+position = Vector2(-2944, -1024)
+script = ExtResource("12_map_rect")
+rect_kind = "building"
+rect_id = "House_Home_NW_8x6"
+size_units = Vector2(8, 6)
+subtype = "house"
+has_collision = true
+
+[node name="House_Home_NE_8x6" type="Node2D" parent="WorldRoot/MapLayout/Buildings" unique_id=865241253]
+position = Vector2(-128, -1088)
+script = ExtResource("12_map_rect")
+rect_kind = "building"
+rect_id = "House_Home_NE_8x6"
+size_units = Vector2(8, 6)
+subtype = "house"
+has_collision = true
+
+[node name="Shop_Main_North_16x6_A" type="Node2D" parent="WorldRoot/MapLayout/Buildings" unique_id=1582494030]
+position = Vector2(1536, -576)
+script = ExtResource("12_map_rect")
+rect_kind = "building"
+rect_id = "Shop_Main_North_16x6_A"
+size_units = Vector2(16, 6)
+subtype = "shop"
+ring = "middle"
+has_collision = true
+
+[node name="Shop_Main_North_16x6_B" type="Node2D" parent="WorldRoot/MapLayout/Buildings" unique_id=1119669791]
+position = Vector2(3584, -576)
+script = ExtResource("12_map_rect")
+rect_kind = "building"
+rect_id = "Shop_Main_North_16x6_B"
+size_units = Vector2(16, 6)
+subtype = "shop"
+ring = "middle"
+has_collision = true
+
+[node name="Standard_Main_South_10x8_A" type="Node2D" parent="WorldRoot/MapLayout/Buildings" unique_id=1413326080]
+position = Vector2(1536, 640)
+script = ExtResource("12_map_rect")
+rect_kind = "building"
+rect_id = "Standard_Main_South_10x8_A"
+size_units = Vector2(10, 8)
+subtype = "house"
+ring = "middle"
+has_collision = true
+
+[node name="Standard_Main_South_10x8_B" type="Node2D" parent="WorldRoot/MapLayout/Buildings" unique_id=1162053705]
+position = Vector2(3840, 640)
+script = ExtResource("12_map_rect")
+rect_kind = "building"
+rect_id = "Standard_Main_South_10x8_B"
+size_units = Vector2(10, 8)
+subtype = "house"
+ring = "middle"
+has_collision = true
+
+[node name="Apartment_NorthSpine_W_12x12" type="Node2D" parent="WorldRoot/MapLayout/Buildings" unique_id=271519639]
+position = Vector2(1472, -3008)
+script = ExtResource("12_map_rect")
+rect_kind = "building"
+rect_id = "Apartment_NorthSpine_W_12x12"
+size_units = Vector2(12, 12)
+subtype = "apartment"
+ring = "middle"
+has_collision = true
+
+[node name="Warehouse_NorthSpine_E_18x12" type="Node2D" parent="WorldRoot/MapLayout/Buildings" unique_id=1319547780]
+position = Vector2(3008, -3264)
+script = ExtResource("12_map_rect")
+rect_kind = "building"
+rect_id = "Warehouse_NorthSpine_E_18x12"
+size_units = Vector2(18, 12)
+subtype = "warehouse"
+ring = "middle"
+has_collision = true
+
+[node name="Apartment_SouthSpine_E_12x12" type="Node2D" parent="WorldRoot/MapLayout/Buildings" unique_id=1770193214]
+position = Vector2(4096, 2944)
+script = ExtResource("12_map_rect")
+rect_kind = "building"
+rect_id = "Apartment_SouthSpine_E_12x12"
+size_units = Vector2(12, 12)
+subtype = "apartment"
+ring = "middle"
+has_collision = true
+
+[node name="Shop_SouthConnector_N_16x6" type="Node2D" parent="WorldRoot/MapLayout/Buildings" unique_id=1987038918]
+position = Vector2(2112, 1408)
+script = ExtResource("12_map_rect")
+rect_kind = "building"
+rect_id = "Shop_SouthConnector_N_16x6"
+size_units = Vector2(16, 6)
+subtype = "shop"
+ring = "middle"
+has_collision = true
+
+[node name="Warehouse_Outer_E_18x12_A" type="Node2D" parent="WorldRoot/MapLayout/Buildings" unique_id=151453134]
+position = Vector2(6784, -2176)
+script = ExtResource("12_map_rect")
+rect_kind = "building"
+rect_id = "Warehouse_Outer_E_18x12_A"
+size_units = Vector2(18, 12)
+subtype = "warehouse"
+ring = "outer"
+has_collision = true
+
+[node name="Warehouse_Outer_E_18x12_B" type="Node2D" parent="WorldRoot/MapLayout/Buildings" unique_id=967723771]
+position = Vector2(6784, 2304)
+script = ExtResource("12_map_rect")
+rect_kind = "building"
+rect_id = "Warehouse_Outer_E_18x12_B"
+size_units = Vector2(18, 12)
+subtype = "warehouse"
+ring = "outer"
+has_collision = true
+
+[node name="Factory_OuterTop_N_18x12" type="Node2D" parent="WorldRoot/MapLayout/Buildings" unique_id=2101662841]
+position = Vector2(4992, -5632)
+script = ExtResource("12_map_rect")
+rect_kind = "building"
+rect_id = "Factory_OuterTop_N_18x12"
+size_units = Vector2(18, 12)
+subtype = "factory"
+ring = "outer"
+has_collision = true
+
+[node name="Construction_OuterBottom_S_16x16" type="Node2D" parent="WorldRoot/MapLayout/Buildings" unique_id=166481243]
+position = Vector2(5376, 5568)
+script = ExtResource("12_map_rect")
+rect_kind = "building"
+rect_id = "Construction_OuterBottom_S_16x16"
+size_units = Vector2(16, 16)
+subtype = "factory"
+ring = "outer"
+has_collision = true
+
+[node name="Standard_B01_W_10x8" type="Node2D" parent="WorldRoot/MapLayout/Buildings" unique_id=1456351439]
+position = Vector2(5440, -3840)
+script = ExtResource("12_map_rect")
+rect_kind = "building"
+rect_id = "Standard_B01_W_10x8"
+size_units = Vector2(10, 8)
+subtype = "house"
+ring = "outer"
+has_collision = true
+
+[node name="Standard_B02_E_10x8" type="Node2D" parent="WorldRoot/MapLayout/Buildings" unique_id=1912019707]
+position = Vector2(8512, 1024)
+script = ExtResource("12_map_rect")
+rect_kind = "building"
+rect_id = "Standard_B02_E_10x8"
+size_units = Vector2(10, 8)
+subtype = "house"
+ring = "outer"
+has_collision = true
+
+[node name="House_WestRoad_N_8x6" type="Node2D" parent="WorldRoot/MapLayout/Buildings" unique_id=875228647]
+position = Vector2(-4480, -640)
+script = ExtResource("12_map_rect")
+rect_kind = "building"
+rect_id = "House_WestRoad_N_8x6"
+size_units = Vector2(8, 6)
+subtype = "house"
+ring = "middle"
+has_collision = true
+
+[node name="House_WestRoad_S_8x6" type="Node2D" parent="WorldRoot/MapLayout/Buildings" unique_id=718706487]
+position = Vector2(-4480, 640)
+script = ExtResource("12_map_rect")
+rect_kind = "building"
+rect_id = "House_WestRoad_S_8x6"
+size_units = Vector2(8, 6)
+subtype = "house"
+ring = "middle"
+has_collision = true
+
+[node name="Shop_InnerLoop_N_16x6" type="Node2D" parent="WorldRoot/MapLayout/Buildings" unique_id=312395497]
+position = Vector2(-1536, -1280)
+script = ExtResource("12_map_rect")
+rect_kind = "building"
+rect_id = "Shop_InnerLoop_N_16x6"
+size_units = Vector2(16, 6)
+subtype = "shop"
+has_collision = true
+
+[node name="Apartment_InnerLoop_SW_12x12" type="Node2D" parent="WorldRoot/MapLayout/Buildings" unique_id=622051010]
+position = Vector2(-2944, 1024)
+script = ExtResource("12_map_rect")
+rect_kind = "building"
+rect_id = "Apartment_InnerLoop_SW_12x12"
+size_units = Vector2(12, 12)
+subtype = "apartment"
+has_collision = true
+
+[node name="Standard_InnerLoop_SE_10x8" type="Node2D" parent="WorldRoot/MapLayout/Buildings" unique_id=1699020348]
+position = Vector2(-128, 1088)
+script = ExtResource("12_map_rect")
+rect_kind = "building"
+rect_id = "Standard_InnerLoop_SE_10x8"
+size_units = Vector2(10, 8)
+subtype = "house"
+has_collision = true
+
+[node name="Shop_Main_North_16x6_C" type="Node2D" parent="WorldRoot/MapLayout/Buildings" unique_id=1647307838]
+position = Vector2(5632, -576)
+script = ExtResource("12_map_rect")
+rect_kind = "building"
+rect_id = "Shop_Main_North_16x6_C"
+size_units = Vector2(16, 6)
+subtype = "shop"
+ring = "outer"
+has_collision = true
+
+[node name="Standard_Main_South_10x8_C" type="Node2D" parent="WorldRoot/MapLayout/Buildings" unique_id=517780966]
+position = Vector2(5632, 640)
+script = ExtResource("12_map_rect")
+rect_kind = "building"
+rect_id = "Standard_Main_South_10x8_C"
+size_units = Vector2(10, 8)
+subtype = "house"
+ring = "outer"
+has_collision = true
+
+[node name="Apartment_OuterMid_W_12x12" type="Node2D" parent="WorldRoot/MapLayout/Buildings" unique_id=284915213]
+position = Vector2(4480, -2304)
+script = ExtResource("12_map_rect")
+rect_kind = "building"
+rect_id = "Apartment_OuterMid_W_12x12"
+size_units = Vector2(12, 12)
+subtype = "apartment"
+ring = "outer"
+has_collision = true
+
+[node name="Apartment_OuterMid_E_12x12" type="Node2D" parent="WorldRoot/MapLayout/Buildings" unique_id=1718401206]
+position = Vector2(5504, -2304)
+script = ExtResource("12_map_rect")
+rect_kind = "building"
+rect_id = "Apartment_OuterMid_E_12x12"
+size_units = Vector2(12, 12)
+subtype = "apartment"
+ring = "outer"
+has_collision = true
+
+[node name="Shop_OuterTop_S_16x6" type="Node2D" parent="WorldRoot/MapLayout/Buildings" unique_id=1497239973]
+position = Vector2(5120, -4352)
+script = ExtResource("12_map_rect")
+rect_kind = "building"
+rect_id = "Shop_OuterTop_S_16x6"
+size_units = Vector2(16, 6)
+subtype = "shop"
+ring = "outer"
+has_collision = true
+
+[node name="Factory_B04_N_18x12" type="Node2D" parent="WorldRoot/MapLayout/Buildings" unique_id=576048815]
+position = Vector2(7168, -6016)
+script = ExtResource("12_map_rect")
+rect_kind = "building"
+rect_id = "Factory_B04_N_18x12"
+size_units = Vector2(18, 12)
+subtype = "factory"
+ring = "far_outer"
+has_collision = true
+
+[node name="Warehouse_B03_S_18x12" type="Node2D" parent="WorldRoot/MapLayout/Buildings" unique_id=1634186206]
+position = Vector2(5504, 5376)
+script = ExtResource("12_map_rect")
+rect_kind = "building"
+rect_id = "Warehouse_B03_S_18x12"
+size_units = Vector2(18, 12)
+subtype = "warehouse"
+ring = "far_outer"
+has_collision = true
+
+[node name="House_HomeDoor_E_N_8x6" type="Node2D" parent="WorldRoot/MapLayout/Buildings"]
+position = Vector2(-64, -512)
+script = ExtResource("12_map_rect")
+rect_kind = "building"
+rect_id = "House_HomeDoor_E_N_8x6"
+size_units = Vector2(8, 6)
+subtype = "house"
+has_collision = true
+
+[node name="House_HomeDoor_E_S_8x6" type="Node2D" parent="WorldRoot/MapLayout/Buildings"]
+position = Vector2(-64, 512)
+script = ExtResource("12_map_rect")
+rect_kind = "building"
+rect_id = "House_HomeDoor_E_S_8x6"
+size_units = Vector2(8, 6)
+subtype = "house"
+has_collision = true
+
+[node name="Standard_HomeDoor_W_N_10x8" type="Node2D" parent="WorldRoot/MapLayout/Buildings"]
+position = Vector2(-2432, -640)
+script = ExtResource("12_map_rect")
+rect_kind = "building"
+rect_id = "Standard_HomeDoor_W_N_10x8"
+size_units = Vector2(10, 8)
+subtype = "house"
+has_collision = true
+
+[node name="Standard_HomeDoor_W_S_10x8" type="Node2D" parent="WorldRoot/MapLayout/Buildings"]
+position = Vector2(-2432, 640)
+script = ExtResource("12_map_rect")
+rect_kind = "building"
+rect_id = "Standard_HomeDoor_W_S_10x8"
+size_units = Vector2(10, 8)
+subtype = "house"
+has_collision = true
+
+[node name="Shop_Main_North_16x6_D" type="Node2D" parent="WorldRoot/MapLayout/Buildings"]
+position = Vector2(512, -576)
+script = ExtResource("12_map_rect")
+rect_kind = "building"
+rect_id = "Shop_Main_North_16x6_D"
+size_units = Vector2(16, 6)
+subtype = "shop"
+ring = "middle"
+has_collision = true
+
+[node name="Standard_Main_South_10x8_D" type="Node2D" parent="WorldRoot/MapLayout/Buildings"]
+position = Vector2(512, 640)
+script = ExtResource("12_map_rect")
+rect_kind = "building"
+rect_id = "Standard_Main_South_10x8_D"
+size_units = Vector2(10, 8)
+subtype = "house"
+ring = "middle"
+has_collision = true
+
+[node name="Shop_OuterMain_North_16x6_D" type="Node2D" parent="WorldRoot/MapLayout/Buildings"]
+position = Vector2(6528, -576)
+script = ExtResource("12_map_rect")
+rect_kind = "building"
+rect_id = "Shop_OuterMain_North_16x6_D"
+size_units = Vector2(16, 6)
+subtype = "shop"
+ring = "outer"
+has_collision = true
+
+[node name="Standard_OuterMain_South_10x8_D" type="Node2D" parent="WorldRoot/MapLayout/Buildings"]
+position = Vector2(6528, 640)
+script = ExtResource("12_map_rect")
+rect_kind = "building"
+rect_id = "Standard_OuterMain_South_10x8_D"
+size_units = Vector2(10, 8)
+subtype = "house"
+ring = "outer"
+has_collision = true
+
+[node name="Apartment_OuterVertical_W_N_12x12" type="Node2D" parent="WorldRoot/MapLayout/Buildings"]
+position = Vector2(6912, -1024)
+script = ExtResource("12_map_rect")
+rect_kind = "building"
+rect_id = "Apartment_OuterVertical_W_N_12x12"
+size_units = Vector2(12, 12)
+subtype = "apartment"
+ring = "outer"
+has_collision = true
+
+[node name="Apartment_OuterVertical_W_S_12x12" type="Node2D" parent="WorldRoot/MapLayout/Buildings"]
+position = Vector2(6912, 1536)
+script = ExtResource("12_map_rect")
+rect_kind = "building"
+rect_id = "Apartment_OuterVertical_W_S_12x12"
+size_units = Vector2(12, 12)
+subtype = "apartment"
+ring = "outer"
+has_collision = true
+
+[node name="Apartment_OuterVertical_E_N_12x12" type="Node2D" parent="WorldRoot/MapLayout/Buildings"]
+position = Vector2(8448, -1024)
+script = ExtResource("12_map_rect")
+rect_kind = "building"
+rect_id = "Apartment_OuterVertical_E_N_12x12"
+size_units = Vector2(12, 12)
+subtype = "apartment"
+ring = "outer"
+has_collision = true
+
+[node name="Apartment_OuterVertical_E_S_12x12" type="Node2D" parent="WorldRoot/MapLayout/Buildings"]
+position = Vector2(8448, 2304)
+script = ExtResource("12_map_rect")
+rect_kind = "building"
+rect_id = "Apartment_OuterVertical_E_S_12x12"
+size_units = Vector2(12, 12)
+subtype = "apartment"
+ring = "outer"
+has_collision = true
+
+[node name="Standard_B01_E_10x8" type="Node2D" parent="WorldRoot/MapLayout/Buildings"]
+position = Vector2(7360, -3840)
+script = ExtResource("12_map_rect")
+rect_kind = "building"
+rect_id = "Standard_B01_E_10x8"
+size_units = Vector2(10, 8)
+subtype = "house"
+ring = "outer"
+has_collision = true
+
+[node name="Shop_B02_N_16x6" type="Node2D" parent="WorldRoot/MapLayout/Buildings"]
+position = Vector2(7552, 0)
+script = ExtResource("12_map_rect")
+rect_kind = "building"
+rect_id = "Shop_B02_N_16x6"
+size_units = Vector2(16, 6)
+subtype = "shop"
+ring = "outer"
+has_collision = true
+
+[node name="Standard_B03_N_10x8" type="Node2D" parent="WorldRoot/MapLayout/Buildings"]
+position = Vector2(5504, 3712)
+script = ExtResource("12_map_rect")
+rect_kind = "building"
+rect_id = "Standard_B03_N_10x8"
+size_units = Vector2(10, 8)
+subtype = "house"
+ring = "far_outer"
+has_collision = true
+
+[node name="Standard_B04_S_10x8" type="Node2D" parent="WorldRoot/MapLayout/Buildings"]
+position = Vector2(7168, -4736)
+script = ExtResource("12_map_rect")
+rect_kind = "building"
+rect_id = "Standard_B04_S_10x8"
+size_units = Vector2(10, 8)
+subtype = "house"
+ring = "far_outer"
+has_collision = true
+
+[node name="Points" type="Node2D" parent="WorldRoot/MapLayout" unique_id=1613745880]
+
+[node name="ContainerSpawnPoints" type="Node2D" parent="WorldRoot/MapLayout/Points" unique_id=273129784]
+
+[node name="Container_IN_01" type="Marker2D" parent="WorldRoot/MapLayout/Points/ContainerSpawnPoints" unique_id=426172181]
+position = Vector2(-768, -768)
+script = ExtResource("13_map_point")
+point_id = "Container_IN_01"
+tags = Array[StringName]([&"road_edge"])
+
+[node name="Container_IN_02" type="Marker2D" parent="WorldRoot/MapLayout/Points/ContainerSpawnPoints" unique_id=654695948]
+position = Vector2(-384, 832)
+script = ExtResource("13_map_point")
+point_id = "Container_IN_02"
+tags = Array[StringName]([&"road_edge"])
+
+[node name="Container_IN_03" type="Marker2D" parent="WorldRoot/MapLayout/Points/ContainerSpawnPoints" unique_id=908390290]
+position = Vector2(-2688, 512)
+script = ExtResource("13_map_point")
+point_id = "Container_IN_03"
+tags = Array[StringName]([&"road_edge"])
+
+[node name="Container_IN_04" type="Marker2D" parent="WorldRoot/MapLayout/Points/ContainerSpawnPoints" unique_id=724835913]
+position = Vector2(128, -832)
+script = ExtResource("13_map_point")
+point_id = "Container_IN_04"
+tags = Array[StringName]([&"road_edge"])
+
+[node name="Container_MID_01" type="Marker2D" parent="WorldRoot/MapLayout/Points/ContainerSpawnPoints" unique_id=1822757893]
+position = Vector2(1408, -1920)
+script = ExtResource("13_map_point")
+point_id = "Container_MID_01"
+ring = "middle"
+tags = Array[StringName]([&"road_edge"])
+
+[node name="Container_MID_02" type="Marker2D" parent="WorldRoot/MapLayout/Points/ContainerSpawnPoints" unique_id=168231702]
+position = Vector2(2304, -1536)
+script = ExtResource("13_map_point")
+point_id = "Container_MID_02"
+ring = "middle"
+tags = Array[StringName]([&"road_edge"])
+
+[node name="Container_MID_03" type="Marker2D" parent="WorldRoot/MapLayout/Points/ContainerSpawnPoints" unique_id=309118340]
+position = Vector2(3328, 512)
+script = ExtResource("13_map_point")
+point_id = "Container_MID_03"
+ring = "middle"
+tags = Array[StringName]([&"road_edge"])
+
+[node name="Container_MID_04" type="Marker2D" parent="WorldRoot/MapLayout/Points/ContainerSpawnPoints" unique_id=535555281]
+position = Vector2(1792, 2176)
+script = ExtResource("13_map_point")
+point_id = "Container_MID_04"
+ring = "middle"
+tags = Array[StringName]([&"road_edge"])
+
+[node name="Container_MID_05" type="Marker2D" parent="WorldRoot/MapLayout/Points/ContainerSpawnPoints" unique_id=2054146651]
+position = Vector2(3968, 2048)
+script = ExtResource("13_map_point")
+point_id = "Container_MID_05"
+ring = "middle"
+tags = Array[StringName]([&"road_edge"])
+
+[node name="Container_MID_06" type="Marker2D" parent="WorldRoot/MapLayout/Points/ContainerSpawnPoints" unique_id=1805337619]
+position = Vector2(4736, -384)
+script = ExtResource("13_map_point")
+point_id = "Container_MID_06"
+ring = "middle"
+map_side = "right"
+tags = Array[StringName]([&"road_edge"])
+
+[node name="Container_OUT_01" type="Marker2D" parent="WorldRoot/MapLayout/Points/ContainerSpawnPoints" unique_id=129278439]
+position = Vector2(4992, -3968)
+script = ExtResource("13_map_point")
+point_id = "Container_OUT_01"
+ring = "outer"
+map_side = "right"
+tags = Array[StringName]([&"road_edge"])
+
+[node name="Container_OUT_02" type="Marker2D" parent="WorldRoot/MapLayout/Points/ContainerSpawnPoints" unique_id=9977626]
+position = Vector2(6528, -4864)
+script = ExtResource("13_map_point")
+point_id = "Container_OUT_02"
+ring = "outer"
+map_side = "right"
+tags = Array[StringName]([&"road_edge"])
+
+[node name="Container_OUT_03" type="Marker2D" parent="WorldRoot/MapLayout/Points/ContainerSpawnPoints" unique_id=853945952]
+position = Vector2(7552, -1920)
+script = ExtResource("13_map_point")
+point_id = "Container_OUT_03"
+ring = "outer"
+map_side = "right"
+tags = Array[StringName]([&"road_edge"])
+
+[node name="Container_OUT_04" type="Marker2D" parent="WorldRoot/MapLayout/Points/ContainerSpawnPoints" unique_id=1825108448]
+position = Vector2(7808, 1024)
+script = ExtResource("13_map_point")
+point_id = "Container_OUT_04"
+ring = "outer"
+map_side = "right"
+tags = Array[StringName]([&"road_edge"])
+
+[node name="Container_OUT_05" type="Marker2D" parent="WorldRoot/MapLayout/Points/ContainerSpawnPoints" unique_id=318146701]
+position = Vector2(5504, 4480)
+script = ExtResource("13_map_point")
+point_id = "Container_OUT_05"
+ring = "outer"
+map_side = "right"
+tags = Array[StringName]([&"road_edge"])
+
+[node name="Container_OUT_06" type="Marker2D" parent="WorldRoot/MapLayout/Points/ContainerSpawnPoints" unique_id=2122744077]
+position = Vector2(4224, 4608)
+script = ExtResource("13_map_point")
+point_id = "Container_OUT_06"
+ring = "outer"
+tags = Array[StringName]([&"road_edge"])
+
+[node name="Container_FAR_01" type="Marker2D" parent="WorldRoot/MapLayout/Points/ContainerSpawnPoints" unique_id=1897410742]
+position = Vector2(7168, -5376)
+script = ExtResource("13_map_point")
+point_id = "Container_FAR_01"
+ring = "far_outer"
+map_side = "right"
+tags = Array[StringName]([&"road_edge"])
+
+[node name="Container_FAR_02" type="Marker2D" parent="WorldRoot/MapLayout/Points/ContainerSpawnPoints" unique_id=1591617642]
+position = Vector2(8064, 3456)
+script = ExtResource("13_map_point")
+point_id = "Container_FAR_02"
+ring = "far_outer"
+map_side = "right"
+tags = Array[StringName]([&"road_edge"])
+
+[node name="Container_FAR_03" type="Marker2D" parent="WorldRoot/MapLayout/Points/ContainerSpawnPoints" unique_id=1673905717]
+position = Vector2(5888, 5248)
+script = ExtResource("13_map_point")
+point_id = "Container_FAR_03"
+ring = "far_outer"
+map_side = "right"
+tags = Array[StringName]([&"road_edge"])
+
+[node name="Container_FAR_04" type="Marker2D" parent="WorldRoot/MapLayout/Points/ContainerSpawnPoints" unique_id=1133835203]
+position = Vector2(7936, -5632)
+script = ExtResource("13_map_point")
+point_id = "Container_FAR_04"
+ring = "far_outer"
+map_side = "right"
+tags = Array[StringName]([&"road_edge"])
+
+[node name="MaterialSpawnPoints" type="Node2D" parent="WorldRoot/MapLayout/Points" unique_id=1150354193]
+
+[node name="Material_A_01" type="Marker2D" parent="WorldRoot/MapLayout/Points/MaterialSpawnPoints" unique_id=618088315]
+position = Vector2(2048, -1664)
+script = ExtResource("13_map_point")
+point_type = "material"
+point_id = "Material_A_01"
+ring = "middle"
+tags = Array[StringName]([&"road_edge"])
+
+[node name="Material_A_02" type="Marker2D" parent="WorldRoot/MapLayout/Points/MaterialSpawnPoints" unique_id=136140959]
+position = Vector2(2560, -1920)
+script = ExtResource("13_map_point")
+point_type = "material"
+point_id = "Material_A_02"
+ring = "middle"
+tags = Array[StringName]([&"road_edge"])
+
+[node name="Material_A_03" type="Marker2D" parent="WorldRoot/MapLayout/Points/MaterialSpawnPoints" unique_id=722277419]
+position = Vector2(3200, 640)
+script = ExtResource("13_map_point")
+point_type = "material"
+point_id = "Material_A_03"
+ring = "middle"
+tags = Array[StringName]([&"road_edge"])
+
+[node name="Material_A_04" type="Marker2D" parent="WorldRoot/MapLayout/Points/MaterialSpawnPoints" unique_id=1715859425]
+position = Vector2(3584, 1024)
+script = ExtResource("13_map_point")
+point_type = "material"
+point_id = "Material_A_04"
+ring = "middle"
+tags = Array[StringName]([&"road_edge"])
+
+[node name="Material_A_05" type="Marker2D" parent="WorldRoot/MapLayout/Points/MaterialSpawnPoints" unique_id=646485565]
+position = Vector2(1920, 2176)
+script = ExtResource("13_map_point")
+point_type = "material"
+point_id = "Material_A_05"
+ring = "middle"
+tags = Array[StringName]([&"road_edge"])
+
+[node name="Material_A_06" type="Marker2D" parent="WorldRoot/MapLayout/Points/MaterialSpawnPoints" unique_id=65647083]
+position = Vector2(2432, 2432)
+script = ExtResource("13_map_point")
+point_type = "material"
+point_id = "Material_A_06"
+ring = "middle"
+tags = Array[StringName]([&"road_edge"])
+
+[node name="Material_B_01" type="Marker2D" parent="WorldRoot/MapLayout/Points/MaterialSpawnPoints" unique_id=195801264]
+position = Vector2(6144, -3584)
+script = ExtResource("13_map_point")
+point_type = "material"
+point_id = "Material_B_01"
+ring = "outer"
+map_side = "right"
+tags = Array[StringName]([&"road_edge"])
+
+[node name="Material_B_02" type="Marker2D" parent="WorldRoot/MapLayout/Points/MaterialSpawnPoints" unique_id=1272867439]
+position = Vector2(6656, -3968)
+script = ExtResource("13_map_point")
+point_type = "material"
+point_id = "Material_B_02"
+ring = "outer"
+map_side = "right"
+tags = Array[StringName]([&"road_edge"])
+
+[node name="Material_B_03" type="Marker2D" parent="WorldRoot/MapLayout/Points/MaterialSpawnPoints" unique_id=710657974]
+position = Vector2(7552, 1024)
+script = ExtResource("13_map_point")
+point_type = "material"
+point_id = "Material_B_03"
+ring = "outer"
+map_side = "right"
+tags = Array[StringName]([&"road_edge"])
+
+[node name="Material_B_04" type="Marker2D" parent="WorldRoot/MapLayout/Points/MaterialSpawnPoints" unique_id=1359075824]
+position = Vector2(7936, 512)
+script = ExtResource("13_map_point")
+point_type = "material"
+point_id = "Material_B_04"
+ring = "outer"
+map_side = "right"
+tags = Array[StringName]([&"road_edge"])
+
+[node name="Material_B_05" type="Marker2D" parent="WorldRoot/MapLayout/Points/MaterialSpawnPoints" unique_id=121234402]
+position = Vector2(5504, 4352)
+script = ExtResource("13_map_point")
+point_type = "material"
+point_id = "Material_B_05"
+ring = "outer"
+map_side = "right"
+tags = Array[StringName]([&"road_edge"])
+
+[node name="Material_B_06" type="Marker2D" parent="WorldRoot/MapLayout/Points/MaterialSpawnPoints" unique_id=710658710]
+position = Vector2(6016, 4608)
+script = ExtResource("13_map_point")
+point_type = "material"
+point_id = "Material_B_06"
+ring = "outer"
+map_side = "right"
+tags = Array[StringName]([&"road_edge"])
+
+[node name="PlayerRoot" type="Node2D" parent="WorldRoot" unique_id=502134850]
+position = Vector2(-1536, 0)
+
+[node name="PlayerSpawn" type="Marker2D" parent="WorldRoot/PlayerRoot" unique_id=1156965986]
 script = ExtResource("3_spawn_point")
-spawn_id = "PlayerSpawn"
 
-[node name="ContainerRoot" type="Node2D" parent="WorldRoot"]
+[node name="HomeSafeZone" type="Area2D" parent="WorldRoot/PlayerRoot" unique_id=1836207874]
+script = ExtResource("5_home_safe_zone")
 
-[node name="OutpostRoot" type="Node2D" parent="WorldRoot"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="WorldRoot/PlayerRoot/HomeSafeZone" unique_id=2138604763]
+shape = SubResource("RectangleShape2D_home_safe_zone")
 
-[node name="OutpostCandidates" type="Node2D" parent="WorldRoot/OutpostRoot"]
+[node name="ContainerRoot" type="Node2D" parent="WorldRoot" unique_id=505334510]
 
-[node name="First" type="Node2D" parent="WorldRoot/OutpostRoot/OutpostCandidates"]
+[node name="OutpostRoot" type="Node2D" parent="WorldRoot" unique_id=1984135266]
 
-[node name="OutpostA_01" type="Marker2D" parent="WorldRoot/OutpostRoot/OutpostCandidates/First"]
-position = Vector2(240, -80)
+[node name="OutpostCandidates" type="Node2D" parent="WorldRoot/OutpostRoot" unique_id=1156794764]
+
+[node name="First" type="Node2D" parent="WorldRoot/OutpostRoot/OutpostCandidates" unique_id=1260202229]
+
+[node name="OutpostA_01" type="Marker2D" parent="WorldRoot/OutpostRoot/OutpostCandidates/First" unique_id=819252724]
+position = Vector2(2176, -1792)
 script = ExtResource("4_outpost_candidate")
-outpost_tier = "first"
 candidate_id = "OutpostA_01"
 
-[node name="OutpostA_02" type="Marker2D" parent="WorldRoot/OutpostRoot/OutpostCandidates/First"]
-position = Vector2(320, 120)
+[node name="OutpostA_02" type="Marker2D" parent="WorldRoot/OutpostRoot/OutpostCandidates/First" unique_id=937594871]
+position = Vector2(3328, 768)
 script = ExtResource("4_outpost_candidate")
-outpost_tier = "first"
 candidate_id = "OutpostA_02"
 
-[node name="OutpostA_03" type="Marker2D" parent="WorldRoot/OutpostRoot/OutpostCandidates/First"]
-position = Vector2(180, 220)
+[node name="OutpostA_03" type="Marker2D" parent="WorldRoot/OutpostRoot/OutpostCandidates/First" unique_id=620724659]
+position = Vector2(1920, 2304)
 script = ExtResource("4_outpost_candidate")
-outpost_tier = "first"
 candidate_id = "OutpostA_03"
 
-[node name="Second" type="Node2D" parent="WorldRoot/OutpostRoot/OutpostCandidates"]
+[node name="Second" type="Node2D" parent="WorldRoot/OutpostRoot/OutpostCandidates" unique_id=125344101]
 
-[node name="OutpostB_01" type="Marker2D" parent="WorldRoot/OutpostRoot/OutpostCandidates/Second"]
-position = Vector2(620, -260)
+[node name="OutpostB_01" type="Marker2D" parent="WorldRoot/OutpostRoot/OutpostCandidates/Second" unique_id=1428607807]
+position = Vector2(6144, -3840)
 script = ExtResource("4_outpost_candidate")
 outpost_tier = "second"
 candidate_id = "OutpostB_01"
 
-[node name="OutpostB_02" type="Marker2D" parent="WorldRoot/OutpostRoot/OutpostCandidates/Second"]
-position = Vector2(760, 40)
+[node name="OutpostB_02" type="Marker2D" parent="WorldRoot/OutpostRoot/OutpostCandidates/Second" unique_id=286657084]
+position = Vector2(7552, 768)
 script = ExtResource("4_outpost_candidate")
 outpost_tier = "second"
 candidate_id = "OutpostB_02"
 
-[node name="OutpostB_03" type="Marker2D" parent="WorldRoot/OutpostRoot/OutpostCandidates/Second"]
-position = Vector2(560, 300)
+[node name="OutpostB_03" type="Marker2D" parent="WorldRoot/OutpostRoot/OutpostCandidates/Second" unique_id=1501159160]
+position = Vector2(5504, 4224)
 script = ExtResource("4_outpost_candidate")
 outpost_tier = "second"
 candidate_id = "OutpostB_03"
 
-[node name="OutpostB_04" type="Marker2D" parent="WorldRoot/OutpostRoot/OutpostCandidates/Second"]
-position = Vector2(880, 260)
+[node name="OutpostB_04" type="Marker2D" parent="WorldRoot/OutpostRoot/OutpostCandidates/Second" unique_id=550445006]
+position = Vector2(7168, -5248)
 script = ExtResource("4_outpost_candidate")
 outpost_tier = "second"
 candidate_id = "OutpostB_04"
 
-[node name="ExtractionRoot" type="Node2D" parent="WorldRoot"]
+[node name="ExtractionRoot" type="Node2D" parent="WorldRoot" unique_id=1988031226]
 
-[node name="EffectRoot" type="Node2D" parent="WorldRoot"]
+[node name="EffectRoot" type="Node2D" parent="WorldRoot" unique_id=366365985]
 
-[node name="CameraRoot" type="Node2D" parent="."]
+[node name="CameraRoot" type="Node2D" parent="." unique_id=447163172]
 
-[node name="RunUIRoot" type="CanvasLayer" parent="."]
+[node name="RunCameraController" type="Node" parent="CameraRoot" unique_id=799699287]
+script = ExtResource("8_camera")
 
-[node name="RunDirector" type="Node" parent="."]
+[node name="RunUIRoot" type="CanvasLayer" parent="." unique_id=371911869]
+
+[node name="VisionController" type="Node" parent="RunUIRoot" unique_id=373244988]
+script = ExtResource("7_vision")
+
+[node name="StabilityComponent" type="Node" parent="." unique_id=1080227173]
+script = ExtResource("6_stability")
+
+[node name="WeightComponent" type="Node" parent="." unique_id=603999899]
+script = ExtResource("10_weight")
+
+[node name="InventoryComponent" type="Node" parent="." unique_id=838575908]
+script = ExtResource("9_inventory")
+weight_component_path = NodePath("../WeightComponent")
+
+[node name="HomeStorageComponent" type="Node" parent="." unique_id=1481011442]
+script = ExtResource("11_home_storage")
+
+[node name="RunDirector" type="Node" parent="." unique_id=1734912767]
 script = ExtResource("1_run_director")
+stability_component_path = NodePath("../StabilityComponent")
+vision_controller_path = NodePath("../RunUIRoot/VisionController")
+camera_controller_path = NodePath("../CameraRoot/RunCameraController")
+inventory_component_path = NodePath("../InventoryComponent")
+weight_component_path = NodePath("../WeightComponent")
+home_storage_component_path = NodePath("../HomeStorageComponent")
 
-[node name="RunStateMachine" type="Node" parent="RunDirector"]
+[node name="RunStateMachine" type="Node" parent="RunDirector" unique_id=1282437613]
 script = ExtResource("2_state_machine")

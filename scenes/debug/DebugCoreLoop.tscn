@@ -1,10 +1,20 @@
-[gd_scene load_steps=6 format=3]
+[gd_scene load_steps=14 format=3]
 
 [ext_resource type="Script" path="res://scripts/debug/debug_core_loop.gd" id="1_debug"]
 [ext_resource type="Script" path="res://scripts/run/run_director.gd" id="2_director"]
 [ext_resource type="Script" path="res://scripts/run/run_state_machine.gd" id="3_state_machine"]
 [ext_resource type="Script" path="res://scripts/run/spawn_point.gd" id="4_spawn_point"]
 [ext_resource type="Script" path="res://scripts/outpost/outpost_candidate_point.gd" id="5_outpost_candidate"]
+[ext_resource type="Script" path="res://scripts/run/home_safe_zone.gd" id="6_home_safe_zone"]
+[ext_resource type="Script" path="res://scripts/player/stability_component.gd" id="7_stability"]
+[ext_resource type="Script" path="res://scripts/vision/vision_controller.gd" id="8_vision"]
+[ext_resource type="Script" path="res://scripts/camera/run_camera_controller.gd" id="9_camera"]
+[ext_resource type="Script" path="res://scripts/inventory/inventory_component.gd" id="10_inventory"]
+[ext_resource type="Script" path="res://scripts/inventory/weight_component.gd" id="11_weight"]
+[ext_resource type="Script" path="res://scripts/inventory/home_storage_component.gd" id="12_home_storage"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_home_safe_zone"]
+radius = 96.0
 
 [node name="DebugCoreLoop" type="Control"]
 layout_mode = 3
@@ -15,6 +25,12 @@ script = ExtResource("1_debug")
 
 [node name="RunDirector" type="Node" parent="."]
 script = ExtResource("2_director")
+stability_component_path = NodePath("../StabilityComponent")
+vision_controller_path = NodePath("../VisionController")
+camera_controller_path = NodePath("../RunCameraController")
+inventory_component_path = NodePath("../InventoryComponent")
+weight_component_path = NodePath("../WeightComponent")
+home_storage_component_path = NodePath("../HomeStorageComponent")
 
 [node name="RunStateMachine" type="Node" parent="RunDirector"]
 script = ExtResource("3_state_machine")
@@ -24,6 +40,12 @@ script = ExtResource("3_state_machine")
 [node name="PlayerSpawn" type="Marker2D" parent="DebugWorld"]
 script = ExtResource("4_spawn_point")
 spawn_id = "DebugPlayerSpawn"
+
+[node name="HomeSafeZone" type="Area2D" parent="DebugWorld"]
+script = ExtResource("6_home_safe_zone")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="DebugWorld/HomeSafeZone"]
+shape = SubResource("CircleShape2D_home_safe_zone")
 
 [node name="OutpostCandidates" type="Node2D" parent="DebugWorld"]
 
@@ -144,6 +166,30 @@ text = "Interrupt Extract"
 layout_mode = 2
 text = "Kill Player"
 
+[node name="StabilityDown" type="Button" parent="Margin/RootVBox/ButtonGrid"]
+layout_mode = 2
+text = "Stability -10"
+
+[node name="StabilityUp" type="Button" parent="Margin/RootVBox/ButtonGrid"]
+layout_mode = 2
+text = "Stability +10"
+
+[node name="AddScrap" type="Button" parent="Margin/RootVBox/ButtonGrid"]
+layout_mode = 2
+text = "Add Scrap"
+
+[node name="AddHeavy" type="Button" parent="Margin/RootVBox/ButtonGrid"]
+layout_mode = 2
+text = "Add Heavy"
+
+[node name="DepositFirst" type="Button" parent="Margin/RootVBox/ButtonGrid"]
+layout_mode = 2
+text = "Deposit First"
+
+[node name="DropFirst" type="Button" parent="Margin/RootVBox/ButtonGrid"]
+layout_mode = 2
+text = "Drop First"
+
 [node name="RunSuccessPath" type="Button" parent="Margin/RootVBox/ButtonGrid"]
 layout_mode = 2
 text = "Auto Success"
@@ -172,6 +218,25 @@ layout_mode = 2
 custom_minimum_size = Vector2(0, 220)
 fit_content = true
 
+[node name="StabilityComponent" type="Node" parent="."]
+script = ExtResource("7_stability")
+
+[node name="VisionController" type="Node" parent="."]
+script = ExtResource("8_vision")
+
+[node name="RunCameraController" type="Node" parent="."]
+script = ExtResource("9_camera")
+
+[node name="WeightComponent" type="Node" parent="."]
+script = ExtResource("11_weight")
+
+[node name="InventoryComponent" type="Node" parent="."]
+script = ExtResource("10_inventory")
+weight_component_path = NodePath("../WeightComponent")
+
+[node name="HomeStorageComponent" type="Node" parent="."]
+script = ExtResource("12_home_storage")
+
 [connection signal="pressed" from="Margin/RootVBox/ButtonGrid/StartNewRun" to="." method="_on_start_new_run_pressed"]
 [connection signal="pressed" from="Margin/RootVBox/ButtonGrid/LeaveHome" to="." method="_on_leave_home_pressed"]
 [connection signal="pressed" from="Margin/RootVBox/ButtonGrid/CameraDone" to="." method="_on_camera_done_pressed"]
@@ -183,5 +248,11 @@ fit_content = true
 [connection signal="pressed" from="Margin/RootVBox/ButtonGrid/CompleteExtract" to="." method="_on_complete_extract_pressed"]
 [connection signal="pressed" from="Margin/RootVBox/ButtonGrid/InterruptExtract" to="." method="_on_interrupt_extract_pressed"]
 [connection signal="pressed" from="Margin/RootVBox/ButtonGrid/KillPlayer" to="." method="_on_kill_player_pressed"]
+[connection signal="pressed" from="Margin/RootVBox/ButtonGrid/StabilityDown" to="." method="_on_stability_down_pressed"]
+[connection signal="pressed" from="Margin/RootVBox/ButtonGrid/StabilityUp" to="." method="_on_stability_up_pressed"]
+[connection signal="pressed" from="Margin/RootVBox/ButtonGrid/AddScrap" to="." method="_on_add_scrap_pressed"]
+[connection signal="pressed" from="Margin/RootVBox/ButtonGrid/AddHeavy" to="." method="_on_add_heavy_pressed"]
+[connection signal="pressed" from="Margin/RootVBox/ButtonGrid/DepositFirst" to="." method="_on_deposit_first_pressed"]
+[connection signal="pressed" from="Margin/RootVBox/ButtonGrid/DropFirst" to="." method="_on_drop_first_pressed"]
 [connection signal="pressed" from="Margin/RootVBox/ButtonGrid/RunSuccessPath" to="." method="_on_run_success_path_pressed"]
 [connection signal="pressed" from="Margin/RootVBox/ButtonGrid/RunDeathPath" to="." method="_on_run_death_path_pressed"]

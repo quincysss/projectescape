@@ -93,6 +93,63 @@ BootScene
   进入 MainMenu 或 BaseScene
 ```
 
+### 3.1 V0.1 启动场景硬规则
+
+V0.1 阶段项目初始场景必须明确设置为：
+
+```text
+res://scenes/boot/BootScene.tscn
+```
+
+落地操作：
+
+```text
+1. 打开 Project Settings。
+2. 进入 Application > Run。
+3. 将 Main Scene 设置为 res://scenes/boot/BootScene.tscn。
+4. 确认 project.godot 中出现：
+   [application]
+   run/main_scene="res://scenes/boot/BootScene.tscn"
+5. 运行项目，确认首先进入 BootScene。
+```
+
+V0.1 的 BootScene 可以非常薄，只负责启动分流，不承载业务系统。
+
+初期允许 BootScene 直接跳转：
+
+```text
+BootScene
+  -> BaseScene
+```
+
+当 BaseScene 的出发按钮可用后，进入局内的正式路径为：
+
+```text
+BootScene
+  -> BaseScene
+  -> RunScene
+```
+
+DebugCoreLoop 不是项目初始场景，只用于开发验证：
+
+```text
+res://scenes/debug/DebugCoreLoop.tscn
+```
+
+禁止把 DebugCoreLoop 长期设置为项目 Main Scene。需要调试时，应从编辑器直接运行该场景，或通过开发用 Debug 入口进入。
+
+验收标准：
+
+```text
+[ ] project.godot 明确设置 run/main_scene。
+[ ] 运行项目不会进入空白场景。
+[ ] BootScene 存在并能进入 BaseScene。
+[ ] BaseScene 有进入 RunScene 的入口或临时调试按钮。
+[ ] DebugCoreLoop 可独立运行，但不是正式启动入口。
+```
+
+---
+
 V0.1 可简化：
 
 ```text

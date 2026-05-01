@@ -59,6 +59,46 @@ func _on_kill_player_pressed() -> void:
 	run_director.on_player_dead("debug_stability_depleted")
 	_refresh()
 
+func _on_stability_down_pressed() -> void:
+	if run_director.stability_component:
+		run_director.stability_component.add_stability(-10.0)
+	_refresh()
+
+func _on_stability_up_pressed() -> void:
+	if run_director.stability_component:
+		run_director.stability_component.add_stability(10.0)
+	_refresh()
+
+func _on_add_scrap_pressed() -> void:
+	run_director.debug_add_item({
+		"item_id": "scrap_metal",
+		"display_name": "Scrap Metal",
+		"amount": 1,
+		"weight_per_unit": 2.0,
+		"stack_limit": 5,
+		"item_type": "material",
+	})
+	_refresh()
+
+func _on_add_heavy_pressed() -> void:
+	run_director.debug_add_item({
+		"item_id": "heavy_battery",
+		"display_name": "Heavy Battery",
+		"amount": 1,
+		"weight_per_unit": 12.0,
+		"stack_limit": 1,
+		"item_type": "material",
+	})
+	_refresh()
+
+func _on_deposit_first_pressed() -> void:
+	run_director.debug_deposit_first_inventory_item()
+	_refresh()
+
+func _on_drop_first_pressed() -> void:
+	run_director.debug_drop_first_inventory_item()
+	_refresh()
+
 func _on_run_success_path_pressed() -> void:
 	run_director.start_new_run()
 	run_director.on_home_exited()

@@ -2,7 +2,7 @@
   "mcpServers": {
     "godot_mcp_pro": {
       "command": "node",
-      "args": ["D:/Godot_v4.6.2-stable_win64.exe/godot-mcp-pro-v1.9.4/server/build/index.js"]
+      "args": ["E:/godot/godot-mcp-pro-v1.7.0/server/build/index.js"]
     }
   }
 }

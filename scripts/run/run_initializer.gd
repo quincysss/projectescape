@@ -40,6 +40,8 @@ func create_context(
 	context.player_inventory = []
 	context.current_weight = 0.0
 	context.weight_limit = config.base_weight_limit
+	context.weight_stage = "LIGHT"
+	context.weight_speed_multiplier = 1.0
 	context.home_storage = _create_empty_slots(config.home_storage_slots)
 	context.selected_first_outpost_id = first_outpost_id
 	context.selected_second_outpost_id = second_outpost_id
@@ -56,6 +58,10 @@ func create_context(
 	context.is_extraction_unlocked = false
 	context.camera_mode = "observe"
 	context.darkness_enabled = false
+	context.active_safe_zone_id = "home"
+	context.active_safe_zone_type = "home"
+	context.stability_stage = "SAFE"
+	context.vision_radius = 0.0
 
 	run_context_created.emit(context)
 	run_initialized.emit(context)

@@ -5,20 +5,37 @@ signal run_context_created(context)
 signal run_initialized(context)
 signal initialization_failed(reason: String)
 signal debug_log(message: String)
+signal stability_changed(current: float, max_value: float, stage: int)
+signal inventory_changed(items: Array)
+signal weight_changed(current_weight: float, max_weight: float, stage: int)
+signal home_storage_changed(items: Array)
 
 const RunConfigScript := preload("res://scripts/run/run_config.gd")
 const RunInitializerScript := preload("res://scripts/run/run_initializer.gd")
 const RunStateMachineScript := preload("res://scripts/run/run_state_machine.gd")
+const WeightComponentScript := preload("res://scripts/inventory/weight_component.gd")
 
 @export var spawn_position: Vector2 = Vector2.ZERO
 @export var first_outpost_candidates: Array = ["OutpostA_01", "OutpostA_02", "OutpostA_03"]
 @export var second_outpost_candidates: Array = ["OutpostB_01", "OutpostB_02", "OutpostB_03", "OutpostB_04"]
 @export var prefer_scene_points: bool = true
+@export var stability_component_path: NodePath
+@export var vision_controller_path: NodePath
+@export var camera_controller_path: NodePath
+@export var inventory_component_path: NodePath
+@export var weight_component_path: NodePath
+@export var home_storage_component_path: NodePath
 
 var config = RunConfigScript.new()
 var context
 var initializer = RunInitializerScript.new()
 var state_machine
+var stability_component
+var vision_controller
+var camera_controller
+var inventory_component
+var weight_component
+var home_storage_component
 
 func _ready() -> void:
 	state_machine = get_node_or_null("RunStateMachine")
@@ -32,6 +49,9 @@ func _ready() -> void:
 	state_machine.run_finished.connect(_on_run_finished)
 	state_machine.invalid_transition_requested.connect(_on_invalid_transition_requested)
 	initializer.initialization_failed.connect(_on_initialization_failed)
+	_resolve_runtime_components()
+	_connect_safe_zones()
+	call_deferred("_connect_safe_zones")
 
 func start_new_run() -> bool:
 	_log("Starting new run.")
@@ -51,6 +71,7 @@ func start_new_run() -> bool:
 	run_context_created.emit(context)
 	run_initialized.emit(context)
 	_log("Run initialized: %s" % context.to_debug_dictionary())
+	_initialize_runtime_components()
 	return state_machine.complete_initialization()
 
 func on_home_exited() -> void:
@@ -59,6 +80,9 @@ func on_home_exited() -> void:
 	if context:
 		context.camera_mode = "transition_to_follow"
 		context.darkness_enabled = true
+		context.active_safe_zone_id = ""
+		context.active_safe_zone_type = ""
+	_apply_danger_zone_runtime()
 
 func on_camera_transition_finished() -> void:
 	_log("Event: camera_transition_finished")
@@ -73,6 +97,9 @@ func on_safe_zone_entered(zone_id: String = "home") -> void:
 	if context:
 		context.darkness_enabled = false
 		context.camera_mode = "observe" if zone_id == "home" else "safe_zone"
+		context.active_safe_zone_id = zone_id
+		context.active_safe_zone_type = "home" if zone_id == "home" else "outpost"
+	_apply_safe_zone_runtime(zone_id)
 
 func on_safe_zone_exited(zone_id: String = "home") -> void:
 	_log("Event: safe_zone_exited %s" % zone_id)
@@ -80,6 +107,9 @@ func on_safe_zone_exited(zone_id: String = "home") -> void:
 	if context:
 		context.darkness_enabled = true
 		context.camera_mode = "transition_to_follow"
+		context.active_safe_zone_id = ""
+		context.active_safe_zone_type = ""
+	_apply_danger_zone_runtime()
 
 func on_outpost_repair_started(outpost_id: String) -> void:
 	_log("Event: outpost_repair_started %s" % outpost_id)
@@ -106,6 +136,8 @@ func on_extraction_interrupted() -> void:
 
 func on_player_dead(reason: String = "stability_depleted") -> void:
 	_log("Event: player_dead %s" % reason)
+	if stability_component and stability_component.has_method("stop"):
+		stability_component.stop()
 	state_machine.on_player_dead(reason)
 
 func get_debug_snapshot() -> Dictionary:
@@ -114,6 +146,37 @@ func get_debug_snapshot() -> Dictionary:
 		"context": context.to_debug_dictionary() if context else {},
 	}
 	return snapshot
+
+func debug_add_item(item: Dictionary) -> bool:
+	if inventory_component == null:
+		_log("InventoryComponent missing; cannot add item.")
+		return false
+	return inventory_component.add_item(item)
+
+func debug_deposit_first_inventory_item() -> bool:
+	return deposit_inventory_item_to_home(0)
+
+func debug_drop_first_inventory_item() -> bool:
+	if inventory_component == null:
+		return false
+	var removed: Dictionary = inventory_component.remove_item_at(0)
+	if removed.is_empty():
+		_log("No inventory item to drop.")
+		return false
+	_log("Dropped %s x%s." % [removed.item_id, removed.amount])
+	return true
+
+func deposit_inventory_item_to_home(slot_index: int, amount: int = -1) -> bool:
+	if inventory_component == null or home_storage_component == null:
+		_log("Inventory or HomeStorage missing; cannot deposit.")
+		return false
+	if context and context.active_safe_zone_id != "home":
+		_log("Cannot deposit outside home.")
+		return false
+	var stored: bool = home_storage_component.store_from_inventory(inventory_component, slot_index, amount)
+	if not stored:
+		_log("Deposit failed.")
+	return stored
 
 func get_candidate_summary() -> Dictionary:
 	return {
@@ -151,6 +214,195 @@ func _resolve_outpost_candidates(tier: String) -> Array:
 			"position": candidate_position,
 		})
 	return candidates
+
+func _resolve_runtime_components() -> void:
+	stability_component = _get_optional_node(stability_component_path, "StabilityComponent")
+	vision_controller = _get_optional_node(vision_controller_path, "VisionController")
+	camera_controller = _get_optional_node(camera_controller_path, "RunCameraController")
+	inventory_component = _get_optional_node(inventory_component_path, "InventoryComponent")
+	weight_component = _get_optional_node(weight_component_path, "WeightComponent")
+	home_storage_component = _get_optional_node(home_storage_component_path, "HomeStorageComponent")
+
+	if stability_component:
+		if not stability_component.stability_changed.is_connected(_on_stability_changed):
+			stability_component.stability_changed.connect(_on_stability_changed)
+		if not stability_component.stability_stage_changed.is_connected(_on_stability_stage_changed):
+			stability_component.stability_stage_changed.connect(_on_stability_stage_changed)
+		if not stability_component.stability_depleted.is_connected(_on_stability_depleted):
+			stability_component.stability_depleted.connect(_on_stability_depleted)
+	else:
+		_log("Warning: StabilityComponent not found; stability runtime disabled.")
+
+	if camera_controller and camera_controller.has_signal("transition_finished"):
+		if not camera_controller.transition_finished.is_connected(_on_camera_controller_transition_finished):
+			camera_controller.transition_finished.connect(_on_camera_controller_transition_finished)
+	else:
+		_log("Warning: RunCameraController not found; camera mode stored in context only.")
+
+	if vision_controller == null:
+		_log("Warning: VisionController not found; darkness state stored in context only.")
+
+	if inventory_component:
+		if weight_component and inventory_component.weight_component == null:
+			inventory_component.weight_component = weight_component
+		if not inventory_component.inventory_changed.is_connected(_on_inventory_changed):
+			inventory_component.inventory_changed.connect(_on_inventory_changed)
+		if not inventory_component.item_add_failed.is_connected(_on_item_add_failed):
+			inventory_component.item_add_failed.connect(_on_item_add_failed)
+	else:
+		_log("Warning: InventoryComponent not found; inventory runtime disabled.")
+
+	if weight_component:
+		if not weight_component.weight_changed.is_connected(_on_weight_changed):
+			weight_component.weight_changed.connect(_on_weight_changed)
+	else:
+		_log("Warning: WeightComponent not found; weight runtime disabled.")
+
+	if home_storage_component:
+		if not home_storage_component.home_storage_changed.is_connected(_on_home_storage_changed):
+			home_storage_component.home_storage_changed.connect(_on_home_storage_changed)
+		if not home_storage_component.home_storage_full.is_connected(_on_home_storage_full):
+			home_storage_component.home_storage_full.connect(_on_home_storage_full)
+	else:
+		_log("Warning: HomeStorageComponent not found; home storage runtime disabled.")
+
+func _get_optional_node(path: NodePath, fallback_name: String):
+	if not path.is_empty():
+		return get_node_or_null(path)
+	if get_tree():
+		return _find_node_by_name(get_tree().root, fallback_name)
+	return null
+
+func _find_node_by_name(root: Node, target_name: String) -> Node:
+	if root.name == target_name:
+		return root
+	for child in root.get_children():
+		var found := _find_node_by_name(child, target_name)
+		if found:
+			return found
+	return null
+
+func _connect_safe_zones() -> void:
+	for zone in get_tree().get_nodes_in_group("safe_zones"):
+		if zone.has_signal("safe_zone_entered") and not zone.safe_zone_entered.is_connected(_on_safe_zone_entered):
+			zone.safe_zone_entered.connect(_on_safe_zone_entered)
+		if zone.has_signal("safe_zone_exited") and not zone.safe_zone_exited.is_connected(_on_safe_zone_exited):
+			zone.safe_zone_exited.connect(_on_safe_zone_exited)
+
+func _initialize_runtime_components() -> void:
+	if weight_component:
+		weight_component.set_weight(0.0, config.base_weight_limit)
+	if inventory_component:
+		inventory_component.setup(config.inventory_slots, config.base_weight_limit)
+	if home_storage_component:
+		home_storage_component.setup(config.home_storage_slots)
+	if stability_component:
+		stability_component.configure(
+			config.max_stability,
+			config.max_stability,
+			config.stability_decay_per_second,
+			config.stability_recover_per_second
+		)
+		stability_component.start_recover()
+	if vision_controller:
+		vision_controller.set_darkness_enabled(false)
+		vision_controller.set_vision_stage(0)
+	if camera_controller:
+		camera_controller.set_overview_mode()
+	_sync_inventory_context()
+
+func _apply_safe_zone_runtime(zone_id: String) -> void:
+	if stability_component:
+		stability_component.start_recover()
+	if vision_controller:
+		vision_controller.set_darkness_enabled(false)
+	if camera_controller:
+		if zone_id == "home":
+			camera_controller.set_overview_mode()
+
+func _apply_danger_zone_runtime() -> void:
+	if stability_component:
+		stability_component.start_decay()
+	if vision_controller:
+		vision_controller.set_darkness_enabled(true)
+	if camera_controller:
+		camera_controller.set_player_follow_mode()
+
+func _on_safe_zone_entered(zone_id: StringName, _zone_type: StringName) -> void:
+	on_safe_zone_entered(str(zone_id))
+
+func _on_safe_zone_exited(zone_id: StringName, _zone_type: StringName) -> void:
+	on_safe_zone_exited(str(zone_id))
+
+func _on_stability_changed(current: float, max_value: float, stage: int) -> void:
+	if context:
+		context.player_stability = current
+		context.stability_stage = StabilityComponent.stage_name(stage)
+	stability_changed.emit(current, max_value, stage)
+
+func _on_stability_stage_changed(_old_stage: int, new_stage: int) -> void:
+	if vision_controller:
+		vision_controller.set_vision_stage(new_stage)
+	if context:
+		context.stability_stage = StabilityComponent.stage_name(new_stage)
+		context.vision_radius = vision_controller.current_radius if vision_controller else context.vision_radius
+
+func _on_stability_depleted() -> void:
+	on_player_dead("stability_depleted")
+
+func _on_camera_controller_transition_finished(_mode: int) -> void:
+	if context and camera_controller:
+		context.camera_mode = "observe" if camera_controller.current_mode == 0 else "follow"
+	if state_machine.current_phase == RunStateMachineScript.RunPhase.LEAVE_HOME:
+		on_camera_transition_finished()
+
+func _on_inventory_changed(items: Array) -> void:
+	if context:
+		context.player_inventory = _snapshot_to_context(items)
+		context.current_weight = inventory_component.get_current_weight() if inventory_component else context.current_weight
+	inventory_changed.emit(items)
+	_sync_inventory_context()
+
+func _on_item_add_failed(item_id: StringName, reason: String) -> void:
+	_log("Item add failed: %s, %s" % [item_id, reason])
+
+func _on_weight_changed(current_weight: float, max_weight: float, stage: int) -> void:
+	if context:
+		context.current_weight = current_weight
+		context.weight_limit = max_weight
+		context.weight_stage = WeightComponentScript.stage_name(stage)
+		context.weight_speed_multiplier = weight_component.speed_multiplier if weight_component else 1.0
+	weight_changed.emit(current_weight, max_weight, stage)
+
+func _on_home_storage_changed(items: Array) -> void:
+	if context:
+		context.home_storage = _snapshot_to_context(home_storage_component.get_slots_snapshot() if home_storage_component else items)
+	home_storage_changed.emit(items)
+
+func _on_home_storage_full() -> void:
+	_log("Home storage is full.")
+
+func _sync_inventory_context() -> void:
+	if context == null:
+		return
+	if inventory_component:
+		context.player_inventory = _snapshot_to_context(inventory_component.get_items_snapshot())
+		context.current_weight = inventory_component.get_current_weight()
+	if weight_component:
+		context.weight_limit = weight_component.max_weight
+		context.weight_stage = WeightComponentScript.stage_name(weight_component.current_stage)
+		context.weight_speed_multiplier = weight_component.speed_multiplier
+	if home_storage_component:
+		context.home_storage = _snapshot_to_context(home_storage_component.get_slots_snapshot())
+
+func _snapshot_to_context(items: Array) -> Array:
+	var snapshot: Array = []
+	for item in items:
+		if item == null:
+			snapshot.append(null)
+		elif item is Dictionary:
+			snapshot.append(item.duplicate(true))
+	return snapshot
 
 func _on_phase_changed(old_phase: int, new_phase: int) -> void:
 	_log("Phase changed: %s -> %s" % [
