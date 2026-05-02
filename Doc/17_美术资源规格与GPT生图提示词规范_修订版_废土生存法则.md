@@ -6,7 +6,7 @@
 > 所属项目：《废土生存法则》  
 > 前置文档：01_项目总纲.md / 03_地图与安全区规则.md / 13_数据配置表与TAB规范.md  
 > 适用阶段：美术资产生成、场景拆件、资源替换  
-> 本次修订重点：根据新参考图调整整体美术风格；将场景生产方式改为通过 GPT-image-2.0 生成可拆件资产，包括不同规格楼房、道路、路灯、花坛、围栏、装饰物等，便于 Godot 拼装。
+> 本次修订重点：根据新参考图调整整体美术风格；将场景生产方式改为通过 GPT-image-2.0 生成可拆件资产，包括街道、区块地基、不同规格楼房、路灯、花坛、围栏、装饰物等，便于 Godot 拼装。地图地基采用“街道可通行 + 区块不可通行 + 楼房放在区块上”。
 
 ---
 
@@ -53,6 +53,8 @@
 密集城市街区。
 水泥路面。
 老旧楼房。
+街区区块。
+水泥区块地砖。
 屋顶管线。
 空调外机。
 楼梯。
@@ -175,6 +177,8 @@ Q版大头身。
 ```text
 拆楼房。
 拆道路。
+拆区块地基。
+拆区块边缘。
 拆路口。
 拆台阶。
 拆围栏。
@@ -209,6 +213,8 @@ P0：
 
 ```text
 家 / 安全屋。
+区块填充地砖。
+区块边缘 / 角。
 道路直线块。
 十字路口。
 T 字路口。
@@ -258,6 +264,9 @@ P2：
 | 类型 | 建议尺寸 | 说明 |
 |---|---|---|
 | 小装饰 | 128x128 / 256x256 | 路灯、垃圾桶、花坛 |
+| 区块填充地砖 | 256x256 | 不可通行街区内部，可无缝平铺 |
+| 区块边缘/角 | 256x256 | 区块 curb、边框、外角、内凹角 |
+| 区块覆盖贴花 | 256x256 透明 | 裂纹、污渍、杂草、排水口 |
 | 道路块 | 512x512 | 可平铺 |
 | 小楼 | 512x512 | 单栋小建筑 |
 | 中楼 | 768x768 / 1024x1024 | 街区主建筑 |
@@ -271,7 +280,8 @@ P2：
 场景拆件要求：
 
 ```text
-透明背景 PNG。
+普通独立物件使用透明背景 PNG。
+区块填充/道路 tile 可以是不透明方形 tile。
 俯视或轻微斜俯视统一。
 主体完整，不被裁切。
 边缘干净，方便切图。
@@ -279,6 +289,80 @@ P2：
 不要生成完整街区背景。
 不要带大面积投影覆盖外部区域。
 碰撞边界可读。
+```
+
+### 5.1.1 区块地基资源规格
+
+区块资源用于铺出不可通行街区底座，对应地图规则中的 `TileMap_BlockSolid` 和 `TileMap_BlockEdge`。
+
+首批区块 Sheet 建议：
+
+```text
+assets/map/blocks/sheets/block_district_tiles_sheet_01.png
+```
+
+切片输出建议：
+
+```text
+assets/map/blocks/fill/block_fill_clean_01.png
+assets/map/blocks/fill/block_fill_cracked_01.png
+assets/map/blocks/fill/block_fill_dirty_01.png
+assets/map/blocks/edge/block_edge_straight_01.png
+assets/map/blocks/edge/block_corner_outer_01.png
+assets/map/blocks/edge/block_corner_inner_01.png
+assets/map/blocks/cut/block_alley_cut_01.png
+assets/map/blocks/cut/block_driveway_cut_01.png
+assets/map/blocks/overlay/block_decal_cracks_01.png
+```
+
+Sheet 内容：
+
+| 类型 | 单元尺寸 | 背景 | 要求 |
+|---|---:|---|---|
+| 填充地砖 | 256x256 | 不透明 | 四边无缝平铺 |
+| 直边 | 256x256 | 不透明或透明边缘 | 有清晰 curb/边框 |
+| 外角 | 256x256 | 不透明或透明边缘 | 与直边可拼接 |
+| 内凹角 | 256x256 | 不透明或透明边缘 | 用于凹形区块 |
+| 缺口 | 256x256 | 不透明或透明边缘 | 小巷、车道、入口 |
+| 覆盖贴花 | 256x256 | 透明 | 裂纹、污渍、草、井盖 |
+
+视觉要求：
+
+```text
+灰黑脏旧水泥地面。
+高密度但低对比的手绘裂纹。
+边缘有清晰 curb、台阶、砖线或破损边。
+填充地砖重复 4×4 后不能出现明显接缝。
+不要自带楼房。
+不要自带完整街道。
+不要有大面积方向性阴影。
+不要有文字和水印。
+```
+
+关于“可拉伸”：
+
+```text
+可以制作可重复填充的区块纹理，但不要依赖单张图片直接缩放。
+推荐用 TileMap/Terrain 逐格铺 block_fill，并用 edge/corner 收边。
+如果需要编辑器中快速拉出大区块，可使用可无缝平铺的 fill 纹理做 repeat texture，
+再用 edge/corner 或 curb 资源补边。
+```
+
+Godot 推荐：
+
+```text
+长期方案：TileMapLayer + TileSet terrain。
+快速方案：BlockArea.tscn 使用 Polygon2D/Sprite2D repeat texture + CollisionPolygon2D。
+原型方案：灰色 Polygon2D + CollisionShape2D，后续替换成区块 TileSet。
+```
+
+禁止：
+
+```text
+把一张带明显边框的 512x512 图直接拉伸成大区块。
+拉伸后让裂纹和地砖线变形。
+让楼房贴图承担区块边界。
+让区块纹理比道路纹理更亮、更抢眼。
 ```
 
 ---
@@ -399,6 +483,8 @@ res://assets/map/buildings/building_medium_apartment_01.png
 res://assets/map/safe/safe_house_active_01.png
 res://assets/map/outposts/outpost_broken_01.png
 res://assets/map/outposts/outpost_repaired_01.png
+res://assets/map/blocks/fill/block_fill_clean_01.png
+res://assets/map/blocks/edge/block_edge_straight_01.png
 res://assets/map/roads/road_straight_01.png
 res://assets/map/roads/road_cross_01.png
 res://assets/map/props/streetlamp_01.png
@@ -424,6 +510,8 @@ res://assets/sprites/player/player_idle_down.png
 building_small_shop_01.png
 building_medium_rooftop_02.png
 road_corner_01.png
+block_fill_cracked_01.png
+block_corner_outer_01.png
 streetlamp_warm_01.png
 container_safe_closed.png
 container_safe_open.png
@@ -463,6 +551,36 @@ Avoid: full map background, photorealism, glossy 3D render, cute cartoon, bright
 ---
 
 ## 8. 场景拆件提示词模板
+
+## 8.0 区块地基拆件
+
+```text
+Create a modular city block foundation tile sheet for a 2D top-down wasteland extraction game.
+Subject: non-walkable city district block ground tiles, concrete block interiors, curb edges, outer corners, inner corners, alley cuts, driveway cuts, cracked concrete decals.
+View: top-down orthographic tile sheet, designed for Godot TileMap assembly.
+Style: dark hand-drawn manga line art, dense black ink outlines, rough sketch texture, dirty grey concrete, worn urban wasteland, subtle cracks, stains, weeds, chipped curbs.
+Color palette: grayscale and charcoal, low contrast, tiny muted stains only, no bright colors.
+Production requirement: clean grid-based sheet, each tile 256x256, include seamless fill tiles and edge/corner tiles, suitable for drawing large non-walkable city blocks; no buildings attached; no complete street scene.
+Important: fill tiles must be seamless on all four edges and look natural when repeated in a 4x4 area; edge and corner tiles must connect cleanly.
+Avoid: full map background, buildings, cars as main subject, strong directional shadows, photorealism, glossy 3D render, readable text, watermark, logo.
+```
+
+建议批量主题：
+
+```text
+block_fill_clean
+block_fill_cracked
+block_fill_dirty
+block_edge_straight
+block_corner_outer
+block_corner_inner
+block_alley_cut
+block_driveway_cut
+block_decal_cracks
+block_decal_grass
+```
+
+---
 
 ## 8.1 楼房拆件
 
@@ -701,12 +819,13 @@ Avoid: glossy app icon, 3D render, bright color, complex illustration.
 ```text
 1. 先生成 1 张完整街区概念图，只作为风格参考。
 2. 从概念图中列出可复用拆件清单。
-3. 按拆件类型分别生成独立 PNG。
-4. 每个拆件至少生成 3 个变体。
-5. 人工筛选风格最统一的一批。
-6. 在 Godot 中拼装测试街区。
-7. 根据碰撞、遮挡、可读性反向调整提示词。
-8. 形成固定资产库后再批量扩展。
+3. 先生成区块地基 Sheet，确认街道/区块基底可施工。
+4. 再生成道路、楼房、装饰等独立 PNG。
+5. 每个拆件至少生成 3 个变体。
+6. 人工筛选风格最统一的一批。
+7. 在 Godot 中先用街道 + 区块拼装测试街区，再放楼房。
+8. 根据碰撞、遮挡、可读性反向调整提示词。
+9. 形成固定资产库后再批量扩展。
 ```
 
 安全建筑生产流程：
@@ -724,6 +843,7 @@ Avoid: glossy app icon, 3D render, bright color, complex illustration.
 ```text
 直接把完整街区图当地图。
 一口气生成所有建筑。
+跳过区块地基直接用楼房围出街道。
 混用不同透视角度。
 混用完全不同线稿密度。
 让装饰件自带不可控阴影和背景。
@@ -738,8 +858,10 @@ Avoid: glossy app icon, 3D render, bright color, complex illustration.
 场景拆件进入 Godot 后：
 
 ```text
-道路作为 TileMap 或大块 Sprite。
-建筑作为 StaticBody2D + Sprite2D。
+街道作为 TileMap 或 NavigationRegion2D。
+区块作为 TileMap_BlockSolid / BlockArea，提供主不可通行碰撞。
+区块边缘作为 TileMap_BlockEdge 或独立 curb 资源。
+建筑作为放在区块上的 Sprite2D/Node2D，必要时追加局部 StaticBody2D。
 家作为特殊 SafeHouseScene。
 前哨站作为 OutpostScene，按 repair_state 切换 broken / repaired 资源。
 路灯、花坛、垃圾桶作为 Prop Scene。
@@ -786,6 +908,9 @@ DebugName，可选
 碰撞边界清晰。
 不会挡住玩家读图。
 道路边缘能和其他道路块连接。
+区块填充 tile 4×4 平铺无明显接缝。
+区块边缘/角能围出清晰不可通行街区。
+楼房放在区块上后，不改变街道通行宽度。
 建筑底部边缘适合放置碰撞。
 ```
 
@@ -840,7 +965,7 @@ data/map_assets.tab
 | 字段 | 说明 |
 |---|---|
 | id | 场景资产ID |
-| asset_type | building/road/prop/container/home/outpost/extract |
+| asset_type | block/road/building/prop/container/home/outpost/extract |
 | size_class | small/medium/large/tile |
 | state | normal/broken/repaired/active |
 | theme_tags | 风格标签 |

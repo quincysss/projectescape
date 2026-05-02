@@ -15,6 +15,222 @@
 [ext_resource type="Script" uid="uid://djluasuolovxg" path="res://scripts/map/whitebox_map_rect.gd" id="12_map_rect"]
 [ext_resource type="Script" uid="uid://ddmr5koxxcwn5" path="res://scripts/map/whitebox_map_point.gd" id="13_map_point"]
 
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_whitebox_001"]
+size = Vector2(1024, 896)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_whitebox_002"]
+size = Vector2(1152, 384)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_whitebox_003"]
+size = Vector2(1024, 384)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_whitebox_004"]
+size = Vector2(384, 640)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_whitebox_005"]
+size = Vector2(384, 640)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_whitebox_006"]
+size = Vector2(2304, 256)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_whitebox_007"]
+size = Vector2(2304, 256)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_whitebox_008"]
+size = Vector2(256, 1792)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_whitebox_009"]
+size = Vector2(256, 1792)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_whitebox_010"]
+size = Vector2(3072, 384)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_whitebox_011"]
+size = Vector2(4864, 384)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_whitebox_012"]
+size = Vector2(4352, 384)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_whitebox_013"]
+size = Vector2(384, 4096)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_whitebox_014"]
+size = Vector2(4736, 256)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_whitebox_015"]
+size = Vector2(384, 3456)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_whitebox_016"]
+size = Vector2(4608, 256)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_whitebox_017"]
+size = Vector2(384, 9600)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_whitebox_018"]
+size = Vector2(384, 9216)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_whitebox_019"]
+size = Vector2(5376, 256)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_whitebox_020"]
+size = Vector2(5376, 256)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_whitebox_021"]
+size = Vector2(256, 3328)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_whitebox_022"]
+size = Vector2(256, 3072)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_whitebox_023"]
+size = Vector2(160, 3328)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_whitebox_024"]
+size = Vector2(160, 3200)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_whitebox_025"]
+size = Vector2(384, 3712)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_whitebox_026"]
+size = Vector2(1152, 256)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_whitebox_027"]
+size = Vector2(1280, 256)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_whitebox_028"]
+size = Vector2(640, 640)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_whitebox_029"]
+size = Vector2(512, 384)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_whitebox_030"]
+size = Vector2(512, 384)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_whitebox_031"]
+size = Vector2(1024, 384)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_whitebox_032"]
+size = Vector2(1024, 384)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_whitebox_033"]
+size = Vector2(640, 512)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_whitebox_034"]
+size = Vector2(640, 512)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_whitebox_035"]
+size = Vector2(768, 768)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_whitebox_036"]
+size = Vector2(1152, 768)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_whitebox_037"]
+size = Vector2(768, 768)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_whitebox_038"]
+size = Vector2(1024, 384)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_whitebox_039"]
+size = Vector2(1152, 768)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_whitebox_040"]
+size = Vector2(1152, 768)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_whitebox_041"]
+size = Vector2(1152, 768)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_whitebox_042"]
+size = Vector2(1024, 1024)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_whitebox_043"]
+size = Vector2(640, 512)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_whitebox_044"]
+size = Vector2(640, 512)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_whitebox_045"]
+size = Vector2(512, 384)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_whitebox_046"]
+size = Vector2(512, 384)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_whitebox_047"]
+size = Vector2(1024, 384)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_whitebox_048"]
+size = Vector2(768, 768)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_whitebox_049"]
+size = Vector2(640, 512)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_whitebox_050"]
+size = Vector2(1024, 384)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_whitebox_051"]
+size = Vector2(640, 512)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_whitebox_052"]
+size = Vector2(768, 768)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_whitebox_053"]
+size = Vector2(768, 768)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_whitebox_054"]
+size = Vector2(1024, 384)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_whitebox_055"]
+size = Vector2(1152, 768)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_whitebox_056"]
+size = Vector2(1152, 768)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_whitebox_057"]
+size = Vector2(512, 384)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_whitebox_058"]
+size = Vector2(512, 384)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_whitebox_059"]
+size = Vector2(640, 512)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_whitebox_060"]
+size = Vector2(640, 512)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_whitebox_061"]
+size = Vector2(1024, 384)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_whitebox_062"]
+size = Vector2(640, 512)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_whitebox_063"]
+size = Vector2(1024, 384)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_whitebox_064"]
+size = Vector2(640, 512)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_whitebox_065"]
+size = Vector2(768, 768)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_whitebox_066"]
+size = Vector2(768, 768)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_whitebox_067"]
+size = Vector2(768, 768)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_whitebox_068"]
+size = Vector2(768, 768)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_whitebox_069"]
+size = Vector2(640, 512)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_whitebox_070"]
+size = Vector2(1024, 384)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_whitebox_071"]
+size = Vector2(640, 512)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_whitebox_072"]
+size = Vector2(640, 512)
+
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_home_safe_zone"]
 size = Vector2(768, 640)
 
@@ -29,8 +245,12 @@ script = ExtResource("0_run_scene")
 
 [node name="Roads" type="Node2D" parent="WorldRoot/MapLayout" unique_id=1497275522]
 
-[node name="HomePlaza_16x14" type="Node2D" parent="WorldRoot/MapLayout/Roads" unique_id=1455212820]
+[node name="HomePlaza_16x14" type="Area2D" parent="WorldRoot/MapLayout/Roads" unique_id=1455212820]
 position = Vector2(-1536, 0)
+collision_layer = 0
+collision_mask = 0
+monitoring = false
+monitorable = false
 script = ExtResource("12_map_rect")
 rect_kind = "plaza"
 rect_id = "HomePlaza_16x14"
@@ -38,104 +258,195 @@ size_units = Vector2(16, 14)
 subtype = "plaza"
 walkable = true
 
-[node name="HomeDoor_East_18x6" type="Node2D" parent="WorldRoot/MapLayout/Roads"]
-position = Vector2(-576, 0)
+[node name="WhiteboxCollisionShape" type="CollisionShape2D" parent="WorldRoot/MapLayout/Roads/HomePlaza_16x14" unique_id=1771587770]
+shape = SubResource("RectangleShape2D_whitebox_001")
+
+[node name="HomeDoor_East_18x6" type="Area2D" parent="WorldRoot/MapLayout/Roads" unique_id=615280247]
+position = Vector2(-576, 3)
+collision_layer = 0
+collision_mask = 0
+monitoring = false
+monitorable = false
 script = ExtResource("12_map_rect")
 rect_id = "HomeDoor_East_18x6"
 size_units = Vector2(18, 6)
 subtype = "transition"
 walkable = true
 
-[node name="HomeDoor_West_16x6" type="Node2D" parent="WorldRoot/MapLayout/Roads"]
+[node name="WhiteboxCollisionShape" type="CollisionShape2D" parent="WorldRoot/MapLayout/Roads/HomeDoor_East_18x6" unique_id=2117214407]
+shape = SubResource("RectangleShape2D_whitebox_002")
+
+[node name="HomeDoor_West_16x6" type="Area2D" parent="WorldRoot/MapLayout/Roads" unique_id=492105029]
 position = Vector2(-2432, 0)
+collision_layer = 0
+collision_mask = 0
+monitoring = false
+monitorable = false
 script = ExtResource("12_map_rect")
 rect_id = "HomeDoor_West_16x6"
 size_units = Vector2(16, 6)
 subtype = "transition"
 walkable = true
 
-[node name="HomeDoor_North_6x10" type="Node2D" parent="WorldRoot/MapLayout/Roads"]
+[node name="WhiteboxCollisionShape" type="CollisionShape2D" parent="WorldRoot/MapLayout/Roads/HomeDoor_West_16x6" unique_id=1669866603]
+shape = SubResource("RectangleShape2D_whitebox_003")
+
+[node name="HomeDoor_North_6x10" type="Area2D" parent="WorldRoot/MapLayout/Roads" unique_id=421530080]
 position = Vector2(-1536, -512)
+collision_layer = 0
+collision_mask = 0
+monitoring = false
+monitorable = false
 script = ExtResource("12_map_rect")
 rect_id = "HomeDoor_North_6x10"
 size_units = Vector2(6, 10)
 subtype = "transition"
 walkable = true
 
-[node name="HomeDoor_South_6x10" type="Node2D" parent="WorldRoot/MapLayout/Roads"]
-position = Vector2(-1536, 512)
+[node name="WhiteboxCollisionShape" type="CollisionShape2D" parent="WorldRoot/MapLayout/Roads/HomeDoor_North_6x10" unique_id=115903371]
+shape = SubResource("RectangleShape2D_whitebox_004")
+
+[node name="HomeDoor_South_6x10" type="Area2D" parent="WorldRoot/MapLayout/Roads" unique_id=1711552710]
+position = Vector2(-1536, 511)
+collision_layer = 0
+collision_mask = 0
+monitoring = false
+monitorable = false
 script = ExtResource("12_map_rect")
 rect_id = "HomeDoor_South_6x10"
 size_units = Vector2(6, 10)
 subtype = "transition"
 walkable = true
 
-[node name="InnerLoop_N_Main_36x4" type="Node2D" parent="WorldRoot/MapLayout/Roads" unique_id=2104884876]
+[node name="WhiteboxCollisionShape" type="CollisionShape2D" parent="WorldRoot/MapLayout/Roads/HomeDoor_South_6x10" unique_id=428658610]
+shape = SubResource("RectangleShape2D_whitebox_005")
+
+[node name="InnerLoop_N_Main_36x4" type="Area2D" parent="WorldRoot/MapLayout/Roads" unique_id=2104884876]
 position = Vector2(-1536, -768)
+collision_layer = 0
+collision_mask = 0
+monitoring = false
+monitorable = false
 script = ExtResource("12_map_rect")
 rect_id = "InnerLoop_N_Main_36x4"
 size_units = Vector2(36, 4)
 subtype = "secondary"
 walkable = true
 
-[node name="InnerLoop_S_Main_36x4" type="Node2D" parent="WorldRoot/MapLayout/Roads" unique_id=878059520]
+[node name="WhiteboxCollisionShape" type="CollisionShape2D" parent="WorldRoot/MapLayout/Roads/InnerLoop_N_Main_36x4" unique_id=2114868686]
+shape = SubResource("RectangleShape2D_whitebox_006")
+
+[node name="InnerLoop_S_Main_36x4" type="Area2D" parent="WorldRoot/MapLayout/Roads" unique_id=878059520]
 position = Vector2(-1536, 768)
+collision_layer = 0
+collision_mask = 0
+monitoring = false
+monitorable = false
 script = ExtResource("12_map_rect")
 rect_id = "InnerLoop_S_Main_36x4"
 size_units = Vector2(36, 4)
 subtype = "secondary"
 walkable = true
 
-[node name="InnerLoop_W_Main_4x28" type="Node2D" parent="WorldRoot/MapLayout/Roads" unique_id=1777454062]
+[node name="WhiteboxCollisionShape" type="CollisionShape2D" parent="WorldRoot/MapLayout/Roads/InnerLoop_S_Main_36x4" unique_id=542780661]
+shape = SubResource("RectangleShape2D_whitebox_007")
+
+[node name="InnerLoop_W_Main_4x28" type="Area2D" parent="WorldRoot/MapLayout/Roads" unique_id=1777454062]
 position = Vector2(-2688, 0)
+collision_layer = 0
+collision_mask = 0
+monitoring = false
+monitorable = false
 script = ExtResource("12_map_rect")
 rect_id = "InnerLoop_W_Main_4x28"
 size_units = Vector2(4, 28)
 subtype = "secondary"
 walkable = true
 
-[node name="InnerLoop_E_Main_4x28" type="Node2D" parent="WorldRoot/MapLayout/Roads" unique_id=1897970431]
+[node name="WhiteboxCollisionShape" type="CollisionShape2D" parent="WorldRoot/MapLayout/Roads/InnerLoop_W_Main_4x28" unique_id=126040413]
+shape = SubResource("RectangleShape2D_whitebox_008")
+
+[node name="InnerLoop_E_Main_4x28" type="Area2D" parent="WorldRoot/MapLayout/Roads" unique_id=1897970431]
 position = Vector2(-384, 0)
+collision_layer = 0
+collision_mask = 0
+monitoring = false
+monitorable = false
 script = ExtResource("12_map_rect")
 rect_id = "InnerLoop_E_Main_4x28"
 size_units = Vector2(4, 28)
 subtype = "secondary"
 walkable = true
 
-[node name="MainRoad_West_48x6" type="Node2D" parent="WorldRoot/MapLayout/Roads" unique_id=1907999777]
-position = Vector2(-4480, 0)
+[node name="WhiteboxCollisionShape" type="CollisionShape2D" parent="WorldRoot/MapLayout/Roads/InnerLoop_E_Main_4x28" unique_id=943692864]
+shape = SubResource("RectangleShape2D_whitebox_009")
+
+[node name="MainRoad_West_48x6" type="Area2D" parent="WorldRoot/MapLayout/Roads" unique_id=1907999777]
+position = Vector2(-4480, -1)
+collision_layer = 0
+collision_mask = 0
+monitoring = false
+monitorable = false
 script = ExtResource("12_map_rect")
 rect_id = "MainRoad_West_48x6"
 size_units = Vector2(48, 6)
 ring = "middle"
 walkable = true
 
-[node name="MainRoad_East_76x6" type="Node2D" parent="WorldRoot/MapLayout/Roads" unique_id=563528856]
+[node name="WhiteboxCollisionShape" type="CollisionShape2D" parent="WorldRoot/MapLayout/Roads/MainRoad_West_48x6" unique_id=306926846]
+shape = SubResource("RectangleShape2D_whitebox_010")
+
+[node name="MainRoad_East_76x6" type="Area2D" parent="WorldRoot/MapLayout/Roads" unique_id=563528856]
 position = Vector2(1536, 0)
+collision_layer = 0
+collision_mask = 0
+monitoring = false
+monitorable = false
 script = ExtResource("12_map_rect")
 rect_id = "MainRoad_East_76x6"
 size_units = Vector2(76, 6)
 ring = "middle"
 walkable = true
 
-[node name="MainRoad_Outer_68x6" type="Node2D" parent="WorldRoot/MapLayout/Roads" unique_id=1075313483]
+[node name="WhiteboxCollisionShape" type="CollisionShape2D" parent="WorldRoot/MapLayout/Roads/MainRoad_East_76x6" unique_id=1168250193]
+shape = SubResource("RectangleShape2D_whitebox_011")
+
+[node name="MainRoad_Outer_68x6" type="Area2D" parent="WorldRoot/MapLayout/Roads" unique_id=1075313483]
 position = Vector2(5632, 0)
+collision_layer = 0
+collision_mask = 0
+monitoring = false
+monitorable = false
 script = ExtResource("12_map_rect")
 rect_id = "MainRoad_Outer_68x6"
 size_units = Vector2(68, 6)
 ring = "outer"
 walkable = true
 
-[node name="NorthSpine_A_6x64" type="Node2D" parent="WorldRoot/MapLayout/Roads" unique_id=1313088671]
+[node name="WhiteboxCollisionShape" type="CollisionShape2D" parent="WorldRoot/MapLayout/Roads/MainRoad_Outer_68x6" unique_id=226426695]
+shape = SubResource("RectangleShape2D_whitebox_012")
+
+[node name="NorthSpine_A_6x64" type="Area2D" parent="WorldRoot/MapLayout/Roads" unique_id=1313088671]
 position = Vector2(2176, -2176)
+collision_layer = 0
+collision_mask = 0
+monitoring = false
+monitorable = false
 script = ExtResource("12_map_rect")
 rect_id = "NorthSpine_A_6x64"
 size_units = Vector2(6, 64)
 ring = "middle"
 walkable = true
 
-[node name="NorthConnector_A_74x4" type="Node2D" parent="WorldRoot/MapLayout/Roads" unique_id=57804064]
+[node name="WhiteboxCollisionShape" type="CollisionShape2D" parent="WorldRoot/MapLayout/Roads/NorthSpine_A_6x64" unique_id=1813829723]
+shape = SubResource("RectangleShape2D_whitebox_013")
+
+[node name="NorthConnector_A_74x4" type="Area2D" parent="WorldRoot/MapLayout/Roads" unique_id=57804064]
 position = Vector2(2176, -1792)
+collision_layer = 0
+collision_mask = 0
+monitoring = false
+monitorable = false
 script = ExtResource("12_map_rect")
 rect_id = "NorthConnector_A_74x4"
 size_units = Vector2(74, 4)
@@ -143,16 +454,30 @@ subtype = "secondary"
 ring = "middle"
 walkable = true
 
-[node name="SouthSpine_A_6x54" type="Node2D" parent="WorldRoot/MapLayout/Roads" unique_id=163088078]
+[node name="WhiteboxCollisionShape" type="CollisionShape2D" parent="WorldRoot/MapLayout/Roads/NorthConnector_A_74x4" unique_id=885080706]
+shape = SubResource("RectangleShape2D_whitebox_014")
+
+[node name="SouthSpine_A_6x54" type="Area2D" parent="WorldRoot/MapLayout/Roads" unique_id=163088078]
 position = Vector2(3328, 2176)
+collision_layer = 0
+collision_mask = 0
+monitoring = false
+monitorable = false
 script = ExtResource("12_map_rect")
 rect_id = "SouthSpine_A_6x54"
 size_units = Vector2(6, 54)
 ring = "middle"
 walkable = true
 
-[node name="SouthConnector_A_72x4" type="Node2D" parent="WorldRoot/MapLayout/Roads" unique_id=1041060985]
+[node name="WhiteboxCollisionShape" type="CollisionShape2D" parent="WorldRoot/MapLayout/Roads/SouthSpine_A_6x54" unique_id=1332846801]
+shape = SubResource("RectangleShape2D_whitebox_015")
+
+[node name="SouthConnector_A_72x4" type="Area2D" parent="WorldRoot/MapLayout/Roads" unique_id=1041060985]
 position = Vector2(2048, 2048)
+collision_layer = 0
+collision_mask = 0
+monitoring = false
+monitorable = false
 script = ExtResource("12_map_rect")
 rect_id = "SouthConnector_A_72x4"
 size_units = Vector2(72, 4)
@@ -160,24 +485,45 @@ subtype = "secondary"
 ring = "middle"
 walkable = true
 
-[node name="OuterVertical_E_6x150" type="Node2D" parent="WorldRoot/MapLayout/Roads" unique_id=966731715]
-position = Vector2(7680, 0)
+[node name="WhiteboxCollisionShape" type="CollisionShape2D" parent="WorldRoot/MapLayout/Roads/SouthConnector_A_72x4" unique_id=1884200190]
+shape = SubResource("RectangleShape2D_whitebox_016")
+
+[node name="OuterVertical_E_6x150" type="Area2D" parent="WorldRoot/MapLayout/Roads" unique_id=966731715]
+position = Vector2(7680, 1)
+collision_layer = 0
+collision_mask = 0
+monitoring = false
+monitorable = false
 script = ExtResource("12_map_rect")
 rect_id = "OuterVertical_E_6x150"
 size_units = Vector2(6, 150)
 ring = "outer"
 walkable = true
 
-[node name="OuterVertical_Mid_6x144" type="Node2D" parent="WorldRoot/MapLayout/Roads" unique_id=1433328532]
+[node name="WhiteboxCollisionShape" type="CollisionShape2D" parent="WorldRoot/MapLayout/Roads/OuterVertical_E_6x150" unique_id=382431950]
+shape = SubResource("RectangleShape2D_whitebox_017")
+
+[node name="OuterVertical_Mid_6x144" type="Area2D" parent="WorldRoot/MapLayout/Roads" unique_id=1433328532]
 position = Vector2(4992, 0)
+collision_layer = 0
+collision_mask = 0
+monitoring = false
+monitorable = false
 script = ExtResource("12_map_rect")
 rect_id = "OuterVertical_Mid_6x144"
 size_units = Vector2(6, 144)
 ring = "outer"
 walkable = true
 
-[node name="OuterTop_Bypass_84x4" type="Node2D" parent="WorldRoot/MapLayout/Roads" unique_id=1283402818]
+[node name="WhiteboxCollisionShape" type="CollisionShape2D" parent="WorldRoot/MapLayout/Roads/OuterVertical_Mid_6x144" unique_id=1031920299]
+shape = SubResource("RectangleShape2D_whitebox_018")
+
+[node name="OuterTop_Bypass_84x4" type="Area2D" parent="WorldRoot/MapLayout/Roads" unique_id=1283402818]
 position = Vector2(5120, -4864)
+collision_layer = 0
+collision_mask = 0
+monitoring = false
+monitorable = false
 script = ExtResource("12_map_rect")
 rect_id = "OuterTop_Bypass_84x4"
 size_units = Vector2(84, 4)
@@ -185,8 +531,15 @@ subtype = "secondary"
 ring = "outer"
 walkable = true
 
-[node name="OuterBottom_Bypass_84x4" type="Node2D" parent="WorldRoot/MapLayout/Roads" unique_id=577139218]
+[node name="WhiteboxCollisionShape" type="CollisionShape2D" parent="WorldRoot/MapLayout/Roads/OuterTop_Bypass_84x4" unique_id=261053068]
+shape = SubResource("RectangleShape2D_whitebox_019")
+
+[node name="OuterBottom_Bypass_84x4" type="Area2D" parent="WorldRoot/MapLayout/Roads" unique_id=577139218]
 position = Vector2(5504, 4608)
+collision_layer = 0
+collision_mask = 0
+monitoring = false
+monitorable = false
 script = ExtResource("12_map_rect")
 rect_id = "OuterBottom_Bypass_84x4"
 size_units = Vector2(84, 4)
@@ -194,8 +547,15 @@ subtype = "secondary"
 ring = "outer"
 walkable = true
 
-[node name="TopConnector_4x52" type="Node2D" parent="WorldRoot/MapLayout/Roads" unique_id=1740559039]
+[node name="WhiteboxCollisionShape" type="CollisionShape2D" parent="WorldRoot/MapLayout/Roads/OuterBottom_Bypass_84x4" unique_id=1980188156]
+shape = SubResource("RectangleShape2D_whitebox_020")
+
+[node name="TopConnector_4x52" type="Area2D" parent="WorldRoot/MapLayout/Roads" unique_id=1740559039]
 position = Vector2(3712, -3328)
+collision_layer = 0
+collision_mask = 0
+monitoring = false
+monitorable = false
 script = ExtResource("12_map_rect")
 rect_id = "TopConnector_4x52"
 size_units = Vector2(4, 52)
@@ -203,8 +563,15 @@ subtype = "secondary"
 ring = "middle"
 walkable = true
 
-[node name="BottomConnector_4x48" type="Node2D" parent="WorldRoot/MapLayout/Roads" unique_id=1034963008]
+[node name="WhiteboxCollisionShape" type="CollisionShape2D" parent="WorldRoot/MapLayout/Roads/TopConnector_4x52" unique_id=526256635]
+shape = SubResource("RectangleShape2D_whitebox_021")
+
+[node name="BottomConnector_4x48" type="Area2D" parent="WorldRoot/MapLayout/Roads" unique_id=1034963008]
 position = Vector2(4096, 3200)
+collision_layer = 0
+collision_mask = 0
+monitoring = false
+monitorable = false
 script = ExtResource("12_map_rect")
 rect_id = "BottomConnector_4x48"
 size_units = Vector2(4, 48)
@@ -212,8 +579,15 @@ subtype = "secondary"
 ring = "middle"
 walkable = true
 
-[node name="Alley_NorthCut_2p5x52" type="Node2D" parent="WorldRoot/MapLayout/Roads" unique_id=589824773]
+[node name="WhiteboxCollisionShape" type="CollisionShape2D" parent="WorldRoot/MapLayout/Roads/BottomConnector_4x48" unique_id=1277532322]
+shape = SubResource("RectangleShape2D_whitebox_022")
+
+[node name="Alley_NorthCut_2p5x52" type="Area2D" parent="WorldRoot/MapLayout/Roads" unique_id=589824773]
 position = Vector2(512, -3200)
+collision_layer = 0
+collision_mask = 0
+monitoring = false
+monitorable = false
 script = ExtResource("12_map_rect")
 rect_id = "Alley_NorthCut_2p5x52"
 size_units = Vector2(2.5, 52)
@@ -221,8 +595,15 @@ subtype = "alley"
 ring = "middle"
 walkable = true
 
-[node name="Alley_SouthCut_2p5x50" type="Node2D" parent="WorldRoot/MapLayout/Roads" unique_id=1873832338]
+[node name="WhiteboxCollisionShape" type="CollisionShape2D" parent="WorldRoot/MapLayout/Roads/Alley_NorthCut_2p5x52" unique_id=762665354]
+shape = SubResource("RectangleShape2D_whitebox_023")
+
+[node name="Alley_SouthCut_2p5x50" type="Area2D" parent="WorldRoot/MapLayout/Roads" unique_id=1873832338]
 position = Vector2(896, 3200)
+collision_layer = 0
+collision_mask = 0
+monitoring = false
+monitorable = false
 script = ExtResource("12_map_rect")
 rect_id = "Alley_SouthCut_2p5x50"
 size_units = Vector2(2.5, 50)
@@ -230,8 +611,15 @@ subtype = "alley"
 ring = "middle"
 walkable = true
 
-[node name="B01Spur_6x58" type="Node2D" parent="WorldRoot/MapLayout/Roads" unique_id=556829890]
+[node name="WhiteboxCollisionShape" type="CollisionShape2D" parent="WorldRoot/MapLayout/Roads/Alley_SouthCut_2p5x50" unique_id=1354845738]
+shape = SubResource("RectangleShape2D_whitebox_024")
+
+[node name="B01Spur_6x58" type="Area2D" parent="WorldRoot/MapLayout/Roads" unique_id=556829890]
 position = Vector2(6144, -3200)
+collision_layer = 0
+collision_mask = 0
+monitoring = false
+monitorable = false
 script = ExtResource("12_map_rect")
 rect_id = "B01Spur_6x58"
 size_units = Vector2(6, 58)
@@ -239,8 +627,15 @@ subtype = "secondary"
 ring = "outer"
 walkable = true
 
-[node name="B04Spur_18x4" type="Node2D" parent="WorldRoot/MapLayout/Roads" unique_id=1812002886]
+[node name="WhiteboxCollisionShape" type="CollisionShape2D" parent="WorldRoot/MapLayout/Roads/B01Spur_6x58" unique_id=1339644695]
+shape = SubResource("RectangleShape2D_whitebox_025")
+
+[node name="B04Spur_18x4" type="Area2D" parent="WorldRoot/MapLayout/Roads" unique_id=1812002886]
 position = Vector2(7168, -5248)
+collision_layer = 0
+collision_mask = 0
+monitoring = false
+monitorable = false
 script = ExtResource("12_map_rect")
 rect_id = "B04Spur_18x4"
 size_units = Vector2(18, 4)
@@ -248,8 +643,15 @@ subtype = "secondary"
 ring = "outer"
 walkable = true
 
-[node name="B03Spur_20x4" type="Node2D" parent="WorldRoot/MapLayout/Roads" unique_id=1481457104]
+[node name="WhiteboxCollisionShape" type="CollisionShape2D" parent="WorldRoot/MapLayout/Roads/B04Spur_18x4" unique_id=373937274]
+shape = SubResource("RectangleShape2D_whitebox_026")
+
+[node name="B03Spur_20x4" type="Area2D" parent="WorldRoot/MapLayout/Roads" unique_id=1481457104]
 position = Vector2(5504, 4224)
+collision_layer = 0
+collision_mask = 0
+monitoring = false
+monitorable = false
 script = ExtResource("12_map_rect")
 rect_id = "B03Spur_20x4"
 size_units = Vector2(20, 4)
@@ -257,8 +659,15 @@ subtype = "secondary"
 ring = "outer"
 walkable = true
 
-[node name="B02Plaza_10x10" type="Node2D" parent="WorldRoot/MapLayout/Roads" unique_id=776433619]
+[node name="WhiteboxCollisionShape" type="CollisionShape2D" parent="WorldRoot/MapLayout/Roads/B03Spur_20x4" unique_id=1628413050]
+shape = SubResource("RectangleShape2D_whitebox_027")
+
+[node name="B02Plaza_10x10" type="Area2D" parent="WorldRoot/MapLayout/Roads" unique_id=776433619]
 position = Vector2(7552, 768)
+collision_layer = 0
+collision_mask = 0
+monitoring = false
+monitorable = false
 script = ExtResource("12_map_rect")
 rect_kind = "plaza"
 rect_id = "B02Plaza_10x10"
@@ -267,10 +676,17 @@ subtype = "plaza"
 ring = "outer"
 walkable = true
 
+[node name="WhiteboxCollisionShape" type="CollisionShape2D" parent="WorldRoot/MapLayout/Roads/B02Plaza_10x10" unique_id=535354910]
+shape = SubResource("RectangleShape2D_whitebox_028")
+
 [node name="Buildings" type="Node2D" parent="WorldRoot/MapLayout" unique_id=419648086]
 
-[node name="House_Home_NW_8x6" type="Node2D" parent="WorldRoot/MapLayout/Buildings" unique_id=810747454]
+[node name="House_Home_NW_8x6" type="Area2D" parent="WorldRoot/MapLayout/Buildings" unique_id=810747454]
 position = Vector2(-2944, -1024)
+collision_layer = 0
+collision_mask = 0
+monitoring = false
+monitorable = false
 script = ExtResource("12_map_rect")
 rect_kind = "building"
 rect_id = "House_Home_NW_8x6"
@@ -278,8 +694,15 @@ size_units = Vector2(8, 6)
 subtype = "house"
 has_collision = true
 
-[node name="House_Home_NE_8x6" type="Node2D" parent="WorldRoot/MapLayout/Buildings" unique_id=865241253]
+[node name="WhiteboxCollisionShape" type="CollisionShape2D" parent="WorldRoot/MapLayout/Buildings/House_Home_NW_8x6" unique_id=390289918]
+shape = SubResource("RectangleShape2D_whitebox_029")
+
+[node name="House_Home_NE_8x6" type="Area2D" parent="WorldRoot/MapLayout/Buildings" unique_id=865241253]
 position = Vector2(-128, -1088)
+collision_layer = 0
+collision_mask = 0
+monitoring = false
+monitorable = false
 script = ExtResource("12_map_rect")
 rect_kind = "building"
 rect_id = "House_Home_NE_8x6"
@@ -287,8 +710,15 @@ size_units = Vector2(8, 6)
 subtype = "house"
 has_collision = true
 
-[node name="Shop_Main_North_16x6_A" type="Node2D" parent="WorldRoot/MapLayout/Buildings" unique_id=1582494030]
+[node name="WhiteboxCollisionShape" type="CollisionShape2D" parent="WorldRoot/MapLayout/Buildings/House_Home_NE_8x6" unique_id=1808535588]
+shape = SubResource("RectangleShape2D_whitebox_030")
+
+[node name="Shop_Main_North_16x6_A" type="Area2D" parent="WorldRoot/MapLayout/Buildings" unique_id=1582494030]
 position = Vector2(1536, -576)
+collision_layer = 0
+collision_mask = 0
+monitoring = false
+monitorable = false
 script = ExtResource("12_map_rect")
 rect_kind = "building"
 rect_id = "Shop_Main_North_16x6_A"
@@ -297,8 +727,15 @@ subtype = "shop"
 ring = "middle"
 has_collision = true
 
-[node name="Shop_Main_North_16x6_B" type="Node2D" parent="WorldRoot/MapLayout/Buildings" unique_id=1119669791]
-position = Vector2(3584, -576)
+[node name="WhiteboxCollisionShape" type="CollisionShape2D" parent="WorldRoot/MapLayout/Buildings/Shop_Main_North_16x6_A" unique_id=2046344527]
+shape = SubResource("RectangleShape2D_whitebox_031")
+
+[node name="Shop_Main_North_16x6_B" type="Area2D" parent="WorldRoot/MapLayout/Buildings" unique_id=1119669791]
+position = Vector2(4183, -870)
+collision_layer = 0
+collision_mask = 0
+monitoring = false
+monitorable = false
 script = ExtResource("12_map_rect")
 rect_kind = "building"
 rect_id = "Shop_Main_North_16x6_B"
@@ -307,8 +744,15 @@ subtype = "shop"
 ring = "middle"
 has_collision = true
 
-[node name="Standard_Main_South_10x8_A" type="Node2D" parent="WorldRoot/MapLayout/Buildings" unique_id=1413326080]
+[node name="WhiteboxCollisionShape" type="CollisionShape2D" parent="WorldRoot/MapLayout/Buildings/Shop_Main_North_16x6_B" unique_id=1999968106]
+shape = SubResource("RectangleShape2D_whitebox_032")
+
+[node name="Standard_Main_South_10x8_A" type="Area2D" parent="WorldRoot/MapLayout/Buildings" unique_id=1413326080]
 position = Vector2(1536, 640)
+collision_layer = 0
+collision_mask = 0
+monitoring = false
+monitorable = false
 script = ExtResource("12_map_rect")
 rect_kind = "building"
 rect_id = "Standard_Main_South_10x8_A"
@@ -317,8 +761,15 @@ subtype = "house"
 ring = "middle"
 has_collision = true
 
-[node name="Standard_Main_South_10x8_B" type="Node2D" parent="WorldRoot/MapLayout/Buildings" unique_id=1162053705]
+[node name="WhiteboxCollisionShape" type="CollisionShape2D" parent="WorldRoot/MapLayout/Buildings/Standard_Main_South_10x8_A" unique_id=198747963]
+shape = SubResource("RectangleShape2D_whitebox_033")
+
+[node name="Standard_Main_South_10x8_B" type="Area2D" parent="WorldRoot/MapLayout/Buildings" unique_id=1162053705]
 position = Vector2(3840, 640)
+collision_layer = 0
+collision_mask = 0
+monitoring = false
+monitorable = false
 script = ExtResource("12_map_rect")
 rect_kind = "building"
 rect_id = "Standard_Main_South_10x8_B"
@@ -327,8 +778,15 @@ subtype = "house"
 ring = "middle"
 has_collision = true
 
-[node name="Apartment_NorthSpine_W_12x12" type="Node2D" parent="WorldRoot/MapLayout/Buildings" unique_id=271519639]
+[node name="WhiteboxCollisionShape" type="CollisionShape2D" parent="WorldRoot/MapLayout/Buildings/Standard_Main_South_10x8_B" unique_id=1391247394]
+shape = SubResource("RectangleShape2D_whitebox_034")
+
+[node name="Apartment_NorthSpine_W_12x12" type="Area2D" parent="WorldRoot/MapLayout/Buildings" unique_id=271519639]
 position = Vector2(1472, -3008)
+collision_layer = 0
+collision_mask = 0
+monitoring = false
+monitorable = false
 script = ExtResource("12_map_rect")
 rect_kind = "building"
 rect_id = "Apartment_NorthSpine_W_12x12"
@@ -337,8 +795,15 @@ subtype = "apartment"
 ring = "middle"
 has_collision = true
 
-[node name="Warehouse_NorthSpine_E_18x12" type="Node2D" parent="WorldRoot/MapLayout/Buildings" unique_id=1319547780]
+[node name="WhiteboxCollisionShape" type="CollisionShape2D" parent="WorldRoot/MapLayout/Buildings/Apartment_NorthSpine_W_12x12" unique_id=858666603]
+shape = SubResource("RectangleShape2D_whitebox_035")
+
+[node name="Warehouse_NorthSpine_E_18x12" type="Area2D" parent="WorldRoot/MapLayout/Buildings" unique_id=1319547780]
 position = Vector2(3008, -3264)
+collision_layer = 0
+collision_mask = 0
+monitoring = false
+monitorable = false
 script = ExtResource("12_map_rect")
 rect_kind = "building"
 rect_id = "Warehouse_NorthSpine_E_18x12"
@@ -347,8 +812,15 @@ subtype = "warehouse"
 ring = "middle"
 has_collision = true
 
-[node name="Apartment_SouthSpine_E_12x12" type="Node2D" parent="WorldRoot/MapLayout/Buildings" unique_id=1770193214]
+[node name="WhiteboxCollisionShape" type="CollisionShape2D" parent="WorldRoot/MapLayout/Buildings/Warehouse_NorthSpine_E_18x12" unique_id=948231211]
+shape = SubResource("RectangleShape2D_whitebox_036")
+
+[node name="Apartment_SouthSpine_E_12x12" type="Area2D" parent="WorldRoot/MapLayout/Buildings" unique_id=1770193214]
 position = Vector2(4096, 2944)
+collision_layer = 0
+collision_mask = 0
+monitoring = false
+monitorable = false
 script = ExtResource("12_map_rect")
 rect_kind = "building"
 rect_id = "Apartment_SouthSpine_E_12x12"
@@ -357,8 +829,15 @@ subtype = "apartment"
 ring = "middle"
 has_collision = true
 
-[node name="Shop_SouthConnector_N_16x6" type="Node2D" parent="WorldRoot/MapLayout/Buildings" unique_id=1987038918]
+[node name="WhiteboxCollisionShape" type="CollisionShape2D" parent="WorldRoot/MapLayout/Buildings/Apartment_SouthSpine_E_12x12" unique_id=1984708761]
+shape = SubResource("RectangleShape2D_whitebox_037")
+
+[node name="Shop_SouthConnector_N_16x6" type="Area2D" parent="WorldRoot/MapLayout/Buildings" unique_id=1987038918]
 position = Vector2(2112, 1408)
+collision_layer = 0
+collision_mask = 0
+monitoring = false
+monitorable = false
 script = ExtResource("12_map_rect")
 rect_kind = "building"
 rect_id = "Shop_SouthConnector_N_16x6"
@@ -367,8 +846,15 @@ subtype = "shop"
 ring = "middle"
 has_collision = true
 
-[node name="Warehouse_Outer_E_18x12_A" type="Node2D" parent="WorldRoot/MapLayout/Buildings" unique_id=151453134]
+[node name="WhiteboxCollisionShape" type="CollisionShape2D" parent="WorldRoot/MapLayout/Buildings/Shop_SouthConnector_N_16x6" unique_id=1063523962]
+shape = SubResource("RectangleShape2D_whitebox_038")
+
+[node name="Warehouse_Outer_E_18x12_A" type="Area2D" parent="WorldRoot/MapLayout/Buildings" unique_id=151453134]
 position = Vector2(6784, -2176)
+collision_layer = 0
+collision_mask = 0
+monitoring = false
+monitorable = false
 script = ExtResource("12_map_rect")
 rect_kind = "building"
 rect_id = "Warehouse_Outer_E_18x12_A"
@@ -377,8 +863,15 @@ subtype = "warehouse"
 ring = "outer"
 has_collision = true
 
-[node name="Warehouse_Outer_E_18x12_B" type="Node2D" parent="WorldRoot/MapLayout/Buildings" unique_id=967723771]
+[node name="WhiteboxCollisionShape" type="CollisionShape2D" parent="WorldRoot/MapLayout/Buildings/Warehouse_Outer_E_18x12_A" unique_id=1091234903]
+shape = SubResource("RectangleShape2D_whitebox_039")
+
+[node name="Warehouse_Outer_E_18x12_B" type="Area2D" parent="WorldRoot/MapLayout/Buildings" unique_id=967723771]
 position = Vector2(6784, 2304)
+collision_layer = 0
+collision_mask = 0
+monitoring = false
+monitorable = false
 script = ExtResource("12_map_rect")
 rect_kind = "building"
 rect_id = "Warehouse_Outer_E_18x12_B"
@@ -387,8 +880,15 @@ subtype = "warehouse"
 ring = "outer"
 has_collision = true
 
-[node name="Factory_OuterTop_N_18x12" type="Node2D" parent="WorldRoot/MapLayout/Buildings" unique_id=2101662841]
+[node name="WhiteboxCollisionShape" type="CollisionShape2D" parent="WorldRoot/MapLayout/Buildings/Warehouse_Outer_E_18x12_B" unique_id=406954942]
+shape = SubResource("RectangleShape2D_whitebox_040")
+
+[node name="Factory_OuterTop_N_18x12" type="Area2D" parent="WorldRoot/MapLayout/Buildings" unique_id=2101662841]
 position = Vector2(4992, -5632)
+collision_layer = 0
+collision_mask = 0
+monitoring = false
+monitorable = false
 script = ExtResource("12_map_rect")
 rect_kind = "building"
 rect_id = "Factory_OuterTop_N_18x12"
@@ -397,8 +897,15 @@ subtype = "factory"
 ring = "outer"
 has_collision = true
 
-[node name="Construction_OuterBottom_S_16x16" type="Node2D" parent="WorldRoot/MapLayout/Buildings" unique_id=166481243]
+[node name="WhiteboxCollisionShape" type="CollisionShape2D" parent="WorldRoot/MapLayout/Buildings/Factory_OuterTop_N_18x12" unique_id=1304618047]
+shape = SubResource("RectangleShape2D_whitebox_041")
+
+[node name="Construction_OuterBottom_S_16x16" type="Area2D" parent="WorldRoot/MapLayout/Buildings" unique_id=166481243]
 position = Vector2(5376, 5568)
+collision_layer = 0
+collision_mask = 0
+monitoring = false
+monitorable = false
 script = ExtResource("12_map_rect")
 rect_kind = "building"
 rect_id = "Construction_OuterBottom_S_16x16"
@@ -407,8 +914,15 @@ subtype = "factory"
 ring = "outer"
 has_collision = true
 
-[node name="Standard_B01_W_10x8" type="Node2D" parent="WorldRoot/MapLayout/Buildings" unique_id=1456351439]
+[node name="WhiteboxCollisionShape" type="CollisionShape2D" parent="WorldRoot/MapLayout/Buildings/Construction_OuterBottom_S_16x16" unique_id=1040325789]
+shape = SubResource("RectangleShape2D_whitebox_042")
+
+[node name="Standard_B01_W_10x8" type="Area2D" parent="WorldRoot/MapLayout/Buildings" unique_id=1456351439]
 position = Vector2(5440, -3840)
+collision_layer = 0
+collision_mask = 0
+monitoring = false
+monitorable = false
 script = ExtResource("12_map_rect")
 rect_kind = "building"
 rect_id = "Standard_B01_W_10x8"
@@ -417,8 +931,15 @@ subtype = "house"
 ring = "outer"
 has_collision = true
 
-[node name="Standard_B02_E_10x8" type="Node2D" parent="WorldRoot/MapLayout/Buildings" unique_id=1912019707]
+[node name="WhiteboxCollisionShape" type="CollisionShape2D" parent="WorldRoot/MapLayout/Buildings/Standard_B01_W_10x8" unique_id=110027860]
+shape = SubResource("RectangleShape2D_whitebox_043")
+
+[node name="Standard_B02_E_10x8" type="Area2D" parent="WorldRoot/MapLayout/Buildings" unique_id=1912019707]
 position = Vector2(8512, 1024)
+collision_layer = 0
+collision_mask = 0
+monitoring = false
+monitorable = false
 script = ExtResource("12_map_rect")
 rect_kind = "building"
 rect_id = "Standard_B02_E_10x8"
@@ -427,8 +948,15 @@ subtype = "house"
 ring = "outer"
 has_collision = true
 
-[node name="House_WestRoad_N_8x6" type="Node2D" parent="WorldRoot/MapLayout/Buildings" unique_id=875228647]
+[node name="WhiteboxCollisionShape" type="CollisionShape2D" parent="WorldRoot/MapLayout/Buildings/Standard_B02_E_10x8" unique_id=812945756]
+shape = SubResource("RectangleShape2D_whitebox_044")
+
+[node name="House_WestRoad_N_8x6" type="Area2D" parent="WorldRoot/MapLayout/Buildings" unique_id=875228647]
 position = Vector2(-4480, -640)
+collision_layer = 0
+collision_mask = 0
+monitoring = false
+monitorable = false
 script = ExtResource("12_map_rect")
 rect_kind = "building"
 rect_id = "House_WestRoad_N_8x6"
@@ -437,8 +965,15 @@ subtype = "house"
 ring = "middle"
 has_collision = true
 
-[node name="House_WestRoad_S_8x6" type="Node2D" parent="WorldRoot/MapLayout/Buildings" unique_id=718706487]
+[node name="WhiteboxCollisionShape" type="CollisionShape2D" parent="WorldRoot/MapLayout/Buildings/House_WestRoad_N_8x6" unique_id=1488855948]
+shape = SubResource("RectangleShape2D_whitebox_045")
+
+[node name="House_WestRoad_S_8x6" type="Area2D" parent="WorldRoot/MapLayout/Buildings" unique_id=718706487]
 position = Vector2(-4480, 640)
+collision_layer = 0
+collision_mask = 0
+monitoring = false
+monitorable = false
 script = ExtResource("12_map_rect")
 rect_kind = "building"
 rect_id = "House_WestRoad_S_8x6"
@@ -447,8 +982,16 @@ subtype = "house"
 ring = "middle"
 has_collision = true
 
-[node name="Shop_InnerLoop_N_16x6" type="Node2D" parent="WorldRoot/MapLayout/Buildings" unique_id=312395497]
+[node name="WhiteboxCollisionShape" type="CollisionShape2D" parent="WorldRoot/MapLayout/Buildings/House_WestRoad_S_8x6" unique_id=528109650]
+position = Vector2(-6, 0)
+shape = SubResource("RectangleShape2D_whitebox_046")
+
+[node name="Shop_InnerLoop_N_16x6" type="Area2D" parent="WorldRoot/MapLayout/Buildings" unique_id=312395497]
 position = Vector2(-1536, -1280)
+collision_layer = 0
+collision_mask = 0
+monitoring = false
+monitorable = false
 script = ExtResource("12_map_rect")
 rect_kind = "building"
 rect_id = "Shop_InnerLoop_N_16x6"
@@ -456,8 +999,15 @@ size_units = Vector2(16, 6)
 subtype = "shop"
 has_collision = true
 
-[node name="Apartment_InnerLoop_SW_12x12" type="Node2D" parent="WorldRoot/MapLayout/Buildings" unique_id=622051010]
+[node name="WhiteboxCollisionShape" type="CollisionShape2D" parent="WorldRoot/MapLayout/Buildings/Shop_InnerLoop_N_16x6" unique_id=593424303]
+shape = SubResource("RectangleShape2D_whitebox_047")
+
+[node name="Apartment_InnerLoop_SW_12x12" type="Area2D" parent="WorldRoot/MapLayout/Buildings" unique_id=622051010]
 position = Vector2(-2944, 1024)
+collision_layer = 0
+collision_mask = 0
+monitoring = false
+monitorable = false
 script = ExtResource("12_map_rect")
 rect_kind = "building"
 rect_id = "Apartment_InnerLoop_SW_12x12"
@@ -465,8 +1015,15 @@ size_units = Vector2(12, 12)
 subtype = "apartment"
 has_collision = true
 
-[node name="Standard_InnerLoop_SE_10x8" type="Node2D" parent="WorldRoot/MapLayout/Buildings" unique_id=1699020348]
+[node name="WhiteboxCollisionShape" type="CollisionShape2D" parent="WorldRoot/MapLayout/Buildings/Apartment_InnerLoop_SW_12x12" unique_id=318211316]
+shape = SubResource("RectangleShape2D_whitebox_048")
+
+[node name="Standard_InnerLoop_SE_10x8" type="Area2D" parent="WorldRoot/MapLayout/Buildings" unique_id=1699020348]
 position = Vector2(-128, 1088)
+collision_layer = 0
+collision_mask = 0
+monitoring = false
+monitorable = false
 script = ExtResource("12_map_rect")
 rect_kind = "building"
 rect_id = "Standard_InnerLoop_SE_10x8"
@@ -474,8 +1031,15 @@ size_units = Vector2(10, 8)
 subtype = "house"
 has_collision = true
 
-[node name="Shop_Main_North_16x6_C" type="Node2D" parent="WorldRoot/MapLayout/Buildings" unique_id=1647307838]
+[node name="WhiteboxCollisionShape" type="CollisionShape2D" parent="WorldRoot/MapLayout/Buildings/Standard_InnerLoop_SE_10x8" unique_id=2032449317]
+shape = SubResource("RectangleShape2D_whitebox_049")
+
+[node name="Shop_Main_North_16x6_C" type="Area2D" parent="WorldRoot/MapLayout/Buildings" unique_id=1647307838]
 position = Vector2(5632, -576)
+collision_layer = 0
+collision_mask = 0
+monitoring = false
+monitorable = false
 script = ExtResource("12_map_rect")
 rect_kind = "building"
 rect_id = "Shop_Main_North_16x6_C"
@@ -484,8 +1048,15 @@ subtype = "shop"
 ring = "outer"
 has_collision = true
 
-[node name="Standard_Main_South_10x8_C" type="Node2D" parent="WorldRoot/MapLayout/Buildings" unique_id=517780966]
+[node name="WhiteboxCollisionShape" type="CollisionShape2D" parent="WorldRoot/MapLayout/Buildings/Shop_Main_North_16x6_C" unique_id=1998800168]
+shape = SubResource("RectangleShape2D_whitebox_050")
+
+[node name="Standard_Main_South_10x8_C" type="Area2D" parent="WorldRoot/MapLayout/Buildings" unique_id=517780966]
 position = Vector2(5632, 640)
+collision_layer = 0
+collision_mask = 0
+monitoring = false
+monitorable = false
 script = ExtResource("12_map_rect")
 rect_kind = "building"
 rect_id = "Standard_Main_South_10x8_C"
@@ -494,8 +1065,15 @@ subtype = "house"
 ring = "outer"
 has_collision = true
 
-[node name="Apartment_OuterMid_W_12x12" type="Node2D" parent="WorldRoot/MapLayout/Buildings" unique_id=284915213]
+[node name="WhiteboxCollisionShape" type="CollisionShape2D" parent="WorldRoot/MapLayout/Buildings/Standard_Main_South_10x8_C" unique_id=1163439272]
+shape = SubResource("RectangleShape2D_whitebox_051")
+
+[node name="Apartment_OuterMid_W_12x12" type="Area2D" parent="WorldRoot/MapLayout/Buildings" unique_id=284915213]
 position = Vector2(4480, -2304)
+collision_layer = 0
+collision_mask = 0
+monitoring = false
+monitorable = false
 script = ExtResource("12_map_rect")
 rect_kind = "building"
 rect_id = "Apartment_OuterMid_W_12x12"
@@ -504,8 +1082,15 @@ subtype = "apartment"
 ring = "outer"
 has_collision = true
 
-[node name="Apartment_OuterMid_E_12x12" type="Node2D" parent="WorldRoot/MapLayout/Buildings" unique_id=1718401206]
+[node name="WhiteboxCollisionShape" type="CollisionShape2D" parent="WorldRoot/MapLayout/Buildings/Apartment_OuterMid_W_12x12" unique_id=581991204]
+shape = SubResource("RectangleShape2D_whitebox_052")
+
+[node name="Apartment_OuterMid_E_12x12" type="Area2D" parent="WorldRoot/MapLayout/Buildings" unique_id=1718401206]
 position = Vector2(5504, -2304)
+collision_layer = 0
+collision_mask = 0
+monitoring = false
+monitorable = false
 script = ExtResource("12_map_rect")
 rect_kind = "building"
 rect_id = "Apartment_OuterMid_E_12x12"
@@ -514,8 +1099,15 @@ subtype = "apartment"
 ring = "outer"
 has_collision = true
 
-[node name="Shop_OuterTop_S_16x6" type="Node2D" parent="WorldRoot/MapLayout/Buildings" unique_id=1497239973]
+[node name="WhiteboxCollisionShape" type="CollisionShape2D" parent="WorldRoot/MapLayout/Buildings/Apartment_OuterMid_E_12x12" unique_id=281004441]
+shape = SubResource("RectangleShape2D_whitebox_053")
+
+[node name="Shop_OuterTop_S_16x6" type="Area2D" parent="WorldRoot/MapLayout/Buildings" unique_id=1497239973]
 position = Vector2(5120, -4352)
+collision_layer = 0
+collision_mask = 0
+monitoring = false
+monitorable = false
 script = ExtResource("12_map_rect")
 rect_kind = "building"
 rect_id = "Shop_OuterTop_S_16x6"
@@ -524,8 +1116,15 @@ subtype = "shop"
 ring = "outer"
 has_collision = true
 
-[node name="Factory_B04_N_18x12" type="Node2D" parent="WorldRoot/MapLayout/Buildings" unique_id=576048815]
+[node name="WhiteboxCollisionShape" type="CollisionShape2D" parent="WorldRoot/MapLayout/Buildings/Shop_OuterTop_S_16x6" unique_id=1123067538]
+shape = SubResource("RectangleShape2D_whitebox_054")
+
+[node name="Factory_B04_N_18x12" type="Area2D" parent="WorldRoot/MapLayout/Buildings" unique_id=576048815]
 position = Vector2(7168, -6016)
+collision_layer = 0
+collision_mask = 0
+monitoring = false
+monitorable = false
 script = ExtResource("12_map_rect")
 rect_kind = "building"
 rect_id = "Factory_B04_N_18x12"
@@ -534,8 +1133,15 @@ subtype = "factory"
 ring = "far_outer"
 has_collision = true
 
-[node name="Warehouse_B03_S_18x12" type="Node2D" parent="WorldRoot/MapLayout/Buildings" unique_id=1634186206]
+[node name="WhiteboxCollisionShape" type="CollisionShape2D" parent="WorldRoot/MapLayout/Buildings/Factory_B04_N_18x12" unique_id=1814673483]
+shape = SubResource("RectangleShape2D_whitebox_055")
+
+[node name="Warehouse_B03_S_18x12" type="Area2D" parent="WorldRoot/MapLayout/Buildings" unique_id=1634186206]
 position = Vector2(5504, 5376)
+collision_layer = 0
+collision_mask = 0
+monitoring = false
+monitorable = false
 script = ExtResource("12_map_rect")
 rect_kind = "building"
 rect_id = "Warehouse_B03_S_18x12"
@@ -544,8 +1150,15 @@ subtype = "warehouse"
 ring = "far_outer"
 has_collision = true
 
-[node name="House_HomeDoor_E_N_8x6" type="Node2D" parent="WorldRoot/MapLayout/Buildings"]
+[node name="WhiteboxCollisionShape" type="CollisionShape2D" parent="WorldRoot/MapLayout/Buildings/Warehouse_B03_S_18x12" unique_id=822048695]
+shape = SubResource("RectangleShape2D_whitebox_056")
+
+[node name="House_HomeDoor_E_N_8x6" type="Area2D" parent="WorldRoot/MapLayout/Buildings" unique_id=36993079]
 position = Vector2(-64, -512)
+collision_layer = 0
+collision_mask = 0
+monitoring = false
+monitorable = false
 script = ExtResource("12_map_rect")
 rect_kind = "building"
 rect_id = "House_HomeDoor_E_N_8x6"
@@ -553,8 +1166,15 @@ size_units = Vector2(8, 6)
 subtype = "house"
 has_collision = true
 
-[node name="House_HomeDoor_E_S_8x6" type="Node2D" parent="WorldRoot/MapLayout/Buildings"]
+[node name="WhiteboxCollisionShape" type="CollisionShape2D" parent="WorldRoot/MapLayout/Buildings/House_HomeDoor_E_N_8x6" unique_id=781846770]
+shape = SubResource("RectangleShape2D_whitebox_057")
+
+[node name="House_HomeDoor_E_S_8x6" type="Area2D" parent="WorldRoot/MapLayout/Buildings" unique_id=1144045263]
 position = Vector2(-64, 512)
+collision_layer = 0
+collision_mask = 0
+monitoring = false
+monitorable = false
 script = ExtResource("12_map_rect")
 rect_kind = "building"
 rect_id = "House_HomeDoor_E_S_8x6"
@@ -562,8 +1182,15 @@ size_units = Vector2(8, 6)
 subtype = "house"
 has_collision = true
 
-[node name="Standard_HomeDoor_W_N_10x8" type="Node2D" parent="WorldRoot/MapLayout/Buildings"]
+[node name="WhiteboxCollisionShape" type="CollisionShape2D" parent="WorldRoot/MapLayout/Buildings/House_HomeDoor_E_S_8x6" unique_id=1796108726]
+shape = SubResource("RectangleShape2D_whitebox_058")
+
+[node name="Standard_HomeDoor_W_N_10x8" type="Area2D" parent="WorldRoot/MapLayout/Buildings" unique_id=1492575602]
 position = Vector2(-2432, -640)
+collision_layer = 0
+collision_mask = 0
+monitoring = false
+monitorable = false
 script = ExtResource("12_map_rect")
 rect_kind = "building"
 rect_id = "Standard_HomeDoor_W_N_10x8"
@@ -571,8 +1198,15 @@ size_units = Vector2(10, 8)
 subtype = "house"
 has_collision = true
 
-[node name="Standard_HomeDoor_W_S_10x8" type="Node2D" parent="WorldRoot/MapLayout/Buildings"]
+[node name="WhiteboxCollisionShape" type="CollisionShape2D" parent="WorldRoot/MapLayout/Buildings/Standard_HomeDoor_W_N_10x8" unique_id=805051901]
+shape = SubResource("RectangleShape2D_whitebox_059")
+
+[node name="Standard_HomeDoor_W_S_10x8" type="Area2D" parent="WorldRoot/MapLayout/Buildings" unique_id=2015971999]
 position = Vector2(-2432, 640)
+collision_layer = 0
+collision_mask = 0
+monitoring = false
+monitorable = false
 script = ExtResource("12_map_rect")
 rect_kind = "building"
 rect_id = "Standard_HomeDoor_W_S_10x8"
@@ -580,8 +1214,15 @@ size_units = Vector2(10, 8)
 subtype = "house"
 has_collision = true
 
-[node name="Shop_Main_North_16x6_D" type="Node2D" parent="WorldRoot/MapLayout/Buildings"]
+[node name="WhiteboxCollisionShape" type="CollisionShape2D" parent="WorldRoot/MapLayout/Buildings/Standard_HomeDoor_W_S_10x8" unique_id=1856533352]
+shape = SubResource("RectangleShape2D_whitebox_060")
+
+[node name="Shop_Main_North_16x6_D" type="Area2D" parent="WorldRoot/MapLayout/Buildings" unique_id=1323345227]
 position = Vector2(512, -576)
+collision_layer = 0
+collision_mask = 0
+monitoring = false
+monitorable = false
 script = ExtResource("12_map_rect")
 rect_kind = "building"
 rect_id = "Shop_Main_North_16x6_D"
@@ -590,8 +1231,15 @@ subtype = "shop"
 ring = "middle"
 has_collision = true
 
-[node name="Standard_Main_South_10x8_D" type="Node2D" parent="WorldRoot/MapLayout/Buildings"]
+[node name="WhiteboxCollisionShape" type="CollisionShape2D" parent="WorldRoot/MapLayout/Buildings/Shop_Main_North_16x6_D" unique_id=99807334]
+shape = SubResource("RectangleShape2D_whitebox_061")
+
+[node name="Standard_Main_South_10x8_D" type="Area2D" parent="WorldRoot/MapLayout/Buildings" unique_id=1565136165]
 position = Vector2(512, 640)
+collision_layer = 0
+collision_mask = 0
+monitoring = false
+monitorable = false
 script = ExtResource("12_map_rect")
 rect_kind = "building"
 rect_id = "Standard_Main_South_10x8_D"
@@ -600,8 +1248,15 @@ subtype = "house"
 ring = "middle"
 has_collision = true
 
-[node name="Shop_OuterMain_North_16x6_D" type="Node2D" parent="WorldRoot/MapLayout/Buildings"]
+[node name="WhiteboxCollisionShape" type="CollisionShape2D" parent="WorldRoot/MapLayout/Buildings/Standard_Main_South_10x8_D" unique_id=1243528608]
+shape = SubResource("RectangleShape2D_whitebox_062")
+
+[node name="Shop_OuterMain_North_16x6_D" type="Area2D" parent="WorldRoot/MapLayout/Buildings" unique_id=215300340]
 position = Vector2(6528, -576)
+collision_layer = 0
+collision_mask = 0
+monitoring = false
+monitorable = false
 script = ExtResource("12_map_rect")
 rect_kind = "building"
 rect_id = "Shop_OuterMain_North_16x6_D"
@@ -610,8 +1265,15 @@ subtype = "shop"
 ring = "outer"
 has_collision = true
 
-[node name="Standard_OuterMain_South_10x8_D" type="Node2D" parent="WorldRoot/MapLayout/Buildings"]
+[node name="WhiteboxCollisionShape" type="CollisionShape2D" parent="WorldRoot/MapLayout/Buildings/Shop_OuterMain_North_16x6_D" unique_id=1051959671]
+shape = SubResource("RectangleShape2D_whitebox_063")
+
+[node name="Standard_OuterMain_South_10x8_D" type="Area2D" parent="WorldRoot/MapLayout/Buildings" unique_id=1483985637]
 position = Vector2(6528, 640)
+collision_layer = 0
+collision_mask = 0
+monitoring = false
+monitorable = false
 script = ExtResource("12_map_rect")
 rect_kind = "building"
 rect_id = "Standard_OuterMain_South_10x8_D"
@@ -620,8 +1282,15 @@ subtype = "house"
 ring = "outer"
 has_collision = true
 
-[node name="Apartment_OuterVertical_W_N_12x12" type="Node2D" parent="WorldRoot/MapLayout/Buildings"]
+[node name="WhiteboxCollisionShape" type="CollisionShape2D" parent="WorldRoot/MapLayout/Buildings/Standard_OuterMain_South_10x8_D" unique_id=851894482]
+shape = SubResource("RectangleShape2D_whitebox_064")
+
+[node name="Apartment_OuterVertical_W_N_12x12" type="Area2D" parent="WorldRoot/MapLayout/Buildings" unique_id=914855687]
 position = Vector2(6912, -1024)
+collision_layer = 0
+collision_mask = 0
+monitoring = false
+monitorable = false
 script = ExtResource("12_map_rect")
 rect_kind = "building"
 rect_id = "Apartment_OuterVertical_W_N_12x12"
@@ -630,8 +1299,15 @@ subtype = "apartment"
 ring = "outer"
 has_collision = true
 
-[node name="Apartment_OuterVertical_W_S_12x12" type="Node2D" parent="WorldRoot/MapLayout/Buildings"]
+[node name="WhiteboxCollisionShape" type="CollisionShape2D" parent="WorldRoot/MapLayout/Buildings/Apartment_OuterVertical_W_N_12x12" unique_id=1946916420]
+shape = SubResource("RectangleShape2D_whitebox_065")
+
+[node name="Apartment_OuterVertical_W_S_12x12" type="Area2D" parent="WorldRoot/MapLayout/Buildings" unique_id=739206330]
 position = Vector2(6912, 1536)
+collision_layer = 0
+collision_mask = 0
+monitoring = false
+monitorable = false
 script = ExtResource("12_map_rect")
 rect_kind = "building"
 rect_id = "Apartment_OuterVertical_W_S_12x12"
@@ -640,8 +1316,15 @@ subtype = "apartment"
 ring = "outer"
 has_collision = true
 
-[node name="Apartment_OuterVertical_E_N_12x12" type="Node2D" parent="WorldRoot/MapLayout/Buildings"]
+[node name="WhiteboxCollisionShape" type="CollisionShape2D" parent="WorldRoot/MapLayout/Buildings/Apartment_OuterVertical_W_S_12x12" unique_id=1933394028]
+shape = SubResource("RectangleShape2D_whitebox_066")
+
+[node name="Apartment_OuterVertical_E_N_12x12" type="Area2D" parent="WorldRoot/MapLayout/Buildings" unique_id=290530090]
 position = Vector2(8448, -1024)
+collision_layer = 0
+collision_mask = 0
+monitoring = false
+monitorable = false
 script = ExtResource("12_map_rect")
 rect_kind = "building"
 rect_id = "Apartment_OuterVertical_E_N_12x12"
@@ -650,8 +1333,15 @@ subtype = "apartment"
 ring = "outer"
 has_collision = true
 
-[node name="Apartment_OuterVertical_E_S_12x12" type="Node2D" parent="WorldRoot/MapLayout/Buildings"]
+[node name="WhiteboxCollisionShape" type="CollisionShape2D" parent="WorldRoot/MapLayout/Buildings/Apartment_OuterVertical_E_N_12x12" unique_id=1421341622]
+shape = SubResource("RectangleShape2D_whitebox_067")
+
+[node name="Apartment_OuterVertical_E_S_12x12" type="Area2D" parent="WorldRoot/MapLayout/Buildings" unique_id=1749210668]
 position = Vector2(8448, 2304)
+collision_layer = 0
+collision_mask = 0
+monitoring = false
+monitorable = false
 script = ExtResource("12_map_rect")
 rect_kind = "building"
 rect_id = "Apartment_OuterVertical_E_S_12x12"
@@ -660,8 +1350,15 @@ subtype = "apartment"
 ring = "outer"
 has_collision = true
 
-[node name="Standard_B01_E_10x8" type="Node2D" parent="WorldRoot/MapLayout/Buildings"]
+[node name="WhiteboxCollisionShape" type="CollisionShape2D" parent="WorldRoot/MapLayout/Buildings/Apartment_OuterVertical_E_S_12x12" unique_id=1713674598]
+shape = SubResource("RectangleShape2D_whitebox_068")
+
+[node name="Standard_B01_E_10x8" type="Area2D" parent="WorldRoot/MapLayout/Buildings" unique_id=1603322919]
 position = Vector2(7360, -3840)
+collision_layer = 0
+collision_mask = 0
+monitoring = false
+monitorable = false
 script = ExtResource("12_map_rect")
 rect_kind = "building"
 rect_id = "Standard_B01_E_10x8"
@@ -670,8 +1367,15 @@ subtype = "house"
 ring = "outer"
 has_collision = true
 
-[node name="Shop_B02_N_16x6" type="Node2D" parent="WorldRoot/MapLayout/Buildings"]
+[node name="WhiteboxCollisionShape" type="CollisionShape2D" parent="WorldRoot/MapLayout/Buildings/Standard_B01_E_10x8" unique_id=1613723238]
+shape = SubResource("RectangleShape2D_whitebox_069")
+
+[node name="Shop_B02_N_16x6" type="Area2D" parent="WorldRoot/MapLayout/Buildings" unique_id=1444652186]
 position = Vector2(7552, 0)
+collision_layer = 0
+collision_mask = 0
+monitoring = false
+monitorable = false
 script = ExtResource("12_map_rect")
 rect_kind = "building"
 rect_id = "Shop_B02_N_16x6"
@@ -680,8 +1384,15 @@ subtype = "shop"
 ring = "outer"
 has_collision = true
 
-[node name="Standard_B03_N_10x8" type="Node2D" parent="WorldRoot/MapLayout/Buildings"]
+[node name="WhiteboxCollisionShape" type="CollisionShape2D" parent="WorldRoot/MapLayout/Buildings/Shop_B02_N_16x6" unique_id=1922911016]
+shape = SubResource("RectangleShape2D_whitebox_070")
+
+[node name="Standard_B03_N_10x8" type="Area2D" parent="WorldRoot/MapLayout/Buildings" unique_id=170487468]
 position = Vector2(5504, 3712)
+collision_layer = 0
+collision_mask = 0
+monitoring = false
+monitorable = false
 script = ExtResource("12_map_rect")
 rect_kind = "building"
 rect_id = "Standard_B03_N_10x8"
@@ -690,8 +1401,15 @@ subtype = "house"
 ring = "far_outer"
 has_collision = true
 
-[node name="Standard_B04_S_10x8" type="Node2D" parent="WorldRoot/MapLayout/Buildings"]
+[node name="WhiteboxCollisionShape" type="CollisionShape2D" parent="WorldRoot/MapLayout/Buildings/Standard_B03_N_10x8" unique_id=1553459855]
+shape = SubResource("RectangleShape2D_whitebox_071")
+
+[node name="Standard_B04_S_10x8" type="Area2D" parent="WorldRoot/MapLayout/Buildings" unique_id=516102589]
 position = Vector2(7168, -4736)
+collision_layer = 0
+collision_mask = 0
+monitoring = false
+monitorable = false
 script = ExtResource("12_map_rect")
 rect_kind = "building"
 rect_id = "Standard_B04_S_10x8"
@@ -699,6 +1417,9 @@ size_units = Vector2(10, 8)
 subtype = "house"
 ring = "far_outer"
 has_collision = true
+
+[node name="WhiteboxCollisionShape" type="CollisionShape2D" parent="WorldRoot/MapLayout/Buildings/Standard_B04_S_10x8" unique_id=2003947918]
+shape = SubResource("RectangleShape2D_whitebox_072")
 
 [node name="Points" type="Node2D" parent="WorldRoot/MapLayout" unique_id=1613745880]
 
@@ -958,9 +1679,11 @@ tags = Array[StringName]([&"road_edge"])
 position = Vector2(-1536, 0)
 
 [node name="PlayerSpawn" type="Marker2D" parent="WorldRoot/PlayerRoot" unique_id=1156965986]
+position = Vector2(4288, -513)
 script = ExtResource("3_spawn_point")
 
 [node name="HomeSafeZone" type="Area2D" parent="WorldRoot/PlayerRoot" unique_id=1836207874]
+position = Vector2(4288, -513)
 script = ExtResource("5_home_safe_zone")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="WorldRoot/PlayerRoot/HomeSafeZone" unique_id=2138604763]

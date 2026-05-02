@@ -14,6 +14,7 @@ Style target:
 |---|---|---|
 | `_concept/` | `scene_wasteland_city_modular_preview_01.png` | Overall modular city scene preview and art-direction target. |
 | `roads/sheets/` | `road_ground_tiles_sheet_01.png` | Road, intersection, sidewalk, curb, gutter, manhole, puddle, and pavement modules. |
+| `blocks/sheets/` | `block_district_tiles_sheet_01.png` | District block foundation tiles: non-walkable city block fill, edges, corners, cuts, and decals. |
 | `buildings/sheets/` | `building_modular_sheet_01.png` | Concept mixed building sheet; keep as visual reference, not the preferred slicing source. |
 | `buildings/sheets/` | `building_small_corner_shop_assembly_01.png` | Recommended production assembly sheet for an 8x6-ish small corner shop road-boundary building. |
 | `buildings/sheets/` | `building_small_residential_block_assembly_01.png` | Recommended production assembly sheet for a small residential block. |
@@ -37,6 +38,9 @@ Style target:
 - Remove the flat chroma-key background and export transparent PNGs.
 - Keep final sliced names lowercase with underscores, matching the document 17 naming convention.
 - Suggested final paths include:
+  - `res://assets/map/blocks/fill/block_fill_clean_01.png`
+  - `res://assets/map/blocks/edge/block_edge_straight_01.png`
+  - `res://assets/map/blocks/edge/block_corner_outer_01.png`
   - `res://assets/map/roads/road_straight_01.png`
   - `res://assets/map/buildings/building_small_shop_01.png`
   - `res://assets/map/safe/safe_house_active_01.png`
@@ -76,8 +80,9 @@ The remaining sheets under `assets/map` have also been split into transparent PN
 
 | Category | Runtime folders | Standard notes |
 |---|---|---|
+| Blocks | `blocks/fill/`, `blocks/edge/`, `blocks/cut/`, `blocks/overlay/` | Follow `13_街道区块基底与区块资源规格.md`: city block foundations are non-walkable; buildings sit on top of blocks; street width is defined by block edges, not irregular building silhouettes. |
 | Roads | `roads/tiles/`, `roads/details/`, root aliases `road_straight_01.png`, `road_cross_01.png`, `road_t_junction_01.png`, `road_corner_01.png` | Follow `02_道路拓扑与通行碰撞.md`: main roads 5-7 units, secondary roads 3-4, alleys 2-3, transitions >=3, plazas >=8x8. |
-| Buildings | `buildings/assembled/`, `buildings/parts/`, root aliases for each `building_*_01.png` | Follow `03_建筑障碍与视觉遮挡.md`: ordinary buildings are non-enterable obstacles with explicit `CollisionShape2D`; do not rely on transparent pixels for collision. |
+| Buildings | `buildings/assembled/`, `buildings/parts/`, root aliases for each `building_*_01.png` | Follow `03_建筑障碍与视觉遮挡.md`: ordinary buildings sit on non-walkable blocks as visual landmarks and optional local obstacles; do not use irregular building silhouettes to define street collision. |
 | Props | `props/placement/` | Street props for placement; add collision only for props that block movement. |
 | Rooftop/Wall Details | `details/rooftop/`, `details/walls/` | Decorative or modular facade/roof equipment; attach to buildings as needed. |
 | Interactables | `interactables/containers/`, `interactables/loot/`, `interactables/props/`, `interactables/barriers/` | Container state naming preserves closed/open or role where available. |
@@ -95,7 +100,7 @@ Each split run writes:
 - `building_medium_apartment_rooftop_assembly_01.png` and `building_medium_shop_blank_neon_assembly_01.png` cover main street-block anchors and visual landmarks.
 - `building_narrow_alley_assembly_01.png` is for compressing route width and forming tight alley boundaries. Avoid placing it so close to another collider that it creates gaps under 2 map units.
 - `building_large_ruined_market_assembly_01.png` is for large obstacle masses and landmarks. Check that broken edges do not obscure critical points or produce unreadable collision.
-- Ordinary building assets should become `StaticBody2D + Sprite2D + CollisionShape2D`; do not depend on transparent pixels for collision.
+- Ordinary building assets should be placed on block foundations. The block layer provides primary street collision; building scenes may add small local `CollisionShape2D` only when needed. Do not depend on transparent pixels for collision.
 
 ## Source
 

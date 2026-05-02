@@ -1,0 +1,601 @@
+﻿{
+    "version":  "v01",
+    "map_units":  {
+                      "tile_size_px":  64,
+                      "width":  300,
+                      "source_scale_px_per_unit_in_concept":  6,
+                      "height":  240
+                  },
+    "view":  "top-down / slightly top-down, matching assets/map art direction",
+    "home_center_units":  {
+                              "y":  118,
+                              "x":  142
+                          },
+    "home":  {
+                 "id":  "HOME",
+                 "door_buffer":  {
+                                     "y":  122,
+                                     "w":  10,
+                                     "h":  3,
+                                     "x":  137
+                                 },
+                 "safe_area":  {
+                                   "y":  113,
+                                   "w":  12,
+                                   "h":  10,
+                                   "x":  136
+                               },
+                 "y":  114,
+                 "h":  8,
+                 "x":  137,
+                 "w":  10
+             },
+    "roads":  [
+                  {
+                      "id":  "R01",
+                      "h":  6,
+                      "y":  117,
+                      "type":  "main",
+                      "label":  "main road 6u",
+                      "x":  28,
+                      "w":  246
+                  },
+                  {
+                      "id":  "R02",
+                      "h":  186,
+                      "y":  28,
+                      "type":  "main",
+                      "label":  "main road 6u",
+                      "x":  144,
+                      "w":  6
+                  },
+                  {
+                      "id":  "R03",
+                      "h":  5,
+                      "y":  42,
+                      "type":  "main",
+                      "label":  "outer ring 5u",
+                      "x":  52,
+                      "w":  198
+                  },
+                  {
+                      "id":  "R04",
+                      "h":  5,
+                      "y":  194,
+                      "type":  "main",
+                      "label":  "outer ring 5u",
+                      "x":  42,
+                      "w":  224
+                  },
+                  {
+                      "id":  "R05",
+                      "h":  157,
+                      "y":  42,
+                      "type":  "main",
+                      "label":  "outer ring 5u",
+                      "x":  42,
+                      "w":  5
+                  },
+                  {
+                      "id":  "R06",
+                      "h":  157,
+                      "y":  42,
+                      "type":  "main",
+                      "label":  "outer ring 5u",
+                      "x":  250,
+                      "w":  5
+                  },
+                  {
+                      "id":  "R07",
+                      "h":  4,
+                      "y":  76,
+                      "type":  "secondary",
+                      "label":  "secondary 4u",
+                      "x":  60,
+                      "w":  170
+                  },
+                  {
+                      "id":  "R08",
+                      "h":  4,
+                      "y":  160,
+                      "type":  "secondary",
+                      "label":  "secondary 4u",
+                      "x":  60,
+                      "w":  176
+                  },
+                  {
+                      "id":  "R09",
+                      "h":  130,
+                      "y":  60,
+                      "type":  "secondary",
+                      "label":  "secondary 4u",
+                      "x":  82,
+                      "w":  4
+                  },
+                  {
+                      "id":  "R10",
+                      "h":  136,
+                      "y":  62,
+                      "type":  "secondary",
+                      "label":  "secondary 4u",
+                      "x":  210,
+                      "w":  4
+                  },
+                  {
+                      "id":  "R11",
+                      "h":  39,
+                      "y":  78,
+                      "type":  "alley",
+                      "label":  "alley 3u",
+                      "x":  105,
+                      "w":  3
+                  },
+                  {
+                      "id":  "R12",
+                      "h":  37,
+                      "y":  123,
+                      "type":  "alley",
+                      "label":  "alley 3u",
+                      "x":  180,
+                      "w":  3
+                  },
+                  {
+                      "id":  "R13",
+                      "h":  3,
+                      "y":  100,
+                      "type":  "alley",
+                      "label":  "alley 3u",
+                      "x":  47,
+                      "w":  69
+                  },
+                  {
+                      "id":  "R14",
+                      "h":  3,
+                      "y":  182,
+                      "type":  "alley",
+                      "label":  "alley 3u",
+                      "x":  148,
+                      "w":  100
+                  },
+                  {
+                      "id":  "R15",
+                      "h":  5,
+                      "y":  94,
+                      "type":  "inner_ring",
+                      "label":  "inner ring 5u",
+                      "x":  116,
+                      "w":  58
+                  },
+                  {
+                      "id":  "R16",
+                      "h":  5,
+                      "y":  138,
+                      "type":  "inner_ring",
+                      "label":  "inner ring 5u",
+                      "x":  116,
+                      "w":  58
+                  },
+                  {
+                      "id":  "R17",
+                      "h":  49,
+                      "y":  94,
+                      "type":  "inner_ring",
+                      "label":  "inner ring 5u",
+                      "x":  116,
+                      "w":  5
+                  },
+                  {
+                      "id":  "R18",
+                      "h":  49,
+                      "y":  94,
+                      "type":  "inner_ring",
+                      "label":  "inner ring 5u",
+                      "x":  169,
+                      "w":  5
+                  }
+              ],
+    "plazas":  [
+                   {
+                       "id":  "P_HOME",
+                       "label":  "home plaza 22x18",
+                       "y":  110,
+                       "h":  18,
+                       "x":  132,
+                       "w":  22
+                   },
+                   {
+                       "id":  "P_CROSS",
+                       "label":  "central cross",
+                       "y":  111,
+                       "h":  18,
+                       "x":  136,
+                       "w":  18
+                   },
+                   {
+                       "id":  "P_N",
+                       "label":  "north node",
+                       "y":  72,
+                       "h":  12,
+                       "x":  138,
+                       "w":  18
+                   },
+                   {
+                       "id":  "P_S",
+                       "label":  "south node",
+                       "y":  156,
+                       "h":  12,
+                       "x":  136,
+                       "w":  20
+                   },
+                   {
+                       "id":  "P_E",
+                       "label":  "east node",
+                       "y":  112,
+                       "h":  14,
+                       "x":  205,
+                       "w":  16
+                   },
+                   {
+                       "id":  "P_W",
+                       "label":  "west node",
+                       "y":  112,
+                       "h":  14,
+                       "x":  76,
+                       "w":  16
+                   }
+               ],
+    "buildings":  [
+                      {
+                          "id":  "B01",
+                          "h":  6,
+                          "y":  30,
+                          "type":  "long_shop",
+                          "x":  64,
+                          "w":  16
+                      },
+                      {
+                          "id":  "B02",
+                          "h":  12,
+                          "y":  28,
+                          "type":  "apartment",
+                          "x":  92,
+                          "w":  12
+                      },
+                      {
+                          "id":  "B03",
+                          "h":  12,
+                          "y":  28,
+                          "type":  "warehouse",
+                          "x":  118,
+                          "w":  18
+                      },
+                      {
+                          "id":  "B04",
+                          "h":  8,
+                          "y":  30,
+                          "type":  "standard_house",
+                          "x":  158,
+                          "w":  10
+                      },
+                      {
+                          "id":  "B05",
+                          "h":  6,
+                          "y":  30,
+                          "type":  "long_shop",
+                          "x":  176,
+                          "w":  16
+                      },
+                      {
+                          "id":  "B06",
+                          "h":  12,
+                          "y":  28,
+                          "type":  "apartment",
+                          "x":  214,
+                          "w":  12
+                      },
+                      {
+                          "id":  "B07",
+                          "h":  12,
+                          "y":  60,
+                          "type":  "apartment",
+                          "x":  27,
+                          "w":  12
+                      },
+                      {
+                          "id":  "B08",
+                          "h":  6,
+                          "y":  84,
+                          "type":  "small_house",
+                          "x":  50,
+                          "w":  8
+                      },
+                      {
+                          "id":  "B09",
+                          "h":  6,
+                          "y":  104,
+                          "type":  "long_shop",
+                          "x":  55,
+                          "w":  16
+                      },
+                      {
+                          "id":  "B10",
+                          "h":  8,
+                          "y":  104,
+                          "type":  "standard_house",
+                          "x":  88,
+                          "w":  10
+                      },
+                      {
+                          "id":  "B11",
+                          "h":  12,
+                          "y":  102,
+                          "type":  "apartment",
+                          "x":  156,
+                          "w":  12
+                      },
+                      {
+                          "id":  "B12",
+                          "h":  6,
+                          "y":  104,
+                          "type":  "long_shop",
+                          "x":  190,
+                          "w":  16
+                      },
+                      {
+                          "id":  "B13",
+                          "h":  8,
+                          "y":  103,
+                          "type":  "standard_house",
+                          "x":  225,
+                          "w":  10
+                      },
+                      {
+                          "id":  "B14",
+                          "h":  8,
+                          "y":  130,
+                          "type":  "standard_house",
+                          "x":  55,
+                          "w":  10
+                      },
+                      {
+                          "id":  "B15",
+                          "h":  6,
+                          "y":  129,
+                          "type":  "long_shop",
+                          "x":  88,
+                          "w":  16
+                      },
+                      {
+                          "id":  "B16",
+                          "h":  8,
+                          "y":  130,
+                          "type":  "standard_house",
+                          "x":  156,
+                          "w":  10
+                      },
+                      {
+                          "id":  "B17",
+                          "h":  12,
+                          "y":  128,
+                          "type":  "apartment",
+                          "x":  190,
+                          "w":  12
+                      },
+                      {
+                          "id":  "B18",
+                          "h":  6,
+                          "y":  130,
+                          "type":  "long_shop",
+                          "x":  226,
+                          "w":  16
+                      },
+                      {
+                          "id":  "B19",
+                          "h":  12,
+                          "y":  145,
+                          "type":  "warehouse",
+                          "x":  26,
+                          "w":  18
+                      },
+                      {
+                          "id":  "B20",
+                          "h":  8,
+                          "y":  166,
+                          "type":  "standard_house",
+                          "x":  50,
+                          "w":  10
+                      },
+                      {
+                          "id":  "B21",
+                          "h":  12,
+                          "y":  60,
+                          "type":  "apartment",
+                          "x":  260,
+                          "w":  12
+                      },
+                      {
+                          "id":  "B22",
+                          "h":  12,
+                          "y":  86,
+                          "type":  "warehouse",
+                          "x":  228,
+                          "w":  18
+                      },
+                      {
+                          "id":  "B23",
+                          "h":  12,
+                          "y":  145,
+                          "type":  "apartment",
+                          "x":  260,
+                          "w":  12
+                      },
+                      {
+                          "id":  "B24",
+                          "h":  6,
+                          "y":  166,
+                          "type":  "long_shop",
+                          "x":  232,
+                          "w":  16
+                      },
+                      {
+                          "id":  "B25",
+                          "h":  12,
+                          "y":  172,
+                          "type":  "ruined_market",
+                          "x":  102,
+                          "w":  18
+                      },
+                      {
+                          "id":  "B26",
+                          "h":  16,
+                          "y":  174,
+                          "type":  "construction",
+                          "x":  184,
+                          "w":  16
+                      }
+                  ],
+    "outpost_candidates":  [
+                               {
+                                   "id":  "O1A",
+                                   "h":  8,
+                                   "t":  "T1 ~14s",
+                                   "y":  70,
+                                   "type":  "outpost_t1_candidate",
+                                   "x":  82,
+                                   "w":  10
+                               },
+                               {
+                                   "id":  "O1B",
+                                   "h":  8,
+                                   "t":  "T1 ~16s",
+                                   "y":  70,
+                                   "type":  "outpost_t1_candidate",
+                                   "x":  206,
+                                   "w":  10
+                               },
+                               {
+                                   "id":  "O1C",
+                                   "h":  8,
+                                   "t":  "T1 ~12s",
+                                   "y":  154,
+                                   "type":  "outpost_t1_candidate",
+                                   "x":  118,
+                                   "w":  10
+                               },
+                               {
+                                   "id":  "O2A",
+                                   "h":  8,
+                                   "t":  "T2 ~32s",
+                                   "y":  48,
+                                   "type":  "outpost_t2_candidate",
+                                   "x":  54,
+                                   "w":  12
+                               },
+                               {
+                                   "id":  "O2B",
+                                   "h":  8,
+                                   "t":  "T2 ~34s",
+                                   "y":  48,
+                                   "type":  "outpost_t2_candidate",
+                                   "x":  236,
+                                   "w":  12
+                               },
+                               {
+                                   "id":  "O2C",
+                                   "h":  8,
+                                   "t":  "T2 ~30s",
+                                   "y":  184,
+                                   "type":  "outpost_t2_candidate",
+                                   "x":  56,
+                                   "w":  12
+                               },
+                               {
+                                   "id":  "O2D",
+                                   "h":  8,
+                                   "t":  "T2 ~36s",
+                                   "y":  184,
+                                   "type":  "outpost_t2_candidate",
+                                   "x":  236,
+                                   "w":  12
+                               }
+                           ],
+    "points":  [
+                   {
+                       "y":  116,
+                       "kind":  "container",
+                       "id":  "C01",
+                       "x":  78
+                   },
+                   {
+                       "y":  78,
+                       "kind":  "container",
+                       "id":  "C02",
+                       "x":  99
+                   },
+                   {
+                       "y":  78,
+                       "kind":  "container",
+                       "id":  "C03",
+                       "x":  160
+                   },
+                   {
+                       "y":  118,
+                       "kind":  "container",
+                       "id":  "C04",
+                       "x":  218
+                   },
+                   {
+                       "y":  160,
+                       "kind":  "container",
+                       "id":  "C05",
+                       "x":  132
+                   },
+                   {
+                       "y":  162,
+                       "kind":  "container",
+                       "id":  "C06",
+                       "x":  207
+                   },
+                   {
+                       "y":  102,
+                       "kind":  "outpost_material",
+                       "id":  "M01",
+                       "x":  45
+                   },
+                   {
+                       "y":  125,
+                       "kind":  "outpost_material",
+                       "id":  "M02",
+                       "x":  182
+                   },
+                   {
+                       "y":  184,
+                       "kind":  "outpost_material",
+                       "id":  "M03",
+                       "x":  246
+                   },
+                   {
+                       "y":  185,
+                       "kind":  "outpost_material",
+                       "id":  "M04",
+                       "x":  105
+                   },
+                   {
+                       "y":  204,
+                       "kind":  "extract_or_event",
+                       "id":  "E01",
+                       "x":  145
+                   },
+                   {
+                       "y":  77,
+                       "kind":  "anomaly",
+                       "id":  "A01",
+                       "x":  236
+                   }
+               ],
+    "notes":  [
+                  "Ordinary buildings are non-enterable blockers and should become StaticBody2D + CollisionShape2D.",
+                  "Player movement should be constrained to roads, plazas, home, and repaired outpost safe areas.",
+                  "Main corridors deliberately have buildings on both sides to read as streets, not open fields."
+              ]
+}

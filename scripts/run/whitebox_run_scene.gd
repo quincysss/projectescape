@@ -42,6 +42,7 @@ var outpost_requirements: Dictionary = {}
 var container_index: int = 0
 var _container_timer: float = 0.0
 var _walkable_rects: Array[Rect2] = []
+var _walkable_polygons: Array[PackedVector2Array] = []
 var _last_container_spawn_point_index: int = 0
 
 var hud_label: Label
@@ -118,6 +119,7 @@ func _build_whitebox_world() -> void:
 
 func _create_ground() -> void:
 	_walkable_rects.clear()
+	_walkable_polygons.clear()
 	var ground := ColorRect.new()
 	ground.name = "WhiteboxGround"
 	ground.color = Color(0.12, 0.14, 0.12)
@@ -135,36 +137,36 @@ func _add_road_from_layout(layout) -> void:
 	var color := Color(0.42, 0.42, 0.42)
 	if layout.subtype == "plaza" or layout.rect_kind == "plaza":
 		color = Color(0.34, 0.34, 0.32)
-	_add_road(layout.get_rect_id(), layout.global_position, layout.size_units, color)
+	_add_road(layout.get_rect_id(), layout.global_transform, layout.get_local_corners_px(UNIT), color)
+	_walkable_polygons.append(layout.get_world_corners_px(UNIT))
 	_walkable_rects.append(layout.get_rect_px(UNIT))
 
-func _add_road(road_name: String, center_px: Vector2, size_units: Vector2, color: Color = Color(0.42, 0.42, 0.42)) -> void:
-	var road := ColorRect.new()
+func _add_road(road_name: String, source_transform: Transform2D, local_polygon: PackedVector2Array, color: Color = Color(0.42, 0.42, 0.42)) -> void:
+	var road := Polygon2D.new()
 	road.name = road_name
 	road.color = color
-	road.size = _u(size_units)
-	road.position = center_px - road.size * 0.5
+	road.polygon = local_polygon
 	road.z_index = -90
 	world_root.add_child(road)
+	road.global_transform = source_transform
 
 func _add_building_from_layout(layout) -> void:
-	_add_building(layout.get_rect_id(), layout.global_position, layout.size_units)
+	_add_building(layout.get_rect_id(), layout.global_transform, layout.get_local_corners_px(UNIT))
 
-func _add_building(building_name: String, center_px: Vector2, size_units: Vector2) -> void:
+func _add_building(building_name: String, source_transform: Transform2D, local_polygon: PackedVector2Array) -> void:
 	var body := StaticBody2D.new()
 	body.name = building_name
-	body.position = center_px
 	body.z_index = -40
 	world_root.add_child(body)
-	var visual := ColorRect.new()
+	body.global_transform = source_transform
+	var visual := Polygon2D.new()
 	visual.name = "Visual"
 	visual.color = Color(0.92, 0.92, 0.9)
-	visual.size = _u(size_units)
-	visual.position = -visual.size * 0.5
+	visual.polygon = local_polygon
 	body.add_child(visual)
 	var shape := CollisionShape2D.new()
 	var rect := RectangleShape2D.new()
-	rect.size = visual.size
+	rect.size = local_polygon[2] - local_polygon[0]
 	shape.shape = rect
 	body.add_child(shape)
 
@@ -218,6 +220,7 @@ func _create_player() -> void:
 	player_root.add_child(player)
 	_walkable_rects.append(Rect2(player_root.global_position - _u(HOME_SAFE_SIZE_UNITS) * 0.5, _u(HOME_SAFE_SIZE_UNITS)))
 	player.set_walkable_rects(_walkable_rects)
+	player.set_walkable_polygons(_walkable_polygons)
 	var shape := CollisionShape2D.new()
 	var circle := CircleShape2D.new()
 	circle.radius = 0.6 * UNIT
