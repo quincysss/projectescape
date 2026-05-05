@@ -18,6 +18,7 @@ const ALLEY_WIDTH_UNITS := 2.5
 const PLAYER_FOLLOW_ZOOM := Vector2(0.28, 0.28)
 const HOME_OVERVIEW_MAX_ZOOM := 0.11
 const HOME_OVERVIEW_MIN_ZOOM := 0.025
+const HOME_OVERVIEW_PADDING_UNITS := Vector2(0.0, 0.0)
 const CAMERA_TRANSITION_SECONDS := 0.5
 const SHOW_DEBUG_VISION_CIRCLE := false
 
@@ -58,6 +59,10 @@ var backpack_button: Button
 var _game_state: Node
 var _camera_tween: Tween
 
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_WM_SIZE_CHANGED:
+		_refresh_camera_for_viewport()
+
 func _ready() -> void:
 	_ensure_input_actions()
 	_game_state = get_node_or_null("/root/GameState")
@@ -72,6 +77,13 @@ func _ready() -> void:
 		camera.zoom = _home_overview_zoom()
 		camera.position = _home_overview_offset()
 	_refresh_ui()
+
+func _refresh_camera_for_viewport() -> void:
+	if camera == null or player == null:
+		return
+	if run_director.context != null and run_director.context.active_safe_zone_id == "home":
+		camera.zoom = _home_overview_zoom()
+		camera.position = _home_overview_offset()
 
 func _ensure_input_actions() -> void:
 	_add_key_action("move_left", KEY_A)
@@ -128,40 +140,46 @@ func _create_ground() -> void:
 	ground.z_index = -100
 	world_root.add_child(ground)
 
-	for road in _get_layout_rects("Roads"):
-		_add_road_from_layout(road)
+	for street in _get_layout_rects("StreetWalkable"):
+		_add_street_from_layout(street)
+	for block in _get_layout_rects("BlockSolid"):
+		_add_block_from_layout(block)
 	for building in _get_layout_rects("Buildings"):
-		_add_building_from_layout(building)
+		_add_visual_building_from_layout(building)
 
-func _add_road_from_layout(layout) -> void:
+func _add_street_from_layout(layout) -> void:
 	var color := Color(0.42, 0.42, 0.42)
 	if layout.subtype == "plaza" or layout.rect_kind == "plaza":
 		color = Color(0.34, 0.34, 0.32)
-	_add_road(layout.get_rect_id(), layout.global_transform, layout.get_local_corners_px(UNIT), color)
+	_add_layout_polygon(layout.get_rect_id(), layout.global_transform, layout.get_local_corners_px(UNIT), color, -90)
 	_walkable_polygons.append(layout.get_world_corners_px(UNIT))
 	_walkable_rects.append(layout.get_rect_px(UNIT))
 
-func _add_road(road_name: String, source_transform: Transform2D, local_polygon: PackedVector2Array, color: Color = Color(0.42, 0.42, 0.42)) -> void:
-	var road := Polygon2D.new()
-	road.name = road_name
-	road.color = color
-	road.polygon = local_polygon
-	road.z_index = -90
-	world_root.add_child(road)
-	road.global_transform = source_transform
+func _add_block_from_layout(layout) -> void:
+	_add_solid_layout_rect(layout.get_rect_id(), layout.global_transform, layout.get_local_corners_px(UNIT), Color(0.86, 0.86, 0.82), -70)
 
-func _add_building_from_layout(layout) -> void:
-	_add_building(layout.get_rect_id(), layout.global_transform, layout.get_local_corners_px(UNIT))
+func _add_visual_building_from_layout(layout) -> void:
+	_add_layout_polygon(layout.get_rect_id(), layout.global_transform, layout.get_local_corners_px(UNIT), Color(0.92, 0.92, 0.9), -40)
 
-func _add_building(building_name: String, source_transform: Transform2D, local_polygon: PackedVector2Array) -> void:
+func _add_layout_polygon(polygon_name: String, source_transform: Transform2D, local_polygon: PackedVector2Array, color: Color, z: int) -> Polygon2D:
+	var polygon := Polygon2D.new()
+	polygon.name = polygon_name
+	polygon.color = color
+	polygon.polygon = local_polygon
+	polygon.z_index = z
+	world_root.add_child(polygon)
+	polygon.global_transform = source_transform
+	return polygon
+
+func _add_solid_layout_rect(block_name: String, source_transform: Transform2D, local_polygon: PackedVector2Array, color: Color, z: int) -> void:
 	var body := StaticBody2D.new()
-	body.name = building_name
-	body.z_index = -40
+	body.name = block_name
+	body.z_index = z
 	world_root.add_child(body)
 	body.global_transform = source_transform
 	var visual := Polygon2D.new()
 	visual.name = "Visual"
-	visual.color = Color(0.92, 0.92, 0.9)
+	visual.color = color
 	visual.polygon = local_polygon
 	body.add_child(visual)
 	var shape := CollisionShape2D.new()
@@ -175,7 +193,7 @@ func _get_layout_rects(section_name: String) -> Array:
 	if section == null:
 		return []
 	var rects := []
-	for child in section.get_children():
+	for child in section.find_children("*", "", true, false):
 		if child.has_method("get_rect_px"):
 			rects.append(child)
 	return rects
@@ -215,7 +233,7 @@ func _create_player() -> void:
 	player = CharacterBody2D.new()
 	player.name = "Player"
 	player.script = PlayerScript
-	player.base_speed = 6.0 * UNIT
+	player.base_speed = 12.0 * UNIT
 	player.position = $WorldRoot/PlayerRoot/PlayerSpawn.position
 	player_root.add_child(player)
 	_walkable_rects.append(Rect2(player_root.global_position - _u(HOME_SAFE_SIZE_UNITS) * 0.5, _u(HOME_SAFE_SIZE_UNITS)))
@@ -406,7 +424,7 @@ func _make_interactable(id: String, type: String, label_text: String, pos: Vecto
 	area.position = pos
 	var shape := CollisionShape2D.new()
 	var circle := CircleShape2D.new()
-	circle.radius = 2.0 * UNIT
+	circle.radius = (6.0 if type == "outpost" else 2.0) * UNIT
 	shape.shape = circle
 	area.add_child(shape)
 	var box := ColorRect.new()
@@ -639,7 +657,7 @@ func _tween_camera(target_zoom: Vector2, target_position: Vector2) -> void:
 	_camera_tween.tween_property(camera, "position", target_position, CAMERA_TRANSITION_SECONDS).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
 
 func _home_overview_zoom() -> Vector2:
-	var viewport_size := get_viewport_rect().size
+	var viewport_size := _camera_viewport_size()
 	if viewport_size.x <= 0.0 or viewport_size.y <= 0.0:
 		return Vector2(HOME_OVERVIEW_MAX_ZOOM, HOME_OVERVIEW_MAX_ZOOM)
 	var focus_bounds := _home_overview_bounds()
@@ -653,6 +671,17 @@ func _home_overview_offset() -> Vector2:
 	return _home_overview_bounds().get_center() - player.global_position
 
 func _home_overview_bounds() -> Rect2:
+	var map_bounds := _map_bounds_px()
+	var padding: Vector2 = _u(HOME_OVERVIEW_PADDING_UNITS)
+	return Rect2(map_bounds.position - padding, map_bounds.size + padding * 2.0)
+
+func _map_bounds_px() -> Rect2:
+	return Rect2(_u(MAP_ORIGIN_UNITS), _u(MAP_UNITS))
+
+func _camera_viewport_size() -> Vector2:
+	return get_viewport_rect().size
+
+func _home_target_bounds() -> Rect2:
 	var points: Array[Vector2] = [player_root.global_position]
 	if run_director.context:
 		for pos in run_director.context.selected_outpost_positions.values():

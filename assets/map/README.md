@@ -95,6 +95,14 @@ Each split run writes:
 
 ## Building Assembly Notes
 
+## Editor Placement Notes
+
+- Streets and blocks must be editable by designers in Godot, preferably through TileMap/TileSet terrain.
+- `blocks/fill` tiles should repeat cleanly for large non-walkable city blocks.
+- `blocks/edge` and `blocks/cut` tiles are for manually shaping readable curbs, corners, alleys, and driveways.
+- Buildings are placed on top of blocks as visual landmarks; they should not define the main street collision.
+- After changing street/block layout, run map validation before decorating.
+
 - Prefer the `*_assembly_01.png` building sheets for slicing because each sheet includes an assembled reference plus matching construction pieces.
 - `building_small_corner_shop_assembly_01.png` and `building_small_residential_block_assembly_01.png` cover small 8x6 to 10x8 road-boundary buildings.
 - `building_medium_apartment_rooftop_assembly_01.png` and `building_medium_shop_blank_neon_assembly_01.png` cover main street-block anchors and visual landmarks.

@@ -4,26 +4,26 @@ extends Area2D
 
 const COLLISION_SHAPE_NAME := "WhiteboxCollisionShape"
 
-@export_enum("road", "plaza", "building", "home", "outpost") var rect_kind: String = "road"
+@export_enum("street", "plaza", "block", "building", "home", "outpost") var rect_kind: String = "street"
 @export var rect_id: String = ""
 @export var size_units: Vector2 = Vector2(6.0, 6.0):
 	set(value):
 		size_units = Vector2(maxf(value.x, 0.25), maxf(value.y, 0.25))
-		_sync_native_collision_shape()
+		_sync_native_collision_shape(true)
 		queue_redraw()
-@export_enum("main", "secondary", "alley", "plaza", "transition", "house", "shop", "apartment", "warehouse", "factory", "home", "outpost") var subtype: String = "main"
+@export_enum("main", "secondary", "alley", "plaza", "transition", "small_block", "standard_block", "long_block", "large_block", "special_block", "house", "shop", "apartment", "warehouse", "factory", "home", "outpost") var subtype: String = "main"
 @export_enum("inner", "middle", "outer", "far_outer") var ring: String = "inner"
 @export var walkable: bool = false
 @export var has_collision: bool = false
 @export var sync_native_collision_shape: bool = true:
 	set(value):
 		sync_native_collision_shape = value
-		_sync_native_collision_shape()
+		_sync_native_collision_shape(false)
 @export_group("Editor Box")
 @export var editor_unit_px: float = 64.0:
 	set(value):
 		editor_unit_px = maxf(value, 1.0)
-		_sync_native_collision_shape()
+		_sync_native_collision_shape(true)
 		queue_redraw()
 @export var show_editor_box: bool = true:
 	set(value):
@@ -47,7 +47,7 @@ func _ready() -> void:
 	collision_mask = 0
 	monitoring = false
 	monitorable = false
-	_sync_native_collision_shape()
+	_sync_native_collision_shape(false)
 	queue_redraw()
 
 func _notification(what: int) -> void:
@@ -86,6 +86,8 @@ func _editor_color() -> Color:
 	match rect_kind:
 		"building":
 			return Color(1.0, 1.0, 1.0)
+		"block":
+			return Color(0.86, 0.86, 0.82)
 		"home":
 			return Color(0.0, 0.95, 0.28)
 		"outpost":
@@ -96,9 +98,9 @@ func _editor_color() -> Color:
 			return Color(0.68, 0.68, 0.68)
 
 func _editor_outline_color() -> Color:
-	if has_collision or rect_kind == "building":
+	if has_collision or rect_kind == "building" or rect_kind == "block":
 		return Color(1.0, 0.45, 0.1)
-	if walkable or rect_kind == "road" or rect_kind == "plaza":
+	if walkable or rect_kind == "street" or rect_kind == "plaza":
 		return Color(0.15, 0.9, 1.0)
 	if rect_kind == "home":
 		return Color(0.0, 1.0, 0.35)
@@ -140,7 +142,7 @@ func get_rect_px(unit_size: float) -> Rect2:
 		max_pos.y = maxf(max_pos.y, corner.y)
 	return Rect2(min_pos, max_pos - min_pos)
 
-func _sync_native_collision_shape() -> void:
+func _sync_native_collision_shape(force_size_from_units: bool = false) -> void:
 	if not sync_native_collision_shape or not is_inside_tree():
 		return
 	var shape_node := get_node_or_null(COLLISION_SHAPE_NAME) as CollisionShape2D
@@ -158,7 +160,7 @@ func _sync_native_collision_shape() -> void:
 		rect_shape = RectangleShape2D.new()
 		shape_node.shape = rect_shape
 		created_shape_resource = true
-	if created_shape_resource or rect_shape.size == Vector2.ZERO:
+	if force_size_from_units or created_shape_resource or rect_shape.size == Vector2.ZERO:
 		rect_shape.size = size_units * editor_unit_px
 	shape_node.position = Vector2.ZERO
 	shape_node.rotation = 0.0

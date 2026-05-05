@@ -1,0 +1,134 @@
+﻿{
+    "source_sheet":  "assets/map/blocks/sheets/block_district_tiles_sheet_01.png",
+    "generated_source":  "C:\\Users\\Administrator\\.codex\\generated_images\\019de737-3b52-74d0-8b05-5c7ee6e3db26\\ig_0599fd167dd062d70169f9c32cef0c8190a1e92a0a3981c5dd.png",
+    "spec_doc":  "Doc/17_缇庢湳璧勬簮瑙勬牸涓嶨PT鐢熷浘鎻愮ず璇嶈鑼僟淇鐗坃搴熷湡鐢熷瓨娉曞垯.md section 5.1.1",
+    "note":  "Block district foundation tiles. Fill tiles and edge/corner/cut tiles are 256x256. Overlay tile is exported with alpha.",
+    "assets":  [
+                   {
+                       "id":  "block_fill_clean_01",
+                       "file":  "assets/map/blocks/fill/block_fill_clean_01.png",
+                       "category":  "fill",
+                       "role":  "seamless clean concrete block fill",
+                       "tile_size_px":  256,
+                       "source_box_xywh":  [
+                                               18,
+                                               18,
+                                               382,
+                                               382
+                                           ],
+                       "output_has_alpha":  false
+                   },
+                   {
+                       "id":  "block_fill_cracked_01",
+                       "file":  "assets/map/blocks/fill/block_fill_cracked_01.png",
+                       "category":  "fill",
+                       "role":  "seamless cracked concrete block fill",
+                       "tile_size_px":  256,
+                       "source_box_xywh":  [
+                                               436,
+                                               18,
+                                               382,
+                                               382
+                                           ],
+                       "output_has_alpha":  false
+                   },
+                   {
+                       "id":  "block_fill_dirty_01",
+                       "file":  "assets/map/blocks/fill/block_fill_dirty_01.png",
+                       "category":  "fill",
+                       "role":  "seamless dirty concrete block fill",
+                       "tile_size_px":  256,
+                       "source_box_xywh":  [
+                                               854,
+                                               18,
+                                               382,
+                                               382
+                                           ],
+                       "output_has_alpha":  false
+                   },
+                   {
+                       "id":  "block_edge_straight_01",
+                       "file":  "assets/map/blocks/edge/block_edge_straight_01.png",
+                       "category":  "edge",
+                       "role":  "straight curb edge",
+                       "tile_size_px":  256,
+                       "source_box_xywh":  [
+                                               18,
+                                               436,
+                                               382,
+                                               382
+                                           ],
+                       "output_has_alpha":  false
+                   },
+                   {
+                       "id":  "block_corner_outer_01",
+                       "file":  "assets/map/blocks/edge/block_corner_outer_01.png",
+                       "category":  "edge",
+                       "role":  "outer curb corner",
+                       "tile_size_px":  256,
+                       "source_box_xywh":  [
+                                               436,
+                                               436,
+                                               382,
+                                               382
+                                           ],
+                       "output_has_alpha":  false
+                   },
+                   {
+                       "id":  "block_corner_inner_01",
+                       "file":  "assets/map/blocks/edge/block_corner_inner_01.png",
+                       "category":  "edge",
+                       "role":  "inner concave curb corner",
+                       "tile_size_px":  256,
+                       "source_box_xywh":  [
+                                               854,
+                                               436,
+                                               382,
+                                               382
+                                           ],
+                       "output_has_alpha":  false
+                   },
+                   {
+                       "id":  "block_alley_cut_01",
+                       "file":  "assets/map/blocks/cut/block_alley_cut_01.png",
+                       "category":  "cut",
+                       "role":  "alley cut or notch",
+                       "tile_size_px":  256,
+                       "source_box_xywh":  [
+                                               18,
+                                               854,
+                                               382,
+                                               382
+                                           ],
+                       "output_has_alpha":  false
+                   },
+                   {
+                       "id":  "block_driveway_cut_01",
+                       "file":  "assets/map/blocks/cut/block_driveway_cut_01.png",
+                       "category":  "cut",
+                       "role":  "driveway or entrance cut",
+                       "tile_size_px":  256,
+                       "source_box_xywh":  [
+                                               436,
+                                               854,
+                                               382,
+                                               382
+                                           ],
+                       "output_has_alpha":  false
+                   },
+                   {
+                       "id":  "block_decal_cracks_01",
+                       "file":  "assets/map/blocks/overlay/block_decal_cracks_01.png",
+                       "category":  "overlay",
+                       "role":  "transparent crack stain weed drain overlay",
+                       "tile_size_px":  256,
+                       "source_box_xywh":  [
+                                               854,
+                                               854,
+                                               382,
+                                               382
+                                           ],
+                       "output_has_alpha":  true
+                   }
+               ]
+}

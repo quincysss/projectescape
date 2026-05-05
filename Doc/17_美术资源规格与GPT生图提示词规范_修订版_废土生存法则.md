@@ -346,6 +346,7 @@ Sheet 内容：
 推荐用 TileMap/Terrain 逐格铺 block_fill，并用 edge/corner 收边。
 如果需要编辑器中快速拉出大区块，可使用可无缝平铺的 fill 纹理做 repeat texture，
 再用 edge/corner 或 curb 资源补边。
+资源必须服务制作人在 Godot 编辑器中手动绘制和摆放，而不是只适合整图合成。
 ```
 
 Godot 推荐：
@@ -354,6 +355,16 @@ Godot 推荐：
 长期方案：TileMapLayer + TileSet terrain。
 快速方案：BlockArea.tscn 使用 Polygon2D/Sprite2D repeat texture + CollisionPolygon2D。
 原型方案：灰色 Polygon2D + CollisionShape2D，后续替换成区块 TileSet。
+```
+
+编辑器使用要求：
+
+```text
+区块 tile 必须适合 TileSet/Terrain 配置。
+区块 fill 必须适合重复填充。
+edge/corner/cut 必须能人工补边。
+楼房资源必须能作为独立 Sprite/Scene 手动摆到区块上。
+道路资源必须能作为 TileMap 或可拼接 tile 手动铺设。
 ```
 
 禁止：
@@ -824,8 +835,9 @@ Avoid: glossy app icon, 3D render, bright color, complex illustration.
 5. 每个拆件至少生成 3 个变体。
 6. 人工筛选风格最统一的一批。
 7. 在 Godot 中先用街道 + 区块拼装测试街区，再放楼房。
-8. 根据碰撞、遮挡、可读性反向调整提示词。
-9. 形成固定资产库后再批量扩展。
+8. 由制作人在编辑器中实际手动摆放一次，检查是否顺手。
+9. 根据碰撞、遮挡、可读性和编辑器摆放体验反向调整提示词。
+10. 形成固定资产库后再批量扩展。
 ```
 
 安全建筑生产流程：
@@ -844,6 +856,7 @@ Avoid: glossy app icon, 3D render, bright color, complex illustration.
 直接把完整街区图当地图。
 一口气生成所有建筑。
 跳过区块地基直接用楼房围出街道。
+生成只能看不能摆、不能拼、不能重复的区块/街道图。
 混用不同透视角度。
 混用完全不同线稿密度。
 让装饰件自带不可控阴影和背景。
@@ -911,6 +924,7 @@ DebugName，可选
 区块填充 tile 4×4 平铺无明显接缝。
 区块边缘/角能围出清晰不可通行街区。
 楼房放在区块上后，不改变街道通行宽度。
+街道和区块资源能在 Godot 编辑器中手动铺设、移动和替换。
 建筑底部边缘适合放置碰撞。
 ```
 
