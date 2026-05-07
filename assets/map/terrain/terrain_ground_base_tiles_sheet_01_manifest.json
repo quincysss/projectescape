@@ -1,0 +1,188 @@
+{
+  "source_sheet": "res://assets/map/terrain/sheets/terrain_ground_base_tiles_sheet_01.png",
+  "generated_from": "C:\\Users\\KSG\\.codex\\generated_images\\019dddbb-7736-7c22-a715-6a97b9c4774e",
+  "created_on": "2026-05-07",
+  "doc_reference": [
+    "Doc/17 RoadGroundBase strategy adapted to TerrainGroundBase underlay",
+    "Doc/22 Street_RoadField_280x158 and 1 unit = 64 px"
+  ],
+  "unit_px": 64,
+  "map_field_units": [
+    280,
+    158
+  ],
+  "map_field_production_px": [
+    17920,
+    10112
+  ],
+  "recommended_usage": "Tile terrain_ground_base_tile_1024_01..06 across the whole 280x220 map as TerrainGroundBase. Street identity should be added above this by road overlays/decals and block/building coverage; this underlay is not road geometry and has no collision.",
+  "items": [
+    {
+      "name": "terrain_ground_base_tile_1024_01",
+      "output": "res://assets/map/terrain/ground/terrain_ground_base_tile_1024_01.png",
+      "source_bbox": [
+        0,
+        0,
+        512,
+        512
+      ],
+      "size_px": [
+        1024,
+        1024
+      ],
+      "size_units_at_64px": [
+        16,
+        16
+      ],
+      "role": "whole_map_underlay_terrain_tile",
+      "collision": "none_visual_underlay_only",
+      "recommended_node": "WorldRoot/MapVisual/TerrainGroundBase",
+      "seamless_mode": "mirror_quadrant_from_generated_tile"
+    },
+    {
+      "name": "terrain_ground_base_tile_1024_02",
+      "output": "res://assets/map/terrain/ground/terrain_ground_base_tile_1024_02.png",
+      "source_bbox": [
+        512,
+        0,
+        1024,
+        512
+      ],
+      "size_px": [
+        1024,
+        1024
+      ],
+      "size_units_at_64px": [
+        16,
+        16
+      ],
+      "role": "whole_map_underlay_terrain_tile",
+      "collision": "none_visual_underlay_only",
+      "recommended_node": "WorldRoot/MapVisual/TerrainGroundBase",
+      "seamless_mode": "mirror_quadrant_from_generated_tile"
+    },
+    {
+      "name": "terrain_ground_base_tile_1024_03",
+      "output": "res://assets/map/terrain/ground/terrain_ground_base_tile_1024_03.png",
+      "source_bbox": [
+        1024,
+        0,
+        1536,
+        512
+      ],
+      "size_px": [
+        1024,
+        1024
+      ],
+      "size_units_at_64px": [
+        16,
+        16
+      ],
+      "role": "whole_map_underlay_terrain_tile",
+      "collision": "none_visual_underlay_only",
+      "recommended_node": "WorldRoot/MapVisual/TerrainGroundBase",
+      "seamless_mode": "mirror_quadrant_from_generated_tile"
+    },
+    {
+      "name": "terrain_ground_base_tile_1024_04",
+      "output": "res://assets/map/terrain/ground/terrain_ground_base_tile_1024_04.png",
+      "source_bbox": [
+        0,
+        512,
+        512,
+        1024
+      ],
+      "size_px": [
+        1024,
+        1024
+      ],
+      "size_units_at_64px": [
+        16,
+        16
+      ],
+      "role": "whole_map_underlay_terrain_tile",
+      "collision": "none_visual_underlay_only",
+      "recommended_node": "WorldRoot/MapVisual/TerrainGroundBase",
+      "seamless_mode": "mirror_quadrant_from_generated_tile"
+    },
+    {
+      "name": "terrain_ground_base_tile_1024_05",
+      "output": "res://assets/map/terrain/ground/terrain_ground_base_tile_1024_05.png",
+      "source_bbox": [
+        512,
+        512,
+        1024,
+        1024
+      ],
+      "size_px": [
+        1024,
+        1024
+      ],
+      "size_units_at_64px": [
+        16,
+        16
+      ],
+      "role": "whole_map_underlay_terrain_tile",
+      "collision": "none_visual_underlay_only",
+      "recommended_node": "WorldRoot/MapVisual/TerrainGroundBase",
+      "seamless_mode": "mirror_quadrant_from_generated_tile"
+    },
+    {
+      "name": "terrain_ground_base_tile_1024_06",
+      "output": "res://assets/map/terrain/ground/terrain_ground_base_tile_1024_06.png",
+      "source_bbox": [
+        1024,
+        512,
+        1536,
+        1024
+      ],
+      "size_px": [
+        1024,
+        1024
+      ],
+      "size_units_at_64px": [
+        16,
+        16
+      ],
+      "role": "whole_map_underlay_terrain_tile",
+      "collision": "none_visual_underlay_only",
+      "recommended_node": "WorldRoot/MapVisual/TerrainGroundBase",
+      "seamless_mode": "mirror_quadrant_from_generated_tile"
+    },
+    {
+      "name": "terrain_ground_field_280x158_preview_4096",
+      "output": "res://assets/map/terrain/ground/terrain_ground_field_280x158_preview_4096.png",
+      "size_units": [
+        280,
+        158
+      ],
+      "size_px_preview": [
+        4096,
+        2311
+      ],
+      "production_size_px": [
+        17920,
+        10112
+      ],
+      "role": "whole_map_underlay_preview_for_Street_RoadField_280x158",
+      "collision": "none_visual_underlay_only",
+      "recommended_node": "WorldRoot/MapVisual/TerrainGroundBase"
+    }
+  ],
+  "map_units": [
+    280,
+    220
+  ],
+  "map_production_px": [
+    17920,
+    14080
+  ],
+  "road_field_units": [
+    280,
+    158
+  ],
+  "road_field_production_px": [
+    17920,
+    10112
+  ]
+}

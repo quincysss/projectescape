@@ -1,29 +1,21 @@
 @tool
 class_name WhiteboxMapRect
-extends Area2D
-
-const COLLISION_SHAPE_NAME := "WhiteboxCollisionShape"
+extends Node2D
 
 @export_enum("street", "plaza", "block", "building", "home", "outpost") var rect_kind: String = "street"
 @export var rect_id: String = ""
 @export var size_units: Vector2 = Vector2(6.0, 6.0):
 	set(value):
 		size_units = Vector2(maxf(value.x, 0.25), maxf(value.y, 0.25))
-		_sync_native_collision_shape(true)
 		queue_redraw()
 @export_enum("main", "secondary", "alley", "plaza", "transition", "small_block", "standard_block", "long_block", "large_block", "special_block", "house", "shop", "apartment", "warehouse", "factory", "home", "outpost") var subtype: String = "main"
 @export_enum("inner", "middle", "outer", "far_outer") var ring: String = "inner"
 @export var walkable: bool = false
 @export var has_collision: bool = false
-@export var sync_native_collision_shape: bool = true:
-	set(value):
-		sync_native_collision_shape = value
-		_sync_native_collision_shape(false)
 @export_group("Editor Box")
 @export var editor_unit_px: float = 64.0:
 	set(value):
 		editor_unit_px = maxf(value, 1.0)
-		_sync_native_collision_shape(true)
 		queue_redraw()
 @export var show_editor_box: bool = true:
 	set(value):
@@ -43,11 +35,6 @@ const COLLISION_SHAPE_NAME := "WhiteboxCollisionShape"
 		queue_redraw()
 
 func _ready() -> void:
-	collision_layer = 0
-	collision_mask = 0
-	monitoring = false
-	monitorable = false
-	_sync_native_collision_shape(false)
 	queue_redraw()
 
 func _notification(what: int) -> void:
@@ -114,7 +101,7 @@ func get_rect_id() -> String:
 	return rect_id
 
 func get_local_corners_px(unit_size: float) -> PackedVector2Array:
-	var size_px := _get_native_shape_size_px(unit_size)
+	var size_px := size_units * unit_size
 	var half := size_px * 0.5
 	return PackedVector2Array([
 		Vector2(-half.x, -half.y),
@@ -141,35 +128,3 @@ func get_rect_px(unit_size: float) -> Rect2:
 		max_pos.x = maxf(max_pos.x, corner.x)
 		max_pos.y = maxf(max_pos.y, corner.y)
 	return Rect2(min_pos, max_pos - min_pos)
-
-func _sync_native_collision_shape(force_size_from_units: bool = false) -> void:
-	if not sync_native_collision_shape or not is_inside_tree():
-		return
-	var shape_node := get_node_or_null(COLLISION_SHAPE_NAME) as CollisionShape2D
-	if shape_node == null:
-		shape_node = CollisionShape2D.new()
-		shape_node.name = COLLISION_SHAPE_NAME
-		add_child(shape_node)
-		if Engine.is_editor_hint():
-			var scene_root := get_tree().edited_scene_root
-			if scene_root:
-				shape_node.owner = scene_root
-	var rect_shape := shape_node.shape as RectangleShape2D
-	var created_shape_resource := false
-	if rect_shape == null:
-		rect_shape = RectangleShape2D.new()
-		shape_node.shape = rect_shape
-		created_shape_resource = true
-	if force_size_from_units or created_shape_resource or rect_shape.size == Vector2.ZERO:
-		rect_shape.size = size_units * editor_unit_px
-	shape_node.position = Vector2.ZERO
-	shape_node.rotation = 0.0
-	shape_node.scale = Vector2.ONE
-	shape_node.disabled = false
-	shape_node.visible = true
-
-func _get_native_shape_size_px(unit_size: float) -> Vector2:
-	var shape_node := get_node_or_null(COLLISION_SHAPE_NAME) as CollisionShape2D
-	if shape_node and shape_node.shape is RectangleShape2D:
-		return (shape_node.shape as RectangleShape2D).size
-	return size_units * unit_size

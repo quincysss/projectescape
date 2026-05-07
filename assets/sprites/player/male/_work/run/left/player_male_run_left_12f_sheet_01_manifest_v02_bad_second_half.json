@@ -1,0 +1,372 @@
+{
+  "source_sheet": "K:\\ProjectEscape\\project-escape\\assets\\sprites\\player\\male\\run\\left\\player_male_run_left_12f_sheet_01.png",
+  "source_chroma_sheet": "K:\\ProjectEscape\\project-escape\\assets\\sprites\\player\\male\\_work\\run\\left\\player_male_run_left_12f_sheet_01_chroma.png",
+  "source_transparent_sheet": "K:\\ProjectEscape\\project-escape\\assets\\sprites\\player\\male\\_work\\run\\left\\player_male_run_left_12f_sheet_source_01.png",
+  "reference_frame": "K:\\ProjectEscape\\project-escape\\assets\\sprites\\player\\male\\base\\directions\\player_male_idle_left_01.png",
+  "pose_guide": "K:\\ProjectEscape\\project-escape\\assets\\sprites\\player\\male\\_work\\run\\left\\player_male_run_left_12f_pose_guide.png",
+  "backups": [
+    "player_male_run_left_12f_sheet_01_v01_bad_gait.png",
+    "player_male_run_left_12f_preview_sheet_01_v01_bad_gait.png"
+  ],
+  "notes": "Corrected male protagonist left-facing 12-frame run cycle. Re-generated using a local 12-frame pose guide after earlier versions had broken gait phase. Chroma removed, extracted by masked whole-character components, normalized with one shared scale.",
+  "metadata": {
+    "asset_type": "character_animation_sprite",
+    "character": "player_male",
+    "direction": "left",
+    "animation": "run",
+    "frame_count": 12,
+    "frame_size": [
+      256,
+      256
+    ],
+    "sheet_size": [
+      3072,
+      256
+    ],
+    "sheet_layout": "12x1",
+    "recommended_fps": 14,
+    "loop_mode": "cyclic_run_loop",
+    "anchor_policy": "feet baseline aligned near y=244, centered per masked complete character component with one shared scale",
+    "motion_standard": "explicit 12-frame alternating two-leg run guided by phase sheet",
+    "phase_plan": [
+      "01 near leg forward planted; far leg trails lifted",
+      "02 near leg supports/compresses; far leg swings forward",
+      "03 near leg pushes back; far leg passes under body",
+      "04 near foot leaves behind; far leg swings forward",
+      "05 far leg prepares forward landing; near leg folds behind",
+      "06 far leg forward contact; near leg trails lifted",
+      "07 far leg supports/compresses; near leg swings forward",
+      "08 far leg pushes back; near leg passes under body",
+      "09 far foot leaves behind; near leg swings forward",
+      "10 near leg prepares forward landing; far leg folds behind",
+      "11 near leg forward contact again",
+      "12 transition back into frame 01"
+    ],
+    "positive_constraints": [
+      "same character identity across all frames",
+      "same left-facing side direction only",
+      "same messy black hair, backpack, straps, dirty grey shirt, black shorts, worn sneakers, purple and blue electronic accents",
+      "full body visible in every frame",
+      "near and far legs alternate roles across the cycle",
+      "clear planted foot contacts and lifted recovery poses",
+      "arms swing opposite the legs",
+      "backpack follows running motion without changing design"
+    ],
+    "negative_constraints": [
+      "no repeated same-leg-only cycle",
+      "no one-foot hopping",
+      "no extra limbs or missing limbs",
+      "no duplicate arms, legs, or heads",
+      "no broken knees or backwards feet",
+      "no front-facing, right-facing, or back-facing pose",
+      "no idle-only bob, skating, or walking-only shuffle",
+      "no weapons, new accessories, text, labels, frame borders, grid lines, watermark, or logo",
+      "no green chroma-key edge pixels in final assets",
+      "no cropped shoes, backpack, hair, or limbs"
+    ]
+  },
+  "frames": [
+    {
+      "index": 1,
+      "id": "player_male_run_left_12f_01_frame_01",
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\sprites\\player\\male\\run\\left\\frames\\player_male_run_left_12f_01_frame_01.png",
+      "sheet_box_xywh": [
+        0,
+        0,
+        256,
+        256
+      ],
+      "source_box_xyxy": [
+        11,
+        182,
+        210,
+        520
+      ],
+      "visible_bbox_xyxy": [
+        60,
+        15,
+        195,
+        244
+      ],
+      "component_area": 24472
+    },
+    {
+      "index": 2,
+      "id": "player_male_run_left_12f_01_frame_02",
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\sprites\\player\\male\\run\\left\\frames\\player_male_run_left_12f_01_frame_02.png",
+      "sheet_box_xywh": [
+        256,
+        0,
+        256,
+        256
+      ],
+      "source_box_xyxy": [
+        218,
+        182,
+        378,
+        531
+      ],
+      "visible_bbox_xyxy": [
+        74,
+        8,
+        182,
+        244
+      ],
+      "component_area": 24260
+    },
+    {
+      "index": 3,
+      "id": "player_male_run_left_12f_01_frame_03",
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\sprites\\player\\male\\run\\left\\frames\\player_male_run_left_12f_01_frame_03.png",
+      "sheet_box_xywh": [
+        512,
+        0,
+        256,
+        256
+      ],
+      "source_box_xyxy": [
+        403,
+        181,
+        579,
+        508
+      ],
+      "visible_bbox_xyxy": [
+        68,
+        23,
+        187,
+        244
+      ],
+      "component_area": 24168
+    },
+    {
+      "index": 4,
+      "id": "player_male_run_left_12f_01_frame_04",
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\sprites\\player\\male\\run\\left\\frames\\player_male_run_left_12f_01_frame_04.png",
+      "sheet_box_xywh": [
+        768,
+        0,
+        256,
+        256
+      ],
+      "source_box_xyxy": [
+        587,
+        183,
+        764,
+        513
+      ],
+      "visible_bbox_xyxy": [
+        68,
+        21,
+        188,
+        244
+      ],
+      "component_area": 23846
+    },
+    {
+      "index": 5,
+      "id": "player_male_run_left_12f_01_frame_05",
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\sprites\\player\\male\\run\\left\\frames\\player_male_run_left_12f_01_frame_05.png",
+      "sheet_box_xywh": [
+        1024,
+        0,
+        256,
+        256
+      ],
+      "source_box_xyxy": [
+        748,
+        190,
+        957,
+        520
+      ],
+      "visible_bbox_xyxy": [
+        58,
+        21,
+        199,
+        244
+      ],
+      "component_area": 23828
+    },
+    {
+      "index": 6,
+      "id": "player_male_run_left_12f_01_frame_06",
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\sprites\\player\\male\\run\\left\\frames\\player_male_run_left_12f_01_frame_06.png",
+      "sheet_box_xywh": [
+        1280,
+        0,
+        256,
+        256
+      ],
+      "source_box_xyxy": [
+        941,
+        187,
+        1105,
+        523
+      ],
+      "visible_bbox_xyxy": [
+        72,
+        17,
+        183,
+        244
+      ],
+      "component_area": 22807
+    },
+    {
+      "index": 7,
+      "id": "player_male_run_left_12f_01_frame_07",
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\sprites\\player\\male\\run\\left\\frames\\player_male_run_left_12f_01_frame_07.png",
+      "sheet_box_xywh": [
+        1536,
+        0,
+        256,
+        256
+      ],
+      "source_box_xyxy": [
+        1140,
+        196,
+        1296,
+        536
+      ],
+      "visible_bbox_xyxy": [
+        76,
+        14,
+        181,
+        244
+      ],
+      "component_area": 23888,
+      "split_from_source_box_xyxy": [
+        1140,
+        196,
+        1487,
+        536
+      ],
+      "split_x": 1296
+    },
+    {
+      "index": 8,
+      "id": "player_male_run_left_12f_01_frame_08",
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\sprites\\player\\male\\run\\left\\frames\\player_male_run_left_12f_01_frame_08.png",
+      "sheet_box_xywh": [
+        1792,
+        0,
+        256,
+        256
+      ],
+      "source_box_xyxy": [
+        1296,
+        196,
+        1487,
+        517
+      ],
+      "visible_bbox_xyxy": [
+        64,
+        27,
+        193,
+        244
+      ],
+      "component_area": 23399,
+      "split_from_source_box_xyxy": [
+        1140,
+        196,
+        1487,
+        536
+      ],
+      "split_x": 1296
+    },
+    {
+      "index": 9,
+      "id": "player_male_run_left_12f_01_frame_09",
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\sprites\\player\\male\\run\\left\\frames\\player_male_run_left_12f_01_frame_09.png",
+      "sheet_box_xywh": [
+        2048,
+        0,
+        256,
+        256
+      ],
+      "source_box_xyxy": [
+        1494,
+        200,
+        1636,
+        535
+      ],
+      "visible_bbox_xyxy": [
+        80,
+        17,
+        176,
+        244
+      ],
+      "component_area": 21941
+    },
+    {
+      "index": 10,
+      "id": "player_male_run_left_12f_01_frame_10",
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\sprites\\player\\male\\run\\left\\frames\\player_male_run_left_12f_01_frame_10.png",
+      "sheet_box_xywh": [
+        2304,
+        0,
+        256,
+        256
+      ],
+      "source_box_xyxy": [
+        1656,
+        203,
+        1828,
+        529
+      ],
+      "visible_bbox_xyxy": [
+        70,
+        24,
+        186,
+        244
+      ],
+      "component_area": 23152
+    },
+    {
+      "index": 11,
+      "id": "player_male_run_left_12f_01_frame_11",
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\sprites\\player\\male\\run\\left\\frames\\player_male_run_left_12f_01_frame_11.png",
+      "sheet_box_xywh": [
+        2560,
+        0,
+        256,
+        256
+      ],
+      "source_box_xyxy": [
+        1835,
+        205,
+        1993,
+        532
+      ],
+      "visible_bbox_xyxy": [
+        74,
+        23,
+        181,
+        244
+      ],
+      "component_area": 22034
+    },
+    {
+      "index": 12,
+      "id": "player_male_run_left_12f_01_frame_12",
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\sprites\\player\\male\\run\\left\\frames\\player_male_run_left_12f_01_frame_12.png",
+      "sheet_box_xywh": [
+        2816,
+        0,
+        256,
+        256
+      ],
+      "source_box_xyxy": [
+        2005,
+        203,
+        2160,
+        531
+      ],
+      "visible_bbox_xyxy": [
+        76,
+        22,
+        181,
+        244
+      ],
+      "component_area": 22210
+    }
+  ]
+}

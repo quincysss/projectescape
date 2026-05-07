@@ -1,0 +1,242 @@
+{
+  "source_sheet": "res://assets/map/roads/sheets/road_ground_base_large_sheet_01.png",
+  "generated_from": "C:\\Users\\KSG\\.codex\\generated_images\\019dddbb-7736-7c22-a715-6a97b9c4774e",
+  "unit_px": 64,
+  "notes": "Generated for large/whole street base placement plus decoration overlays. Green chroma background removed from split outputs.",
+  "items": [
+    {
+      "name": "road_base_main_vertical_01",
+      "output": "res://assets/map/roads/base/road_base_main_vertical_01.png",
+      "source_bbox": [
+        25,
+        21,
+        233,
+        698
+      ],
+      "crop_box_with_padding": [
+        23,
+        19,
+        235,
+        700
+      ],
+      "logical_role": "8-unit main road vertical base",
+      "doc_reference": "Doc17/Doc22"
+    },
+    {
+      "name": "road_base_main_horizontal_01",
+      "output": "res://assets/map/roads/base/road_base_main_horizontal_01.png",
+      "source_bbox": [
+        249,
+        21,
+        1476,
+        231
+      ],
+      "crop_box_with_padding": [
+        247,
+        19,
+        1478,
+        233
+      ],
+      "logical_role": "8-unit main road horizontal base",
+      "doc_reference": "Doc17/Doc22"
+    },
+    {
+      "name": "road_base_main_vertical_02",
+      "output": "res://assets/map/roads/base/road_base_main_vertical_02.png",
+      "source_bbox": [
+        682,
+        246,
+        832,
+        720
+      ],
+      "crop_box_with_padding": [
+        680,
+        244,
+        834,
+        722
+      ],
+      "logical_role": "8-unit main road vertical variant",
+      "doc_reference": "Doc17/Doc22"
+    },
+    {
+      "name": "road_base_home_plaza_01",
+      "output": "res://assets/map/roads/base/road_base_home_plaza_01.png",
+      "source_bbox": [
+        1094,
+        249,
+        1468,
+        599
+      ],
+      "crop_box_with_padding": [
+        1092,
+        247,
+        1470,
+        601
+      ],
+      "logical_role": "large home/plaza pavement block",
+      "doc_reference": "Doc17/Doc22"
+    },
+    {
+      "name": "road_base_secondary_horizontal_01",
+      "output": "res://assets/map/roads/base/road_base_secondary_horizontal_01.png",
+      "source_bbox": [
+        258,
+        255,
+        647,
+        450
+      ],
+      "crop_box_with_padding": [
+        256,
+        253,
+        649,
+        452
+      ],
+      "logical_role": "6-unit secondary road horizontal base",
+      "doc_reference": "Doc17/Doc22"
+    },
+    {
+      "name": "road_base_secondary_vertical_01",
+      "output": "res://assets/map/roads/base/road_base_secondary_vertical_01.png",
+      "source_bbox": [
+        863,
+        255,
+        961,
+        698
+      ],
+      "crop_box_with_padding": [
+        861,
+        253,
+        963,
+        700
+      ],
+      "logical_role": "6-unit secondary road vertical base",
+      "doc_reference": "Doc17/Doc22"
+    },
+    {
+      "name": "road_base_alley_vertical_01",
+      "output": "res://assets/map/roads/base/road_base_alley_vertical_01.png",
+      "source_bbox": [
+        993,
+        272,
+        1065,
+        664
+      ],
+      "crop_box_with_padding": [
+        991,
+        270,
+        1067,
+        666
+      ],
+      "logical_role": "4-unit alley vertical base",
+      "doc_reference": "Doc17/Doc22"
+    },
+    {
+      "name": "road_base_secondary_horizontal_02",
+      "output": "res://assets/map/roads/base/road_base_secondary_horizontal_02.png",
+      "source_bbox": [
+        270,
+        476,
+        628,
+        596
+      ],
+      "crop_box_with_padding": [
+        268,
+        474,
+        630,
+        598
+      ],
+      "logical_role": "secondary road no-centerline variant",
+      "doc_reference": "Doc17/Doc22"
+    },
+    {
+      "name": "road_base_alley_horizontal_01",
+      "output": "res://assets/map/roads/base/road_base_alley_horizontal_01.png",
+      "source_bbox": [
+        260,
+        619,
+        639,
+        692
+      ],
+      "crop_box_with_padding": [
+        258,
+        617,
+        641,
+        694
+      ],
+      "logical_role": "4-unit alley horizontal base",
+      "doc_reference": "Doc17/Doc22"
+    },
+    {
+      "name": "road_base_plaza_rect_01",
+      "output": "res://assets/map/roads/base/road_base_plaza_rect_01.png",
+      "source_bbox": [
+        1087,
+        625,
+        1495,
+        812
+      ],
+      "crop_box_with_padding": [
+        1085,
+        623,
+        1497,
+        814
+      ],
+      "logical_role": "plaza pavement rectangle",
+      "doc_reference": "Doc17/Doc22"
+    },
+    {
+      "name": "road_base_cross_intersection_large_01",
+      "output": "res://assets/map/roads/base/road_base_cross_intersection_large_01.png",
+      "source_bbox": [
+        21,
+        712,
+        526,
+        991
+      ],
+      "crop_box_with_padding": [
+        19,
+        710,
+        528,
+        993
+      ],
+      "logical_role": "large intersection/plaza base",
+      "doc_reference": "Doc17/Doc22"
+    },
+    {
+      "name": "road_base_transition_8_to_6_01",
+      "output": "res://assets/map/roads/base/road_base_transition_8_to_6_01.png",
+      "source_bbox": [
+        553,
+        793,
+        990,
+        986
+      ],
+      "crop_box_with_padding": [
+        551,
+        791,
+        992,
+        988
+      ],
+      "logical_role": "main to secondary transition",
+      "doc_reference": "Doc17/Doc22"
+    },
+    {
+      "name": "road_base_transition_6_to_4_01",
+      "output": "res://assets/map/roads/base/road_base_transition_6_to_4_01.png",
+      "source_bbox": [
+        1028,
+        836,
+        1471,
+        958
+      ],
+      "crop_box_with_padding": [
+        1026,
+        834,
+        1473,
+        960
+      ],
+      "logical_role": "secondary to alley transition",
+      "doc_reference": "Doc17/Doc22"
+    }
+  ]
+}

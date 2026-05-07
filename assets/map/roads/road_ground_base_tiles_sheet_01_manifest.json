@@ -1,0 +1,89 @@
+{
+  "source_sheet": "res://assets/map/roads/sheets/road_ground_base_tiles_sheet_01.png",
+  "doc_reference": [
+    "Doc/17 section 8.3 RoadGroundBase strategy",
+    "Doc/22 Street_RoadField_280x158"
+  ],
+  "unit_px": 64,
+  "road_field_units": [
+    280,
+    158
+  ],
+  "road_field_production_px": [
+    17920,
+    10112
+  ],
+  "recommended_usage": "Tile road_ground_base_tile_1024_01..03 across RoadGroundBase, then draw BlockVisual above it; put road overlays/decals above RoadGroundBase.",
+  "items": [
+    {
+      "name": "road_ground_base_tile_1024_01",
+      "output": "res://assets/map/roads/ground/road_ground_base_tile_1024_01.png",
+      "source_bbox": [
+        50,
+        50,
+        696,
+        674
+      ],
+      "size_px": [
+        1024,
+        1024
+      ],
+      "role": "plain continuous road field texture",
+      "collision": "none_visual_ground_only",
+      "seamless_mode": "mirror_quadrant"
+    },
+    {
+      "name": "road_ground_base_tile_1024_02",
+      "output": "res://assets/map/roads/ground/road_ground_base_tile_1024_02.png",
+      "source_bbox": [
+        763,
+        50,
+        1408,
+        674
+      ],
+      "size_px": [
+        1024,
+        1024
+      ],
+      "role": "cracked patched continuous road field texture",
+      "collision": "none_visual_ground_only",
+      "seamless_mode": "mirror_quadrant"
+    },
+    {
+      "name": "road_ground_base_tile_1024_03",
+      "output": "res://assets/map/roads/ground/road_ground_base_tile_1024_03.png",
+      "source_bbox": [
+        1476,
+        50,
+        2121,
+        674
+      ],
+      "size_px": [
+        1024,
+        1024
+      ],
+      "role": "dark grimy continuous road field texture",
+      "collision": "none_visual_ground_only",
+      "seamless_mode": "mirror_quadrant"
+    },
+    {
+      "name": "road_ground_field_280x158_preview_4096",
+      "output": "res://assets/map/roads/ground/road_ground_field_280x158_preview_4096.png",
+      "size_units": [
+        280,
+        158
+      ],
+      "size_px_preview": [
+        4096,
+        2311
+      ],
+      "production_size_px": [
+        17920,
+        10112
+      ],
+      "role": "whole-scene RoadGroundBase preview assembled from 1024 tiles; blocks should cover this layer to reveal roads",
+      "collision": "none_visual_ground_only"
+    }
+  ],
+  "seamless_processing": "The runtime 1024 tiles were converted to mirror-seamless quadrants from the generated source crops to avoid visible seams when tiled across the full RoadGroundBase."
+}

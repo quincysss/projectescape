@@ -42,7 +42,18 @@ func _verify_whitebox_loop() -> bool:
 		printerr("Expected a loot container")
 		return false
 	root._open_container(container)
+	if not root.loot_panel.visible or not root.inventory_panel.visible:
+		printerr("Expected container interaction to open loot and backpack panels")
+		return false
+	root._on_interactable_exited(container)
+	if root.loot_panel.visible or root.inventory_panel.visible:
+		printerr("Expected leaving container range to close loot and backpack panels")
+		return false
+	root._open_container(container)
 	root._take_all_loot()
+	if root.loot_panel.visible or root.inventory_panel.visible:
+		printerr("Expected empty container to close loot and backpack panels")
+		return false
 	if root.run_director.inventory_component.items.is_empty():
 		printerr("Expected loot to enter backpack")
 		return false
@@ -65,7 +76,11 @@ func _verify_whitebox_loop() -> bool:
 
 	for interactable in root.interactables.duplicate():
 		if is_instance_valid(interactable) and interactable.interact_type == "material":
-			root._pick_material(interactable)
+			root._open_material(interactable)
+			if not root.loot_panel.visible or not root.inventory_panel.visible:
+				printerr("Expected material interaction to open loot and backpack panels")
+				return false
+			root._take_all_loot()
 
 	var repaired := 0
 	for interactable in root.interactables.duplicate():

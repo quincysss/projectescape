@@ -528,6 +528,43 @@ container_safe_closed.png
 container_safe_open.png
 ```
 
+## 6.1 Godot 场景放置规则
+
+正式地图资源不直接替代白盒布局节点，而是放入 `RunScene` 的表现层。
+
+```text
+WorldRoot/MapLayout
+  白盒数据层：WhiteboxMapRect、点位、碰撞生成依据
+
+WorldRoot/MapVisual/RoadVisual
+  道路、广场、人行道、井盖、斑马线
+
+WorldRoot/MapVisual/BlockVisual
+  街区地块底图、废墟块、不可进入区域视觉
+
+WorldRoot/MapVisual/BuildingVisual
+  家、前哨站、楼房主体
+
+WorldRoot/MapVisual/PropVisual
+  路灯杆、垃圾桶、围栏、路障、容器外观等
+
+WorldRoot/MapVisual/DecalVisual
+  裂痕、血迹、水渍、脏污、涂鸦等地表叠加物
+
+WorldRoot/MapLights
+  路灯、建筑灯、整体氛围光
+```
+
+放置原则：
+
+```text
+WhiteboxMapRect 决定位置、尺寸、碰撞和可通行规则。
+Sprite2D / TileMapLayer / PackedScene 只负责视觉表现。
+街区、道路这类大面积资源可以由脚本根据 WhiteboxMapRect 自动生成。
+家、前哨站、可交互建筑适合做成独立 .tscn，再挂到 BuildingVisual。
+路灯适合做成 Sprite2D + PointLight2D 的独立 .tscn，再挂到 MapLights/StreetLights。
+```
+
 ---
 
 ## 7. GPT-image-2.0 通用提示词结构
@@ -673,6 +710,114 @@ Avoid: dark abandoned state, closed roof hiding the interior, full city map, pho
 ---
 
 ## 8.3 道路拆件
+
+### 8.3.1 V0.1 推荐道路地面方案
+
+当前白盒地图采用“红框街区为不可进入区，红框之外为道路”的结构。道路不适合继续用 `road_straight / corner / T junction / cross` 一条街一条街拼接。
+
+推荐方案：
+
+```text
+道路主体 = 一整块或少数几块可平铺的大面积废土城市地面。
+街区/楼房 = 盖在道路地面上方。
+道路装饰 = 井盖、斑马线、裂缝、路沿、人行道边、污渍、路标等局部 Sprite。
+```
+
+Godot 放置层级：
+
+```text
+WorldRoot/MapVisual/RoadVisual/RoadGroundBase
+  大面积道路地面底图，可用 TextureRect / Sprite2D / TileMapLayer 表示
+
+WorldRoot/MapVisual/RoadVisual/ManualRoadPieces
+  手工调试道路样例、特殊路口、局部装饰
+
+WorldRoot/MapVisual/BlockVisual
+  街区、楼房、不可进入地块视觉，盖在 RoadGroundBase 上方
+```
+
+当前地图尺寸参考：
+
+```text
+1 Size Unit = 64 px
+Street_RoadField_280x158 = 当前道路底板范围
+道路底板目标像素范围 = 17920 px × 10112 px
+```
+
+由于 `17920 × 10112` 作为单张贴图过大，不建议一次生成整张完整道路图。推荐生成可平铺底图：
+
+```text
+road_ground_base_tile_1024_01.png    # 1024 × 1024，可无缝平铺
+road_ground_base_tile_1024_02.png    # 轻微变化版本，避免重复感
+road_ground_base_tile_1024_03.png    # 轻微变化版本，避免重复感
+road_ground_noise_overlay_1024_01.png
+road_ground_crack_decal_512_01.png
+road_ground_stain_decal_512_01.png
+```
+
+道路底图要求：
+
+```text
+正交俯视。
+无透视地平线。
+不包含楼房、车辆主体、大件路障。
+可以包含细碎裂痕、污渍、磨损、浅色旧标线残留。
+四边必须可无缝平铺。
+整体明度应低于街区/建筑，避免和可进入区域抢视觉。
+不要有明显方向性大线条，否则平铺后会暴露重复。
+```
+
+### 8.3.2 道路地面底图提示词
+
+```text
+Create a seamless square ground texture tile for a 2D top-down wasteland city extraction game.
+Asset type: road ground base tile.
+Subject: cracked asphalt and dirty concrete urban road surface, worn pavement, subtle old lane paint fragments, dust, grime, small cracks and stains.
+View: strict top-down orthographic, no perspective, no horizon.
+Style: dark hand-drawn manga line art texture, gritty ink details, dirty grey concrete and asphalt, readable but not too busy.
+Color palette: charcoal, dark grey, concrete grey, faded off-white road paint, tiny muted rust stains only.
+Production requirement: seamless tile on all four edges, 1024x1024 square texture, no transparent background, suitable for repeated tiling in Godot as the base RoadGround layer.
+Avoid: buildings, vehicles, characters, big props, readable text, logos, arrows, bright colors, strong directional shadows, obvious border frame, photorealism, glossy 3D render, single huge crack dominating the tile.
+```
+
+变化版提示词：
+
+```text
+Create a variation of the same seamless 1024x1024 top-down wasteland road ground tile.
+Keep the same scale, color palette, and edge continuity.
+Change only the distribution of cracks, stains, old paint fragments, small rubble specks, and dust patches.
+Do not add buildings, props, cars, characters, readable text, or strong directional markings.
+```
+
+### 8.3.3 道路装饰提示词
+
+道路装饰应作为独立透明 PNG，放在道路底图上方。
+
+```text
+Create a standalone transparent decal asset for a 2D top-down wasteland city road.
+Subject: [crosswalk remnant / manhole cover / cracked curb edge / oil stain / puddle / faded lane marking / small rubble strip / drainage gutter].
+View: strict top-down orthographic.
+Style: dark hand-drawn manga line art, gritty dirty texture, worn urban wasteland.
+Color palette: grey, charcoal, faded white paint, muted brown rust, very low saturation.
+Production requirement: transparent background, clean alpha edges, no surrounding full road tile, suitable as a Sprite2D decal on top of a tiled road ground base.
+Avoid: buildings, vehicles, characters, large props, readable text, watermark, bright saturated color, perspective.
+```
+
+### 8.3.4 旧道路 tile 的定位
+
+`road_straight / road_corner / road_t_junction / road_cross` 不再作为 V0.1 道路主体的主要拼接方式。它们保留为：
+
+```text
+特殊路口装饰参考。
+小范围手工拼接测试。
+后续 TileMap 方案的候选资源。
+```
+
+V0.1 主体道路优先使用 `RoadGroundBase` 大面积地面层。
+
+---
+
+## 8.3.5 旧道路拆件提示词
 
 ```text
 Create a modular road tile asset for a 2D top-down wasteland city game.

@@ -1,0 +1,247 @@
+{
+  "source_sheet": "K:\\ProjectEscape\\project-escape\\assets\\sprites\\player\\male\\run\\left\\player_male_run_left_8f_sheet_01.png",
+  "source_chroma_sheet": "K:\\ProjectEscape\\project-escape\\assets\\sprites\\player\\male\\_work\\run\\left\\player_male_run_left_8f_sheet_01_chroma.png",
+  "source_transparent_sheet": "K:\\ProjectEscape\\project-escape\\assets\\sprites\\player\\male\\_work\\run\\left\\player_male_run_left_8f_sheet_source_01.png",
+  "reference_frame": "K:\\ProjectEscape\\project-escape\\assets\\sprites\\player\\male\\base\\directions\\player_male_idle_left_01.png",
+  "pose_guide": "K:\\ProjectEscape\\project-escape\\assets\\sprites\\player\\male\\_work\\run\\left\\player_male_run_left_8f_tracked_foot_pose_guide.png",
+  "backups": [
+    "player_male_run_left_8f_sheet_01_v01_left_foot_never_lands.png"
+  ],
+  "notes": "Third 8-frame left run attempt with stricter two-visible-shoe prompt. The generated art is normalized to 256x256 frames and keeps the 8f naming standard.",
+  "metadata": {
+    "asset_type": "character_animation_sprite",
+    "character": "player_male",
+    "direction": "left",
+    "animation": "run",
+    "frame_count": 8,
+    "frame_size": [
+      256,
+      256
+    ],
+    "sheet_size": [
+      2048,
+      256
+    ],
+    "sheet_layout": "8x1",
+    "recommended_fps": 12,
+    "loop_mode": "cyclic_run_loop",
+    "anchor_policy": "feet baseline aligned near y=244; centered per masked complete character component with one shared scale",
+    "motion_standard": "screen-position tracked 8-frame run with visible shoe contact checks",
+    "phase_plan": [
+      "01 screen-left/front shoe planted; screen-right/back shoe lifted",
+      "02 lifted shoe descends while front supports",
+      "03 formerly lifted shoe is drawn near ground/contact; opposite starts lifting",
+      "04 new support holds; opposite lifted",
+      "05 same support/recovery",
+      "06 opposite returns/contact",
+      "07 front shoe planted again; back shoe starts lifting",
+      "08 front shoe supports; back shoe lifted loop"
+    ],
+    "positive_constraints": [
+      "both shoes visible where possible",
+      "track frame-01 lifted screen-right shoe down by frame 03",
+      "same character identity and left-facing direction",
+      "full body visible"
+    ],
+    "negative_constraints": [
+      "no lifted shoe hanging through all frames",
+      "no one-foot-only hopping",
+      "no cropped shoes/backpack/hair",
+      "no green chroma-key edge pixels"
+    ]
+  },
+  "frames": [
+    {
+      "index": 1,
+      "id": "player_male_run_left_8f_01_frame_01",
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\sprites\\player\\male\\run\\left\\frames\\player_male_run_left_8f_01_frame_01.png",
+      "sheet_box_xywh": [
+        0,
+        0,
+        256,
+        256
+      ],
+      "source_box_xyxy": [
+        27,
+        149,
+        283,
+        562
+      ],
+      "visible_bbox_xyxy": [
+        55,
+        9,
+        201,
+        244
+      ],
+      "component_area": 36139
+    },
+    {
+      "index": 2,
+      "id": "player_male_run_left_8f_01_frame_02",
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\sprites\\player\\male\\run\\left\\frames\\player_male_run_left_8f_01_frame_02.png",
+      "sheet_box_xywh": [
+        256,
+        0,
+        256,
+        256
+      ],
+      "source_box_xyxy": [
+        306,
+        149,
+        539,
+        563
+      ],
+      "visible_bbox_xyxy": [
+        62,
+        8,
+        195,
+        244
+      ],
+      "component_area": 35741
+    },
+    {
+      "index": 3,
+      "id": "player_male_run_left_8f_01_frame_03",
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\sprites\\player\\male\\run\\left\\frames\\player_male_run_left_8f_01_frame_03.png",
+      "sheet_box_xywh": [
+        512,
+        0,
+        256,
+        256
+      ],
+      "source_box_xyxy": [
+        587,
+        149,
+        810,
+        563
+      ],
+      "visible_bbox_xyxy": [
+        64,
+        8,
+        191,
+        244
+      ],
+      "component_area": 36404
+    },
+    {
+      "index": 4,
+      "id": "player_male_run_left_8f_01_frame_04",
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\sprites\\player\\male\\run\\left\\frames\\player_male_run_left_8f_01_frame_04.png",
+      "sheet_box_xywh": [
+        768,
+        0,
+        256,
+        256
+      ],
+      "source_box_xyxy": [
+        861,
+        153,
+        1080,
+        565
+      ],
+      "visible_bbox_xyxy": [
+        66,
+        9,
+        191,
+        244
+      ],
+      "component_area": 35224
+    },
+    {
+      "index": 5,
+      "id": "player_male_run_left_8f_01_frame_05",
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\sprites\\player\\male\\run\\left\\frames\\player_male_run_left_8f_01_frame_05.png",
+      "sheet_box_xywh": [
+        1024,
+        0,
+        256,
+        256
+      ],
+      "source_box_xyxy": [
+        1149,
+        149,
+        1369,
+        563
+      ],
+      "visible_bbox_xyxy": [
+        66,
+        8,
+        191,
+        244
+      ],
+      "component_area": 35836
+    },
+    {
+      "index": 6,
+      "id": "player_male_run_left_8f_01_frame_06",
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\sprites\\player\\male\\run\\left\\frames\\player_male_run_left_8f_01_frame_06.png",
+      "sheet_box_xywh": [
+        1280,
+        0,
+        256,
+        256
+      ],
+      "source_box_xyxy": [
+        1392,
+        152,
+        1627,
+        565
+      ],
+      "visible_bbox_xyxy": [
+        61,
+        9,
+        195,
+        244
+      ],
+      "component_area": 36721
+    },
+    {
+      "index": 7,
+      "id": "player_male_run_left_8f_01_frame_07",
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\sprites\\player\\male\\run\\left\\frames\\player_male_run_left_8f_01_frame_07.png",
+      "sheet_box_xywh": [
+        1536,
+        0,
+        256,
+        256
+      ],
+      "source_box_xyxy": [
+        1645,
+        150,
+        1896,
+        563
+      ],
+      "visible_bbox_xyxy": [
+        56,
+        9,
+        199,
+        244
+      ],
+      "component_area": 36046
+    },
+    {
+      "index": 8,
+      "id": "player_male_run_left_8f_01_frame_08",
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\sprites\\player\\male\\run\\left\\frames\\player_male_run_left_8f_01_frame_08.png",
+      "sheet_box_xywh": [
+        1792,
+        0,
+        256,
+        256
+      ],
+      "source_box_xyxy": [
+        1905,
+        150,
+        2147,
+        564
+      ],
+      "visible_bbox_xyxy": [
+        59,
+        8,
+        197,
+        244
+      ],
+      "component_area": 36182
+    }
+  ]
+}

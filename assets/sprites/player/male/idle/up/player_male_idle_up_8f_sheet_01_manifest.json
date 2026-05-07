@@ -1,0 +1,182 @@
+{
+  "source_sheet": "K:\\ProjectEscape\\project-escape\\assets\\sprites\\player\\male\\idle\\up\\player_male_idle_up_8f_sheet_01.png",
+  "source_chroma_sheet": "K:\\ProjectEscape\\project-escape\\assets\\sprites\\player\\male\\_work\\idle\\up\\player_male_idle_up_8f_sheet_01_chroma.png",
+  "source_transparent_sheet": "K:\\ProjectEscape\\project-escape\\assets\\sprites\\player\\male\\_work\\idle\\up\\player_male_idle_up_8f_sheet_source_01.png",
+  "reference_frame": "K:\\ProjectEscape\\project-escape\\assets\\sprites\\player\\male\\base\\directions\\player_male_idle_up_01.png",
+  "notes": "Male protagonist up-facing idle breathing animation. Eight frames in a single horizontal row, normalized to the existing 256x256 up idle frame's visual height and foot baseline.",
+  "metadata": {
+    "asset_type": "character_animation_sprite",
+    "character": "player_male",
+    "direction": "up",
+    "animation": "idle",
+    "frame_count": 8,
+    "frame_size": [
+      256,
+      256
+    ],
+    "sheet_size": [
+      2048,
+      256
+    ],
+    "sheet_layout": "8x1",
+    "recommended_fps": 8,
+    "loop_mode": "pingless_loop",
+    "anchor_policy": "feet baseline aligned to y=244, centered to the original up idle frame",
+    "motion_standard": "subtle breathing only: slight upper-back and shoulder rise, backpack follows with 1-2px perceived float, no steps or direction change",
+    "positive_constraints": [
+      "same character identity across all frames",
+      "same messy back hair, backpack, straps, dirty grey shirt back, black shorts, worn sneakers, purple and blue electronic accents",
+      "back/up direction only",
+      "full body visible in every frame",
+      "feet remain visually planted on the same baseline",
+      "backpack shape and line-art density stay consistent"
+    ],
+    "negative_constraints": [
+      "no extra limbs or missing limbs",
+      "no duplicate arms or heads",
+      "no face reveal or front-facing chest panel",
+      "no new backpack shape, accessories, weapons, or major costume changes",
+      "no walking, running, turning, or large pose shift",
+      "no text, labels, frame borders, grid lines, watermark, or logo",
+      "no green chroma-key edge pixels in final assets"
+    ]
+  },
+  "frames": [
+    {
+      "index": 1,
+      "id": "player_male_idle_up_8f_01_frame_01",
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\sprites\\player\\male\\idle\\up\\frames\\player_male_idle_up_8f_01_frame_01.png",
+      "sheet_box_xywh": [
+        0,
+        0,
+        256,
+        256
+      ],
+      "visible_bbox_xyxy": [
+        90,
+        30,
+        165,
+        244
+      ]
+    },
+    {
+      "index": 2,
+      "id": "player_male_idle_up_8f_01_frame_02",
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\sprites\\player\\male\\idle\\up\\frames\\player_male_idle_up_8f_01_frame_02.png",
+      "sheet_box_xywh": [
+        256,
+        0,
+        256,
+        256
+      ],
+      "visible_bbox_xyxy": [
+        90,
+        30,
+        164,
+        244
+      ]
+    },
+    {
+      "index": 3,
+      "id": "player_male_idle_up_8f_01_frame_03",
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\sprites\\player\\male\\idle\\up\\frames\\player_male_idle_up_8f_01_frame_03.png",
+      "sheet_box_xywh": [
+        512,
+        0,
+        256,
+        256
+      ],
+      "visible_bbox_xyxy": [
+        90,
+        30,
+        165,
+        244
+      ]
+    },
+    {
+      "index": 4,
+      "id": "player_male_idle_up_8f_01_frame_04",
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\sprites\\player\\male\\idle\\up\\frames\\player_male_idle_up_8f_01_frame_04.png",
+      "sheet_box_xywh": [
+        768,
+        0,
+        256,
+        256
+      ],
+      "visible_bbox_xyxy": [
+        90,
+        31,
+        165,
+        244
+      ]
+    },
+    {
+      "index": 5,
+      "id": "player_male_idle_up_8f_01_frame_05",
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\sprites\\player\\male\\idle\\up\\frames\\player_male_idle_up_8f_01_frame_05.png",
+      "sheet_box_xywh": [
+        1024,
+        0,
+        256,
+        256
+      ],
+      "visible_bbox_xyxy": [
+        90,
+        30,
+        165,
+        244
+      ]
+    },
+    {
+      "index": 6,
+      "id": "player_male_idle_up_8f_01_frame_06",
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\sprites\\player\\male\\idle\\up\\frames\\player_male_idle_up_8f_01_frame_06.png",
+      "sheet_box_xywh": [
+        1280,
+        0,
+        256,
+        256
+      ],
+      "visible_bbox_xyxy": [
+        90,
+        31,
+        165,
+        244
+      ]
+    },
+    {
+      "index": 7,
+      "id": "player_male_idle_up_8f_01_frame_07",
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\sprites\\player\\male\\idle\\up\\frames\\player_male_idle_up_8f_01_frame_07.png",
+      "sheet_box_xywh": [
+        1536,
+        0,
+        256,
+        256
+      ],
+      "visible_bbox_xyxy": [
+        90,
+        31,
+        165,
+        244
+      ]
+    },
+    {
+      "index": 8,
+      "id": "player_male_idle_up_8f_01_frame_08",
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\sprites\\player\\male\\idle\\up\\frames\\player_male_idle_up_8f_01_frame_08.png",
+      "sheet_box_xywh": [
+        1792,
+        0,
+        256,
+        256
+      ],
+      "visible_bbox_xyxy": [
+        90,
+        30,
+        166,
+        244
+      ]
+    }
+  ]
+}

@@ -1,0 +1,332 @@
+{
+  "source_sheet": "res://assets/map/roads/sheets/road_decor_overlays_sheet_01.png",
+  "generated_from": "C:\\Users\\KSG\\.codex\\generated_images\\019dddbb-7736-7c22-a715-6a97b9c4774e",
+  "unit_px": 64,
+  "notes": "Generated for large/whole street base placement plus decoration overlays. Green chroma background removed from split outputs.",
+  "items": [
+    {
+      "name": "road_overlay_edge_dirt_vertical_01",
+      "output": "res://assets/map/roads/overlays/road_overlay_edge_dirt_vertical_01.png",
+      "source_bbox": [
+        85,
+        35,
+        175,
+        811
+      ],
+      "crop_box_with_padding": [
+        83,
+        33,
+        177,
+        813
+      ],
+      "logical_role": "long road edge dirt strip",
+      "doc_reference": "Doc17/Doc22"
+    },
+    {
+      "name": "road_overlay_broken_lane_short_01",
+      "output": "res://assets/map/roads/overlays/road_overlay_broken_lane_short_01.png",
+      "source_bbox": [
+        284,
+        35,
+        317,
+        151
+      ],
+      "crop_box_with_padding": [
+        282,
+        33,
+        319,
+        153
+      ],
+      "logical_role": "broken lane marking short",
+      "doc_reference": "Doc17/Doc22"
+    },
+    {
+      "name": "road_overlay_lane_marking_strip_01",
+      "output": "res://assets/map/roads/overlays/road_overlay_lane_marking_strip_01.png",
+      "source_bbox": [
+        432,
+        45,
+        634,
+        92
+      ],
+      "crop_box_with_padding": [
+        430,
+        43,
+        636,
+        94
+      ],
+      "logical_role": "faded lane marking strip",
+      "doc_reference": "Doc17/Doc22"
+    },
+    {
+      "name": "road_overlay_manhole_01",
+      "output": "res://assets/map/roads/overlays/road_overlay_manhole_01.png",
+      "source_bbox": [
+        738,
+        56,
+        909,
+        224
+      ],
+      "crop_box_with_padding": [
+        736,
+        54,
+        911,
+        226
+      ],
+      "logical_role": "manhole cover",
+      "doc_reference": "Doc17/Doc22"
+    },
+    {
+      "name": "road_overlay_storm_drain_01",
+      "output": "res://assets/map/roads/overlays/road_overlay_storm_drain_01.png",
+      "source_bbox": [
+        963,
+        67,
+        1162,
+        212
+      ],
+      "crop_box_with_padding": [
+        961,
+        65,
+        1164,
+        214
+      ],
+      "logical_role": "storm drain grate",
+      "doc_reference": "Doc17/Doc22"
+    },
+    {
+      "name": "road_overlay_branching_crack_01",
+      "output": "res://assets/map/roads/overlays/road_overlay_branching_crack_01.png",
+      "source_bbox": [
+        1240,
+        67,
+        1446,
+        376
+      ],
+      "crop_box_with_padding": [
+        1238,
+        65,
+        1448,
+        378
+      ],
+      "logical_role": "branching asphalt crack",
+      "doc_reference": "Doc17/Doc22"
+    },
+    {
+      "name": "road_overlay_crosswalk_remnant_01",
+      "output": "res://assets/map/roads/overlays/road_overlay_crosswalk_remnant_01.png",
+      "source_bbox": [
+        433,
+        107,
+        645,
+        374
+      ],
+      "crop_box_with_padding": [
+        431,
+        105,
+        647,
+        376
+      ],
+      "logical_role": "crosswalk remnants group",
+      "doc_reference": "Doc17/Doc22"
+    },
+    {
+      "name": "road_overlay_long_crack_01",
+      "output": "res://assets/map/roads/overlays/road_overlay_long_crack_01.png",
+      "source_bbox": [
+        746,
+        281,
+        1226,
+        369
+      ],
+      "crop_box_with_padding": [
+        744,
+        279,
+        1228,
+        371
+      ],
+      "logical_role": "long asphalt crack",
+      "doc_reference": "Doc17/Doc22"
+    },
+    {
+      "name": "road_overlay_oil_stain_01",
+      "output": "res://assets/map/roads/overlays/road_overlay_oil_stain_01.png",
+      "source_bbox": [
+        387,
+        420,
+        653,
+        627
+      ],
+      "crop_box_with_padding": [
+        385,
+        418,
+        655,
+        629
+      ],
+      "logical_role": "oil stain",
+      "doc_reference": "Doc17/Doc22"
+    },
+    {
+      "name": "road_overlay_dust_stain_01",
+      "output": "res://assets/map/roads/overlays/road_overlay_dust_stain_01.png",
+      "source_bbox": [
+        706,
+        433,
+        895,
+        619
+      ],
+      "crop_box_with_padding": [
+        704,
+        431,
+        897,
+        621
+      ],
+      "logical_role": "dust stain",
+      "doc_reference": "Doc17/Doc22"
+    },
+    {
+      "name": "road_overlay_patch_plate_01",
+      "output": "res://assets/map/roads/overlays/road_overlay_patch_plate_01.png",
+      "source_bbox": [
+        945,
+        440,
+        1200,
+        620
+      ],
+      "crop_box_with_padding": [
+        943,
+        438,
+        1202,
+        622
+      ],
+      "logical_role": "patched asphalt plate",
+      "doc_reference": "Doc17/Doc22"
+    },
+    {
+      "name": "road_overlay_rubble_scatter_01",
+      "output": "res://assets/map/roads/overlays/road_overlay_rubble_scatter_01.png",
+      "source_bbox": [
+        1278,
+        443,
+        1443,
+        597
+      ],
+      "crop_box_with_padding": [
+        1276,
+        441,
+        1445,
+        599
+      ],
+      "logical_role": "loose rubble scatter",
+      "doc_reference": "Doc17/Doc22"
+    },
+    {
+      "name": "road_overlay_curb_chip_strip_01",
+      "output": "res://assets/map/roads/overlays/road_overlay_curb_chip_strip_01.png",
+      "source_bbox": [
+        246,
+        703,
+        682,
+        779
+      ],
+      "crop_box_with_padding": [
+        244,
+        701,
+        684,
+        781
+      ],
+      "logical_role": "curb chip strip",
+      "doc_reference": "Doc17/Doc22"
+    },
+    {
+      "name": "road_overlay_sewer_access_rect_01",
+      "output": "res://assets/map/roads/overlays/road_overlay_sewer_access_rect_01.png",
+      "source_bbox": [
+        736,
+        668,
+        956,
+        806
+      ],
+      "crop_box_with_padding": [
+        734,
+        666,
+        958,
+        808
+      ],
+      "logical_role": "sewer access rectangle",
+      "doc_reference": "Doc17/Doc22"
+    },
+    {
+      "name": "road_overlay_tire_skid_marks_01",
+      "output": "res://assets/map/roads/overlays/road_overlay_tire_skid_marks_01.png",
+      "source_bbox": [
+        1030,
+        669,
+        1405,
+        805
+      ],
+      "crop_box_with_padding": [
+        1028,
+        667,
+        1407,
+        807
+      ],
+      "logical_role": "tire skid marks",
+      "doc_reference": "Doc17/Doc22"
+    },
+    {
+      "name": "road_overlay_faded_arrow_01",
+      "output": "res://assets/map/roads/overlays/road_overlay_faded_arrow_01.png",
+      "source_bbox": [
+        81,
+        823,
+        491,
+        984
+      ],
+      "crop_box_with_padding": [
+        79,
+        821,
+        493,
+        986
+      ],
+      "logical_role": "faded directional arrow decal",
+      "doc_reference": "Doc17/Doc22"
+    },
+    {
+      "name": "road_overlay_neon_scuff_01",
+      "output": "res://assets/map/roads/overlays/road_overlay_neon_scuff_01.png",
+      "source_bbox": [
+        553,
+        849,
+        809,
+        960
+      ],
+      "crop_box_with_padding": [
+        551,
+        847,
+        811,
+        962
+      ],
+      "logical_role": "small neon paint scuff",
+      "doc_reference": "Doc17/Doc22"
+    },
+    {
+      "name": "road_overlay_edge_dirt_horizontal_01",
+      "output": "res://assets/map/roads/overlays/road_overlay_edge_dirt_horizontal_01.png",
+      "source_bbox": [
+        898,
+        855,
+        1465,
+        981
+      ],
+      "crop_box_with_padding": [
+        896,
+        853,
+        1467,
+        983
+      ],
+      "logical_role": "horizontal road edge dirt strip",
+      "doc_reference": "Doc17/Doc22"
+    }
+  ]
+}

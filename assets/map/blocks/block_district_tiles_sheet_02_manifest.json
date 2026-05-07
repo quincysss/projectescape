@@ -1,0 +1,224 @@
+{
+  "source_sheet": "res://assets/map/blocks/sheets/block_district_tiles_sheet_02.png",
+  "generated_from": "C:\\Users\\KSG\\.codex\\generated_images\\019dddbb-7736-7c22-a715-6a97b9c4774e",
+  "unit_px": 64,
+  "notes": "Generated for large/whole street base placement plus decoration overlays. Green chroma background removed from split outputs.",
+  "items": [
+    {
+      "name": "block_fill_clean_02",
+      "output": "res://assets/map/blocks/fill/block_fill_clean_02.png",
+      "source_bbox": [
+        44,
+        38,
+        490,
+        472
+      ],
+      "crop_box_with_padding": [
+        42,
+        36,
+        492,
+        474
+      ],
+      "logical_role": "4x4-unit clean block fill",
+      "doc_reference": "Doc17/Doc22"
+    },
+    {
+      "name": "block_fill_cracked_02",
+      "output": "res://assets/map/blocks/fill/block_fill_cracked_02.png",
+      "source_bbox": [
+        535,
+        38,
+        959,
+        472
+      ],
+      "crop_box_with_padding": [
+        533,
+        36,
+        961,
+        474
+      ],
+      "logical_role": "4x4-unit cracked block fill",
+      "doc_reference": "Doc17/Doc22"
+    },
+    {
+      "name": "block_fill_dirty_02",
+      "output": "res://assets/map/blocks/fill/block_fill_dirty_02.png",
+      "source_bbox": [
+        999,
+        38,
+        1429,
+        472
+      ],
+      "crop_box_with_padding": [
+        997,
+        36,
+        1431,
+        474
+      ],
+      "logical_role": "4x4-unit dirty block fill",
+      "doc_reference": "Doc17/Doc22"
+    },
+    {
+      "name": "block_corner_outer_round_01",
+      "output": "res://assets/map/blocks/edge/block_corner_outer_round_01.png",
+      "source_bbox": [
+        523,
+        513,
+        697,
+        653
+      ],
+      "crop_box_with_padding": [
+        521,
+        511,
+        699,
+        655
+      ],
+      "logical_role": "outside curb corner",
+      "doc_reference": "Doc17/Doc22"
+    },
+    {
+      "name": "block_corner_inner_round_01",
+      "output": "res://assets/map/blocks/edge/block_corner_inner_round_01.png",
+      "source_bbox": [
+        789,
+        513,
+        952,
+        653
+      ],
+      "crop_box_with_padding": [
+        787,
+        511,
+        954,
+        655
+      ],
+      "logical_role": "inside curb corner",
+      "doc_reference": "Doc17/Doc22"
+    },
+    {
+      "name": "block_edge_straight_long_02",
+      "output": "res://assets/map/blocks/edge/block_edge_straight_long_02.png",
+      "source_bbox": [
+        38,
+        524,
+        477,
+        606
+      ],
+      "crop_box_with_padding": [
+        36,
+        522,
+        479,
+        608
+      ],
+      "logical_role": "straight road-facing curb",
+      "doc_reference": "Doc17/Doc22"
+    },
+    {
+      "name": "block_edge_entrance_gap_01",
+      "output": "res://assets/map/blocks/cut/block_edge_entrance_gap_01.png",
+      "source_bbox": [
+        1006,
+        531,
+        1465,
+        614
+      ],
+      "crop_box_with_padding": [
+        1004,
+        529,
+        1467,
+        616
+      ],
+      "logical_role": "curb with entrance gap",
+      "doc_reference": "Doc17/Doc22"
+    },
+    {
+      "name": "block_overlay_cracked_tile_02",
+      "output": "res://assets/map/blocks/overlay/block_overlay_cracked_tile_02.png",
+      "source_bbox": [
+        1207,
+        691,
+        1367,
+        830
+      ],
+      "crop_box_with_padding": [
+        1205,
+        689,
+        1369,
+        832
+      ],
+      "logical_role": "small block decal tile",
+      "doc_reference": "Doc17/Doc22"
+    },
+    {
+      "name": "block_cut_driveway_ramp_02",
+      "output": "res://assets/map/blocks/cut/block_cut_driveway_ramp_02.png",
+      "source_bbox": [
+        38,
+        692,
+        379,
+        782
+      ],
+      "crop_box_with_padding": [
+        36,
+        690,
+        381,
+        784
+      ],
+      "logical_role": "driveway/sidewalk ramp",
+      "doc_reference": "Doc17/Doc22"
+    },
+    {
+      "name": "block_sidewalk_strip_01",
+      "output": "res://assets/map/blocks/edge/block_sidewalk_strip_01.png",
+      "source_bbox": [
+        435,
+        699,
+        784,
+        779
+      ],
+      "crop_box_with_padding": [
+        433,
+        697,
+        786,
+        781
+      ],
+      "logical_role": "narrow sidewalk strip",
+      "doc_reference": "Doc17/Doc22"
+    },
+    {
+      "name": "block_edge_broken_gap_01",
+      "output": "res://assets/map/blocks/edge/block_edge_broken_gap_01.png",
+      "source_bbox": [
+        830,
+        707,
+        1149,
+        786
+      ],
+      "crop_box_with_padding": [
+        828,
+        705,
+        1151,
+        788
+      ],
+      "logical_role": "broken curb segment",
+      "doc_reference": "Doc17/Doc22"
+    },
+    {
+      "name": "block_rubble_patch_02",
+      "output": "res://assets/map/blocks/overlay/block_rubble_patch_02.png",
+      "source_bbox": [
+        447,
+        815,
+        962,
+        989
+      ],
+      "crop_box_with_padding": [
+        445,
+        813,
+        964,
+        991
+      ],
+      "logical_role": "rubble patch decal",
+      "doc_reference": "Doc17/Doc22"
+    }
+  ]
+}

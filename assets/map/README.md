@@ -13,6 +13,7 @@ Style target:
 | Folder | File | Purpose |
 |---|---|---|
 | `_concept/` | `scene_wasteland_city_modular_preview_01.png` | Overall modular city scene preview and art-direction target. |
+| `terrain/sheets/` | `terrain_ground_base_tiles_sheet_01.png` | Whole-map base land parcel / wasteland city ground sheet; use under all streets, blocks, buildings, and decals. |
 | `roads/sheets/` | `road_ground_tiles_sheet_01.png` | Road, intersection, sidewalk, curb, gutter, manhole, puddle, and pavement modules. |
 | `blocks/sheets/` | `block_district_tiles_sheet_01.png` | District block foundation tiles: non-walkable city block fill, edges, corners, cuts, and decals. |
 | `buildings/sheets/` | `building_modular_sheet_01.png` | Concept mixed building sheet; keep as visual reference, not the preferred slicing source. |
@@ -92,6 +93,37 @@ The remaining sheets under `assets/map` have also been split into transparent PN
 Each split run writes:
 - `*_manifest.json` with source sheet, crop boxes, and metadata.
 - `guides/*_split_preview.png` for visual review.
+
+## Scene Road Ground Base Refresh
+
+The 2026-05-07 street refresh follows `Doc/17` and `Doc/22`: the map now uses a whole-map `TerrainGroundBase` underlay first. Streets are expressed above it with road decals/overlays and readable block edges; they should not require building the entire map from separate road segment sprites.
+
+| Folder | Purpose |
+|---|---|
+| `terrain/sheets/terrain_ground_base_tiles_sheet_01.png` | Source sheet for whole-map base land/ground tiles. |
+| `terrain/ground/` | Runtime-ready 1024x1024 base terrain tiles plus preview images. Use as the lowest visual ground layer. |
+| `roads/sheets/road_ground_base_tiles_sheet_01.png` | Source sheet for whole-scene road-ground texture tiles. |
+| `roads/ground/` | Runtime-ready 1024x1024 road-surface texture tiles. Keep these as road-surface variants or references; do not treat them as the whole-map underlay. |
+| `roads/sheets/road_decor_overlays_sheet_01.png` | Source sheet for road decoration decals. |
+| `roads/overlays/` | Transparent overlay decals for lane remnants, cracks, stains, drains, rubble, skid marks, and edge dirt. |
+| `blocks/sheets/block_district_tiles_sheet_02.png` | Refreshed block foundation and curb source sheet for the new road scale. |
+| `blocks/fill/`, `blocks/edge/`, `blocks/cut/`, `blocks/overlay/` | Additional block foundation, curb, entrance gap, ramp, and rubble/decal pieces. |
+| `roads/base/` | Transitional/manual road-piece outputs from the earlier pass; use only for special-case placement, not as the main map ground. |
+
+Use `terrain/ground/terrain_ground_base_tile_1024_01.png` through `_06.png` as the visual underlay under `WorldRoot/MapVisual/TerrainGroundBase`. Avoid building the new map from the older `road_straight/road_corner/road_t_junction/road_cross` pieces except as special-case intersection references. Decorations in `roads/overlays/` are visual-only and should not define navigation or collision.
+
+`RunScene.tscn` now keeps `RoadVisualGenerator.visual_mode = "street_decor"` so it places transparent street decals over the whole-map terrain instead of covering street rectangles with `roads/ground` tiles.
+
+New manifests:
+- `terrain/terrain_ground_base_tiles_sheet_01_manifest.json`
+- `roads/road_ground_base_tiles_sheet_01_manifest.json`
+- `roads/road_ground_base_large_sheet_01_manifest.json`
+- `roads/road_decor_overlays_sheet_01_manifest.json`
+- `blocks/block_district_tiles_sheet_02_manifest.json`
+
+Runtime catalog:
+- `roads/road_runtime_asset_catalog.json` lists the refreshed road/block runtime assets with size, semantic role, collision policy, and recommended Godot visual node.
+- `roads/guides/road_runtime_asset_contact_sheet_01.png` is a quick visual audit sheet for the refreshed runtime outputs.
 
 ## Building Assembly Notes
 

@@ -246,6 +246,76 @@ RunScene
   RunUIRoot
 ```
 
+### 5.2.1 V0.1 白盒地图节点规则
+
+当前 V0.1 白盒地图使用 `WhiteboxMapRect` 作为地图块编辑节点。该节点应是 `Node2D`，不是 `Area2D`。
+
+```text
+StreetWalkable 下的 WhiteboxMapRect 表示可通行街道/广场。
+BlockSolid 下的 WhiteboxMapRect 表示默认不可进入街区。
+Buildings 下的 WhiteboxMapRect 可用于家、前哨、建筑视觉或后续可进入例外区。
+OutpostCandidates 下的点位用于前哨候选位置。
+```
+
+碰撞生成规则：
+
+```text
+运行时根据 BlockSolid 生成实体碰撞。
+家安全区和前哨候选区是可进入例外区。
+当例外区压在 BlockSolid 上时，运行时会从街区碰撞中切出对应矩形。
+玩家移动白名单同时包含街道、广场、家安全区和前哨候选区。
+```
+
+重要约束：
+
+```text
+不要给 WhiteboxMapRect 保存 CollisionShape2D 子节点作为白盒地图编辑入口。
+地图编辑优先选择 WhiteboxMapRect 父节点，修改 position 与 size_units。
+运行时碰撞由 RunScene 根据 WhiteboxMapRect 数据生成，不保存在白盒编辑节点下。
+```
+
+### 5.2.2 地图美术分层规则
+
+`RunScene` 中地图相关节点按“规则层”和“表现层”拆分：
+
+```text
+WorldRoot
+  MapLayout              # 白盒规则层，只保存地图数据、点位和可编辑矩形
+    StreetWalkable
+    BlockSolid
+    Buildings
+    Points
+  MapVisual              # 地图表现层，只放美术显示，不决定玩法碰撞
+    RoadVisual           # 道路 tile、广场地面、斑马线、井盖
+      ManualRoadPieces   # 手工拼接道路资源，用于确定正式道路尺寸和资源用法
+    BlockVisual          # 街区地块贴图、不可进入大块视觉
+    BuildingVisual       # 家、前哨站、楼房主体
+    PropVisual           # 路灯、路障、垃圾桶、围栏等摆件
+    DecalVisual          # 裂痕、血迹、涂鸦、水渍等地表叠加物
+  MapLights              # 地图灯光层
+    StreetLights
+    BuildingLights
+    AmbientLights
+```
+
+落地规则：
+
+```text
+MapLayout 是权威布局来源。
+MapVisual 可以由脚本根据 MapLayout 自动生成，也可以后续放少量手工摆放的装饰节点。
+正式美术资源不要反向承担碰撞职责，碰撞仍由 BlockSolid / Buildings / 特殊交互对象生成。
+路灯、建筑灯、氛围光放入 MapLights，不混入 RoadVisual 或 BlockVisual。
+```
+
+2026-05-07 起，左下角区域先作为正式资源试验区：
+
+```text
+道路：使用 res://assets/map/roads/tiles/ 下的道路资源按邻接关系生成。
+当前自动生成默认关闭，先允许在 RoadVisual/ManualRoadPieces 下手工拼接参考版。
+街区：暂时保持白盒灰块，不生成正式 plot 资源。
+白盒灰图仍保留在下层，便于对照尺寸与继续调图。
+```
+
 ---
 
 ## 5.3 SettlementScene 或 SettlementPanel
@@ -643,3 +713,48 @@ UI View。
 ```
 
 这样能让每个模块可测试、可替换、可继续扩展。
+## 2026-05-07 V0.1 道路视觉层落地
+
+`RunScene` 的道路视觉层采用 `WorldRoot/MapVisual/RoadVisual` 统一生成。
+
+当前推荐结构：
+
+```text
+WorldRoot
+└── MapVisual
+    └── RoadVisual
+        └── RoadGround_*     # 运行时/编辑器预览生成，不手工维护
+```
+
+`RoadVisual` 挂载 `res://scripts/map/road_visual_generator.gd`：
+
+- `enabled = true`
+- `visual_mode = "ground_field"`
+- `ground_tile_units = Vector2(16, 16)`
+
+该模式使用 `res://assets/map/roads/ground` 下的无缝地面 tile，按 `StreetWalkable` 整块铺满道路底图。它只负责视觉，不改变 `MapLayout`、点位、碰撞和玩家通行规则。
+
+旧的 `cell_tiles` 模式保留为实验用途，但 V0.1 不再默认使用，避免直路/路口资源不足时产生碎裂和错贴。
+
+## 2026-05-07 V0.1 街区块视觉层试替换
+
+街区块的正式美术不直接替换 `MapLayout/BlockSolid` 节点。`BlockSolid` 继续负责：
+
+- 白盒尺寸锚点；
+- 编辑器中移动/缩放；
+- 街区不可进入碰撞；
+- 家/前哨可进入例外区的碰撞开洞依据。
+
+正式街区资源生成到：
+
+```text
+WorldRoot
+└── MapVisual
+    └── BlockVisual
+        └── {BlockSolid 节点名}_Art
+            ├── SingleFill
+```
+
+当前对 `WorldRoot/MapLayout/BlockSolid` 下所有街区块启用，用于验证全图街区主体资源比例。每个街区生成一个 `{BlockSolid 节点名}_Art`，内部暂时只使用单张填充图缩放到对应白盒尺寸。
+
+注意：`block_corner_outer_01.png` 自带大面积内填充，放在当前“只补边框”的结构里会形成过重的方形角块；`block_corner_outer_round_01.png` 与当前直边比例也尚未完全匹配。直边 edge 资源重复摆放后也会干扰街区主体视觉判断。因此 V0.1 试替换阶段暂时关闭 edge、corner、入口缺口和废墟叠加，只保留街区主体填充图。等确认正确的边角/门口专用资源后再恢复。

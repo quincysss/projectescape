@@ -1,0 +1,1077 @@
+{
+  "schema": "project_escape.map_runtime_asset_catalog.v1",
+  "created_on": "2026-05-07",
+  "doc_references": [
+    "Doc/17_???????GPT???????_???_??????.md",
+    "Doc/22_????????_??????.md",
+    "Doc/03_????????/02_?????????.md"
+  ],
+  "unit_px": 64,
+  "strategy": "RoadGroundBase tiled under BlockVisual; road overlays are visual-only decals; block visuals mirror WhiteboxMapRect collision but do not author collision themselves.",
+  "items": [
+    {
+      "name": "road_ground_base_tile_1024_01",
+      "path": "res://assets/map/roads/ground/road_ground_base_tile_1024_01.png",
+      "category": "roads",
+      "subcategory": "ground",
+      "size_px": [
+        1024,
+        1024
+      ],
+      "size_units_at_64px": [
+        16.0,
+        16.0
+      ],
+      "has_alpha": false,
+      "role": "whole_scene_road_ground_tile",
+      "collision_policy": "none_visual_ground_only",
+      "recommended_node": "WorldRoot/MapVisual/RoadVisual/RoadGroundBase",
+      "usage_note": "Tile across Street_RoadField_280x158; blocks cover it to reveal streets."
+    },
+    {
+      "name": "road_ground_base_tile_1024_02",
+      "path": "res://assets/map/roads/ground/road_ground_base_tile_1024_02.png",
+      "category": "roads",
+      "subcategory": "ground",
+      "size_px": [
+        1024,
+        1024
+      ],
+      "size_units_at_64px": [
+        16.0,
+        16.0
+      ],
+      "has_alpha": false,
+      "role": "whole_scene_road_ground_tile",
+      "collision_policy": "none_visual_ground_only",
+      "recommended_node": "WorldRoot/MapVisual/RoadVisual/RoadGroundBase",
+      "usage_note": "Tile across Street_RoadField_280x158; blocks cover it to reveal streets."
+    },
+    {
+      "name": "road_ground_base_tile_1024_03",
+      "path": "res://assets/map/roads/ground/road_ground_base_tile_1024_03.png",
+      "category": "roads",
+      "subcategory": "ground",
+      "size_px": [
+        1024,
+        1024
+      ],
+      "size_units_at_64px": [
+        16.0,
+        16.0
+      ],
+      "has_alpha": false,
+      "role": "whole_scene_road_ground_tile",
+      "collision_policy": "none_visual_ground_only",
+      "recommended_node": "WorldRoot/MapVisual/RoadVisual/RoadGroundBase",
+      "usage_note": "Tile across Street_RoadField_280x158; blocks cover it to reveal streets."
+    },
+    {
+      "name": "road_ground_field_280x158_preview_4096",
+      "path": "res://assets/map/roads/ground/road_ground_field_280x158_preview_4096.png",
+      "category": "roads",
+      "subcategory": "ground",
+      "size_px": [
+        4096,
+        2311
+      ],
+      "size_units_at_64px": [
+        64.0,
+        36.11
+      ],
+      "has_alpha": false,
+      "role": "whole_scene_road_ground_tile",
+      "collision_policy": "none_visual_ground_only",
+      "recommended_node": "WorldRoot/MapVisual/RoadVisual/RoadGroundBase",
+      "usage_note": "Tile across Street_RoadField_280x158; blocks cover it to reveal streets."
+    },
+    {
+      "name": "road_base_alley_horizontal_01",
+      "path": "res://assets/map/roads/base/road_base_alley_horizontal_01.png",
+      "category": "roads",
+      "subcategory": "base",
+      "size_px": [
+        383,
+        77
+      ],
+      "size_units_at_64px": [
+        5.98,
+        1.2
+      ],
+      "has_alpha": true,
+      "role": "manual_large_road_piece",
+      "collision_policy": "none_visual_reference_or_special_case",
+      "recommended_node": "WorldRoot/MapVisual/RoadVisual/ManualRoadPieces",
+      "usage_note": "Special-case/manual placement only; not the default road construction method."
+    },
+    {
+      "name": "road_base_alley_vertical_01",
+      "path": "res://assets/map/roads/base/road_base_alley_vertical_01.png",
+      "category": "roads",
+      "subcategory": "base",
+      "size_px": [
+        76,
+        396
+      ],
+      "size_units_at_64px": [
+        1.19,
+        6.19
+      ],
+      "has_alpha": true,
+      "role": "manual_large_road_piece",
+      "collision_policy": "none_visual_reference_or_special_case",
+      "recommended_node": "WorldRoot/MapVisual/RoadVisual/ManualRoadPieces",
+      "usage_note": "Special-case/manual placement only; not the default road construction method."
+    },
+    {
+      "name": "road_base_cross_intersection_large_01",
+      "path": "res://assets/map/roads/base/road_base_cross_intersection_large_01.png",
+      "category": "roads",
+      "subcategory": "base",
+      "size_px": [
+        509,
+        283
+      ],
+      "size_units_at_64px": [
+        7.95,
+        4.42
+      ],
+      "has_alpha": true,
+      "role": "manual_large_road_piece",
+      "collision_policy": "none_visual_reference_or_special_case",
+      "recommended_node": "WorldRoot/MapVisual/RoadVisual/ManualRoadPieces",
+      "usage_note": "Special-case/manual placement only; not the default road construction method."
+    },
+    {
+      "name": "road_base_home_plaza_01",
+      "path": "res://assets/map/roads/base/road_base_home_plaza_01.png",
+      "category": "roads",
+      "subcategory": "base",
+      "size_px": [
+        378,
+        354
+      ],
+      "size_units_at_64px": [
+        5.91,
+        5.53
+      ],
+      "has_alpha": true,
+      "role": "manual_large_road_piece",
+      "collision_policy": "none_visual_reference_or_special_case",
+      "recommended_node": "WorldRoot/MapVisual/RoadVisual/ManualRoadPieces",
+      "usage_note": "Special-case/manual placement only; not the default road construction method."
+    },
+    {
+      "name": "road_base_main_horizontal_01",
+      "path": "res://assets/map/roads/base/road_base_main_horizontal_01.png",
+      "category": "roads",
+      "subcategory": "base",
+      "size_px": [
+        1231,
+        214
+      ],
+      "size_units_at_64px": [
+        19.23,
+        3.34
+      ],
+      "has_alpha": true,
+      "role": "manual_large_road_piece",
+      "collision_policy": "none_visual_reference_or_special_case",
+      "recommended_node": "WorldRoot/MapVisual/RoadVisual/ManualRoadPieces",
+      "usage_note": "Special-case/manual placement only; not the default road construction method."
+    },
+    {
+      "name": "road_base_main_vertical_01",
+      "path": "res://assets/map/roads/base/road_base_main_vertical_01.png",
+      "category": "roads",
+      "subcategory": "base",
+      "size_px": [
+        212,
+        681
+      ],
+      "size_units_at_64px": [
+        3.31,
+        10.64
+      ],
+      "has_alpha": true,
+      "role": "manual_large_road_piece",
+      "collision_policy": "none_visual_reference_or_special_case",
+      "recommended_node": "WorldRoot/MapVisual/RoadVisual/ManualRoadPieces",
+      "usage_note": "Special-case/manual placement only; not the default road construction method."
+    },
+    {
+      "name": "road_base_main_vertical_02",
+      "path": "res://assets/map/roads/base/road_base_main_vertical_02.png",
+      "category": "roads",
+      "subcategory": "base",
+      "size_px": [
+        154,
+        478
+      ],
+      "size_units_at_64px": [
+        2.41,
+        7.47
+      ],
+      "has_alpha": true,
+      "role": "manual_large_road_piece",
+      "collision_policy": "none_visual_reference_or_special_case",
+      "recommended_node": "WorldRoot/MapVisual/RoadVisual/ManualRoadPieces",
+      "usage_note": "Special-case/manual placement only; not the default road construction method."
+    },
+    {
+      "name": "road_base_plaza_rect_01",
+      "path": "res://assets/map/roads/base/road_base_plaza_rect_01.png",
+      "category": "roads",
+      "subcategory": "base",
+      "size_px": [
+        412,
+        191
+      ],
+      "size_units_at_64px": [
+        6.44,
+        2.98
+      ],
+      "has_alpha": true,
+      "role": "manual_large_road_piece",
+      "collision_policy": "none_visual_reference_or_special_case",
+      "recommended_node": "WorldRoot/MapVisual/RoadVisual/ManualRoadPieces",
+      "usage_note": "Special-case/manual placement only; not the default road construction method."
+    },
+    {
+      "name": "road_base_secondary_horizontal_01",
+      "path": "res://assets/map/roads/base/road_base_secondary_horizontal_01.png",
+      "category": "roads",
+      "subcategory": "base",
+      "size_px": [
+        393,
+        199
+      ],
+      "size_units_at_64px": [
+        6.14,
+        3.11
+      ],
+      "has_alpha": true,
+      "role": "manual_large_road_piece",
+      "collision_policy": "none_visual_reference_or_special_case",
+      "recommended_node": "WorldRoot/MapVisual/RoadVisual/ManualRoadPieces",
+      "usage_note": "Special-case/manual placement only; not the default road construction method."
+    },
+    {
+      "name": "road_base_secondary_horizontal_02",
+      "path": "res://assets/map/roads/base/road_base_secondary_horizontal_02.png",
+      "category": "roads",
+      "subcategory": "base",
+      "size_px": [
+        362,
+        124
+      ],
+      "size_units_at_64px": [
+        5.66,
+        1.94
+      ],
+      "has_alpha": true,
+      "role": "manual_large_road_piece",
+      "collision_policy": "none_visual_reference_or_special_case",
+      "recommended_node": "WorldRoot/MapVisual/RoadVisual/ManualRoadPieces",
+      "usage_note": "Special-case/manual placement only; not the default road construction method."
+    },
+    {
+      "name": "road_base_secondary_vertical_01",
+      "path": "res://assets/map/roads/base/road_base_secondary_vertical_01.png",
+      "category": "roads",
+      "subcategory": "base",
+      "size_px": [
+        102,
+        447
+      ],
+      "size_units_at_64px": [
+        1.59,
+        6.98
+      ],
+      "has_alpha": true,
+      "role": "manual_large_road_piece",
+      "collision_policy": "none_visual_reference_or_special_case",
+      "recommended_node": "WorldRoot/MapVisual/RoadVisual/ManualRoadPieces",
+      "usage_note": "Special-case/manual placement only; not the default road construction method."
+    },
+    {
+      "name": "road_base_transition_6_to_4_01",
+      "path": "res://assets/map/roads/base/road_base_transition_6_to_4_01.png",
+      "category": "roads",
+      "subcategory": "base",
+      "size_px": [
+        447,
+        126
+      ],
+      "size_units_at_64px": [
+        6.98,
+        1.97
+      ],
+      "has_alpha": true,
+      "role": "manual_large_road_piece",
+      "collision_policy": "none_visual_reference_or_special_case",
+      "recommended_node": "WorldRoot/MapVisual/RoadVisual/ManualRoadPieces",
+      "usage_note": "Special-case/manual placement only; not the default road construction method."
+    },
+    {
+      "name": "road_base_transition_8_to_6_01",
+      "path": "res://assets/map/roads/base/road_base_transition_8_to_6_01.png",
+      "category": "roads",
+      "subcategory": "base",
+      "size_px": [
+        441,
+        197
+      ],
+      "size_units_at_64px": [
+        6.89,
+        3.08
+      ],
+      "has_alpha": true,
+      "role": "manual_large_road_piece",
+      "collision_policy": "none_visual_reference_or_special_case",
+      "recommended_node": "WorldRoot/MapVisual/RoadVisual/ManualRoadPieces",
+      "usage_note": "Special-case/manual placement only; not the default road construction method."
+    },
+    {
+      "name": "road_overlay_branching_crack_01",
+      "path": "res://assets/map/roads/overlays/road_overlay_branching_crack_01.png",
+      "category": "roads",
+      "subcategory": "overlays",
+      "size_px": [
+        210,
+        313
+      ],
+      "size_units_at_64px": [
+        3.28,
+        4.89
+      ],
+      "has_alpha": true,
+      "role": "road_visual_decal_overlay",
+      "collision_policy": "none_visual_decal_only",
+      "recommended_node": "WorldRoot/MapVisual/RoadVisual/RoadDecals",
+      "usage_note": "Place above RoadGroundBase for cracks, grime, markings, drains, rubble, and edge dirt."
+    },
+    {
+      "name": "road_overlay_broken_lane_short_01",
+      "path": "res://assets/map/roads/overlays/road_overlay_broken_lane_short_01.png",
+      "category": "roads",
+      "subcategory": "overlays",
+      "size_px": [
+        37,
+        120
+      ],
+      "size_units_at_64px": [
+        0.58,
+        1.88
+      ],
+      "has_alpha": true,
+      "role": "road_visual_decal_overlay",
+      "collision_policy": "none_visual_decal_only",
+      "recommended_node": "WorldRoot/MapVisual/RoadVisual/RoadDecals",
+      "usage_note": "Place above RoadGroundBase for cracks, grime, markings, drains, rubble, and edge dirt."
+    },
+    {
+      "name": "road_overlay_crosswalk_remnant_01",
+      "path": "res://assets/map/roads/overlays/road_overlay_crosswalk_remnant_01.png",
+      "category": "roads",
+      "subcategory": "overlays",
+      "size_px": [
+        216,
+        271
+      ],
+      "size_units_at_64px": [
+        3.38,
+        4.23
+      ],
+      "has_alpha": true,
+      "role": "road_visual_decal_overlay",
+      "collision_policy": "none_visual_decal_only",
+      "recommended_node": "WorldRoot/MapVisual/RoadVisual/RoadDecals",
+      "usage_note": "Place above RoadGroundBase for cracks, grime, markings, drains, rubble, and edge dirt."
+    },
+    {
+      "name": "road_overlay_curb_chip_strip_01",
+      "path": "res://assets/map/roads/overlays/road_overlay_curb_chip_strip_01.png",
+      "category": "roads",
+      "subcategory": "overlays",
+      "size_px": [
+        440,
+        80
+      ],
+      "size_units_at_64px": [
+        6.88,
+        1.25
+      ],
+      "has_alpha": true,
+      "role": "road_visual_decal_overlay",
+      "collision_policy": "none_visual_decal_only",
+      "recommended_node": "WorldRoot/MapVisual/RoadVisual/RoadDecals",
+      "usage_note": "Place above RoadGroundBase for cracks, grime, markings, drains, rubble, and edge dirt."
+    },
+    {
+      "name": "road_overlay_dust_stain_01",
+      "path": "res://assets/map/roads/overlays/road_overlay_dust_stain_01.png",
+      "category": "roads",
+      "subcategory": "overlays",
+      "size_px": [
+        193,
+        190
+      ],
+      "size_units_at_64px": [
+        3.02,
+        2.97
+      ],
+      "has_alpha": true,
+      "role": "road_visual_decal_overlay",
+      "collision_policy": "none_visual_decal_only",
+      "recommended_node": "WorldRoot/MapVisual/RoadVisual/RoadDecals",
+      "usage_note": "Place above RoadGroundBase for cracks, grime, markings, drains, rubble, and edge dirt."
+    },
+    {
+      "name": "road_overlay_edge_dirt_horizontal_01",
+      "path": "res://assets/map/roads/overlays/road_overlay_edge_dirt_horizontal_01.png",
+      "category": "roads",
+      "subcategory": "overlays",
+      "size_px": [
+        571,
+        130
+      ],
+      "size_units_at_64px": [
+        8.92,
+        2.03
+      ],
+      "has_alpha": true,
+      "role": "road_visual_decal_overlay",
+      "collision_policy": "none_visual_decal_only",
+      "recommended_node": "WorldRoot/MapVisual/RoadVisual/RoadDecals",
+      "usage_note": "Place above RoadGroundBase for cracks, grime, markings, drains, rubble, and edge dirt."
+    },
+    {
+      "name": "road_overlay_edge_dirt_vertical_01",
+      "path": "res://assets/map/roads/overlays/road_overlay_edge_dirt_vertical_01.png",
+      "category": "roads",
+      "subcategory": "overlays",
+      "size_px": [
+        94,
+        780
+      ],
+      "size_units_at_64px": [
+        1.47,
+        12.19
+      ],
+      "has_alpha": true,
+      "role": "road_visual_decal_overlay",
+      "collision_policy": "none_visual_decal_only",
+      "recommended_node": "WorldRoot/MapVisual/RoadVisual/RoadDecals",
+      "usage_note": "Place above RoadGroundBase for cracks, grime, markings, drains, rubble, and edge dirt."
+    },
+    {
+      "name": "road_overlay_faded_arrow_01",
+      "path": "res://assets/map/roads/overlays/road_overlay_faded_arrow_01.png",
+      "category": "roads",
+      "subcategory": "overlays",
+      "size_px": [
+        414,
+        165
+      ],
+      "size_units_at_64px": [
+        6.47,
+        2.58
+      ],
+      "has_alpha": true,
+      "role": "road_visual_decal_overlay",
+      "collision_policy": "none_visual_decal_only",
+      "recommended_node": "WorldRoot/MapVisual/RoadVisual/RoadDecals",
+      "usage_note": "Place above RoadGroundBase for cracks, grime, markings, drains, rubble, and edge dirt."
+    },
+    {
+      "name": "road_overlay_lane_marking_strip_01",
+      "path": "res://assets/map/roads/overlays/road_overlay_lane_marking_strip_01.png",
+      "category": "roads",
+      "subcategory": "overlays",
+      "size_px": [
+        206,
+        51
+      ],
+      "size_units_at_64px": [
+        3.22,
+        0.8
+      ],
+      "has_alpha": true,
+      "role": "road_visual_decal_overlay",
+      "collision_policy": "none_visual_decal_only",
+      "recommended_node": "WorldRoot/MapVisual/RoadVisual/RoadDecals",
+      "usage_note": "Place above RoadGroundBase for cracks, grime, markings, drains, rubble, and edge dirt."
+    },
+    {
+      "name": "road_overlay_long_crack_01",
+      "path": "res://assets/map/roads/overlays/road_overlay_long_crack_01.png",
+      "category": "roads",
+      "subcategory": "overlays",
+      "size_px": [
+        484,
+        92
+      ],
+      "size_units_at_64px": [
+        7.56,
+        1.44
+      ],
+      "has_alpha": true,
+      "role": "road_visual_decal_overlay",
+      "collision_policy": "none_visual_decal_only",
+      "recommended_node": "WorldRoot/MapVisual/RoadVisual/RoadDecals",
+      "usage_note": "Place above RoadGroundBase for cracks, grime, markings, drains, rubble, and edge dirt."
+    },
+    {
+      "name": "road_overlay_manhole_01",
+      "path": "res://assets/map/roads/overlays/road_overlay_manhole_01.png",
+      "category": "roads",
+      "subcategory": "overlays",
+      "size_px": [
+        175,
+        172
+      ],
+      "size_units_at_64px": [
+        2.73,
+        2.69
+      ],
+      "has_alpha": true,
+      "role": "road_visual_decal_overlay",
+      "collision_policy": "none_visual_decal_only",
+      "recommended_node": "WorldRoot/MapVisual/RoadVisual/RoadDecals",
+      "usage_note": "Place above RoadGroundBase for cracks, grime, markings, drains, rubble, and edge dirt."
+    },
+    {
+      "name": "road_overlay_neon_scuff_01",
+      "path": "res://assets/map/roads/overlays/road_overlay_neon_scuff_01.png",
+      "category": "roads",
+      "subcategory": "overlays",
+      "size_px": [
+        260,
+        115
+      ],
+      "size_units_at_64px": [
+        4.06,
+        1.8
+      ],
+      "has_alpha": true,
+      "role": "road_visual_decal_overlay",
+      "collision_policy": "none_visual_decal_only",
+      "recommended_node": "WorldRoot/MapVisual/RoadVisual/RoadDecals",
+      "usage_note": "Place above RoadGroundBase for cracks, grime, markings, drains, rubble, and edge dirt."
+    },
+    {
+      "name": "road_overlay_oil_stain_01",
+      "path": "res://assets/map/roads/overlays/road_overlay_oil_stain_01.png",
+      "category": "roads",
+      "subcategory": "overlays",
+      "size_px": [
+        270,
+        211
+      ],
+      "size_units_at_64px": [
+        4.22,
+        3.3
+      ],
+      "has_alpha": true,
+      "role": "road_visual_decal_overlay",
+      "collision_policy": "none_visual_decal_only",
+      "recommended_node": "WorldRoot/MapVisual/RoadVisual/RoadDecals",
+      "usage_note": "Place above RoadGroundBase for cracks, grime, markings, drains, rubble, and edge dirt."
+    },
+    {
+      "name": "road_overlay_patch_plate_01",
+      "path": "res://assets/map/roads/overlays/road_overlay_patch_plate_01.png",
+      "category": "roads",
+      "subcategory": "overlays",
+      "size_px": [
+        259,
+        184
+      ],
+      "size_units_at_64px": [
+        4.05,
+        2.88
+      ],
+      "has_alpha": true,
+      "role": "road_visual_decal_overlay",
+      "collision_policy": "none_visual_decal_only",
+      "recommended_node": "WorldRoot/MapVisual/RoadVisual/RoadDecals",
+      "usage_note": "Place above RoadGroundBase for cracks, grime, markings, drains, rubble, and edge dirt."
+    },
+    {
+      "name": "road_overlay_rubble_scatter_01",
+      "path": "res://assets/map/roads/overlays/road_overlay_rubble_scatter_01.png",
+      "category": "roads",
+      "subcategory": "overlays",
+      "size_px": [
+        169,
+        158
+      ],
+      "size_units_at_64px": [
+        2.64,
+        2.47
+      ],
+      "has_alpha": true,
+      "role": "road_visual_decal_overlay",
+      "collision_policy": "none_visual_decal_only",
+      "recommended_node": "WorldRoot/MapVisual/RoadVisual/RoadDecals",
+      "usage_note": "Place above RoadGroundBase for cracks, grime, markings, drains, rubble, and edge dirt."
+    },
+    {
+      "name": "road_overlay_sewer_access_rect_01",
+      "path": "res://assets/map/roads/overlays/road_overlay_sewer_access_rect_01.png",
+      "category": "roads",
+      "subcategory": "overlays",
+      "size_px": [
+        224,
+        142
+      ],
+      "size_units_at_64px": [
+        3.5,
+        2.22
+      ],
+      "has_alpha": true,
+      "role": "road_visual_decal_overlay",
+      "collision_policy": "none_visual_decal_only",
+      "recommended_node": "WorldRoot/MapVisual/RoadVisual/RoadDecals",
+      "usage_note": "Place above RoadGroundBase for cracks, grime, markings, drains, rubble, and edge dirt."
+    },
+    {
+      "name": "road_overlay_storm_drain_01",
+      "path": "res://assets/map/roads/overlays/road_overlay_storm_drain_01.png",
+      "category": "roads",
+      "subcategory": "overlays",
+      "size_px": [
+        203,
+        149
+      ],
+      "size_units_at_64px": [
+        3.17,
+        2.33
+      ],
+      "has_alpha": true,
+      "role": "road_visual_decal_overlay",
+      "collision_policy": "none_visual_decal_only",
+      "recommended_node": "WorldRoot/MapVisual/RoadVisual/RoadDecals",
+      "usage_note": "Place above RoadGroundBase for cracks, grime, markings, drains, rubble, and edge dirt."
+    },
+    {
+      "name": "road_overlay_tire_skid_marks_01",
+      "path": "res://assets/map/roads/overlays/road_overlay_tire_skid_marks_01.png",
+      "category": "roads",
+      "subcategory": "overlays",
+      "size_px": [
+        379,
+        140
+      ],
+      "size_units_at_64px": [
+        5.92,
+        2.19
+      ],
+      "has_alpha": true,
+      "role": "road_visual_decal_overlay",
+      "collision_policy": "none_visual_decal_only",
+      "recommended_node": "WorldRoot/MapVisual/RoadVisual/RoadDecals",
+      "usage_note": "Place above RoadGroundBase for cracks, grime, markings, drains, rubble, and edge dirt."
+    },
+    {
+      "name": "block_fill_clean_01",
+      "path": "res://assets/map/blocks/fill/block_fill_clean_01.png",
+      "category": "blocks",
+      "subcategory": "fill",
+      "size_px": [
+        256,
+        256
+      ],
+      "size_units_at_64px": [
+        4.0,
+        4.0
+      ],
+      "has_alpha": true,
+      "role": "non_walkable_block_fill_visual",
+      "collision_policy": "visual_matches_BlockSolid_runtime_collision",
+      "recommended_node": "WorldRoot/MapVisual/BlockVisual/BlockFill",
+      "usage_note": "Repeat inside Block_Ref rectangles; collision remains generated from WhiteboxMapRect."
+    },
+    {
+      "name": "block_fill_clean_02",
+      "path": "res://assets/map/blocks/fill/block_fill_clean_02.png",
+      "category": "blocks",
+      "subcategory": "fill",
+      "size_px": [
+        450,
+        438
+      ],
+      "size_units_at_64px": [
+        7.03,
+        6.84
+      ],
+      "has_alpha": true,
+      "role": "non_walkable_block_fill_visual",
+      "collision_policy": "visual_matches_BlockSolid_runtime_collision",
+      "recommended_node": "WorldRoot/MapVisual/BlockVisual/BlockFill",
+      "usage_note": "Repeat inside Block_Ref rectangles; collision remains generated from WhiteboxMapRect."
+    },
+    {
+      "name": "block_fill_cracked_01",
+      "path": "res://assets/map/blocks/fill/block_fill_cracked_01.png",
+      "category": "blocks",
+      "subcategory": "fill",
+      "size_px": [
+        256,
+        256
+      ],
+      "size_units_at_64px": [
+        4.0,
+        4.0
+      ],
+      "has_alpha": true,
+      "role": "non_walkable_block_fill_visual",
+      "collision_policy": "visual_matches_BlockSolid_runtime_collision",
+      "recommended_node": "WorldRoot/MapVisual/BlockVisual/BlockFill",
+      "usage_note": "Repeat inside Block_Ref rectangles; collision remains generated from WhiteboxMapRect."
+    },
+    {
+      "name": "block_fill_cracked_02",
+      "path": "res://assets/map/blocks/fill/block_fill_cracked_02.png",
+      "category": "blocks",
+      "subcategory": "fill",
+      "size_px": [
+        428,
+        438
+      ],
+      "size_units_at_64px": [
+        6.69,
+        6.84
+      ],
+      "has_alpha": true,
+      "role": "non_walkable_block_fill_visual",
+      "collision_policy": "visual_matches_BlockSolid_runtime_collision",
+      "recommended_node": "WorldRoot/MapVisual/BlockVisual/BlockFill",
+      "usage_note": "Repeat inside Block_Ref rectangles; collision remains generated from WhiteboxMapRect."
+    },
+    {
+      "name": "block_fill_dirty_01",
+      "path": "res://assets/map/blocks/fill/block_fill_dirty_01.png",
+      "category": "blocks",
+      "subcategory": "fill",
+      "size_px": [
+        256,
+        256
+      ],
+      "size_units_at_64px": [
+        4.0,
+        4.0
+      ],
+      "has_alpha": true,
+      "role": "non_walkable_block_fill_visual",
+      "collision_policy": "visual_matches_BlockSolid_runtime_collision",
+      "recommended_node": "WorldRoot/MapVisual/BlockVisual/BlockFill",
+      "usage_note": "Repeat inside Block_Ref rectangles; collision remains generated from WhiteboxMapRect."
+    },
+    {
+      "name": "block_fill_dirty_02",
+      "path": "res://assets/map/blocks/fill/block_fill_dirty_02.png",
+      "category": "blocks",
+      "subcategory": "fill",
+      "size_px": [
+        434,
+        438
+      ],
+      "size_units_at_64px": [
+        6.78,
+        6.84
+      ],
+      "has_alpha": true,
+      "role": "non_walkable_block_fill_visual",
+      "collision_policy": "visual_matches_BlockSolid_runtime_collision",
+      "recommended_node": "WorldRoot/MapVisual/BlockVisual/BlockFill",
+      "usage_note": "Repeat inside Block_Ref rectangles; collision remains generated from WhiteboxMapRect."
+    },
+    {
+      "name": "block_corner_inner_01",
+      "path": "res://assets/map/blocks/edge/block_corner_inner_01.png",
+      "category": "blocks",
+      "subcategory": "edge",
+      "size_px": [
+        256,
+        256
+      ],
+      "size_units_at_64px": [
+        4.0,
+        4.0
+      ],
+      "has_alpha": true,
+      "role": "block_curb_or_edge_visual",
+      "collision_policy": "visual_only_edge_for_BlockSolid_boundary",
+      "recommended_node": "WorldRoot/MapVisual/BlockVisual/BlockEdges",
+      "usage_note": "Use on BlockSolid borders to make street boundaries readable."
+    },
+    {
+      "name": "block_corner_inner_round_01",
+      "path": "res://assets/map/blocks/edge/block_corner_inner_round_01.png",
+      "category": "blocks",
+      "subcategory": "edge",
+      "size_px": [
+        167,
+        144
+      ],
+      "size_units_at_64px": [
+        2.61,
+        2.25
+      ],
+      "has_alpha": true,
+      "role": "block_curb_or_edge_visual",
+      "collision_policy": "visual_only_edge_for_BlockSolid_boundary",
+      "recommended_node": "WorldRoot/MapVisual/BlockVisual/BlockEdges",
+      "usage_note": "Use on BlockSolid borders to make street boundaries readable."
+    },
+    {
+      "name": "block_corner_outer_01",
+      "path": "res://assets/map/blocks/edge/block_corner_outer_01.png",
+      "category": "blocks",
+      "subcategory": "edge",
+      "size_px": [
+        256,
+        256
+      ],
+      "size_units_at_64px": [
+        4.0,
+        4.0
+      ],
+      "has_alpha": true,
+      "role": "block_curb_or_edge_visual",
+      "collision_policy": "visual_only_edge_for_BlockSolid_boundary",
+      "recommended_node": "WorldRoot/MapVisual/BlockVisual/BlockEdges",
+      "usage_note": "Use on BlockSolid borders to make street boundaries readable."
+    },
+    {
+      "name": "block_corner_outer_round_01",
+      "path": "res://assets/map/blocks/edge/block_corner_outer_round_01.png",
+      "category": "blocks",
+      "subcategory": "edge",
+      "size_px": [
+        178,
+        144
+      ],
+      "size_units_at_64px": [
+        2.78,
+        2.25
+      ],
+      "has_alpha": true,
+      "role": "block_curb_or_edge_visual",
+      "collision_policy": "visual_only_edge_for_BlockSolid_boundary",
+      "recommended_node": "WorldRoot/MapVisual/BlockVisual/BlockEdges",
+      "usage_note": "Use on BlockSolid borders to make street boundaries readable."
+    },
+    {
+      "name": "block_edge_broken_gap_01",
+      "path": "res://assets/map/blocks/edge/block_edge_broken_gap_01.png",
+      "category": "blocks",
+      "subcategory": "edge",
+      "size_px": [
+        323,
+        83
+      ],
+      "size_units_at_64px": [
+        5.05,
+        1.3
+      ],
+      "has_alpha": true,
+      "role": "block_curb_or_edge_visual",
+      "collision_policy": "visual_only_edge_for_BlockSolid_boundary",
+      "recommended_node": "WorldRoot/MapVisual/BlockVisual/BlockEdges",
+      "usage_note": "Use on BlockSolid borders to make street boundaries readable."
+    },
+    {
+      "name": "block_edge_straight_01",
+      "path": "res://assets/map/blocks/edge/block_edge_straight_01.png",
+      "category": "blocks",
+      "subcategory": "edge",
+      "size_px": [
+        256,
+        256
+      ],
+      "size_units_at_64px": [
+        4.0,
+        4.0
+      ],
+      "has_alpha": true,
+      "role": "block_curb_or_edge_visual",
+      "collision_policy": "visual_only_edge_for_BlockSolid_boundary",
+      "recommended_node": "WorldRoot/MapVisual/BlockVisual/BlockEdges",
+      "usage_note": "Use on BlockSolid borders to make street boundaries readable."
+    },
+    {
+      "name": "block_edge_straight_long_02",
+      "path": "res://assets/map/blocks/edge/block_edge_straight_long_02.png",
+      "category": "blocks",
+      "subcategory": "edge",
+      "size_px": [
+        443,
+        86
+      ],
+      "size_units_at_64px": [
+        6.92,
+        1.34
+      ],
+      "has_alpha": true,
+      "role": "block_curb_or_edge_visual",
+      "collision_policy": "visual_only_edge_for_BlockSolid_boundary",
+      "recommended_node": "WorldRoot/MapVisual/BlockVisual/BlockEdges",
+      "usage_note": "Use on BlockSolid borders to make street boundaries readable."
+    },
+    {
+      "name": "block_sidewalk_strip_01",
+      "path": "res://assets/map/blocks/edge/block_sidewalk_strip_01.png",
+      "category": "blocks",
+      "subcategory": "edge",
+      "size_px": [
+        353,
+        84
+      ],
+      "size_units_at_64px": [
+        5.52,
+        1.31
+      ],
+      "has_alpha": true,
+      "role": "block_curb_or_edge_visual",
+      "collision_policy": "visual_only_edge_for_BlockSolid_boundary",
+      "recommended_node": "WorldRoot/MapVisual/BlockVisual/BlockEdges",
+      "usage_note": "Use on BlockSolid borders to make street boundaries readable."
+    },
+    {
+      "name": "block_alley_cut_01",
+      "path": "res://assets/map/blocks/cut/block_alley_cut_01.png",
+      "category": "blocks",
+      "subcategory": "cut",
+      "size_px": [
+        256,
+        256
+      ],
+      "size_units_at_64px": [
+        4.0,
+        4.0
+      ],
+      "has_alpha": true,
+      "role": "block_entry_cut_or_ramp_visual",
+      "collision_policy": "visual_only_do_not_open_collision_without_layout_data",
+      "recommended_node": "WorldRoot/MapVisual/BlockVisual/BlockCuts",
+      "usage_note": "Use for driveway, entrance gap, alley cut, or safe/outpost approach visuals."
+    },
+    {
+      "name": "block_cut_driveway_ramp_02",
+      "path": "res://assets/map/blocks/cut/block_cut_driveway_ramp_02.png",
+      "category": "blocks",
+      "subcategory": "cut",
+      "size_px": [
+        345,
+        94
+      ],
+      "size_units_at_64px": [
+        5.39,
+        1.47
+      ],
+      "has_alpha": true,
+      "role": "block_entry_cut_or_ramp_visual",
+      "collision_policy": "visual_only_do_not_open_collision_without_layout_data",
+      "recommended_node": "WorldRoot/MapVisual/BlockVisual/BlockCuts",
+      "usage_note": "Use for driveway, entrance gap, alley cut, or safe/outpost approach visuals."
+    },
+    {
+      "name": "block_driveway_cut_01",
+      "path": "res://assets/map/blocks/cut/block_driveway_cut_01.png",
+      "category": "blocks",
+      "subcategory": "cut",
+      "size_px": [
+        256,
+        256
+      ],
+      "size_units_at_64px": [
+        4.0,
+        4.0
+      ],
+      "has_alpha": true,
+      "role": "block_entry_cut_or_ramp_visual",
+      "collision_policy": "visual_only_do_not_open_collision_without_layout_data",
+      "recommended_node": "WorldRoot/MapVisual/BlockVisual/BlockCuts",
+      "usage_note": "Use for driveway, entrance gap, alley cut, or safe/outpost approach visuals."
+    },
+    {
+      "name": "block_edge_entrance_gap_01",
+      "path": "res://assets/map/blocks/cut/block_edge_entrance_gap_01.png",
+      "category": "blocks",
+      "subcategory": "cut",
+      "size_px": [
+        463,
+        87
+      ],
+      "size_units_at_64px": [
+        7.23,
+        1.36
+      ],
+      "has_alpha": true,
+      "role": "block_entry_cut_or_ramp_visual",
+      "collision_policy": "visual_only_do_not_open_collision_without_layout_data",
+      "recommended_node": "WorldRoot/MapVisual/BlockVisual/BlockCuts",
+      "usage_note": "Use for driveway, entrance gap, alley cut, or safe/outpost approach visuals."
+    },
+    {
+      "name": "block_decal_cracks_01",
+      "path": "res://assets/map/blocks/overlay/block_decal_cracks_01.png",
+      "category": "blocks",
+      "subcategory": "overlay",
+      "size_px": [
+        256,
+        256
+      ],
+      "size_units_at_64px": [
+        4.0,
+        4.0
+      ],
+      "has_alpha": true,
+      "role": "block_overlay_decal",
+      "collision_policy": "none_visual_decal_only",
+      "recommended_node": "WorldRoot/MapVisual/BlockVisual/BlockDecals",
+      "usage_note": "Decorative overlay on block foundations."
+    },
+    {
+      "name": "block_overlay_cracked_tile_02",
+      "path": "res://assets/map/blocks/overlay/block_overlay_cracked_tile_02.png",
+      "category": "blocks",
+      "subcategory": "overlay",
+      "size_px": [
+        164,
+        143
+      ],
+      "size_units_at_64px": [
+        2.56,
+        2.23
+      ],
+      "has_alpha": true,
+      "role": "block_overlay_decal",
+      "collision_policy": "none_visual_decal_only",
+      "recommended_node": "WorldRoot/MapVisual/BlockVisual/BlockDecals",
+      "usage_note": "Decorative overlay on block foundations."
+    },
+    {
+      "name": "block_rubble_patch_02",
+      "path": "res://assets/map/blocks/overlay/block_rubble_patch_02.png",
+      "category": "blocks",
+      "subcategory": "overlay",
+      "size_px": [
+        519,
+        178
+      ],
+      "size_units_at_64px": [
+        8.11,
+        2.78
+      ],
+      "has_alpha": true,
+      "role": "block_overlay_decal",
+      "collision_policy": "none_visual_decal_only",
+      "recommended_node": "WorldRoot/MapVisual/BlockVisual/BlockDecals",
+      "usage_note": "Decorative overlay on block foundations."
+    }
+  ]
+}

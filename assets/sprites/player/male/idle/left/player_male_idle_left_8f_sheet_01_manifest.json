@@ -1,0 +1,230 @@
+{
+  "source_sheet": "K:\\ProjectEscape\\project-escape\\assets\\sprites\\player\\male\\idle\\left\\player_male_idle_left_8f_sheet_01.png",
+  "source_chroma_sheet": "K:\\ProjectEscape\\project-escape\\assets\\sprites\\player\\male\\_work\\idle\\left\\player_male_idle_left_8f_sheet_01_chroma.png",
+  "source_transparent_sheet": "K:\\ProjectEscape\\project-escape\\assets\\sprites\\player\\male\\_work\\idle\\left\\player_male_idle_left_8f_sheet_source_01.png",
+  "reference_frame": "K:\\ProjectEscape\\project-escape\\assets\\sprites\\player\\male\\base\\directions\\player_male_idle_left_01.png",
+  "notes": "Male protagonist left-facing idle breathing animation. Eight frames in a single horizontal row, normalized to the existing 256x256 left idle frame's visual height and foot baseline.",
+  "metadata": {
+    "asset_type": "character_animation_sprite",
+    "character": "player_male",
+    "direction": "left",
+    "animation": "idle",
+    "frame_count": 8,
+    "frame_size": [
+      256,
+      256
+    ],
+    "sheet_size": [
+      2048,
+      256
+    ],
+    "sheet_layout": "8x1",
+    "recommended_fps": 8,
+    "loop_mode": "pingless_loop",
+    "anchor_policy": "feet baseline aligned to y=244, centered to the original side idle frame",
+    "motion_standard": "subtle breathing only: slight chest and shoulder rise, backpack follows with 1-2px perceived float, no steps or direction change",
+    "positive_constraints": [
+      "same character identity across all frames",
+      "same side-profile hair, backpack, straps, dirty grey shirt, black shorts, worn sneakers, purple and blue electronic accents",
+      "left-facing side direction only",
+      "full body visible in every frame",
+      "feet remain visually planted on the same baseline",
+      "backpack shape and side silhouette stay consistent"
+    ],
+    "negative_constraints": [
+      "no extra limbs or missing limbs",
+      "no duplicate arms, legs, or heads",
+      "no face reveal, front-facing pose, or back-facing pose",
+      "no new backpack shape, accessories, weapons, or major costume changes",
+      "no walking, running, turning, leaning, or large pose shift",
+      "no text, labels, frame borders, grid lines, watermark, or logo",
+      "no green chroma-key edge pixels in final assets"
+    ]
+  },
+  "frames": [
+    {
+      "index": 1,
+      "id": "player_male_idle_left_8f_01_frame_01",
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\sprites\\player\\male\\idle\\left\\frames\\player_male_idle_left_8f_01_frame_01.png",
+      "sheet_box_xywh": [
+        0,
+        0,
+        256,
+        256
+      ],
+      "source_box_xyxy": [
+        78,
+        79,
+        260,
+        659
+      ],
+      "visible_bbox_xyxy": [
+        92,
+        14,
+        164,
+        244
+      ]
+    },
+    {
+      "index": 2,
+      "id": "player_male_idle_left_8f_01_frame_02",
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\sprites\\player\\male\\idle\\left\\frames\\player_male_idle_left_8f_01_frame_02.png",
+      "sheet_box_xywh": [
+        256,
+        0,
+        256,
+        256
+      ],
+      "source_box_xyxy": [
+        335,
+        79,
+        519,
+        659
+      ],
+      "visible_bbox_xyxy": [
+        92,
+        14,
+        165,
+        244
+      ]
+    },
+    {
+      "index": 3,
+      "id": "player_male_idle_left_8f_01_frame_03",
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\sprites\\player\\male\\idle\\left\\frames\\player_male_idle_left_8f_01_frame_03.png",
+      "sheet_box_xywh": [
+        512,
+        0,
+        256,
+        256
+      ],
+      "source_box_xyxy": [
+        601,
+        79,
+        788,
+        658
+      ],
+      "visible_bbox_xyxy": [
+        91,
+        14,
+        165,
+        244
+      ]
+    },
+    {
+      "index": 4,
+      "id": "player_male_idle_left_8f_01_frame_04",
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\sprites\\player\\male\\idle\\left\\frames\\player_male_idle_left_8f_01_frame_04.png",
+      "sheet_box_xywh": [
+        768,
+        0,
+        256,
+        256
+      ],
+      "source_box_xyxy": [
+        869,
+        79,
+        1054,
+        659
+      ],
+      "visible_bbox_xyxy": [
+        92,
+        14,
+        165,
+        244
+      ]
+    },
+    {
+      "index": 5,
+      "id": "player_male_idle_left_8f_01_frame_05",
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\sprites\\player\\male\\idle\\left\\frames\\player_male_idle_left_8f_01_frame_05.png",
+      "sheet_box_xywh": [
+        1024,
+        0,
+        256,
+        256
+      ],
+      "source_box_xyxy": [
+        1140,
+        79,
+        1324,
+        658
+      ],
+      "visible_bbox_xyxy": [
+        92,
+        14,
+        165,
+        244
+      ]
+    },
+    {
+      "index": 6,
+      "id": "player_male_idle_left_8f_01_frame_06",
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\sprites\\player\\male\\idle\\left\\frames\\player_male_idle_left_8f_01_frame_06.png",
+      "sheet_box_xywh": [
+        1280,
+        0,
+        256,
+        256
+      ],
+      "source_box_xyxy": [
+        1402,
+        79,
+        1586,
+        659
+      ],
+      "visible_bbox_xyxy": [
+        92,
+        14,
+        165,
+        244
+      ]
+    },
+    {
+      "index": 7,
+      "id": "player_male_idle_left_8f_01_frame_07",
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\sprites\\player\\male\\idle\\left\\frames\\player_male_idle_left_8f_01_frame_07.png",
+      "sheet_box_xywh": [
+        1536,
+        0,
+        256,
+        256
+      ],
+      "source_box_xyxy": [
+        1671,
+        79,
+        1855,
+        659
+      ],
+      "visible_bbox_xyxy": [
+        92,
+        14,
+        165,
+        244
+      ]
+    },
+    {
+      "index": 8,
+      "id": "player_male_idle_left_8f_01_frame_08",
+      "file": "K:\\ProjectEscape\\project-escape\\assets\\sprites\\player\\male\\idle\\left\\frames\\player_male_idle_left_8f_01_frame_08.png",
+      "sheet_box_xywh": [
+        1792,
+        0,
+        256,
+        256
+      ],
+      "source_box_xyxy": [
+        1932,
+        79,
+        2117,
+        659
+      ],
+      "visible_bbox_xyxy": [
+        92,
+        14,
+        165,
+        244
+      ]
+    }
+  ]
+}
