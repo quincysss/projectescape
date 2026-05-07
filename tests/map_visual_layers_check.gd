@@ -21,6 +21,8 @@ func _initialize() -> void:
 	ok = _require_node(root, "WorldRoot/MapLights/StreetLights") and ok
 	ok = _require_node(root, "WorldRoot/MapLights/BuildingLights") and ok
 	ok = _require_node(root, "WorldRoot/MapLights/AmbientLights") and ok
+	ok = _require_interactable_visual(root, "container", "ContainerWhiteboxVisual") and ok
+	ok = _require_interactable_visual(root, "material", "BuildMaterialWhiteboxVisual") and ok
 
 	var road_visual: Node = root.get_node_or_null("WorldRoot/MapVisual/RoadVisual")
 	var block_visual: Node = root.get_node_or_null("WorldRoot/MapVisual/BlockVisual")
@@ -59,6 +61,20 @@ func _require_node(root: Node, node_path: NodePath) -> bool:
 	if root.get_node_or_null(node_path) != null:
 		return true
 	printerr("Missing node: %s" % node_path)
+	return false
+
+func _require_interactable_visual(root: Node, interact_type: String, visual_name: String) -> bool:
+	for interactable in root.interactables:
+		if not is_instance_valid(interactable) or interactable.interact_type != interact_type:
+			continue
+		if interactable.get_node_or_null(visual_name) == null:
+			printerr("Missing %s visual on %s." % [visual_name, interactable.name])
+			return false
+		if interactable.get_node_or_null("WhiteboxMarkerLabel") == null:
+			printerr("Missing whitebox marker label on %s." % interactable.name)
+			return false
+		return true
+	printerr("Missing interactable type for visual check: %s" % interact_type)
 	return false
 
 func _count_layout_rects(root: Node, node_path: NodePath) -> int:

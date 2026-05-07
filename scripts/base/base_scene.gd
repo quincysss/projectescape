@@ -16,8 +16,8 @@ func _on_start_pressed() -> void:
 
 func _refresh() -> void:
 	if _game_state == null:
-		result_label.text = "Project Escape - Whitebox V0.1"
-		warehouse_label.text = "Warehouse: unavailable"
+		result_label.text = "Project Escape - 白盒 V0.1"
+		warehouse_label.text = "局外仓库：不可用"
 		return
-	result_label.text = _game_state.last_run_result if not _game_state.last_run_result.is_empty() else "Project Escape - Whitebox V0.1"
+	result_label.text = _game_state.last_run_result if not _game_state.last_run_result.is_empty() else "Project Escape - 白盒 V0.1"
 	warehouse_label.text = _game_state.get_warehouse_text()

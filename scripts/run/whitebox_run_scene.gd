@@ -4,6 +4,12 @@ const PlayerScript := preload("res://scripts/player/whitebox_player.gd")
 const InteractableScript := preload("res://scripts/run/whitebox_interactable.gd")
 const VisionCircleScript := preload("res://scripts/vision/vision_debug_circle.gd")
 const VisionMaskScript := preload("res://scripts/vision/vision_mask_overlay.gd")
+const LootInteractionControllerScript := preload("res://scripts/run/loot_interaction_controller.gd")
+const RunEndControllerScript := preload("res://scripts/run/run_end_controller.gd")
+const OutpostRepairControllerScript := preload("res://scripts/run/outpost_repair_controller.gd")
+const InteractionProgressControllerScript := preload("res://scripts/run/interaction_progress_controller.gd")
+const ContainerSpawnControllerScript := preload("res://scripts/run/container_spawn_controller.gd")
+const OutpostMaterialSpawnControllerScript := preload("res://scripts/run/outpost_material_spawn_controller.gd")
 const TerrainGroundTextures := [
 	preload("res://assets/map/terrain/ground/terrain_ground_base_tile_1024_01.png"),
 	preload("res://assets/map/terrain/ground/terrain_ground_base_tile_1024_02.png"),
@@ -32,6 +38,8 @@ const HOME_SIZE_UNITS := Vector2(10.0, 8.0)
 const HOME_SAFE_SIZE_UNITS := Vector2(12.0, 10.0)
 const OUTPOST_SIZE_UNITS := Vector2(10.0, 8.0)
 const RESOURCE_SIZE_UNITS := Vector2(1.0, 1.0)
+const CONTAINER_VISUAL_SIZE_UNITS := Vector2(2.4, 2.4)
+const MATERIAL_VISUAL_SIZE_UNITS := Vector2(2.0, 2.0)
 const MAIN_ROAD_WIDTH_UNITS := 8.0
 const SECONDARY_ROAD_WIDTH_UNITS := 6.0
 const ALLEY_WIDTH_UNITS := 4.0
@@ -40,6 +48,7 @@ const HOME_OVERVIEW_MAX_ZOOM := 0.11
 const HOME_OVERVIEW_MIN_ZOOM := 0.025
 const HOME_OVERVIEW_PADDING_UNITS := Vector2(0.0, 0.0)
 const CAMERA_TRANSITION_SECONDS := 0.5
+const OUTPOST_REPAIR_HOLD_SECONDS := 1.5
 const SHOW_DEBUG_VISION_CIRCLE := false
 const TERRAIN_GROUND_TILE_UNITS := Vector2(16.0, 16.0)
 const BLOCK_FILL_TILE_UNITS := Vector2(4.0, 4.0)
@@ -69,25 +78,34 @@ var opened_container
 var opened_loot: Array[Dictionary] = []
 var repaired_outposts: Dictionary = {}
 var outpost_requirements: Dictionary = {}
-var container_index: int = 0
-var _container_timer: float = 0.0
+var outpost_safe_zones: Dictionary = {}
 var _walkable_rects: Array[Rect2] = []
 var _walkable_polygons: Array[PackedVector2Array] = []
 var _enterable_exception_rects: Array[Rect2] = []
-var _last_container_spawn_point_index: int = 0
 
 var hud_label: Label
 var prompt_label: Label
-var inventory_panel: PanelContainer
+var inventory_panel: Panel
 var inventory_label: Label
-var loot_panel: PanelContainer
+var loot_panel: Panel
 var loot_label: Label
+var home_storage_panel: Panel
+var home_storage_label: Label
 var take_all_button: Button
 var deposit_button: Button
 var extract_button: Button
+var extract_hud_button: Button
 var backpack_button: Button
 var _game_state: Node
 var _camera_tween: Tween
+var loot_interaction_controller
+var run_end_controller
+var outpost_repair_controller
+var interaction_progress_controller
+var container_spawn_controller
+var outpost_material_spawn_controller
+var _status_prompt: String = ""
+var _home_storage_user_closed: bool = false
 
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_WM_SIZE_CHANGED:
@@ -96,6 +114,7 @@ func _notification(what: int) -> void:
 func _ready() -> void:
 	_ensure_input_actions()
 	_game_state = get_node_or_null("/root/GameState")
+	_create_runtime_controllers()
 	_build_whitebox_world()
 	_build_ui()
 	_connect_runtime()
@@ -107,6 +126,31 @@ func _ready() -> void:
 		camera.zoom = _home_overview_zoom()
 		camera.position = _home_overview_offset()
 	_refresh_ui()
+
+func _create_runtime_controllers() -> void:
+	loot_interaction_controller = LootInteractionControllerScript.new()
+	run_end_controller = RunEndControllerScript.new()
+	run_end_controller.setup(run_director, _game_state)
+	outpost_repair_controller = OutpostRepairControllerScript.new()
+	outpost_repair_controller.setup(run_director, repaired_outposts)
+	interaction_progress_controller = InteractionProgressControllerScript.new()
+	container_spawn_controller = ContainerSpawnControllerScript.new()
+	container_spawn_controller.setup(
+		container_root,
+		Callable(self, "_get_container_spawn_points"),
+		Callable(self, "_make_interactable"),
+		Callable(self, "_item"),
+		Callable(self, "_remove_interactable"),
+		UNIT
+	)
+	outpost_material_spawn_controller = OutpostMaterialSpawnControllerScript.new()
+	outpost_material_spawn_controller.setup(
+		outpost_root,
+		Callable(self, "_get_material_spawn_points"),
+		Callable(self, "_make_interactable"),
+		Callable(self, "_item"),
+		UNIT
+	)
 
 func _refresh_camera_for_viewport() -> void:
 	if camera == null or player == null:
@@ -138,11 +182,9 @@ func _add_key_action(action_name: String, keycode: Key) -> void:
 	InputMap.action_add_event(action_name, key_event)
 
 func _process(delta: float) -> void:
-	_update_container_lifetimes(delta)
-	_container_timer += delta
-	if _container_timer >= 12.0:
-		_container_timer = 0.0
-		_spawn_container(_random_container_position())
+	_update_active_interaction(delta)
+	if container_spawn_controller != null:
+		container_spawn_controller.update(delta, interactables)
 	if Input.is_action_just_pressed("interact"):
 		_try_interact()
 	if Input.is_action_just_pressed("toggle_inventory"):
@@ -260,7 +302,7 @@ func _add_block_art_from_layout(layout) -> void:
 		_add_block_edges(art_root, block_rect)
 
 func _add_block_single_fill(parent: Node, block_rect: Rect2, rect_id: String) -> void:
-	var texture_index := abs(hash(rect_id)) % BlockFillTextures.size()
+	var texture_index: int = int(abs(hash(rect_id)) % BlockFillTextures.size())
 	parent.add_child(_make_scaled_sprite("SingleFill", BlockFillTextures[texture_index], block_rect, -68))
 
 func _add_block_fill_tiles(parent: Node, block_rect: Rect2) -> void:
@@ -530,64 +572,86 @@ func _build_ui() -> void:
 	hud_label = Label.new()
 	hud_label.name = "HUDLabel"
 	hud_label.position = Vector2(16, 12)
-	hud_label.size = Vector2(760, 160)
+	hud_label.size = Vector2(760, 78)
+	hud_label.add_theme_font_size_override("font_size", 18)
 	ui_root.add_child(hud_label)
 
 	prompt_label = Label.new()
 	prompt_label.name = "PromptLabel"
-	prompt_label.position = Vector2(16, 170)
-	prompt_label.size = Vector2(760, 50)
+	prompt_label.position = Vector2(16, 96)
+	prompt_label.size = Vector2(900, 44)
+	prompt_label.add_theme_font_size_override("font_size", 18)
 	ui_root.add_child(prompt_label)
 
 	backpack_button = Button.new()
 	backpack_button.name = "BackpackButton"
-	backpack_button.text = "Backpack"
-	backpack_button.position = Vector2(780, 16)
-	backpack_button.size = Vector2(130, 36)
+	backpack_button.text = "背包"
+	backpack_button.position = Vector2(820, 16)
+	backpack_button.size = Vector2(96, 38)
 	backpack_button.pressed.connect(_toggle_inventory_panel)
 	ui_root.add_child(backpack_button)
 
-	inventory_panel = _make_panel(Vector2(16, 230), Vector2(360, 320), "Inventory")
+	extract_hud_button = Button.new()
+	extract_hud_button.name = "ExtractHUDButton"
+	extract_hud_button.text = "撤离未解锁"
+	extract_hud_button.position = Vector2(928, 16)
+	extract_hud_button.size = Vector2(140, 38)
+	extract_hud_button.pressed.connect(_try_extract)
+	ui_root.add_child(extract_hud_button)
+
+	inventory_panel = _make_panel(Vector2(16, 154), Vector2(390, 360), "背包")
 	inventory_label = Label.new()
-	inventory_label.position = Vector2(12, 38)
-	inventory_label.size = Vector2(330, 190)
+	inventory_label.position = Vector2(16, 52)
+	inventory_label.size = Vector2(358, 288)
+	inventory_label.clip_text = true
+	inventory_label.add_theme_font_size_override("font_size", 16)
 	inventory_panel.add_child(inventory_label)
-	deposit_button = Button.new()
-	deposit_button.text = "Deposit All At Home"
-	deposit_button.position = Vector2(12, 252)
-	deposit_button.size = Vector2(180, 36)
-	deposit_button.pressed.connect(_deposit_all)
-	inventory_panel.add_child(deposit_button)
-	extract_button = Button.new()
-	extract_button.text = "Extract"
-	extract_button.position = Vector2(204, 252)
-	extract_button.size = Vector2(120, 36)
-	extract_button.pressed.connect(_try_extract)
-	inventory_panel.add_child(extract_button)
+
 	ui_root.add_child(inventory_panel)
 	inventory_panel.visible = false
 
-	loot_panel = _make_panel(Vector2(400, 230), Vector2(320, 260), "Loot")
+	home_action_panel = _make_panel(Vector2(820, 66), Vector2(248, 96), "家中操作")
+	deposit_button = Button.new()
+	deposit_button.text = "存入家中"
+	deposit_button.position = Vector2(16, 42)
+	deposit_button.size = Vector2(104, 40)
+	deposit_button.pressed.connect(_deposit_all)
+	home_action_panel.add_child(deposit_button)
+	extract_button = Button.new()
+	extract_button.text = "撤离"
+	extract_button.position = Vector2(128, 42)
+	extract_button.size = Vector2(104, 40)
+	extract_button.pressed.connect(_try_extract)
+	home_action_panel.add_child(extract_button)
+	ui_root.add_child(home_action_panel)
+	home_action_panel.visible = false
+
+	loot_panel = _make_panel(Vector2(422, 154), Vector2(390, 300), "容器 / 材料")
 	loot_label = Label.new()
-	loot_label.position = Vector2(12, 38)
-	loot_label.size = Vector2(280, 150)
+	loot_label.position = Vector2(16, 52)
+	loot_label.size = Vector2(358, 170)
+	loot_label.clip_text = true
+	loot_label.add_theme_font_size_override("font_size", 16)
 	loot_panel.add_child(loot_label)
 	take_all_button = Button.new()
-	take_all_button.text = "Take All"
-	take_all_button.position = Vector2(12, 204)
-	take_all_button.size = Vector2(120, 36)
+	take_all_button.text = "全部拾取"
+	take_all_button.position = Vector2(16, 240)
+	take_all_button.size = Vector2(172, 40)
 	take_all_button.pressed.connect(_take_all_loot)
 	loot_panel.add_child(take_all_button)
 	ui_root.add_child(loot_panel)
 	loot_panel.visible = false
 
-func _make_panel(pos: Vector2, panel_size: Vector2, title: String) -> PanelContainer:
-	var panel := PanelContainer.new()
+func _make_panel(pos: Vector2, panel_size: Vector2, title: String) -> Panel:
+	var panel := Panel.new()
 	panel.position = pos
 	panel.size = panel_size
+	panel.z_index = 60
 	var label := Label.new()
 	label.text = title
-	label.position = Vector2(12, 8)
+	label.position = Vector2(16, 12)
+	label.size = Vector2(panel_size.x - 32.0, 28.0)
+	label.add_theme_font_size_override("font_size", 20)
 	panel.add_child(label)
 	return panel
 
@@ -606,60 +670,50 @@ func _connect_runtime() -> void:
 		run_director.vision_controller.vision_radius_changed.connect(func(radius, _stage): vision_mask.set_radius(radius))
 
 func _spawn_initial_containers() -> void:
-	for spawn_point in _get_layout_points("ContainerSpawnPoints").slice(0, 6):
-		_spawn_container(spawn_point.global_position)
+	if container_spawn_controller == null:
+		return
+	container_spawn_controller.spawn_initial()
 
 func _spawn_container(pos: Vector2) -> void:
-	container_index += 1
-	var rarity := _pick_rarity()
-	var container = _make_interactable("container_%s" % container_index, "container", "%s Resource Cache" % rarity, pos, _rarity_color(rarity))
-	container.payload = {
-		"state": "available",
-		"rarity": rarity,
-		"lifetime": 45.0,
-		"rewards": [_item("scrap_metal", "Scrap Metal", 1 + randi() % 2, 2.0, 5), _item("food_can", "Food Can", 1, 1.0, 3)],
-	}
-	container_root.add_child(container)
+	if container_spawn_controller == null:
+		return
+	container_spawn_controller.spawn_container(pos)
 
 func _spawn_selected_outposts() -> void:
 	var context = run_director.context
 	if context == null:
 		return
 	outpost_requirements.clear()
+	outpost_safe_zones.clear()
 	var first_id: String = context.selected_first_outpost_id
 	var second_id: String = context.selected_second_outpost_id
-	outpost_requirements[first_id] = {
-		"scrap_metal": {"display_name": "Scrap Metal", "amount": 2, "weight": 2.0},
-		"old_battery": {"display_name": "Old Battery", "amount": 1, "weight": 4.0},
-	}
-	outpost_requirements[second_id] = {
-		"copper_wire": {"display_name": "Copper Wire", "amount": 2, "weight": 1.5},
-		"signal_core": {"display_name": "Signal Core", "amount": 1, "weight": 3.0},
-	}
+	if outpost_material_spawn_controller:
+		outpost_requirements = outpost_material_spawn_controller.build_requirements(first_id, second_id)
 	for outpost_id in [first_id, second_id]:
 		var pos: Vector2 = context.selected_outpost_positions.get(outpost_id, Vector2.ZERO)
-		var station = _make_interactable(outpost_id, "outpost", "Outpost %s" % outpost_id, pos, Color(0.45, 0.24, 0.10))
-		station.payload = {"repaired": false, "requirements": outpost_requirements[outpost_id]}
+		var station = _make_interactable(outpost_id, "outpost", "前哨站 %s" % outpost_id, pos, Color(0.45, 0.24, 0.10))
+		station.payload = {"repaired": false, "repair_state": "UNREPAIRED", "requirements": outpost_requirements[outpost_id]}
+		_attach_outpost_safe_zone(station)
 		outpost_root.add_child(station)
 
 func _spawn_requirement_materials() -> void:
-	for outpost_id in outpost_requirements.keys():
-		var base_pos: Vector2 = run_director.context.selected_outpost_positions.get(outpost_id, Vector2.ZERO)
-		var requirements: Dictionary = outpost_requirements[outpost_id]
-		var material_points := _get_material_points_for_outpost(base_pos, requirements.size())
-		var offset := 0
-		for item_id in requirements.keys():
-			var data: Dictionary = requirements[item_id]
-			var pos: Vector2 = material_points[offset].global_position if offset < material_points.size() else base_pos + _u(Vector2(-2.5 + offset * 1.3, 3.0 + offset * 0.8))
-			var pickup = _make_interactable("pickup_%s" % item_id, "material", data.display_name, pos, Color(0.2, 0.8, 0.35))
-			pickup.payload = {"item": _item(item_id, data.display_name, data.amount, data.weight, 5)}
-			outpost_root.add_child(pickup)
-			offset += 1
+	if run_director.context == null or outpost_material_spawn_controller == null:
+		return
+	outpost_material_spawn_controller.spawn_for_outposts(
+		outpost_requirements,
+		run_director.context.selected_outpost_positions
+	)
 
 func _get_material_points_for_outpost(base_pos: Vector2, count: int) -> Array:
-	var points := _get_layout_points("MaterialSpawnPoints")
+	var points := _get_material_spawn_points()
 	points.sort_custom(func(a, b): return a.global_position.distance_squared_to(base_pos) < b.global_position.distance_squared_to(base_pos))
 	return points.slice(0, count)
+
+func _get_container_spawn_points() -> Array:
+	return _get_layout_points("ContainerSpawnPoints")
+
+func _get_material_spawn_points() -> Array:
+	return _get_layout_points("MaterialSpawnPoints")
 
 func _make_interactable(id: String, type: String, label_text: String, pos: Vector2, color: Color):
 	var area := Area2D.new()
@@ -674,19 +728,115 @@ func _make_interactable(id: String, type: String, label_text: String, pos: Vecto
 	circle.radius = (6.0 if type == "outpost" else 2.0) * UNIT
 	shape.shape = circle
 	area.add_child(shape)
-	var box := ColorRect.new()
-	box.color = color
-	var visual_units := OUTPOST_SIZE_UNITS if type == "outpost" else RESOURCE_SIZE_UNITS
-	box.size = _u(visual_units)
-	box.position = -box.size * 0.5
-	box.z_index = 10
-	area.add_child(box)
-	var label := _make_world_label(label_text, Vector2(-box.size.x * 0.5, -box.size.y * 0.5 - 34), area)
+	var visual_size: Vector2 = _add_interactable_whitebox_visual(area, type, label_text, color)
+	var label := _make_world_label(label_text, Vector2(-visual_size.x * 0.5, -visual_size.y * 0.5 - 42), area)
 	label.z_index = 20
 	area.player_entered.connect(_on_interactable_entered)
 	area.player_exited.connect(_on_interactable_exited)
 	interactables.append(area)
 	return area
+
+func _add_interactable_whitebox_visual(area: Node, type: String, label_text: String, color: Color) -> Vector2:
+	match type:
+		"outpost":
+			var size: Vector2 = _u(OUTPOST_SIZE_UNITS)
+			_add_rect_visual(area, "OutpostWhiteboxVisual", size, color, 10)
+			return size
+		"container":
+			var size: Vector2 = _u(CONTAINER_VISUAL_SIZE_UNITS)
+			_add_rect_visual(area, "ContainerWhiteboxVisual", size, color, 12)
+			_add_rect_outline(area, "ContainerWhiteboxOutline", size, Color(0.06, 0.06, 0.06), 8.0, 13)
+			_add_center_marker_label(area, _container_marker_text(label_text), size, Color(0.02, 0.02, 0.02), 34)
+			return size
+		"material":
+			var size: Vector2 = _u(MATERIAL_VISUAL_SIZE_UNITS)
+			_add_diamond_visual(area, "BuildMaterialWhiteboxVisual", size, color, 12)
+			_add_diamond_outline(area, "BuildMaterialWhiteboxOutline", size, Color(0.02, 0.09, 0.04), 8.0, 13)
+			_add_center_marker_label(area, "建材", size, Color(0.0, 0.0, 0.0), 22)
+			return size
+		_:
+			var size: Vector2 = _u(RESOURCE_SIZE_UNITS)
+			_add_rect_visual(area, "InteractableWhiteboxVisual", size, color, 10)
+			return size
+
+func _add_rect_visual(parent: Node, node_name: String, size: Vector2, color: Color, z: int) -> ColorRect:
+	var box := ColorRect.new()
+	box.name = node_name
+	box.color = color
+	box.size = size
+	box.position = -size * 0.5
+	box.z_index = z
+	parent.add_child(box)
+	return box
+
+func _add_rect_outline(parent: Node, node_name: String, size: Vector2, color: Color, width: float, z: int) -> Line2D:
+	var half := size * 0.5
+	var outline := Line2D.new()
+	outline.name = node_name
+	outline.default_color = color
+	outline.width = width
+	outline.closed = true
+	outline.points = PackedVector2Array([
+		Vector2(-half.x, -half.y),
+		Vector2(half.x, -half.y),
+		Vector2(half.x, half.y),
+		Vector2(-half.x, half.y),
+	])
+	outline.z_index = z
+	parent.add_child(outline)
+	return outline
+
+func _add_diamond_visual(parent: Node, node_name: String, size: Vector2, color: Color, z: int) -> Polygon2D:
+	var half := size * 0.5
+	var diamond := Polygon2D.new()
+	diamond.name = node_name
+	diamond.color = color
+	diamond.polygon = PackedVector2Array([
+		Vector2(0.0, -half.y),
+		Vector2(half.x, 0.0),
+		Vector2(0.0, half.y),
+		Vector2(-half.x, 0.0),
+	])
+	diamond.z_index = z
+	parent.add_child(diamond)
+	return diamond
+
+func _add_diamond_outline(parent: Node, node_name: String, size: Vector2, color: Color, width: float, z: int) -> Line2D:
+	var half := size * 0.5
+	var outline := Line2D.new()
+	outline.name = node_name
+	outline.default_color = color
+	outline.width = width
+	outline.closed = true
+	outline.points = PackedVector2Array([
+		Vector2(0.0, -half.y),
+		Vector2(half.x, 0.0),
+		Vector2(0.0, half.y),
+		Vector2(-half.x, 0.0),
+	])
+	outline.z_index = z
+	parent.add_child(outline)
+	return outline
+
+func _add_center_marker_label(parent: Node, text: String, size: Vector2, color: Color, font_size: int) -> Label:
+	var label := Label.new()
+	label.name = "WhiteboxMarkerLabel"
+	label.text = text
+	label.position = -size * 0.5
+	label.size = size
+	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	label.add_theme_font_size_override("font_size", font_size)
+	label.add_theme_color_override("font_color", color)
+	label.z_index = 30
+	parent.add_child(label)
+	return label
+
+func _container_marker_text(label_text: String) -> String:
+	var grade := label_text.substr(0, 1)
+	if ["C", "B", "A", "S"].has(grade):
+		return "%s级" % grade
+	return "箱"
 
 func _make_world_label(text: String, pos: Vector2, parent: Node) -> Label:
 	var label := Label.new()
@@ -696,8 +846,27 @@ func _make_world_label(text: String, pos: Vector2, parent: Node) -> Label:
 	parent.add_child(label)
 	return label
 
+func _attach_outpost_safe_zone(station) -> void:
+	var safe_zone := Area2D.new()
+	safe_zone.name = "%s_SafeZoneArea_10x8" % station.interact_id
+	safe_zone.set_meta("outpost_id", station.interact_id)
+	safe_zone.set_meta("player_inside", false)
+	safe_zone.monitoring = true
+	safe_zone.monitorable = false
+	var collision := CollisionShape2D.new()
+	collision.name = "SafeZoneCollision_10x8"
+	var rect := RectangleShape2D.new()
+	rect.size = _u(OUTPOST_SIZE_UNITS)
+	collision.shape = rect
+	safe_zone.add_child(collision)
+	safe_zone.body_entered.connect(func(body): _on_outpost_safe_zone_body_entered(station, body))
+	safe_zone.body_exited.connect(func(body): _on_outpost_safe_zone_body_exited(station, body))
+	station.add_child(safe_zone)
+	outpost_safe_zones[station.interact_id] = safe_zone
+
 func _on_interactable_entered(node) -> void:
 	nearest_interactable = node
+	_status_prompt = ""
 	_refresh_ui()
 
 func _on_interactable_exited(node) -> void:
@@ -705,7 +874,33 @@ func _on_interactable_exited(node) -> void:
 		nearest_interactable = null
 	if opened_container == node:
 		_close_loot_transfer()
+	if interaction_progress_controller != null and interaction_progress_controller.is_target(node):
+		interaction_progress_controller.cancel()
+		_status_prompt = "修复中断。"
 	_refresh_ui()
+
+func _on_outpost_safe_zone_body_entered(station, body: Node) -> void:
+	if not _is_player_body(body):
+		return
+	var safe_zone: Area2D = _get_outpost_safe_zone(station)
+	if safe_zone:
+		safe_zone.set_meta("player_inside", true)
+	if _is_repaired_outpost(station):
+		_enter_repaired_outpost_safe_zone(station)
+	_refresh_ui()
+
+func _on_outpost_safe_zone_body_exited(station, body: Node) -> void:
+	if not _is_player_body(body):
+		return
+	var safe_zone: Area2D = _get_outpost_safe_zone(station)
+	if safe_zone:
+		safe_zone.set_meta("player_inside", false)
+	if _is_repaired_outpost(station):
+		_exit_repaired_outpost_safe_zone(station)
+	_refresh_ui()
+
+func _is_player_body(body: Node) -> bool:
+	return body != null and (body.is_in_group("player") or body.name == "Player")
 
 func _try_interact() -> void:
 	if nearest_interactable == null:
@@ -714,37 +909,35 @@ func _try_interact() -> void:
 		"container":
 			_open_container(nearest_interactable)
 		"material":
-			_pick_material(nearest_interactable)
+			_open_material(nearest_interactable)
 		"outpost":
-			_try_repair_outpost(nearest_interactable)
+			_begin_outpost_repair(nearest_interactable)
 
 func _open_container(container) -> void:
-	var rewards: Array = container.payload.get("rewards", [])
-	if rewards.is_empty():
-		prompt_label.text = "Container is empty."
+	if not loot_interaction_controller.open_container(container):
+		prompt_label.text = loot_interaction_controller.last_prompt
 		return
-	container.payload.state = "opened"
-	opened_container = container
-	opened_loot = []
-	for item in rewards:
-		opened_loot.append(item.duplicate(true))
+	_sync_loot_state()
 	_open_loot_transfer_panels()
-	container.modulate = Color(0.45, 0.45, 0.45)
+	_refresh_ui()
+
+func _open_material(pickup) -> void:
+	if not loot_interaction_controller.open_material(pickup):
+		prompt_label.text = loot_interaction_controller.last_prompt
+		return
+	_sync_loot_state()
+	_open_loot_transfer_panels()
 	_refresh_ui()
 
 func _take_all_loot() -> void:
-	var remaining: Array[Dictionary] = []
-	for item in opened_loot:
-		if not run_director.inventory_component.add_item(item):
-			remaining.append(item)
-	opened_loot = remaining
-	if opened_loot.is_empty():
-		if is_instance_valid(opened_container) and opened_container.interact_type == "container":
-			opened_container.payload.state = "depleted"
-			_remove_interactable(opened_container)
-		_close_loot_transfer()
-	elif is_instance_valid(opened_container):
-		_save_opened_loot_to_source()
+	var transfer_finished: bool = loot_interaction_controller.take_all_loot(
+		run_director.inventory_component,
+		Callable(self, "_remove_interactable")
+	)
+	_sync_loot_state()
+	if transfer_finished:
+		loot_panel.visible = false
+		inventory_panel.visible = false
 	_refresh_ui()
 
 func _open_loot_transfer_panels() -> void:
@@ -752,71 +945,138 @@ func _open_loot_transfer_panels() -> void:
 	inventory_panel.visible = true
 
 func _close_loot_transfer() -> void:
-	if is_instance_valid(opened_container) and not opened_loot.is_empty():
-		_save_opened_loot_to_source()
+	loot_interaction_controller.close()
+	_sync_loot_state()
 	loot_panel.visible = false
 	inventory_panel.visible = false
-	opened_container = null
-	opened_loot = []
 
 func _save_opened_loot_to_source() -> void:
-	if not is_instance_valid(opened_container):
-		return
-	match opened_container.interact_type:
-		"container":
-			opened_container.payload.rewards = opened_loot.duplicate(true)
+	loot_interaction_controller.save_opened_loot_to_source()
+	_sync_loot_state()
 
 func _pick_material(pickup) -> void:
-	var item: Dictionary = pickup.payload.get("item", {})
-	if run_director.inventory_component.add_item(item):
-		interactables.erase(pickup)
-		if nearest_interactable == pickup:
-			nearest_interactable = null
-		pickup.queue_free()
+	loot_interaction_controller.pick_material_immediate(
+		pickup,
+		run_director.inventory_component,
+		Callable(self, "_remove_interactable")
+	)
+	_sync_loot_state()
 	_refresh_ui()
+
+func _sync_loot_state() -> void:
+	if loot_interaction_controller == null:
+		opened_container = null
+		opened_loot = []
+		return
+	opened_container = loot_interaction_controller.opened_interactable
+	opened_loot = loot_interaction_controller.opened_loot
+
+func _begin_outpost_repair(station) -> void:
+	if interaction_progress_controller == null or outpost_repair_controller == null:
+		_try_repair_outpost(station)
+		return
+	var validation: Dictionary = outpost_repair_controller.can_repair(station)
+	if not validation.accepted:
+		_status_prompt = validation.message
+		_refresh_ui()
+		return
+	if interaction_progress_controller.begin(
+		"repair_outpost",
+		station,
+		OUTPOST_REPAIR_HOLD_SECONDS,
+		Callable(self, "_complete_held_outpost_repair"),
+		Callable(self, "_cancel_held_outpost_repair")
+	):
+		_status_prompt = ""
+		outpost_repair_controller.mark_repairing(station)
+	_refresh_ui()
+
+func _complete_held_outpost_repair(station) -> void:
+	_try_repair_outpost(station)
+
+func _cancel_held_outpost_repair(station) -> void:
+	if outpost_repair_controller != null:
+		outpost_repair_controller.cancel_repairing(station)
+
+func _update_active_interaction(delta: float) -> void:
+	if interaction_progress_controller == null or not interaction_progress_controller.is_active():
+		return
+	var target = interaction_progress_controller.active_target
+	var should_continue: bool = (
+		Input.is_action_pressed("interact")
+		and nearest_interactable == target
+		and is_instance_valid(target)
+	)
+	var result: Dictionary = interaction_progress_controller.update(delta, should_continue)
+	if bool(result.get("cancelled", false)):
+		_status_prompt = "修复中断。"
+	elif bool(result.get("completed", false)):
+		_status_prompt = "前哨站修复完成。"
 
 func _try_repair_outpost(station) -> void:
-	if station.payload.get("repaired", false):
-		prompt_label.text = "Outpost already repaired."
-		return
-	var requirements: Dictionary = station.payload.get("requirements", {})
-	if not _has_requirements(requirements):
-		prompt_label.text = "Missing materials: %s" % _missing_requirements_text(requirements)
-		return
-	run_director.on_outpost_repair_started(station.interact_id)
-	for item_id in requirements.keys():
-		run_director.inventory_component.remove_item(StringName(item_id), int(requirements[item_id].amount))
-	station.payload.repaired = true
-	repaired_outposts[station.interact_id] = true
-	station.modulate = Color(0.3, 1.0, 0.5)
-	run_director.on_outpost_repaired(station.interact_id)
+	var result: Dictionary = outpost_repair_controller.repair(station)
+	_status_prompt = result.message
+	if result.accepted:
+		_activate_outpost_safe_zone(station)
+	if result.accepted and _is_player_inside_outpost_safe_zone(station):
+		_enter_repaired_outpost_safe_zone(station)
 	_refresh_ui()
 
+func _is_repaired_outpost(node) -> bool:
+	return (
+		node != null
+		and is_instance_valid(node)
+		and node.interact_type == "outpost"
+		and bool(node.payload.get("repaired", false))
+	)
+
+func _enter_repaired_outpost_safe_zone(station) -> void:
+	if run_director.context == null:
+		return
+	if run_director.context.active_safe_zone_id == station.interact_id:
+		return
+	run_director.on_safe_zone_entered(station.interact_id)
+	_status_prompt = "前哨站安全区：稳定值正在恢复。"
+
+func _exit_repaired_outpost_safe_zone(station) -> void:
+	if run_director.context == null:
+		return
+	if run_director.context.active_safe_zone_id != station.interact_id:
+		return
+	run_director.on_safe_zone_exited(station.interact_id)
+
+func _activate_outpost_safe_zone(station) -> void:
+	var safe_zone: Area2D = _get_outpost_safe_zone(station)
+	if safe_zone == null:
+		return
+	safe_zone.set_meta("is_active_after_repair", true)
+
+func _get_outpost_safe_zone(station) -> Area2D:
+	if station == null or not is_instance_valid(station):
+		return null
+	return outpost_safe_zones.get(station.interact_id, null)
+
+func _is_player_inside_outpost_safe_zone(station) -> bool:
+	var safe_zone: Area2D = _get_outpost_safe_zone(station)
+	if safe_zone and bool(safe_zone.get_meta("player_inside", false)):
+		return true
+	if player == null or station == null or not is_instance_valid(station):
+		return false
+	var local_pos: Vector2 = station.to_local(player.global_position)
+	return Rect2(_u(OUTPOST_SIZE_UNITS) * -0.5, _u(OUTPOST_SIZE_UNITS)).has_point(local_pos)
+
 func _has_requirements(requirements: Dictionary) -> bool:
-	for item_id in requirements.keys():
-		if _inventory_count(item_id) < int(requirements[item_id].amount):
-			return false
-	return true
+	return outpost_repair_controller.has_requirements(requirements)
 
 func _missing_requirements_text(requirements: Dictionary) -> String:
-	var parts: Array[String] = []
-	for item_id in requirements.keys():
-		var need := int(requirements[item_id].amount)
-		var have := _inventory_count(item_id)
-		if have < need:
-			parts.append("%s %s/%s" % [requirements[item_id].display_name, have, need])
-	return ", ".join(parts)
+	return outpost_repair_controller.missing_requirements_text(requirements)
 
 func _inventory_count(item_id: String) -> int:
-	var count := 0
-	for stack in run_director.inventory_component.items:
-		if str(stack.item_id) == item_id:
-			count += int(stack.amount)
-	return count
+	return outpost_repair_controller.inventory_count(item_id)
 
 func _deposit_all() -> void:
 	if run_director.context == null or run_director.context.active_safe_zone_id != "home":
-		prompt_label.text = "Return home to deposit."
+		prompt_label.text = "请回到家中存放物品。"
 		return
 	var index := 0
 	while index < run_director.inventory_component.items.size():
@@ -825,33 +1085,22 @@ func _deposit_all() -> void:
 	_refresh_ui()
 
 func _try_extract() -> void:
-	if run_director.context == null:
+	if run_end_controller == null:
 		return
-	if not run_director.context.is_extraction_unlocked:
-		prompt_label.text = "Repair both outposts first."
+	var result: Dictionary = run_end_controller.try_extract(get_tree())
+	if not result.accepted:
+		prompt_label.text = result.message
 		return
-	if run_director.context.active_safe_zone_id != "home":
-		prompt_label.text = "Extract from home."
-		return
-	run_director.on_extraction_started()
-	var gained: Array = []
-	gained.append_array(run_director.inventory_component.get_items_snapshot())
-	gained.append_array(run_director.home_storage_component.get_items_snapshot())
-	if _game_state:
-		_game_state.add_to_warehouse(gained)
-		_game_state.last_run_result = "Extraction success: %s item stacks returned." % gained.size()
-	run_director.on_extraction_completed()
-	get_tree().change_scene_to_file("res://scenes/base/BaseScene.tscn")
 
 func _on_stability_changed(current: float, _max_value: float, _stage: int) -> void:
 	if current <= 0.0:
-		if _game_state:
-			_game_state.last_run_result = "Run failed: stability depleted. Stored home items kept."
-			_game_state.add_to_warehouse(run_director.home_storage_component.get_items_snapshot())
-		call_deferred("_return_to_base_after_death")
+		call_deferred("_return_to_base_after_death", "stability_depleted")
 
-func _return_to_base_after_death() -> void:
-	get_tree().change_scene_to_file("res://scenes/base/BaseScene.tscn")
+func _return_to_base_after_death(reason: String = "stability_depleted") -> void:
+	if run_end_controller:
+		run_end_controller.handle_player_death(get_tree(), reason)
+	else:
+		get_tree().change_scene_to_file("res://scenes/base/BaseScene.tscn")
 
 func _on_weight_changed(_current_weight: float, _max_weight: float, _stage: int) -> void:
 	if player and run_director.weight_component:
@@ -861,34 +1110,100 @@ func _refresh_ui() -> void:
 	if run_director.context == null:
 		return
 	var phase: String = run_director.state_machine.phase_name(run_director.state_machine.current_phase)
-	hud_label.text = "WASD move | F interact | Tab backpack | E extract\nPhase: %s | Stability: %d | Weight: %.1f/%.1f %s | Outposts: %d/2 | Extract: %s" % [
-		phase,
+	hud_label.text = "WASD移动  F交互  Tab背包  E撤离\n阶段：%s    稳定值：%d    负重：%.1f/%.1f（%s）    前哨：%d/2    撤离：%s" % [
+		_phase_name_cn(phase),
 		int(run_director.context.player_stability),
 		run_director.context.current_weight,
 		run_director.context.weight_limit,
-		run_director.context.weight_stage,
+		_weight_stage_cn(run_director.context.weight_stage),
 		run_director.context.repaired_outpost_count,
-		str(run_director.context.is_extraction_unlocked),
+		"已解锁" if run_director.context.is_extraction_unlocked else "未解锁",
 	]
-	if nearest_interactable:
-		prompt_label.text = "F: %s (%s)" % [nearest_interactable.display_name, nearest_interactable.interact_type]
-	elif run_director.context.active_safe_zone_id == "home":
-		prompt_label.text = "Home safe zone: recover, deposit, extract after both outposts."
+	var extraction_ready_at_home: bool = run_director.context.is_extraction_unlocked and run_director.context.active_safe_zone_id == "home"
+	var extraction_unlocked: bool = run_director.context.is_extraction_unlocked
+	var is_home_safe_zone: bool = run_director.context.active_safe_zone_id == "home"
+	if interaction_progress_controller != null and interaction_progress_controller.is_active():
+		var progress_percent: int = int(round(interaction_progress_controller.get_progress() * 100.0))
+		prompt_label.text = "按住 F 修复中：%s%%" % progress_percent
+	elif extraction_ready_at_home:
+		prompt_label.text = "撤离已准备：按 E 或点击“撤离”返回基地。"
+	elif not _status_prompt.is_empty():
+		prompt_label.text = _status_prompt
+	elif nearest_interactable:
+		prompt_label.text = "按 F：%s（%s）" % [nearest_interactable.display_name, _interactable_type_name(nearest_interactable.interact_type)]
+	elif is_home_safe_zone:
+		prompt_label.text = "家中安全区：恢复稳定值，可存放物品。修复两座前哨站后可撤离。"
+	elif extraction_unlocked:
+		prompt_label.text = "撤离已解锁。请返回家中撤离。"
 	else:
 		prompt_label.text = ""
-	inventory_label.text = _items_text("Backpack", run_director.inventory_component.get_items_snapshot())
-	loot_label.text = _items_text("Loot", opened_loot)
-	deposit_button.disabled = run_director.context.active_safe_zone_id != "home"
-	extract_button.disabled = not run_director.context.is_extraction_unlocked or run_director.context.active_safe_zone_id != "home"
+	inventory_label.text = _items_text("背包", run_director.inventory_component.get_items_snapshot())
+	loot_label.text = _items_text("容器 / 材料", opened_loot)
+	home_action_panel.visible = is_home_safe_zone
+	deposit_button.disabled = not is_home_safe_zone
+	extract_button.disabled = not extraction_ready_at_home
+	extract_hud_button.disabled = not extraction_ready_at_home
+	extract_hud_button.text = "撤离(E)" if extraction_ready_at_home else ("返回家中" if extraction_unlocked else "撤离未解锁")
 
 func _items_text(title: String, items: Array) -> String:
-	var lines: Array[String] = [title + ":"]
+	var lines: Array[String] = []
 	if items.is_empty():
-		lines.append("empty")
+		lines.append("空")
 	for item in items:
 		if item is Dictionary:
-			lines.append("- %s x%s (w %.1f)" % [item.get("display_name", item.get("item_id", "")), item.get("amount", 0), float(item.get("weight_per_unit", 0.0))])
+			lines.append("%s  x%s  单重 %.1f" % [
+				item.get("display_name", item.get("item_id", "")),
+				item.get("amount", 0),
+				float(item.get("weight_per_unit", 0.0)),
+			])
 	return "\n".join(lines)
+
+func _phase_name_cn(phase: String) -> String:
+	match phase:
+		"SPAWN":
+			return "出生"
+		"OBSERVE":
+			return "家中观察"
+		"LEAVE_HOME":
+			return "离家"
+		"SCAVENGE":
+			return "探索"
+		"RECOVER":
+			return "恢复"
+		"OUTPOST_PUSH":
+			return "修复前哨"
+		"GREED_DECISION":
+			return "撤离抉择"
+		"EXTRACT":
+			return "撤离"
+		"SETTLEMENT":
+			return "结算"
+		"FAILED":
+			return "失败"
+		_:
+			return phase
+
+func _weight_stage_cn(stage: String) -> String:
+	match stage:
+		"LIGHT":
+			return "轻装"
+		"HEAVY":
+			return "重载"
+		"OVERLOADED":
+			return "超重"
+		_:
+			return stage
+
+func _interactable_type_name(interact_type: String) -> String:
+	match interact_type:
+		"container":
+			return "容器"
+		"material":
+			return "前哨材料"
+		"outpost":
+			return "前哨站"
+		_:
+			return interact_type
 
 func _item(id: String, display_name: String, amount: int, weight: float, stack_limit: int) -> Dictionary:
 	return {
@@ -901,11 +1216,9 @@ func _item(id: String, display_name: String, amount: int, weight: float, stack_l
 	}
 
 func _random_container_position() -> Vector2:
-	var points := _get_layout_points("ContainerSpawnPoints")
-	if points.is_empty():
+	if container_spawn_controller == null:
 		return _u(Vector2(18.0 + randf() * 98.0, -42.0 + randf() * 84.0))
-	_last_container_spawn_point_index = (_last_container_spawn_point_index + 1) % points.size()
-	return points[_last_container_spawn_point_index].global_position
+	return container_spawn_controller.next_spawn_position()
 
 func _toggle_inventory_panel() -> void:
 	inventory_panel.visible = not inventory_panel.visible
@@ -976,14 +1289,9 @@ func _home_target_bounds() -> Rect2:
 	return Rect2(min_pos - padding, (max_pos - min_pos) + padding * 2.0)
 
 func _update_container_lifetimes(delta: float) -> void:
-	for interactable in interactables.duplicate():
-		if not is_instance_valid(interactable) or interactable.interact_type != "container":
-			continue
-		if interactable.payload.get("state", "") != "available":
-			continue
-		interactable.payload.lifetime = float(interactable.payload.get("lifetime", 0.0)) - delta
-		if interactable.payload.lifetime <= 0.0:
-			_remove_interactable(interactable)
+	if container_spawn_controller == null:
+		return
+	container_spawn_controller.update_lifetimes(delta, interactables)
 
 func _remove_interactable(interactable) -> void:
 	if nearest_interactable == interactable:
@@ -997,27 +1305,14 @@ func _remove_interactable(interactable) -> void:
 		interactable.queue_free()
 
 func _pick_rarity() -> String:
-	var roll := randf()
-	if roll < 0.6:
+	if container_spawn_controller == null:
 		return "C"
-	if roll < 0.85:
-		return "B"
-	if roll < 0.97:
-		return "A"
-	return "S"
+	return container_spawn_controller.pick_rarity()
 
 func _rarity_color(rarity: String) -> Color:
-	match rarity:
-		"C":
-			return Color(0.78, 0.78, 0.78)
-		"B":
-			return Color(0.55, 0.78, 1.0)
-		"A":
-			return Color(0.78, 0.58, 1.0)
-		"S":
-			return Color(1.0, 0.84, 0.36)
-		_:
-			return Color.WHITE
+	if container_spawn_controller == null:
+		return Color.WHITE
+	return container_spawn_controller.rarity_color(rarity)
 
 func _u(value: Variant) -> Variant:
 	if value is Vector2:
