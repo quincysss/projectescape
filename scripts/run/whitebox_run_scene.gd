@@ -11,12 +11,8 @@ const InteractionProgressControllerScript := preload("res://scripts/run/interact
 const ContainerSpawnControllerScript := preload("res://scripts/run/container_spawn_controller.gd")
 const OutpostMaterialSpawnControllerScript := preload("res://scripts/run/outpost_material_spawn_controller.gd")
 const TerrainGroundTextures := [
-	preload("res://assets/map/terrain/ground/terrain_ground_base_tile_1024_01.png"),
-	preload("res://assets/map/terrain/ground/terrain_ground_base_tile_1024_02.png"),
-	preload("res://assets/map/terrain/ground/terrain_ground_base_tile_1024_03.png"),
 	preload("res://assets/map/terrain/ground/terrain_ground_base_tile_1024_04.png"),
 	preload("res://assets/map/terrain/ground/terrain_ground_base_tile_1024_05.png"),
-	preload("res://assets/map/terrain/ground/terrain_ground_base_tile_1024_06.png"),
 ]
 const BlockFillTextures := [
 	preload("res://assets/map/blocks/fill/block_fill_dirty_02.png"),
@@ -38,7 +34,7 @@ const HOME_SIZE_UNITS := Vector2(10.0, 8.0)
 const HOME_SAFE_SIZE_UNITS := Vector2(12.0, 10.0)
 const OUTPOST_SIZE_UNITS := Vector2(10.0, 8.0)
 const RESOURCE_SIZE_UNITS := Vector2(1.0, 1.0)
-const CONTAINER_VISUAL_SIZE_UNITS := Vector2(2.4, 2.4)
+const CONTAINER_VISUAL_SIZE_UNITS := Vector2(3.4, 3.4)
 const MATERIAL_VISUAL_SIZE_UNITS := Vector2(2.0, 2.0)
 const MAIN_ROAD_WIDTH_UNITS := 8.0
 const SECONDARY_ROAD_WIDTH_UNITS := 6.0
@@ -48,11 +44,14 @@ const HOME_OVERVIEW_MAX_ZOOM := 0.11
 const HOME_OVERVIEW_MIN_ZOOM := 0.025
 const HOME_OVERVIEW_PADDING_UNITS := Vector2(0.0, 0.0)
 const CAMERA_TRANSITION_SECONDS := 0.5
+const CONTAINER_OPEN_HOLD_SECONDS := 0.8
 const OUTPOST_REPAIR_HOLD_SECONDS := 1.5
+const EXTRACTION_HOLD_SECONDS := 1.2
 const SHOW_DEBUG_VISION_CIRCLE := false
 const TERRAIN_GROUND_TILE_UNITS := Vector2(16.0, 16.0)
 const BLOCK_FILL_TILE_UNITS := Vector2(4.0, 4.0)
 const BLOCK_EDGE_THICKNESS_UNITS := 1.6
+const MAP_BOUNDARY_STRIP_UNITS := 8.0
 
 @onready var run_director: RunDirector = $RunDirector
 @onready var world_root: Node2D = $WorldRoot
@@ -106,6 +105,7 @@ var container_spawn_controller
 var outpost_material_spawn_controller
 var _status_prompt: String = ""
 var _home_storage_user_closed: bool = false
+var _extract_button_held: bool = false
 
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_WM_SIZE_CHANGED:
@@ -185,11 +185,11 @@ func _process(delta: float) -> void:
 	_update_active_interaction(delta)
 	if container_spawn_controller != null:
 		container_spawn_controller.update(delta, interactables)
+	_update_container_lifetime_visuals()
 	if Input.is_action_just_pressed("interact"):
 		_try_interact()
 	if Input.is_action_just_pressed("toggle_inventory"):
-		inventory_panel.visible = not inventory_panel.visible
-		_refresh_ui()
+		_toggle_inventory_panel()
 	if Input.is_action_just_pressed("extract"):
 		_try_extract()
 	_refresh_ui()
@@ -210,8 +210,8 @@ func _clear_generated_visual_layers() -> void:
 			child.free()
 
 func _generate_road_visuals() -> void:
-	if road_visual_root.has_method("generate_from_layout"):
-		road_visual_root.generate_from_layout()
+	if road_visual_root.has_method("_clear_generated"):
+		road_visual_root._clear_generated()
 
 func _create_ground() -> void:
 	_walkable_rects.clear()
@@ -235,10 +235,11 @@ func _create_ground() -> void:
 		_add_block_from_layout(block)
 	for building in _get_layout_rects("Buildings"):
 		_add_visual_building_from_layout(building)
+	_create_map_boundary_visuals()
 
 func _create_terrain_ground_base() -> void:
 	for child in road_visual_root.get_children():
-		if child.has_meta("_generated_whitebox_ground"):
+		if child.has_meta("_generated_whitebox_ground") or child.has_meta("_generated_road_art"):
 			road_visual_root.remove_child(child)
 			child.free()
 	var terrain_root := map_visual_root.get_node_or_null("TerrainGroundBase")
@@ -251,24 +252,18 @@ func _create_terrain_ground_base() -> void:
 		if child.has_meta("_generated_terrain_ground"):
 			terrain_root.remove_child(child)
 			child.free()
-	var tile_size := TERRAIN_GROUND_TILE_UNITS * UNIT
 	var map_rect := Rect2(_u(MAP_ORIGIN_UNITS), _u(MAP_UNITS))
-	var cols := int(ceil(map_rect.size.x / tile_size.x))
-	var rows := int(ceil(map_rect.size.y / tile_size.y))
+	var tile_size: Vector2 = TerrainGroundTextures[0].get_size()
+	var cols: int = int(ceil(map_rect.size.x / tile_size.x))
+	var rows: int = int(ceil(map_rect.size.y / tile_size.y))
 	for y in range(rows):
 		for x in range(cols):
-			var tile_pos := map_rect.position + Vector2(x * tile_size.x, y * tile_size.y)
-			var remaining := (map_rect.position + map_rect.size) - tile_pos
-			var tile_rect := Rect2(tile_pos, Vector2(minf(tile_size.x, remaining.x), minf(tile_size.y, remaining.y)))
-			if tile_rect.size.x <= 0.0 or tile_rect.size.y <= 0.0:
-				continue
-			var texture: Texture2D = TerrainGroundTextures[(x * 2 + y * 3) % TerrainGroundTextures.size()]
+			var texture: Texture2D = TerrainGroundTextures[(x + y) % TerrainGroundTextures.size()]
 			var sprite := Sprite2D.new()
 			sprite.name = "TerrainGround_%03d_%03d" % [x, y]
 			sprite.texture = texture
 			sprite.centered = true
-			sprite.position = tile_rect.get_center()
-			sprite.scale = tile_rect.size / texture.get_size()
+			sprite.position = map_rect.position + Vector2((float(x) + 0.5) * tile_size.x, (float(y) + 0.5) * tile_size.y)
 			sprite.z_index = -115
 			sprite.set_meta("_generated_terrain_ground", true)
 			terrain_root.add_child(sprite)
@@ -278,6 +273,7 @@ func _add_street_from_layout(layout) -> void:
 	if layout.subtype == "plaza" or layout.rect_kind == "plaza":
 		color = Color(0.34, 0.34, 0.32, 0.0)
 	_add_layout_polygon(layout.get_rect_id(), layout.global_transform, layout.get_local_corners_px(UNIT), color, -90, road_visual_root)
+	_add_road_art_from_layout(layout)
 	_walkable_polygons.append(layout.get_world_corners_px(UNIT))
 	_walkable_rects.append(layout.get_rect_px(UNIT))
 
@@ -286,7 +282,53 @@ func _add_block_from_layout(layout) -> void:
 	_add_block_art_from_layout(layout)
 
 func _add_visual_building_from_layout(layout) -> void:
-	_add_layout_polygon(layout.get_rect_id(), layout.global_transform, layout.get_local_corners_px(UNIT), Color(0.92, 0.92, 0.9), -40, building_visual_root)
+	_add_layout_polygon(layout.get_rect_id(), layout.global_transform, layout.get_local_corners_px(UNIT), Color(0.92, 0.92, 0.9, 0.0), -40, building_visual_root)
+
+func _add_road_art_from_layout(layout) -> void:
+	var road_rect: Rect2 = layout.get_rect_px(UNIT)
+	_add_tiled_texture_rect(road_visual_root, "%s_Ground" % layout.get_rect_id(), TerrainGroundTextures, road_rect, -95)
+
+func _create_map_boundary_visuals() -> void:
+	var boundary_root := Node2D.new()
+	boundary_root.name = "MapBoundaryVisual"
+	boundary_root.set_meta("_generated_map_boundary", true)
+	building_visual_root.add_child(boundary_root)
+	var map_rect := Rect2(_u(MAP_ORIGIN_UNITS), _u(MAP_UNITS))
+	var strip: float = MAP_BOUNDARY_STRIP_UNITS * UNIT
+	_add_boundary_ground_strip(boundary_root, "BoundaryTop", Rect2(map_rect.position, Vector2(map_rect.size.x, strip)), 0)
+	_add_boundary_ground_strip(boundary_root, "BoundaryBottom", Rect2(Vector2(map_rect.position.x, map_rect.end.y - strip), Vector2(map_rect.size.x, strip)), 1)
+	_add_boundary_ground_strip(boundary_root, "BoundaryLeft", Rect2(map_rect.position, Vector2(strip, map_rect.size.y)), 2)
+	_add_boundary_ground_strip(boundary_root, "BoundaryRight", Rect2(Vector2(map_rect.end.x - strip, map_rect.position.y), Vector2(strip, map_rect.size.y)), 3)
+
+func _add_boundary_ground_strip(parent: Node, sprite_name: String, rect: Rect2, texture_index: int) -> void:
+	var texture: Texture2D = TerrainGroundTextures[texture_index % TerrainGroundTextures.size()]
+	var sprite := _make_scaled_sprite(sprite_name, texture, rect, -35)
+	sprite.modulate = Color(0.35, 0.38, 0.34)
+	sprite.set_meta("_generated_map_boundary_piece", true)
+	parent.add_child(sprite)
+
+func _add_tiled_texture_rect(parent: Node, prefix: String, textures: Array, rect: Rect2, z: int) -> void:
+	var tile_size: Vector2 = textures[0].get_size()
+	var cols: int = int(ceil(rect.size.x / tile_size.x))
+	var rows: int = int(ceil(rect.size.y / tile_size.y))
+	for y in range(rows):
+		for x in range(cols):
+			var tile_pos := rect.position + Vector2(float(x) * tile_size.x, float(y) * tile_size.y)
+			var remaining := rect.end - tile_pos
+			var region_size := Vector2(minf(tile_size.x, remaining.x), minf(tile_size.y, remaining.y))
+			if region_size.x <= 0.0 or region_size.y <= 0.0:
+				continue
+			var texture: Texture2D = textures[(x + y) % textures.size()]
+			var sprite := Sprite2D.new()
+			sprite.name = "%s_%03d_%03d" % [prefix, x, y]
+			sprite.texture = texture
+			sprite.centered = true
+			sprite.region_enabled = true
+			sprite.region_rect = Rect2(Vector2.ZERO, region_size)
+			sprite.position = tile_pos + region_size * 0.5
+			sprite.z_index = z
+			sprite.set_meta("_generated_road_art", true)
+			parent.add_child(sprite)
 
 func _add_block_art_from_layout(layout) -> void:
 	var block_rect: Rect2 = layout.get_rect_px(UNIT)
@@ -335,14 +377,14 @@ func _add_block_edges(parent: Node, block_rect: Rect2) -> void:
 	_add_corner_sprite(parent, "CornerBottomRight", block_rect.position + block_rect.size - corner_size * 0.5, true, false)
 	_add_corner_sprite(parent, "CornerBottomLeft", Vector2(block_rect.position.x + corner_size.x * 0.5, block_rect.position.y + block_rect.size.y - corner_size.y * 0.5), false, false)
 
-func _add_edge_run(parent: Node, edge_name: String, start_pos: Vector2, direction: Vector2, run_length: float, rotation_degrees: float) -> void:
+func _add_edge_run(parent: Node, edge_name: String, start_pos: Vector2, direction: Vector2, run_length: float, edge_rotation_degrees: float) -> void:
 	var segment_length: float = BlockEdgeTexture.get_size().x
 	var segment_count: int = maxi(1, int(floor(run_length / segment_length)))
 	var used_length: float = float(segment_count) * segment_length
 	var centered_start: Vector2 = start_pos + direction * ((run_length - used_length) * 0.5 + segment_length * 0.5)
 	for index in range(segment_count):
 		var sprite := _make_native_sprite("%s_%02d" % [edge_name, index], BlockEdgeTexture, centered_start + direction * segment_length * index, -66)
-		sprite.rotation_degrees = rotation_degrees
+		sprite.rotation_degrees = edge_rotation_degrees
 		parent.add_child(sprite)
 
 func _add_corner_sprite(parent: Node, sprite_name: String, pos: Vector2, flip_h: bool, flip_v: bool) -> void:
@@ -533,13 +575,6 @@ func _create_player() -> void:
 	circle.radius = 0.6 * UNIT
 	shape.shape = circle
 	player.add_child(shape)
-	var body := ColorRect.new()
-	body.name = "PlayerBox"
-	body.color = Color(0.2, 0.65, 1.0)
-	body.size = _u(Vector2(2.0, 4.0))
-	body.position = Vector2(-body.size.x * 0.5, -body.size.y * 0.75)
-	body.z_index = 30
-	player.add_child(body)
 
 func _create_camera() -> void:
 	camera = Camera2D.new()
@@ -596,7 +631,8 @@ func _build_ui() -> void:
 	extract_hud_button.text = "撤离未解锁"
 	extract_hud_button.position = Vector2(928, 16)
 	extract_hud_button.size = Vector2(140, 38)
-	extract_hud_button.pressed.connect(_try_extract)
+	extract_hud_button.button_down.connect(_begin_extraction_hold_from_button)
+	extract_hud_button.button_up.connect(_release_extraction_hold_button)
 	ui_root.add_child(extract_hud_button)
 
 	inventory_panel = _make_panel(Vector2(16, 154), Vector2(390, 360), "背包")
@@ -610,21 +646,28 @@ func _build_ui() -> void:
 	ui_root.add_child(inventory_panel)
 	inventory_panel.visible = false
 
-	home_action_panel = _make_panel(Vector2(820, 66), Vector2(248, 96), "家中操作")
+	home_storage_panel = _make_panel(Vector2(422, 154), Vector2(390, 360), "家中储存")
+	home_storage_label = Label.new()
+	home_storage_label.position = Vector2(16, 52)
+	home_storage_label.size = Vector2(358, 230)
+	home_storage_label.clip_text = true
+	home_storage_label.add_theme_font_size_override("font_size", 16)
+	home_storage_panel.add_child(home_storage_label)
 	deposit_button = Button.new()
 	deposit_button.text = "存入家中"
-	deposit_button.position = Vector2(16, 42)
-	deposit_button.size = Vector2(104, 40)
+	deposit_button.position = Vector2(16, 300)
+	deposit_button.size = Vector2(172, 40)
 	deposit_button.pressed.connect(_deposit_all)
-	home_action_panel.add_child(deposit_button)
+	home_storage_panel.add_child(deposit_button)
 	extract_button = Button.new()
 	extract_button.text = "撤离"
-	extract_button.position = Vector2(128, 42)
-	extract_button.size = Vector2(104, 40)
-	extract_button.pressed.connect(_try_extract)
-	home_action_panel.add_child(extract_button)
-	ui_root.add_child(home_action_panel)
-	home_action_panel.visible = false
+	extract_button.position = Vector2(202, 300)
+	extract_button.size = Vector2(172, 40)
+	extract_button.button_down.connect(_begin_extraction_hold_from_button)
+	extract_button.button_up.connect(_release_extraction_hold_button)
+	home_storage_panel.add_child(extract_button)
+	ui_root.add_child(home_storage_panel)
+	home_storage_panel.visible = false
 
 	loot_panel = _make_panel(Vector2(422, 154), Vector2(390, 300), "容器 / 材料")
 	loot_label = Label.new()
@@ -744,9 +787,11 @@ func _add_interactable_whitebox_visual(area: Node, type: String, label_text: Str
 			return size
 		"container":
 			var size: Vector2 = _u(CONTAINER_VISUAL_SIZE_UNITS)
-			_add_rect_visual(area, "ContainerWhiteboxVisual", size, color, 12)
-			_add_rect_outline(area, "ContainerWhiteboxOutline", size, Color(0.06, 0.06, 0.06), 8.0, 13)
-			_add_center_marker_label(area, _container_marker_text(label_text), size, Color(0.02, 0.02, 0.02), 34)
+			_add_rect_visual(area, "ContainerWhiteboxVisual", size, Color(0.08, 0.08, 0.08, 0.92), 12)
+			_add_rect_visual(area, "ContainerLifetimeFill", size, color, 14)
+			_add_rect_outline(area, "ContainerWhiteboxOutline", size, Color(0.02, 0.02, 0.02), 10.0, 25)
+			_add_center_marker_label(area, _container_marker_text(label_text), size, Color(0.0, 0.0, 0.0), 52)
+			_add_container_lifetime_label(area, size)
 			return size
 		"material":
 			var size: Vector2 = _u(MATERIAL_VISUAL_SIZE_UNITS)
@@ -832,6 +877,23 @@ func _add_center_marker_label(parent: Node, text: String, size: Vector2, color: 
 	parent.add_child(label)
 	return label
 
+func _add_container_lifetime_label(parent: Node, size: Vector2) -> Label:
+	var label := Label.new()
+	label.name = "ContainerLifetimeLabel"
+	label.text = "45s"
+	label.position = Vector2(-size.x * 0.5, size.y * 0.5 + 6.0)
+	label.size = Vector2(size.x, 34.0)
+	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	label.add_theme_font_size_override("font_size", 24)
+	label.add_theme_color_override("font_color", Color(1.0, 1.0, 1.0))
+	label.add_theme_color_override("font_shadow_color", Color(0.0, 0.0, 0.0))
+	label.add_theme_constant_override("shadow_offset_x", 2)
+	label.add_theme_constant_override("shadow_offset_y", 2)
+	label.z_index = 31
+	parent.add_child(label)
+	return label
+
 func _container_marker_text(label_text: String) -> String:
 	var grade := label_text.substr(0, 1)
 	if ["C", "B", "A", "S"].has(grade):
@@ -875,8 +937,9 @@ func _on_interactable_exited(node) -> void:
 	if opened_container == node:
 		_close_loot_transfer()
 	if interaction_progress_controller != null and interaction_progress_controller.is_target(node):
+		var interaction_id: String = interaction_progress_controller.active_id
 		interaction_progress_controller.cancel()
-		_status_prompt = "修复中断。"
+		_status_prompt = _interaction_cancel_message(interaction_id)
 	_refresh_ui()
 
 func _on_outpost_safe_zone_body_entered(station, body: Node) -> void:
@@ -905,13 +968,42 @@ func _is_player_body(body: Node) -> bool:
 func _try_interact() -> void:
 	if nearest_interactable == null:
 		return
+	if interaction_progress_controller != null and interaction_progress_controller.is_active():
+		return
 	match nearest_interactable.interact_type:
 		"container":
-			_open_container(nearest_interactable)
+			_begin_container_open(nearest_interactable)
 		"material":
 			_open_material(nearest_interactable)
 		"outpost":
 			_begin_outpost_repair(nearest_interactable)
+
+func _begin_container_open(container) -> void:
+	if interaction_progress_controller == null:
+		_open_container(container)
+		return
+	if not is_instance_valid(container):
+		return
+	if container.payload.get("state", "") == "depleted" or container.payload.get("rewards", []).is_empty():
+		_status_prompt = "容器已不可开启。"
+		_refresh_ui()
+		return
+	if interaction_progress_controller.begin(
+		"open_container",
+		container,
+		CONTAINER_OPEN_HOLD_SECONDS,
+		Callable(self, "_complete_held_container_open"),
+		Callable(self, "_cancel_held_container_open")
+	):
+		_status_prompt = ""
+	_refresh_ui()
+
+func _complete_held_container_open(container) -> void:
+	_open_container(container)
+	_status_prompt = "容器已打开。"
+
+func _cancel_held_container_open(_container) -> void:
+	pass
 
 func _open_container(container) -> void:
 	if not loot_interaction_controller.open_container(container):
@@ -1002,16 +1094,70 @@ func _update_active_interaction(delta: float) -> void:
 	if interaction_progress_controller == null or not interaction_progress_controller.is_active():
 		return
 	var target = interaction_progress_controller.active_target
-	var should_continue: bool = (
-		Input.is_action_pressed("interact")
-		and nearest_interactable == target
-		and is_instance_valid(target)
-	)
+	var interaction_id: String = interaction_progress_controller.active_id
+	var should_continue: bool = _should_continue_active_interaction(interaction_id, target)
 	var result: Dictionary = interaction_progress_controller.update(delta, should_continue)
 	if bool(result.get("cancelled", false)):
-		_status_prompt = "修复中断。"
+		_status_prompt = _interaction_cancel_message(interaction_id)
 	elif bool(result.get("completed", false)):
-		_status_prompt = "前哨站修复完成。"
+		_status_prompt = _interaction_complete_message(interaction_id)
+
+func _should_continue_active_interaction(interaction_id: String, target) -> bool:
+	match interaction_id:
+		"open_container", "repair_outpost":
+			return (
+				Input.is_action_pressed("interact")
+				and nearest_interactable == target
+				and is_instance_valid(target)
+			)
+		"extract":
+			return _is_extraction_hold_pressed() and _can_continue_extraction_hold()
+		_:
+			return false
+
+func _is_extraction_hold_pressed() -> bool:
+	return Input.is_action_pressed("extract") or _extract_button_held
+
+func _can_continue_extraction_hold() -> bool:
+	return (
+		run_director != null
+		and run_director.context != null
+		and run_director.context.is_extraction_unlocked
+		and run_director.context.active_safe_zone_id == "home"
+	)
+
+func _interaction_progress_text(interaction_id: String) -> String:
+	match interaction_id:
+		"open_container":
+			return "开箱"
+		"repair_outpost":
+			return "修复"
+		"extract":
+			return "撤离"
+		_:
+			return "交互"
+
+func _interaction_cancel_message(interaction_id: String) -> String:
+	match interaction_id:
+		"open_container":
+			return "开箱中断。"
+		"repair_outpost":
+			return "修复中断。"
+		"extract":
+			return "撤离中断。"
+		_:
+			return "交互中断。"
+
+func _interaction_complete_message(interaction_id: String) -> String:
+	match interaction_id:
+		"open_container":
+			return "容器已打开。"
+		"repair_outpost":
+			return "前哨站修复完成。"
+		"extract":
+			return "撤离完成。"
+		_:
+			return "交互完成。"
 
 func _try_repair_outpost(station) -> void:
 	var result: Dictionary = outpost_repair_controller.repair(station)
@@ -1085,12 +1231,46 @@ func _deposit_all() -> void:
 	_refresh_ui()
 
 func _try_extract() -> void:
+	_begin_extraction_hold()
+
+func _begin_extraction_hold_from_button() -> void:
+	_extract_button_held = true
+	_begin_extraction_hold()
+
+func _release_extraction_hold_button() -> void:
+	_extract_button_held = false
+
+func _begin_extraction_hold() -> void:
+	if run_end_controller == null:
+		return
+	if interaction_progress_controller != null and interaction_progress_controller.is_active():
+		return
+	var validation: Dictionary = run_end_controller.validate_extraction()
+	if not validation.accepted:
+		prompt_label.text = validation.message
+		return
+	if interaction_progress_controller == null:
+		_complete_held_extract(run_director)
+		return
+	if interaction_progress_controller.begin(
+		"extract",
+		run_director,
+		EXTRACTION_HOLD_SECONDS,
+		Callable(self, "_complete_held_extract"),
+		Callable(self, "_cancel_held_extract")
+	):
+		_status_prompt = ""
+	_refresh_ui()
+
+func _complete_held_extract(_target) -> void:
 	if run_end_controller == null:
 		return
 	var result: Dictionary = run_end_controller.try_extract(get_tree())
 	if not result.accepted:
 		prompt_label.text = result.message
-		return
+
+func _cancel_held_extract(_target) -> void:
+	pass
 
 func _on_stability_changed(current: float, _max_value: float, _stage: int) -> void:
 	if current <= 0.0:
@@ -1124,13 +1304,16 @@ func _refresh_ui() -> void:
 	var is_home_safe_zone: bool = run_director.context.active_safe_zone_id == "home"
 	if interaction_progress_controller != null and interaction_progress_controller.is_active():
 		var progress_percent: int = int(round(interaction_progress_controller.get_progress() * 100.0))
-		prompt_label.text = "按住 F 修复中：%s%%" % progress_percent
+		prompt_label.text = "%s中：%s%%" % [
+			_interaction_progress_text(interaction_progress_controller.active_id),
+			progress_percent,
+		]
 	elif extraction_ready_at_home:
-		prompt_label.text = "撤离已准备：按 E 或点击“撤离”返回基地。"
+		prompt_label.text = "撤离已准备：按住 E 或按住“撤离”返回基地。"
 	elif not _status_prompt.is_empty():
 		prompt_label.text = _status_prompt
 	elif nearest_interactable:
-		prompt_label.text = "按 F：%s（%s）" % [nearest_interactable.display_name, _interactable_type_name(nearest_interactable.interact_type)]
+		prompt_label.text = "%s：%s（%s）" % [_interact_prompt_prefix(nearest_interactable.interact_type), nearest_interactable.display_name, _interactable_type_name(nearest_interactable.interact_type)]
 	elif is_home_safe_zone:
 		prompt_label.text = "家中安全区：恢复稳定值，可存放物品。修复两座前哨站后可撤离。"
 	elif extraction_unlocked:
@@ -1138,14 +1321,28 @@ func _refresh_ui() -> void:
 	else:
 		prompt_label.text = ""
 	inventory_label.text = _items_text("背包", run_director.inventory_component.get_items_snapshot())
+	home_storage_label.text = _items_text("家中储存", run_director.home_storage_component.get_items_snapshot() if run_director.home_storage_component != null else [])
 	loot_label.text = _items_text("容器 / 材料", opened_loot)
-	home_action_panel.visible = is_home_safe_zone
+	_sync_home_storage_ui(is_home_safe_zone)
 	deposit_button.disabled = not is_home_safe_zone
 	extract_button.disabled = not extraction_ready_at_home
 	extract_hud_button.disabled = not extraction_ready_at_home
 	extract_hud_button.text = "撤离(E)" if extraction_ready_at_home else ("返回家中" if extraction_unlocked else "撤离未解锁")
 
-func _items_text(title: String, items: Array) -> String:
+func _sync_home_storage_ui(is_home_safe_zone: bool) -> void:
+	if not is_home_safe_zone:
+		_home_storage_user_closed = false
+		home_storage_panel.visible = false
+		if not loot_panel.visible:
+			inventory_panel.visible = false
+		return
+	if _home_storage_user_closed:
+		home_storage_panel.visible = false
+		return
+	inventory_panel.visible = true
+	home_storage_panel.visible = true
+
+func _items_text(_title: String, items: Array) -> String:
 	var lines: Array[String] = []
 	if items.is_empty():
 		lines.append("空")
@@ -1205,6 +1402,15 @@ func _interactable_type_name(interact_type: String) -> String:
 		_:
 			return interact_type
 
+func _interact_prompt_prefix(interact_type: String) -> String:
+	match interact_type:
+		"container":
+			return "按住 F"
+		"outpost":
+			return "按住 F"
+		_:
+			return "按 F"
+
 func _item(id: String, display_name: String, amount: int, weight: float, stack_limit: int) -> Dictionary:
 	return {
 		"item_id": id,
@@ -1221,7 +1427,18 @@ func _random_container_position() -> Vector2:
 	return container_spawn_controller.next_spawn_position()
 
 func _toggle_inventory_panel() -> void:
-	inventory_panel.visible = not inventory_panel.visible
+	var is_home_safe_zone: bool = run_director.context != null and run_director.context.active_safe_zone_id == "home"
+	if is_home_safe_zone:
+		if inventory_panel.visible or home_storage_panel.visible:
+			_home_storage_user_closed = true
+			inventory_panel.visible = false
+			home_storage_panel.visible = false
+		else:
+			_home_storage_user_closed = false
+			inventory_panel.visible = true
+			home_storage_panel.visible = true
+	else:
+		inventory_panel.visible = not inventory_panel.visible
 	_refresh_ui()
 
 func _switch_camera_home() -> void:
@@ -1292,6 +1509,29 @@ func _update_container_lifetimes(delta: float) -> void:
 	if container_spawn_controller == null:
 		return
 	container_spawn_controller.update_lifetimes(delta, interactables)
+
+func _update_container_lifetime_visuals() -> void:
+	for container in container_root.get_children():
+		if not is_instance_valid(container) or not (container is Node2D):
+			continue
+		if container.get("interact_type") != "container":
+			continue
+		_refresh_container_lifetime_visual(container)
+
+func _refresh_container_lifetime_visual(container: Node) -> void:
+	var payload: Dictionary = container.get("payload")
+	var lifetime_max: float = maxf(0.01, float(payload.get("lifetime_max", 45.0)))
+	var lifetime: float = clampf(float(payload.get("lifetime", lifetime_max)), 0.0, lifetime_max)
+	var ratio: float = lifetime / lifetime_max
+	var visual := container.get_node_or_null("ContainerWhiteboxVisual") as ColorRect
+	var fill := container.get_node_or_null("ContainerLifetimeFill") as ColorRect
+	if visual != null and fill != null:
+		fill.color = _rarity_color(String(payload.get("rarity", "C")))
+		fill.position = visual.position
+		fill.size = Vector2(visual.size.x * ratio, visual.size.y)
+	var lifetime_label := container.get_node_or_null("ContainerLifetimeLabel") as Label
+	if lifetime_label != null:
+		lifetime_label.text = "%ds" % int(ceil(lifetime))
 
 func _remove_interactable(interactable) -> void:
 	if nearest_interactable == interactable:

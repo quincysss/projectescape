@@ -13,7 +13,7 @@ func setup(director, state) -> void:
 	game_state = state
 
 func try_extract(tree: SceneTree) -> Dictionary:
-	var validation := _validate_extraction()
+	var validation := validate_extraction()
 	if not validation.accepted:
 		return validation
 
@@ -24,6 +24,9 @@ func try_extract(tree: SceneTree) -> Dictionary:
 	if tree != null:
 		tree.change_scene_to_file(base_scene_path)
 	return {"accepted": true, "result": result, "message": result.get("message", "")}
+
+func validate_extraction() -> Dictionary:
+	return _validate_extraction()
 
 func handle_player_death(tree: SceneTree, reason: String = "stability_depleted") -> Dictionary:
 	if run_director != null and run_director.state_machine != null:

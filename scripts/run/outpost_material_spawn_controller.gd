@@ -34,18 +34,14 @@ func build_requirements(first_outpost_id: String, second_outpost_id: String) -> 
 
 func spawn_for_outposts(requirements_by_outpost: Dictionary, outpost_positions: Dictionary) -> Array:
 	var spawned: Array = []
+	var used_positions: Array[Vector2] = _existing_material_positions()
 	for outpost_id in requirements_by_outpost.keys():
 		var base_pos: Vector2 = outpost_positions.get(outpost_id, Vector2.ZERO)
 		var requirements: Dictionary = requirements_by_outpost[outpost_id]
-		var material_points := _material_points_for_outpost(base_pos, requirements.size())
 		var offset := 0
 		for item_id in requirements.keys():
 			var data: Dictionary = requirements[item_id]
-			var pos: Vector2 = (
-				material_points[offset].global_position
-				if offset < material_points.size()
-				else base_pos + Vector2(-2.5 + offset * 1.3, 3.0 + offset * 0.8) * unit
-			)
+			var pos: Vector2 = _next_material_position(base_pos, used_positions, offset)
 			var pickup = make_interactable.call(
 				"pickup_%s" % item_id,
 				"material",
@@ -58,15 +54,54 @@ func spawn_for_outposts(requirements_by_outpost: Dictionary, outpost_positions: 
 			}
 			outpost_root.add_child(pickup)
 			spawned.append(pickup)
+			used_positions.append(pos)
 			offset += 1
 	return spawned
 
-func _material_points_for_outpost(base_pos: Vector2, count: int) -> Array:
+func _next_material_position(base_pos: Vector2, used_positions: Array[Vector2], fallback_offset: int) -> Vector2:
+	var material_points: Array = _material_points_for_outpost(base_pos)
+	for point in material_points:
+		if not (point is Node2D):
+			continue
+		var pos: Vector2 = point.global_position
+		if _is_position_used(pos, used_positions):
+			continue
+		return pos
+	return _fallback_material_position(base_pos, used_positions, fallback_offset)
+
+func _material_points_for_outpost(base_pos: Vector2) -> Array:
 	var points: Array = []
 	if get_spawn_points.is_valid():
 		points = get_spawn_points.call()
 	points.sort_custom(func(a, b): return a.global_position.distance_squared_to(base_pos) < b.global_position.distance_squared_to(base_pos))
-	return points.slice(0, count)
+	return points
+
+func _fallback_material_position(base_pos: Vector2, used_positions: Array[Vector2], fallback_offset: int) -> Vector2:
+	var offset := fallback_offset
+	while offset < fallback_offset + 64:
+		var pos := base_pos + Vector2(-2.5 + offset * 1.3, 3.0 + offset * 0.8) * unit
+		if not _is_position_used(pos, used_positions):
+			return pos
+		offset += 1
+	return base_pos + Vector2(5.0, 5.0) * unit
+
+func _existing_material_positions() -> Array[Vector2]:
+	var result: Array[Vector2] = []
+	if outpost_root == null:
+		return result
+	for child in outpost_root.get_children():
+		if not is_instance_valid(child) or not (child is Node2D):
+			continue
+		if child.get("interact_type") != "material":
+			continue
+		result.append(child.global_position)
+	return result
+
+func _is_position_used(pos: Vector2, used_positions: Array[Vector2]) -> bool:
+	for used_pos in used_positions:
+		if used_pos.distance_squared_to(pos) <= 1.0:
+			return true
+	return false
 
 func material_color(item_id: String) -> Color:
 	match item_id:

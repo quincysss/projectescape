@@ -33,9 +33,16 @@ func setup(
 
 func spawn_initial() -> void:
 	var points: Array = _spawn_points()
-	for spawn_point in points.slice(0, INITIAL_SPAWN_COUNT):
-		if spawn_point is Node2D:
-			spawn_container(spawn_point.global_position)
+	var spawned_count := 0
+	for spawn_point in points:
+		if not (spawn_point is Node2D):
+			continue
+		if _is_position_occupied(spawn_point.global_position):
+			continue
+		if spawn_container(spawn_point.global_position) != null:
+			spawned_count += 1
+		if spawned_count >= INITIAL_SPAWN_COUNT:
+			return
 
 func update(delta: float, interactables: Array) -> void:
 	update_lifetimes(delta, interactables)
@@ -43,7 +50,7 @@ func update(delta: float, interactables: Array) -> void:
 	if respawn_timer < RESPAWN_INTERVAL_SECONDS:
 		return
 	respawn_timer = 0.0
-	spawn_container(next_spawn_position())
+	spawn_next_container()
 
 func update_lifetimes(delta: float, interactables: Array) -> void:
 	for interactable in interactables.duplicate():
@@ -56,6 +63,8 @@ func update_lifetimes(delta: float, interactables: Array) -> void:
 			remove_interactable.call(interactable)
 
 func spawn_container(pos: Vector2):
+	if _is_position_occupied(pos):
+		return null
 	container_index += 1
 	var rarity := pick_rarity()
 	var container = make_interactable.call(
@@ -69,6 +78,7 @@ func spawn_container(pos: Vector2):
 		"state": "available",
 		"rarity": rarity,
 		"lifetime": CONTAINER_LIFETIME_SECONDS,
+		"lifetime_max": CONTAINER_LIFETIME_SECONDS,
 		"rewards": [
 			make_item.call("scrap_metal", "废金属", 1 + randi() % 2, 2.0, 5),
 			make_item.call("food_can", "罐头食品", 1, 1.0, 3),
@@ -77,12 +87,37 @@ func spawn_container(pos: Vector2):
 	container_root.add_child(container)
 	return container
 
+func spawn_next_container():
+	var spawn_point: Node2D = next_spawn_point()
+	if spawn_point == null:
+		return null
+	return spawn_container(spawn_point.global_position)
+
+func next_spawn_point() -> Node2D:
+	var points: Array = _spawn_points()
+	if points.is_empty():
+		return null
+	for offset in range(points.size()):
+		var index := (last_spawn_point_index + 1 + offset) % points.size()
+		var candidate = points[index]
+		if not (candidate is Node2D):
+			continue
+		var spawn_point: Node2D = candidate
+		if _is_position_occupied(spawn_point.global_position):
+			continue
+		last_spawn_point_index = index
+		return spawn_point
+	return null
+
 func next_spawn_position() -> Vector2:
 	var points: Array = _spawn_points()
 	if points.is_empty():
 		return Vector2(18.0 + randf() * 98.0, -42.0 + randf() * 84.0) * unit
-	last_spawn_point_index = (last_spawn_point_index + 1) % points.size()
-	return points[last_spawn_point_index].global_position
+	var spawn_point: Node2D = next_spawn_point()
+	if spawn_point == null:
+		var fallback_point = points[last_spawn_point_index % points.size()]
+		return fallback_point.global_position if fallback_point is Node2D else Vector2.ZERO
+	return spawn_point.global_position
 
 func pick_rarity() -> String:
 	var roll := randf()
@@ -111,3 +146,20 @@ func _spawn_points() -> Array:
 	if not get_spawn_points.is_valid():
 		return []
 	return get_spawn_points.call()
+
+func _is_position_occupied(pos: Vector2) -> bool:
+	if container_root == null:
+		return false
+	for child in container_root.get_children():
+		if not is_instance_valid(child) or not (child is Node2D):
+			continue
+		if child.get("interact_type") != "container":
+			continue
+		var payload = child.get("payload")
+		if not (payload is Dictionary):
+			continue
+		if payload.get("state", "") != "available":
+			continue
+		if child.global_position.distance_squared_to(pos) <= 1.0:
+			return true
+	return false

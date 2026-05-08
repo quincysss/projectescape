@@ -18,9 +18,17 @@ func _verify_outpost_safe_zone_and_extract_ui() -> bool:
 	if root.deposit_button.get_parent() == root.inventory_panel or root.extract_button.get_parent() == root.inventory_panel:
 		printerr("Expected home action buttons outside backpack panel.")
 		return false
-	if root.deposit_button.get_parent() != root.home_action_panel or root.extract_button.get_parent() != root.home_action_panel:
-		printerr("Expected home action buttons under independent home action panel.")
+	if root.deposit_button.get_parent() != root.home_storage_panel or root.extract_button.get_parent() != root.home_storage_panel:
+		printerr("Expected home action buttons under home storage panel.")
 		return false
+	if not root.inventory_panel.visible or not root.home_storage_panel.visible:
+		printerr("Expected backpack and home storage to auto-open at home.")
+		return false
+	root._toggle_inventory_panel()
+	if root.inventory_panel.visible or root.home_storage_panel.visible:
+		printerr("Expected manual backpack close to also close home storage.")
+		return false
+	root._toggle_inventory_panel()
 
 	var outpost = _find_interactable(root, "outpost")
 	if outpost == null:
@@ -29,6 +37,10 @@ func _verify_outpost_safe_zone_and_extract_ui() -> bool:
 
 	root.run_director.on_safe_zone_exited("home")
 	root.run_director.on_camera_transition_finished()
+	await process_frame
+	if root.inventory_panel.visible or root.home_storage_panel.visible:
+		printerr("Expected backpack and home storage to auto-close after leaving home.")
+		return false
 	root.run_director.stability_component.set_stability(50.0)
 	outpost.payload.repaired = true
 	outpost.payload.repair_state = "ACTIVE"

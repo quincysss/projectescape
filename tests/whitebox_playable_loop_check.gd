@@ -41,18 +41,48 @@ func _verify_whitebox_loop() -> bool:
 	if container == null:
 		printerr("Expected a loot container")
 		return false
-	root._open_container(container)
+	root._on_interactable_entered(container)
+	Input.action_press("interact")
+	root._try_interact()
+	Input.action_release("interact")
+	root._update_active_interaction(0.2)
+	if root.interaction_progress_controller.is_active() or root.loot_panel.visible:
+		printerr("Expected releasing interact to cancel held container open")
+		return false
+	root._on_interactable_entered(container)
+	Input.action_press("interact")
+	root._try_interact()
+	root._on_interactable_exited(container)
+	Input.action_release("interact")
+	if root.interaction_progress_controller.is_active() or root.loot_panel.visible:
+		printerr("Expected leaving range to cancel held container open")
+		return false
+	root._on_interactable_entered(container)
+	Input.action_press("interact")
+	root._try_interact()
+	root._update_active_interaction(root.CONTAINER_OPEN_HOLD_SECONDS + 0.1)
+	Input.action_release("interact")
 	if not root.loot_panel.visible or not root.inventory_panel.visible:
-		printerr("Expected container interaction to open loot and backpack panels")
+		printerr("Expected held container interaction to open loot and backpack panels")
 		return false
 	root._on_interactable_exited(container)
-	if root.loot_panel.visible or root.inventory_panel.visible:
-		printerr("Expected leaving container range to close loot and backpack panels")
+	if root.loot_panel.visible:
+		printerr("Expected leaving container range to close loot panel")
 		return false
-	root._open_container(container)
+	if not root.inventory_panel.visible or not root.home_storage_panel.visible:
+		printerr("Expected backpack and home storage to remain open at home")
+		return false
+	root._on_interactable_entered(container)
+	Input.action_press("interact")
+	root._try_interact()
+	root._update_active_interaction(root.CONTAINER_OPEN_HOLD_SECONDS + 0.1)
+	Input.action_release("interact")
 	root._take_all_loot()
-	if root.loot_panel.visible or root.inventory_panel.visible:
-		printerr("Expected empty container to close loot and backpack panels")
+	if root.loot_panel.visible:
+		printerr("Expected empty container to close loot panel")
+		return false
+	if not root.inventory_panel.visible or not root.home_storage_panel.visible:
+		printerr("Expected backpack and home storage to stay open at home after looting")
 		return false
 	if root.run_director.inventory_component.items.is_empty():
 		printerr("Expected loot to enter backpack")
@@ -85,7 +115,11 @@ func _verify_whitebox_loop() -> bool:
 	var repaired := 0
 	for interactable in root.interactables.duplicate():
 		if is_instance_valid(interactable) and interactable.interact_type == "outpost":
-			root._try_repair_outpost(interactable)
+			root._on_interactable_entered(interactable)
+			Input.action_press("interact")
+			root._try_interact()
+			root._update_active_interaction(root.OUTPOST_REPAIR_HOLD_SECONDS + 0.1)
+			Input.action_release("interact")
 			if interactable.payload.get("repaired", false):
 				repaired += 1
 
@@ -98,7 +132,10 @@ func _verify_whitebox_loop() -> bool:
 
 	root.run_director.on_safe_zone_entered("home")
 	root._deposit_all()
+	Input.action_press("extract")
 	root._try_extract()
+	root._update_active_interaction(root.EXTRACTION_HOLD_SECONDS + 0.1)
+	Input.action_release("extract")
 	await process_frame
 	if game_state.warehouse_items.is_empty():
 		printerr("Expected warehouse items after extraction")
