@@ -21,8 +21,8 @@ func _initialize() -> void:
 	ok = _require_node(root, "WorldRoot/MapLights/StreetLights") and ok
 	ok = _require_node(root, "WorldRoot/MapLights/BuildingLights") and ok
 	ok = _require_node(root, "WorldRoot/MapLights/AmbientLights") and ok
-	ok = _require_interactable_visual(root, "container", "ContainerWhiteboxVisual") and ok
-	ok = _require_interactable_visual(root, "material", "BuildMaterialWhiteboxVisual") and ok
+	ok = _require_interactable_visual(root, "container", "ContainerVisual") and ok
+	ok = _require_interactable_visual(root, "material", "BuildMaterialVisual") and ok
 
 	var road_visual: Node = root.get_node_or_null("WorldRoot/MapVisual/RoadVisual")
 	var block_visual: Node = root.get_node_or_null("WorldRoot/MapVisual/BlockVisual")
@@ -70,8 +70,8 @@ func _require_interactable_visual(root: Node, interact_type: String, visual_name
 		if interactable.get_node_or_null(visual_name) == null:
 			printerr("Missing %s visual on %s." % [visual_name, interactable.name])
 			return false
-		if interactable.get_node_or_null("WhiteboxMarkerLabel") == null:
-			printerr("Missing whitebox marker label on %s." % interactable.name)
+		if interactable.get_node_or_null("MarkerLabel") == null:
+			printerr("Missing marker label on %s." % interactable.name)
 			return false
 		return true
 	printerr("Missing interactable type for visual check: %s" % interact_type)

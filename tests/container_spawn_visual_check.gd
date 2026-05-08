@@ -44,10 +44,10 @@ func _verify_container_spawn_and_visuals() -> bool:
 	return ok
 
 func _check_container_visual(root: Node, container: Node) -> bool:
-	var visual := container.get_node_or_null("ContainerWhiteboxVisual") as ColorRect
+	var visual := container.get_node_or_null("ContainerVisual") as ColorRect
 	var fill := container.get_node_or_null("ContainerLifetimeFill") as ColorRect
 	var lifetime_label := container.get_node_or_null("ContainerLifetimeLabel") as Label
-	var marker_label := container.get_node_or_null("WhiteboxMarkerLabel") as Label
+	var marker_label := container.get_node_or_null("MarkerLabel") as Label
 	var ok := true
 	if visual == null or fill == null:
 		printerr("Expected container visual and lifetime fill nodes.")

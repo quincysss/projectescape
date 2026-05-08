@@ -1,4 +1,4 @@
-class_name WhiteboxInteractable
+class_name RunInteractable
 extends Area2D
 
 signal player_entered(node)

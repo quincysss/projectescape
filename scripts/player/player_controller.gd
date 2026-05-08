@@ -1,4 +1,4 @@
-class_name WhiteboxPlayer
+class_name PlayerController
 extends CharacterBody2D
 
 @export var base_speed: float = 180.0

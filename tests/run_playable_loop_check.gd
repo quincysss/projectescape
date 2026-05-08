@@ -1,10 +1,10 @@
 extends SceneTree
 
 func _initialize() -> void:
-	var ok := await _verify_whitebox_loop()
+	var ok := await _verify_run_loop()
 	quit(0 if ok else 1)
 
-func _verify_whitebox_loop() -> bool:
+func _verify_run_loop() -> bool:
 	var game_state = get_root().get_node("GameState")
 	game_state.clear_warehouse()
 	var scene := load("res://scenes/run/RunScene.tscn")
@@ -17,7 +17,7 @@ func _verify_whitebox_loop() -> bool:
 	await process_frame
 
 	if root.player == null:
-		printerr("Whitebox player missing")
+		printerr("Run player missing")
 		return false
 	if root.run_director.context == null:
 		printerr("Run context missing")
@@ -140,7 +140,7 @@ func _verify_whitebox_loop() -> bool:
 	if game_state.warehouse_items.is_empty():
 		printerr("Expected warehouse items after extraction")
 		return false
-	print("Whitebox playable loop verified.")
+	print("Run playable loop verified.")
 	return true
 
 func _find_interactable(root, interact_type: String):

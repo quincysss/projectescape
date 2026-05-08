@@ -1,5 +1,5 @@
 @tool
-class_name WhiteboxMapRect
+class_name MapLayoutRect
 extends Node2D
 
 @export_enum("street", "plaza", "block", "building", "home", "outpost") var rect_kind: String = "street"

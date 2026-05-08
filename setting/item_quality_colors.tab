@@ -1,0 +1,5 @@
+quality	display_name	sort_order	text_color_hex	frame_color_hex	description	enabled_version
+S	S级	4	#E8B84A	#E8B84A	极稀有道具，结算和展示使用金色文字。	v0.1
+A	A级	3	#A06CFF	#A06CFF	稀有高价值道具，展示使用紫色文字。	v0.1
+B	B级	2	#4BA3FF	#4BA3FF	普通有效道具，展示使用蓝色文字。	v0.1
+C	C级	1	#F2F2F2	#B8B8B8	常见基础道具，展示使用白色文字。	v0.1

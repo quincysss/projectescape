@@ -1,4 +1,4 @@
-class_name WhiteboxMapPoint
+class_name MapLayoutPoint
 extends Marker2D
 
 @export_enum("container", "material", "anomaly", "spawn", "extract") var point_type: String = "container"

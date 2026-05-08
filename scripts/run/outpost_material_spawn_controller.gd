@@ -21,16 +21,16 @@ func setup(
 	unit = p_unit
 
 func build_requirements(first_outpost_id: String, second_outpost_id: String) -> Dictionary:
-	return {
-		first_outpost_id: {
-			"scrap_metal": {"display_name": "废金属", "amount": 2, "weight": 2.0},
-			"old_battery": {"display_name": "旧电池", "amount": 1, "weight": 4.0},
-		},
-		second_outpost_id: {
-			"copper_wire": {"display_name": "铜线", "amount": 2, "weight": 1.5},
-			"signal_core": {"display_name": "信号核心", "amount": 1, "weight": 3.0},
-		},
+	var requirements := {}
+	requirements[first_outpost_id] = {
+		"scrap_metal": {"display_name": "废金属", "amount": 2, "weight": 2.0},
+		"old_battery": {"display_name": "旧电池", "amount": 1, "weight": 4.0},
 	}
+	requirements[second_outpost_id] = {
+		"copper_wire": {"display_name": "铜线", "amount": 2, "weight": 1.5},
+		"signal_core": {"display_name": "信号核心", "amount": 1, "weight": 3.0},
+	}
+	return requirements
 
 func spawn_for_outposts(requirements_by_outpost: Dictionary, outpost_positions: Dictionary) -> Array:
 	var spawned: Array = []

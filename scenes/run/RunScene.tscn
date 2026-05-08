@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://bbxao5r4lyx1d"]
 
-[ext_resource type="Script" uid="uid://dafpycg0ad5iu" path="res://scripts/run/whitebox_run_scene.gd" id="0_run_scene"]
+[ext_resource type="Script" path="res://scripts/run/run_scene.gd" id="0_run_scene"]
 [ext_resource type="Script" uid="uid://b8pmhv7r3q7yw" path="res://scripts/run/run_director.gd" id="1_run_director"]
 [ext_resource type="Script" uid="uid://b6x1qaptybfy0" path="res://scripts/run/run_state_machine.gd" id="2_state_machine"]
 [ext_resource type="Script" uid="uid://diq20cvnrpqvm" path="res://scripts/run/spawn_point.gd" id="3_spawn_point"]
@@ -12,8 +12,8 @@
 [ext_resource type="Script" uid="uid://cbymcmii4cal7" path="res://scripts/inventory/inventory_component.gd" id="9_inventory"]
 [ext_resource type="Script" uid="uid://cxkt7ynvfc2xq" path="res://scripts/inventory/weight_component.gd" id="10_weight"]
 [ext_resource type="Script" uid="uid://lyioyvael0ho" path="res://scripts/inventory/home_storage_component.gd" id="11_home_storage"]
-[ext_resource type="Script" uid="uid://djluasuolovxg" path="res://scripts/map/whitebox_map_rect.gd" id="12_map_rect"]
-[ext_resource type="Script" uid="uid://ddmr5koxxcwn5" path="res://scripts/map/whitebox_map_point.gd" id="13_map_point"]
+[ext_resource type="Script" path="res://scripts/map/map_layout_rect.gd" id="12_map_rect"]
+[ext_resource type="Script" path="res://scripts/map/map_layout_point.gd" id="13_map_point"]
 [ext_resource type="Script" uid="uid://bvmyoqvhbgjca" path="res://scripts/map/road_visual_generator.gd" id="14_road_visual_generator"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_home_safe_zone"]

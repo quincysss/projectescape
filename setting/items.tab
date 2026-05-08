@@ -1,0 +1,17 @@
+id	item_type	name	quality	stackable	stack_limit	weight	icon	description	tags	enabled_version
+scrap_metal	material	废金属	C	true	99	0.10	res://assets/icons/items/scrap_metal.png	常见金属废料，可用于修复和制作。	material;craft;common	v0.1
+cloth_dirty	material	脏布条	C	true	99	0.05	res://assets/icons/items/cloth_dirty.png	从旧衣物和包扎残留中拆出的布条。	material;craft;common	v0.1
+wire_coil	material	旧线圈	B	true	50	0.12	res://assets/icons/items/wire_coil.png	还能导电的旧线圈，适合修设备。	material;electronic;craft	v0.1
+battery_old	material	旧电池	B	true	20	0.20	res://assets/icons/items/battery_old.png	容量不稳定的旧电池。	material;electronic;power	v0.1
+medicine_powder	material	药粉	B	true	20	0.08	res://assets/icons/items/medicine_powder.png	未标记来源的药粉，可用于制作稳定类消耗品。	material;medical;craft	v0.1
+tool_parts	material	工具零件	B	true	30	0.18	res://assets/icons/items/tool_parts.png	来自旧工具的齿轮、螺丝和卡扣。	material;tool;craft	v0.1
+outpost_fuse	outpost_material	前哨保险丝	B	true	10	0.15	res://assets/icons/items/outpost_fuse.png	前哨站基础供电修复材料。	outpost_material;repair;electronic	v0.1
+outpost_filter	outpost_material	净化滤芯	A	true	5	0.35	res://assets/icons/items/outpost_filter.png	用于恢复前哨站空气与饮水循环的关键滤芯。	outpost_material;repair;rare	v0.1
+stability_candy	consumable	安定糖	C	false	1	0.05	res://assets/icons/consumables/stability_candy.png	短时间内帮助角色稳住情绪的小糖块。	consumable;stability	v0.1
+field_bandage	consumable	临时绷带	C	false	1	0.08	res://assets/icons/consumables/field_bandage.png	粗糙但能应急处理伤口的绷带。	consumable;medical	v0.1
+signal_injector	consumable	信号针剂	A	false	1	0.12	res://assets/icons/consumables/signal_injector.png	短时增强感知和信号反馈的危险针剂。	consumable;stability;rare	v0.1
+backpack_small_reinforced	equipment	小型加固背包	C	false	1	1.00	res://assets/icons/equipment/backpack_small_reinforced.png	加固过的小背包，能略微提高携带能力。	equipment;backpack;carry	v0.1
+scanner_broken	equipment	破损扫描器	B	false	1	0.80	res://assets/icons/equipment/scanner_broken.png	旧城区常见的半坏扫描设备。	equipment;tool;electronic	v0.1
+bp_backpack_small	blueprint	小型背包图纸	A	false	1	0.02	res://assets/icons/blueprints/bp_backpack_small.png	记录小型加固背包制作方法的旧图纸。	blueprint;equipment;backpack	v0.1
+keepsake_photo	rare	褪色照片	A	false	1	0.01	res://assets/icons/items/keepsake_photo.png	几乎没有实用价值，却能在结算中换来高价值。	rare;settlement;collectible	v0.1
+gold_data_chip	rare	金色数据芯片	S	false	1	0.03	res://assets/icons/items/gold_data_chip.png	保存着稀缺旧城数据的高价值芯片。	rare;settlement;electronic	v0.1
