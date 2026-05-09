@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://d1oxoexmguf03"
-path="res://.godot/imported/player_male_idle_right_08.png-11cc6a0ed69c6a6ecc9590f6c2b00f3f.ctex"
+uid="uid://cmf0xvqcc60on"
+path="res://.godot/imported/player_male_run_left_03.png-44696287ef0498b2fa7ab10a423125c3.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/sprites/player/male/run/left/frames/player_male_idle_right_08.png"
-dest_files=["res://.godot/imported/player_male_idle_right_08.png-11cc6a0ed69c6a6ecc9590f6c2b00f3f.ctex"]
+source_file="res://assets/sprites/player/male/run/left/frames/player_male_run_left_03.png"
+dest_files=["res://.godot/imported/player_male_run_left_03.png-44696287ef0498b2fa7ab10a423125c3.ctex"]
 
 [params]
 
