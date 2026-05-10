@@ -26,7 +26,7 @@ func _ready() -> void:
 	_setup_animation_sprite()
 
 func _physics_process(_delta: float) -> void:
-	var input_vector := Input.get_vector("move_left", "move_right", "move_up", "move_down")
+	var input_vector := _movement_input_vector()
 	velocity = input_vector * base_speed * speed_multiplier
 	if not _update_interaction_animation(_delta):
 		_update_animation(input_vector)
@@ -60,15 +60,25 @@ func _is_position_walkable(world_position: Vector2) -> bool:
 			return true
 	return false
 
+func _movement_input_vector() -> Vector2:
+	for action_name in ["move_left", "move_right", "move_up", "move_down"]:
+		if not InputMap.has_action(action_name):
+			return Vector2.ZERO
+	return Input.get_vector("move_left", "move_right", "move_up", "move_down")
+
 func _setup_animation_sprite() -> void:
-	sprite = AnimatedSprite2D.new()
-	sprite.name = "PlayerSprite"
+	sprite = get_node_or_null("BodySprite") as AnimatedSprite2D
+	if sprite == null:
+		sprite = get_node_or_null("PlayerSprite") as AnimatedSprite2D
+	if sprite == null:
+		sprite = AnimatedSprite2D.new()
+		sprite.name = "BodySprite"
+		add_child(sprite)
 	sprite.sprite_frames = _build_sprite_frames()
 	sprite.centered = true
 	sprite.scale = sprite_scale
 	sprite.position = Vector2(0.0, -(SPRITE_FOOTLINE_Y - 128.0) * sprite_scale.y)
-	sprite.z_index = 30
-	add_child(sprite)
+	sprite.z_index = 0
 	_play_animation("idle_down", false)
 
 func _build_sprite_frames() -> SpriteFrames:

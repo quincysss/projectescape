@@ -15,7 +15,7 @@
                                                                50
                                                            ]
                             },
-    "output_rule":  "Strict extraction from supplied HUD reference. Text is intentionally removed for localization and runtime state styling.",
+    "output_rule":  "Reference-aligned generated redraw from the supplied HUD mockup. Existing file names, sizes, sheet rects, three-slice rules, and runtime usage are preserved. Text is intentionally removed for localization and runtime state styling.",
     "sheet":  "assets/ui/run_timer_extraction_hud/sheets/ui_run_timer_extraction_hud_sheet_01.png",
     "sheet_size":  [
                        1024,

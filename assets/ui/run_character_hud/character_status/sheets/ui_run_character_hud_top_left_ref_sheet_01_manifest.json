@@ -15,7 +15,7 @@
                                                            100
                                                        ]
                             },
-    "output_rule":  "Strict extraction from supplied reference mockup. No freehand redraw. Current scope only: empty portrait frame and stability progress bar.",
+    "output_rule":  "Reference-aligned generated redraw from the supplied HUD mockup. Existing file names, sizes, sheet rects, and runtime usage are preserved. Current scope only: empty portrait frame, stability fill, tick marks, and stability frame.",
     "sheet":  "assets/ui/run_character_hud/character_status/sheets/ui_run_character_hud_top_left_ref_sheet_01.png",
     "sheet_size":  [
                        1024,
@@ -101,6 +101,6 @@
     "usage":  {
                   "portrait":  "Use portrait_frame_empty as an overlay above a future character portrait texture clipped to the transparent inner aperture.",
                   "stability_one_piece":  "Use stability_bar_full_reference for visual approval or temporary static HUD.",
-                  "stability_dynamic":  "Draw stability_bar_frame_empty, then draw/clamp stability_fill_overlay_current or stretch/tile stability_fill_strip_current under it. The bar preserves the reference tick/number layout, including the duplicated 35 visible in the reference."
+                  "stability_dynamic":  "Draw stability_bar_frame_empty, then draw/clamp stability_fill_overlay_current or stretch/tile stability_fill_strip_current under it. The bar preserves the current approved tick/number layout: 0 / 25 / 50 / 75 / 100 from left to right."
               }
 }

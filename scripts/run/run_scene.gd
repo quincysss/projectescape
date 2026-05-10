@@ -1,6 +1,6 @@
 extends Node2D
 
-const PlayerScript := preload("res://scripts/player/player_controller.gd")
+const BasicPlayerScene := preload("res://scenes/entities/player/BasicPlayer.tscn")
 const InteractableScript := preload("res://scripts/run/run_interactable.gd")
 const VisionCircleScript := preload("res://scripts/vision/vision_debug_circle.gd")
 const VisionMaskScript := preload("res://scripts/vision/vision_mask_overlay.gd")
@@ -36,10 +36,11 @@ const SHOW_DEBUG_VISION_CIRCLE := false
 
 @onready var run_director: RunDirector = $RunDirector
 @onready var world_root: Node2D = $WorldRoot
+@onready var y_sort_root: Node2D = $WorldRoot/YSortRoot
 @onready var map_visual_root: Node2D = $WorldRoot/MapVisual
 @onready var road_visual_root: Node2D = $WorldRoot/MapVisual/RoadVisual
 @onready var block_visual_root: Node2D = $WorldRoot/MapVisual/BlockVisual
-@onready var building_visual_root: Node2D = $WorldRoot/MapVisual/BuildingVisual
+@onready var building_visual_root: Node2D = $WorldRoot/YSortRoot
 @onready var prop_visual_root: Node2D = $WorldRoot/MapVisual/PropVisual
 @onready var decal_visual_root: Node2D = $WorldRoot/MapVisual/DecalVisual
 @onready var player_root: Node2D = $WorldRoot/PlayerRoot
@@ -65,16 +66,22 @@ var enterable_exception_rects: Array[Rect2] = []
 
 var hud_label: Label
 var character_hud_root: Control
-var portrait_frame: Panel
+var portrait_frame: TextureRect
 var stability_hud_root: Control
-var stability_bar: ProgressBar
+var stability_bar: Control
+var stability_fill_clip: Control
+var stability_fill_texture: TextureRect
+var stability_frame_texture: TextureRect
 var stability_value_label: Label
 var stability_stage_label: Label
 var center_hud_root: Control
-var countdown_panel: Panel
+var countdown_panel: TextureRect
 var countdown_label: Label
-var extraction_status_panel: Panel
-var extraction_status_dot: Panel
+var extraction_status_panel: Control
+var extraction_status_frame_left: TextureRect
+var extraction_status_frame_center: TextureRect
+var extraction_status_frame_right: TextureRect
+var extraction_status_dot: TextureRect
 var extraction_status_label: Label
 var outpost_hud_root: Panel
 var outpost_count_label: Label
@@ -91,11 +98,11 @@ var weight_bar: ProgressBar
 var weight_value_label: Label
 var prompt_label: Label
 var inventory_panel: Panel
-var inventory_label: RichTextLabel
+var inventory_label: Control
 var loot_panel: Panel
-var loot_label: RichTextLabel
+var loot_label: Control
 var home_storage_panel: Panel
-var home_storage_label: RichTextLabel
+var home_storage_label: Control
 var take_all_button: Button
 var deposit_button: Button
 var extract_button: Button
@@ -256,20 +263,14 @@ func _create_home_visual() -> void:
 	label.z_index = 20
 
 func _create_player() -> void:
-	player = CharacterBody2D.new()
+	player = BasicPlayerScene.instantiate()
 	player.name = "Player"
-	player.script = PlayerScript
 	player.base_speed = 12.0 * UNIT
-	player.position = $WorldRoot/PlayerRoot/PlayerSpawn.position
-	player_root.add_child(player)
+	y_sort_root.add_child(player)
+	player.global_position = $WorldRoot/PlayerRoot/PlayerSpawn.global_position
 	_walkable_rects.append(Rect2(player_root.global_position - _u(HOME_SAFE_SIZE_UNITS) * 0.5, _u(HOME_SAFE_SIZE_UNITS)))
 	player.set_walkable_rects(_walkable_rects)
 	player.set_walkable_polygons(_walkable_polygons)
-	var shape := CollisionShape2D.new()
-	var circle := CircleShape2D.new()
-	circle.radius = 0.6 * UNIT
-	shape.shape = circle
-	player.add_child(shape)
 
 func _create_camera() -> void:
 	camera = Camera2D.new()
@@ -282,7 +283,10 @@ func _create_camera() -> void:
 	camera.limit_top = int(MAP_ORIGIN_UNITS.y * UNIT)
 	camera.limit_right = int((MAP_ORIGIN_UNITS.x + MAP_UNITS.x) * UNIT)
 	camera.limit_bottom = int((MAP_ORIGIN_UNITS.y + MAP_UNITS.y) * UNIT)
-	player.add_child(camera)
+	var camera_parent: Node = player.get_node_or_null("CameraMount")
+	if camera_parent == null:
+		camera_parent = player
+	camera_parent.add_child(camera)
 	camera.call_deferred("make_current")
 
 func _create_vision_circle() -> void:
@@ -513,6 +517,7 @@ func _begin_container_open(container) -> void:
 		_status_prompt = "容器已不可开启。"
 		_refresh_ui()
 		return
+	_set_container_lifetime_paused(container, true)
 	if interaction_progress_controller.begin(
 		"open_container",
 		container,
@@ -528,13 +533,15 @@ func _complete_held_container_open(container) -> void:
 	_open_container(container)
 	_status_prompt = "容器已打开。"
 
-func _cancel_held_container_open(_container) -> void:
-	pass
+func _cancel_held_container_open(container) -> void:
+	_set_container_lifetime_paused(container, false)
 
 func _open_container(container) -> void:
 	if not loot_interaction_controller.open_container(container):
+		_set_container_lifetime_paused(container, false)
 		prompt_label.text = loot_interaction_controller.last_prompt
 		return
+	_set_container_lifetime_paused(container, true)
 	_play_player_interact_once(container)
 	_sync_loot_state()
 	_open_loot_transfer_panels()
@@ -558,6 +565,7 @@ func _take_all_loot() -> void:
 	if transfer_finished:
 		loot_panel.visible = false
 		inventory_panel.visible = false
+		_set_container_lifetime_paused(opened_container, false)
 	_refresh_ui()
 
 func _on_loot_item_meta_clicked(meta: Variant) -> void:
@@ -588,6 +596,7 @@ func _take_loot_item_at(index: int) -> void:
 		_status_prompt = "已放入背包：%s" % result.item.get("display_name", result.item.get("item_id", ""))
 		if bool(result.get("finished", false)):
 			loot_panel.visible = false
+			_set_container_lifetime_paused(opened_container, false)
 	else:
 		_status_prompt = loot_interaction_controller.last_prompt
 	_refresh_ui()
@@ -641,10 +650,12 @@ func _selection_transfer_reason_text(reason: String) -> String:
 			return "无法移动该道具。"
 
 func _open_loot_transfer_panels() -> void:
+	_set_container_lifetime_paused(opened_container, true)
 	loot_panel.visible = true
 	inventory_panel.visible = true
 
 func _close_loot_transfer() -> void:
+	_set_container_lifetime_paused(opened_container, false)
 	loot_interaction_controller.close()
 	_sync_loot_state()
 	loot_panel.visible = false
@@ -653,6 +664,13 @@ func _close_loot_transfer() -> void:
 func _save_opened_loot_to_source() -> void:
 	loot_interaction_controller.save_opened_loot_to_source()
 	_sync_loot_state()
+
+func _set_container_lifetime_paused(container, paused: bool) -> void:
+	if container == null or not is_instance_valid(container):
+		return
+	if container.get("interact_type") != "container":
+		return
+	container.payload["lifetime_paused"] = paused
 
 func _pick_material(pickup) -> void:
 	loot_interaction_controller.pick_material_immediate(
@@ -954,7 +972,7 @@ func _on_weight_changed(_current_weight: float, _max_weight: float, _stage: int)
 func _refresh_ui() -> void:
 	run_ui_controller.refresh(self)
 
-func _item(id: String, display_name: String, amount: int, weight: float, stack_limit: int) -> Dictionary:
+func _item(id: String, display_name: String, amount: int, weight: float, _stack_limit: int) -> Dictionary:
 	return {
 		"item_id": id,
 		"display_name": display_name,

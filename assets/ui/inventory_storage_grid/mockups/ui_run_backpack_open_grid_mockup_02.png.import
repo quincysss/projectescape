@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dq1im5cqjbcw0"
-path="res://.godot/imported/ui_run_backpack_panel_frame_empty_01.png-13be5e50938b6d4332c2d66710e63987.ctex"
+uid="uid://fv05wg70xgn"
+path="res://.godot/imported/ui_run_backpack_open_grid_mockup_02.png-9507817b533acae9e59e9091c0b270cb.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/ui/run_backpack_hud/components/ui_run_backpack_panel_frame_empty_01.png"
-dest_files=["res://.godot/imported/ui_run_backpack_panel_frame_empty_01.png-13be5e50938b6d4332c2d66710e63987.ctex"]
+source_file="res://assets/ui/inventory_storage_grid/mockups/ui_run_backpack_open_grid_mockup_02.png"
+dest_files=["res://.godot/imported/ui_run_backpack_open_grid_mockup_02.png-9507817b533acae9e59e9091c0b270cb.ctex"]
 
 [params]
 

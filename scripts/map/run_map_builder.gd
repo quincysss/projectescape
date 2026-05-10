@@ -51,8 +51,9 @@ func build() -> void:
 func clear_generated_visual_layers() -> void:
 	for layer in [scene.block_visual_root, scene.building_visual_root, scene.prop_visual_root, scene.decal_visual_root]:
 		for child in layer.get_children():
-			layer.remove_child(child)
-			child.free()
+			if _is_generated_visual_layer_child(child):
+				layer.remove_child(child)
+				child.free()
 
 
 func generate_road_visuals() -> void:
@@ -185,7 +186,8 @@ func _add_block_from_layout(layout) -> void:
 
 
 func _add_visual_building_from_layout(layout) -> void:
-	_add_layout_polygon(layout.get_rect_id(), layout.global_transform, layout.get_local_corners_px(unit), Color(0.92, 0.92, 0.9, 0.0), -40, scene.building_visual_root)
+	var polygon := _add_layout_polygon(layout.get_rect_id(), layout.global_transform, layout.get_local_corners_px(unit), Color(0.92, 0.92, 0.9, 0.0), -40, scene.building_visual_root)
+	polygon.set_meta("_generated_building_visual", true)
 
 
 func _add_road_art_from_layout(layout) -> void:
@@ -395,6 +397,18 @@ func _layout_art_z(layout, default_z: int) -> int:
 func _default_texture_for_layout(textures: Array, layout) -> Texture2D:
 	var texture_index: int = int(abs(hash(layout.get_rect_id())) % textures.size())
 	return textures[texture_index]
+
+
+func _is_generated_visual_layer_child(child: Node) -> bool:
+	if child.has_meta("_generated_block_visual"):
+		return true
+	if child.has_meta("_generated_building_visual"):
+		return true
+	if child.has_meta("_generated_prop_visual"):
+		return true
+	if child.has_meta("_generated_decal_visual"):
+		return true
+	return false
 
 
 func _add_layout_polygon(polygon_name: String, source_transform: Transform2D, local_polygon: PackedVector2Array, color: Color, z: int, parent: Node = null) -> Polygon2D:

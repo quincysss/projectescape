@@ -41,11 +41,16 @@ func _verify_container_spawn_and_visuals() -> bool:
 		root._open_container(first_container)
 		first_container.payload.lifetime = 0.01
 		root._update_container_lifetimes(1.0)
-		if root.interactables.has(first_container) or (is_instance_valid(first_container) and first_container.visible):
-			printerr("Expected opened container to keep counting down and expire.")
+		if not root.interactables.has(first_container) or not (is_instance_valid(first_container) and first_container.visible):
+			printerr("Expected opened container lifetime to pause while transfer UI is open.")
 			ok = false
-		if root.loot_panel.visible:
-			printerr("Expected expired opened container to close loot panel.")
+		if not root.loot_panel.visible:
+			printerr("Expected paused opened container to keep loot panel open.")
+			ok = false
+		root._close_loot_transfer()
+		root._update_container_lifetimes(1.0)
+		if root.interactables.has(first_container) or (is_instance_valid(first_container) and first_container.visible):
+			printerr("Expected container lifetime to resume and expire after transfer UI closes.")
 			ok = false
 
 	root.queue_free()

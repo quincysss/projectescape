@@ -1,7 +1,8 @@
 # Run Timer And Extraction HUD UI
 
-This folder contains the in-run top-center HUD assets extracted from
+This folder contains the in-run top-center HUD assets redrawn to match
 `assets/ui/_mockups/ig_0785fddc4c6e9089016a00430051548190ba1fea0d35bf2000.png`.
+They are not direct crops from the reference; the existing runtime file names and sizes are preserved.
 
 Current scope:
 

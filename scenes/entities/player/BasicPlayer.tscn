@@ -1,0 +1,51 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/player/player_controller.gd" id="1_player_controller"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_body"]
+radius = 38.4
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_attack"]
+size = Vector2(72, 48)
+
+[node name="BasicPlayer" type="CharacterBody2D"]
+script = ExtResource("1_player_controller")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_body")
+
+[node name="BodySprite" type="AnimatedSprite2D" parent="."]
+
+[node name="CameraMount" type="Marker2D" parent="."]
+
+[node name="InteractionAnchor" type="Marker2D" parent="."]
+position = Vector2(0, -48)
+
+[node name="CombatRoot" type="Node2D" parent="."]
+visible = false
+
+[node name="CarrySocket" type="Marker2D" parent="CombatRoot"]
+position = Vector2(20, 24)
+
+[node name="AttackPivot" type="Node2D" parent="CombatRoot"]
+position = Vector2(22, 20)
+
+[node name="WeaponSprite" type="Sprite2D" parent="CombatRoot/AttackPivot"]
+visible = false
+z_index = 31
+
+[node name="SlashVFX" type="AnimatedSprite2D" parent="CombatRoot/AttackPivot"]
+visible = false
+z_index = 32
+
+[node name="AttackHitbox" type="Area2D" parent="CombatRoot/AttackPivot"]
+monitoring = false
+monitorable = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="CombatRoot/AttackPivot/AttackHitbox"]
+shape = SubResource("RectangleShape2D_attack")
+disabled = true
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+
+[node name="CombatController" type="Node" parent="."]

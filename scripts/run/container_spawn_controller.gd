@@ -63,6 +63,8 @@ func update_lifetimes(delta: float, interactables: Array) -> void:
 	for interactable in interactables.duplicate():
 		if not is_instance_valid(interactable) or interactable.interact_type != "container":
 			continue
+		if bool(interactable.payload.get("lifetime_paused", false)):
+			continue
 		if not _should_count_down(interactable.payload):
 			continue
 		interactable.payload.lifetime = float(interactable.payload.get("lifetime", 0.0)) - delta

@@ -3,12 +3,30 @@ extends RefCounted
 
 const STABILITY_MAX := 100.0
 const STABILITY_TICKS := [
-	{"label": "100", "ratio": 0.0},
-	{"label": "60", "ratio": 0.4},
-	{"label": "35", "ratio": 0.65},
-	{"label": "15", "ratio": 0.85},
-	{"label": "0", "ratio": 1.0},
+	{"label": "0", "ratio": 0.0},
+	{"label": "25", "ratio": 0.25},
+	{"label": "50", "ratio": 0.5},
+	{"label": "75", "ratio": 0.75},
+	{"label": "100", "ratio": 1.0},
 ]
+const CHARACTER_HUD_PORTRAIT_FRAME := preload("res://assets/ui/run_character_hud/character_status/components/ui_run_character_portrait_frame_empty_ref_01.png")
+const CHARACTER_HUD_STABILITY_FRAME := preload("res://assets/ui/run_character_hud/character_status/components/ui_run_character_stability_bar_frame_empty_ref_01.png")
+const CHARACTER_HUD_STABILITY_FILL := preload("res://assets/ui/run_character_hud/character_status/components/ui_run_character_stability_fill_strip_current_ref_01.png")
+const TIMER_COUNTDOWN_FRAME := preload("res://assets/ui/run_timer_extraction_hud/components/ui_run_timer_countdown_frame_empty_01.png")
+const EXTRACTION_STATUS_FRAME_LEFT := preload("res://assets/ui/run_timer_extraction_hud/components/ui_run_extraction_status_frame_left_01.png")
+const EXTRACTION_STATUS_FRAME_CENTER := preload("res://assets/ui/run_timer_extraction_hud/components/ui_run_extraction_status_frame_center_tile_01.png")
+const EXTRACTION_STATUS_FRAME_RIGHT := preload("res://assets/ui/run_timer_extraction_hud/components/ui_run_extraction_status_frame_right_01.png")
+const EXTRACTION_STATUS_DOT_UNAVAILABLE := preload("res://assets/ui/run_timer_extraction_hud/components/ui_run_extraction_status_dot_unavailable_01.png")
+const EXTRACTION_STATUS_DOT_AVAILABLE := preload("res://assets/ui/run_timer_extraction_hud/components/ui_run_extraction_status_dot_available_01.png")
+const STABILITY_FILL_OFFSET := Vector2(22, 19)
+const STABILITY_FILL_SIZE := Vector2(361, 35)
+const EXTRACTION_STATUS_WIDTH := 298.0
+const INVENTORY_GRID_COLUMNS := 5
+const INVENTORY_GRID_SLOT_SIZE := 62.0
+const INVENTORY_GRID_SLOT_GAP := 10.0
+const INVENTORY_BACKPACK_DISPLAY_SLOTS := 30
+const INVENTORY_PANEL_TOP := 292.0
+const INVENTORY_LOOT_PANEL_TOP := 374.0
 
 func build(scene) -> void:
 	_build_character_status_hud(scene)
@@ -28,9 +46,6 @@ func refresh(scene) -> void:
 	_refresh_outpost_status_hud(scene)
 	_refresh_backpack_status(scene)
 	_refresh_prompt(scene)
-	_set_items_text(scene.inventory_label, scene.run_director.inventory_component.get_items_snapshot(), "inventory")
-	_set_items_text(scene.home_storage_label, scene.get_active_storage_items_snapshot(), scene.get_active_storage_source_id())
-	_set_items_text(scene.loot_label, scene.opened_loot, "loot")
 	var is_home_safe_zone: bool = scene.is_home_storage_active()
 	var is_storage_zone: bool = scene.is_storage_zone_active()
 	_set_panel_title(scene.home_storage_panel, scene.get_active_storage_title())
@@ -38,88 +53,112 @@ func refresh(scene) -> void:
 	var extraction_ready_at_home: bool = scene.run_director.context.is_extraction_unlocked and is_home_safe_zone
 	scene.deposit_button.disabled = not is_storage_zone
 	scene.deposit_button.text = "存入前哨" if scene._is_active_outpost_storage() else "存入家中"
-	scene.deposit_button.size = Vector2(358, 40) if scene._is_active_outpost_storage() else Vector2(172, 40)
 	scene.extract_button.disabled = not extraction_ready_at_home
 	scene.extract_button.visible = not scene._is_active_outpost_storage()
 	scene.extract_hud_button.disabled = not extraction_ready_at_home
 	scene.extract_hud_button.text = "撤离(E)" if extraction_ready_at_home else ("返回家中" if scene.run_director.context.is_extraction_unlocked else "撤离未解锁")
+	_layout_inventory_surfaces(scene, is_storage_zone, scene.loot_panel.visible)
+	_set_items_grid(scene, scene.inventory_label, scene.run_director.inventory_component.get_items_snapshot(), "inventory", scene.run_director.inventory_component.max_slots)
+	_set_items_grid(scene, scene.home_storage_label, scene.get_active_storage_items_snapshot(), scene.get_active_storage_source_id(), _active_storage_capacity(scene))
+	_set_items_grid(scene, scene.loot_label, scene.opened_loot, "loot", maxi(scene.opened_loot.size(), 8))
 
 func _build_character_status_hud(scene) -> void:
 	scene.character_hud_root = Control.new()
 	scene.character_hud_root.name = "CharacterStatusHUD"
 	scene.character_hud_root.position = Vector2(18, 14)
-	scene.character_hud_root.size = Vector2(560, 132)
+	scene.character_hud_root.size = Vector2(590, 200)
 	scene.ui_root.add_child(scene.character_hud_root)
 
-	scene.stability_hud_root = Panel.new()
+	scene.stability_hud_root = Control.new()
 	scene.stability_hud_root.name = "StabilityPanel"
-	scene.stability_hud_root.position = Vector2(104, 24)
-	scene.stability_hud_root.size = Vector2(438, 82)
-	scene.stability_hud_root.add_theme_stylebox_override("panel", _panel_style(Color(0.06, 0.055, 0.05, 0.88), Color(0.95, 0.46, 0.15, 0.95), 2))
+	scene.stability_hud_root.position = Vector2(150, 38)
+	scene.stability_hud_root.size = Vector2(405, 100)
 	scene.character_hud_root.add_child(scene.stability_hud_root)
 
-	scene.stability_bar = ProgressBar.new()
+	scene.stability_bar = Control.new()
 	scene.stability_bar.name = "StabilityBar"
-	scene.stability_bar.position = Vector2(26, 24)
-	scene.stability_bar.size = Vector2(376, 20)
-	scene.stability_bar.min_value = 0.0
-	scene.stability_bar.max_value = STABILITY_MAX
-	scene.stability_bar.value = STABILITY_MAX
-	scene.stability_bar.show_percentage = false
+	scene.stability_bar.position = Vector2.ZERO
+	scene.stability_bar.size = Vector2(405, 100)
 	scene.stability_hud_root.add_child(scene.stability_bar)
+
+	scene.stability_frame_texture = TextureRect.new()
+	scene.stability_frame_texture.name = "StabilityFrame"
+	scene.stability_frame_texture.texture = CHARACTER_HUD_STABILITY_FRAME
+	scene.stability_frame_texture.position = Vector2.ZERO
+	scene.stability_frame_texture.size = Vector2(405, 100)
+	scene.stability_frame_texture.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	scene.stability_frame_texture.stretch_mode = TextureRect.STRETCH_SCALE
+	scene.stability_bar.add_child(scene.stability_frame_texture)
+
+	scene.stability_fill_clip = Control.new()
+	scene.stability_fill_clip.name = "StabilityFillClip"
+	scene.stability_fill_clip.position = STABILITY_FILL_OFFSET
+	scene.stability_fill_clip.size = STABILITY_FILL_SIZE
+	scene.stability_fill_clip.clip_contents = true
+	scene.stability_bar.add_child(scene.stability_fill_clip)
+
+	scene.stability_fill_texture = TextureRect.new()
+	scene.stability_fill_texture.name = "StabilityFill"
+	scene.stability_fill_texture.texture = CHARACTER_HUD_STABILITY_FILL
+	scene.stability_fill_texture.position = Vector2.ZERO
+	scene.stability_fill_texture.size = STABILITY_FILL_SIZE
+	scene.stability_fill_texture.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	scene.stability_fill_texture.stretch_mode = TextureRect.STRETCH_SCALE
+	scene.stability_fill_clip.add_child(scene.stability_fill_texture)
+
+	_add_corrected_stability_ticks(scene)
 
 	scene.stability_value_label = Label.new()
 	scene.stability_value_label.name = "StabilityValue"
-	scene.stability_value_label.position = Vector2(26, 0)
-	scene.stability_value_label.size = Vector2(210, 22)
-	scene.stability_value_label.add_theme_font_size_override("font_size", 15)
-	scene.stability_value_label.add_theme_color_override("font_color", Color(0.86, 0.82, 0.76))
+	scene.stability_value_label.visible = false
 	scene.stability_hud_root.add_child(scene.stability_value_label)
 
 	scene.stability_stage_label = Label.new()
 	scene.stability_stage_label.name = "StabilityStage"
-	scene.stability_stage_label.position = Vector2(260, 0)
-	scene.stability_stage_label.size = Vector2(142, 22)
-	scene.stability_stage_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
-	scene.stability_stage_label.add_theme_font_size_override("font_size", 14)
-	scene.stability_stage_label.add_theme_color_override("font_color", Color(0.7, 0.66, 0.6))
+	scene.stability_stage_label.visible = false
 	scene.stability_hud_root.add_child(scene.stability_stage_label)
 
-	for tick in STABILITY_TICKS:
-		var x := 26.0 + 376.0 * float(tick.ratio)
-		var line := ColorRect.new()
-		line.name = "Tick_%s" % tick.label
-		line.position = Vector2(x - 1.0, 20.0)
-		line.size = Vector2(2.0, 30.0)
-		line.color = Color(0.9, 0.86, 0.78, 0.72)
-		scene.stability_hud_root.add_child(line)
-
-		var label := Label.new()
-		label.text = String(tick.label)
-		label.position = Vector2(x - 18.0, 48.0)
-		label.size = Vector2(36.0, 20.0)
-		label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		label.add_theme_font_size_override("font_size", 13)
-		label.add_theme_color_override("font_color", Color(0.78, 0.74, 0.68))
-		scene.stability_hud_root.add_child(label)
-
-	scene.portrait_frame = Panel.new()
+	scene.portrait_frame = TextureRect.new()
 	scene.portrait_frame.name = "PortraitFrame"
 	scene.portrait_frame.position = Vector2(0, 0)
-	scene.portrait_frame.size = Vector2(124, 132)
-	scene.portrait_frame.add_theme_stylebox_override("panel", _panel_style(Color(0.10, 0.095, 0.09, 0.96), Color(0.72, 0.08, 0.08, 1.0), 2))
+	scene.portrait_frame.size = Vector2(168, 184)
+	scene.portrait_frame.texture = CHARACTER_HUD_PORTRAIT_FRAME
+	scene.portrait_frame.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	scene.portrait_frame.stretch_mode = TextureRect.STRETCH_SCALE
+	scene.portrait_frame.z_index = 5
 	scene.character_hud_root.add_child(scene.portrait_frame)
 
 	var portrait_placeholder := Label.new()
 	portrait_placeholder.name = "PortraitPlaceholder"
 	portrait_placeholder.text = "头像"
-	portrait_placeholder.position = Vector2(14, 14)
-	portrait_placeholder.size = Vector2(96, 104)
+	portrait_placeholder.position = Vector2(24, 24)
+	portrait_placeholder.size = Vector2(120, 136)
 	portrait_placeholder.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	portrait_placeholder.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	portrait_placeholder.add_theme_font_size_override("font_size", 18)
 	portrait_placeholder.add_theme_color_override("font_color", Color(0.55, 0.54, 0.5))
 	scene.portrait_frame.add_child(portrait_placeholder)
+
+func _add_corrected_stability_ticks(scene) -> void:
+	var label_mask := ColorRect.new()
+	label_mask.name = "StabilityLabelMask"
+	label_mask.position = Vector2(10, 62)
+	label_mask.size = Vector2(382, 26)
+	label_mask.color = Color(0.025, 0.024, 0.022, 0.92)
+	scene.stability_bar.add_child(label_mask)
+
+	for tick in STABILITY_TICKS:
+		var x := STABILITY_FILL_OFFSET.x + STABILITY_FILL_SIZE.x * float(tick.ratio)
+		var label := Label.new()
+		label.name = "CorrectedTick_%s" % tick.label
+		label.text = String(tick.label)
+		label.position = Vector2(x - 22.0, 63.0)
+		label.size = Vector2(44.0, 22.0)
+		label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+		label.add_theme_font_size_override("font_size", 15)
+		label.add_theme_color_override("font_color", Color(0.78, 0.74, 0.68))
+		scene.stability_bar.add_child(label)
 
 func _build_center_status_hud(scene) -> void:
 	scene.center_hud_root = Control.new()
@@ -129,46 +168,80 @@ func _build_center_status_hud(scene) -> void:
 	scene.center_hud_root.offset_left = -190.0
 	scene.center_hud_root.offset_top = 10.0
 	scene.center_hud_root.offset_right = 190.0
-	scene.center_hud_root.offset_bottom = 104.0
+	scene.center_hud_root.offset_bottom = 150.0
 	scene.ui_root.add_child(scene.center_hud_root)
 
-	scene.countdown_panel = Panel.new()
+	scene.countdown_panel = TextureRect.new()
 	scene.countdown_panel.name = "CountdownPanel"
-	scene.countdown_panel.position = Vector2(0, 0)
-	scene.countdown_panel.size = Vector2(380, 62)
-	scene.countdown_panel.add_theme_stylebox_override("panel", _panel_style(Color(0.055, 0.055, 0.055, 0.9), Color(0.15, 0.21, 0.72, 0.9), 2))
+	scene.countdown_panel.texture = TIMER_COUNTDOWN_FRAME
+	scene.countdown_panel.position = Vector2(27.5, 0)
+	scene.countdown_panel.size = Vector2(325, 87)
+	scene.countdown_panel.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	scene.countdown_panel.stretch_mode = TextureRect.STRETCH_SCALE
 	scene.center_hud_root.add_child(scene.countdown_panel)
 
 	scene.countdown_label = Label.new()
 	scene.countdown_label.name = "CountdownLabel"
-	scene.countdown_label.position = Vector2(0, 3)
-	scene.countdown_label.size = Vector2(380, 56)
+	scene.countdown_label.position = Vector2(61, 18)
+	scene.countdown_label.size = Vector2(194, 50)
 	scene.countdown_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	scene.countdown_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	scene.countdown_label.add_theme_font_size_override("font_size", 38)
-	scene.countdown_label.add_theme_color_override("font_color", Color(0.82, 0.80, 0.76))
+	scene.countdown_label.add_theme_font_size_override("font_size", 42)
+	scene.countdown_label.add_theme_color_override("font_color", Color("#D7D0C3"))
+	scene.countdown_label.add_theme_color_override("font_shadow_color", Color("#1A1714"))
+	scene.countdown_label.add_theme_constant_override("shadow_offset_x", 2)
+	scene.countdown_label.add_theme_constant_override("shadow_offset_y", 2)
 	scene.countdown_panel.add_child(scene.countdown_label)
 
-	scene.extraction_status_panel = Panel.new()
+	scene.extraction_status_panel = Control.new()
 	scene.extraction_status_panel.name = "ExtractionStatusPanel"
-	scene.extraction_status_panel.position = Vector2(35, 66)
-	scene.extraction_status_panel.size = Vector2(310, 34)
-	scene.extraction_status_panel.add_theme_stylebox_override("panel", _panel_style(Color(0.055, 0.055, 0.052, 0.86), Color(0.08, 0.48, 0.20, 0.72), 1))
+	scene.extraction_status_panel.position = Vector2(41, 88)
+	scene.extraction_status_panel.size = Vector2(EXTRACTION_STATUS_WIDTH, 50)
 	scene.center_hud_root.add_child(scene.extraction_status_panel)
 
-	scene.extraction_status_dot = Panel.new()
+	scene.extraction_status_frame_left = TextureRect.new()
+	scene.extraction_status_frame_left.name = "ExtractionStatusFrameLeft"
+	scene.extraction_status_frame_left.texture = EXTRACTION_STATUS_FRAME_LEFT
+	scene.extraction_status_frame_left.position = Vector2.ZERO
+	scene.extraction_status_frame_left.size = Vector2(76, 50)
+	scene.extraction_status_frame_left.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	scene.extraction_status_frame_left.stretch_mode = TextureRect.STRETCH_SCALE
+	scene.extraction_status_panel.add_child(scene.extraction_status_frame_left)
+
+	scene.extraction_status_frame_center = TextureRect.new()
+	scene.extraction_status_frame_center.name = "ExtractionStatusFrameCenter"
+	scene.extraction_status_frame_center.texture = EXTRACTION_STATUS_FRAME_CENTER
+	scene.extraction_status_frame_center.position = Vector2(76, 0)
+	scene.extraction_status_frame_center.size = Vector2(EXTRACTION_STATUS_WIDTH - 100.0, 50)
+	scene.extraction_status_frame_center.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	scene.extraction_status_frame_center.stretch_mode = TextureRect.STRETCH_SCALE
+	scene.extraction_status_panel.add_child(scene.extraction_status_frame_center)
+
+	scene.extraction_status_frame_right = TextureRect.new()
+	scene.extraction_status_frame_right.name = "ExtractionStatusFrameRight"
+	scene.extraction_status_frame_right.texture = EXTRACTION_STATUS_FRAME_RIGHT
+	scene.extraction_status_frame_right.position = Vector2(EXTRACTION_STATUS_WIDTH - 24.0, 0)
+	scene.extraction_status_frame_right.size = Vector2(24, 50)
+	scene.extraction_status_frame_right.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	scene.extraction_status_frame_right.stretch_mode = TextureRect.STRETCH_SCALE
+	scene.extraction_status_panel.add_child(scene.extraction_status_frame_right)
+
+	scene.extraction_status_dot = TextureRect.new()
 	scene.extraction_status_dot.name = "ExtractionStatusDot"
-	scene.extraction_status_dot.position = Vector2(20, 11)
-	scene.extraction_status_dot.size = Vector2(12, 12)
-	scene.extraction_status_dot.add_theme_stylebox_override("panel", _dot_style(Color(0.34, 0.34, 0.33, 1.0)))
+	scene.extraction_status_dot.texture = EXTRACTION_STATUS_DOT_UNAVAILABLE
+	scene.extraction_status_dot.position = Vector2(17, 10)
+	scene.extraction_status_dot.size = Vector2(30, 30)
+	scene.extraction_status_dot.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	scene.extraction_status_dot.stretch_mode = TextureRect.STRETCH_SCALE
 	scene.extraction_status_panel.add_child(scene.extraction_status_dot)
 
 	scene.extraction_status_label = Label.new()
 	scene.extraction_status_label.name = "ExtractionStatusLabel"
-	scene.extraction_status_label.position = Vector2(46, 4)
-	scene.extraction_status_label.size = Vector2(240, 26)
+	scene.extraction_status_label.position = Vector2(64, 8)
+	scene.extraction_status_label.size = Vector2(EXTRACTION_STATUS_WIDTH - 88.0, 34)
 	scene.extraction_status_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	scene.extraction_status_label.add_theme_font_size_override("font_size", 17)
+	scene.extraction_status_label.add_theme_font_size_override("font_size", 18)
+	scene.extraction_status_label.add_theme_color_override("font_color", Color("#D7D0C3"))
 	scene.extraction_status_panel.add_child(scene.extraction_status_label)
 
 func _build_outpost_status_hud(scene) -> void:
@@ -307,15 +380,13 @@ func _build_hidden_action_buttons(scene) -> void:
 
 func _build_inventory_panels(scene) -> void:
 	scene.inventory_panel = _make_panel(Vector2(16, 154), Vector2(390, 360), "背包")
-	scene.inventory_label = _make_item_list(Vector2(16, 52), Vector2(358, 288))
-	scene.inventory_label.meta_clicked.connect(scene._on_inventory_item_meta_clicked)
+	scene.inventory_label = _make_grid_area(Vector2(16, 86), Vector2(358, 196))
 	scene.inventory_panel.add_child(scene.inventory_label)
 	scene.ui_root.add_child(scene.inventory_panel)
 	scene.inventory_panel.visible = false
 
 	scene.home_storage_panel = _make_panel(Vector2(422, 154), Vector2(390, 360), "家中存储")
-	scene.home_storage_label = _make_item_list(Vector2(16, 52), Vector2(358, 230))
-	scene.home_storage_label.meta_clicked.connect(scene._on_home_storage_item_meta_clicked)
+	scene.home_storage_label = _make_grid_area(Vector2(16, 52), Vector2(358, 230))
 	scene.home_storage_panel.add_child(scene.home_storage_label)
 	scene.deposit_button = Button.new()
 	scene.deposit_button.text = "存入家中"
@@ -334,8 +405,7 @@ func _build_inventory_panels(scene) -> void:
 	scene.home_storage_panel.visible = false
 
 	scene.loot_panel = _make_panel(Vector2(422, 154), Vector2(390, 300), "容器 / 材料")
-	scene.loot_label = _make_item_list(Vector2(16, 52), Vector2(358, 170))
-	scene.loot_label.meta_clicked.connect(scene._on_loot_item_meta_clicked)
+	scene.loot_label = _make_grid_area(Vector2(16, 52), Vector2(358, 170))
 	scene.loot_panel.add_child(scene.loot_label)
 	scene.take_all_button = Button.new()
 	scene.take_all_button.text = "全部拾取"
@@ -352,30 +422,30 @@ func _refresh_stability_hud(scene) -> void:
 	var max_value: float = maxf(1.0, float(scene.run_director.config.max_stability))
 	var current: float = clampf(float(scene.run_director.context.player_stability), 0.0, max_value)
 	var ratio: float = current / max_value
-	scene.stability_bar.max_value = max_value
-	scene.stability_bar.value = current
+	if scene.stability_fill_clip != null:
+		scene.stability_fill_clip.size = Vector2(STABILITY_FILL_SIZE.x * ratio, STABILITY_FILL_SIZE.y)
 	scene.stability_value_label.text = "稳定值  %d/%d" % [int(round(current)), int(round(max_value))]
 	scene.stability_stage_label.text = _stability_stage_text(ratio)
-	scene.stability_bar.add_theme_stylebox_override("background", _progress_style(Color(0.025, 0.024, 0.022, 0.92), Color(0.42, 0.40, 0.36), 1))
-	scene.stability_bar.add_theme_stylebox_override("fill", _progress_style(_stability_fill_color(ratio), _stability_fill_color(ratio), 0))
 
 func _refresh_countdown(scene) -> void:
 	if scene.countdown_label == null:
 		return
 	var remaining: float = maxf(0.0, float(scene.run_director.context.remaining_seconds))
 	scene.countdown_label.text = _format_countdown(remaining)
-	var text_color := Color(0.82, 0.80, 0.76)
+	var text_color := Color("#D7D0C3")
 	if remaining <= 30.0:
-		text_color = Color(0.72, 0.42, 0.42)
+		text_color = Color("#8F3038")
+		scene.countdown_label.add_theme_color_override("font_outline_color", Color("#080304"))
+		scene.countdown_label.add_theme_constant_override("outline_size", 2)
+	else:
+		scene.countdown_label.add_theme_constant_override("outline_size", 0)
 	scene.countdown_label.add_theme_color_override("font_color", text_color)
 
 func _refresh_extraction_status(scene) -> void:
 	var can_extract: bool = scene.run_director.context.is_extraction_unlocked
-	var active_color := Color(0.05, 0.36, 0.16, 1.0)
-	var inactive_color := Color(0.34, 0.34, 0.33, 1.0)
-	_set_dot_color(scene.extraction_status_dot, active_color if can_extract else inactive_color)
+	scene.extraction_status_dot.texture = EXTRACTION_STATUS_DOT_AVAILABLE if can_extract else EXTRACTION_STATUS_DOT_UNAVAILABLE
 	scene.extraction_status_label.text = "可返回家中撤离" if can_extract else "不可撤离"
-	scene.extraction_status_label.add_theme_color_override("font_color", active_color if can_extract else inactive_color)
+	scene.extraction_status_label.add_theme_color_override("font_color", Color("#D7D0C3"))
 
 func _refresh_outpost_status_hud(scene) -> void:
 	if scene.outpost_hud_root == null:
@@ -548,11 +618,18 @@ func _make_item_list(pos: Vector2, item_list_size: Vector2) -> RichTextLabel:
 	label.meta_underlined = false
 	return label
 
+func _make_grid_area(pos: Vector2, grid_size: Vector2) -> Control:
+	var root := Control.new()
+	root.position = pos
+	root.size = grid_size
+	return root
+
 func _sync_storage_ui(scene, is_storage_zone: bool) -> void:
 	if not is_storage_zone:
+		var was_storage_panel_visible: bool = scene.home_storage_panel.visible
 		scene.home_storage_user_closed = false
 		scene.home_storage_panel.visible = false
-		if not scene.loot_panel.visible:
+		if was_storage_panel_visible and not scene.loot_panel.visible:
 			scene.inventory_panel.visible = false
 		return
 	if scene.home_storage_user_closed:
@@ -561,12 +638,152 @@ func _sync_storage_ui(scene, is_storage_zone: bool) -> void:
 	scene.inventory_panel.visible = true
 	scene.home_storage_panel.visible = true
 
+func _layout_inventory_surfaces(scene, is_storage_zone: bool, loot_open: bool) -> void:
+	_configure_panel_anchor_right(scene.inventory_panel, Vector2(390, 650), 20.0, INVENTORY_PANEL_TOP)
+	scene.inventory_label.position = Vector2(28, 136)
+	scene.inventory_label.size = Vector2(334, 426)
+	if is_storage_zone:
+		_configure_panel_anchor_right(scene.home_storage_panel, Vector2(390, 316), 432.0, INVENTORY_PANEL_TOP)
+		scene.home_storage_label.position = Vector2(24, 68)
+		scene.home_storage_label.size = Vector2(342, 144)
+		scene.deposit_button.position = Vector2(130, 246)
+		scene.deposit_button.size = Vector2(130, 36)
+		scene.extract_button.position = Vector2(268, 246)
+		scene.extract_button.size = Vector2(106, 36)
+	if loot_open:
+		_configure_panel_anchor_right(scene.loot_panel, Vector2(390, 316), 432.0, INVENTORY_LOOT_PANEL_TOP)
+		scene.loot_label.position = Vector2(24, 68)
+		scene.loot_label.size = Vector2(342, 134)
+		scene.take_all_button.position = Vector2(130, 240)
+		scene.take_all_button.size = Vector2(130, 36)
+
+func _configure_panel_rect(panel: Panel, pos: Vector2, panel_size: Vector2, anchor_right: bool) -> void:
+	if anchor_right:
+		_configure_panel_anchor_right(panel, panel_size, 20.0, 72.0)
+		return
+	panel.anchor_left = 0.0
+	panel.anchor_right = 0.0
+	panel.anchor_top = 0.0
+	panel.anchor_bottom = 0.0
+	panel.position = pos
+	panel.size = panel_size
+
+func _configure_panel_anchor_right(panel: Panel, panel_size: Vector2, right_margin: float, top_margin: float) -> void:
+	panel.anchor_left = 1.0
+	panel.anchor_right = 1.0
+	panel.anchor_top = 0.0
+	panel.anchor_bottom = 0.0
+	panel.offset_left = -right_margin - panel_size.x
+	panel.offset_top = top_margin
+	panel.offset_right = -right_margin
+	panel.offset_bottom = top_margin + panel_size.y
+
 func _set_panel_title(panel: Panel, title: String) -> void:
 	if panel == null:
 		return
 	var label := panel.get_node_or_null("TitleLabel") as Label
 	if label != null:
 		label.text = title
+
+func _set_items_grid(scene, grid_root: Control, items: Array, source_id: String, capacity: int) -> void:
+	for child in grid_root.get_children():
+		child.queue_free()
+	capacity = maxi(capacity, items.size())
+	var columns := INVENTORY_GRID_COLUMNS
+	var gap := INVENTORY_GRID_SLOT_GAP
+	var display_slots := _display_slot_count(source_id, capacity)
+	var rows := ceili(float(maxi(display_slots, 1)) / float(columns))
+	var slot_size: float = minf(
+		INVENTORY_GRID_SLOT_SIZE,
+		minf(
+			floorf((grid_root.size.x - gap * float(columns - 1)) / float(columns)),
+			floorf((grid_root.size.y - 34.0 - gap * float(rows - 1)) / float(rows))
+		)
+	)
+	slot_size = maxf(34.0, slot_size)
+	for index in range(display_slots):
+		var col := index % columns
+		var row := int(index / columns)
+		var slot_pos := Vector2(col * (slot_size + gap), row * (slot_size + gap))
+		var item: Variant = items[index] if index < items.size() else null
+		if item is Dictionary:
+			grid_root.add_child(_make_item_slot(scene, slot_pos, Vector2(slot_size, slot_size), item, index, source_id))
+		else:
+			grid_root.add_child(_make_empty_slot(slot_pos, Vector2(slot_size, slot_size), index >= capacity))
+	_add_grid_footer(scene, grid_root, items, capacity, source_id)
+
+func _display_slot_count(source_id: String, capacity: int) -> int:
+	if source_id == "inventory":
+		return maxi(INVENTORY_BACKPACK_DISPLAY_SLOTS, capacity)
+	return maxi(capacity, 1)
+
+func _make_item_slot(scene, pos: Vector2, slot_size: Vector2, item: Dictionary, index: int, source_id: String) -> Button:
+	var button := Button.new()
+	button.position = pos
+	button.size = slot_size
+	button.text = _slot_text(item)
+	button.clip_text = true
+	button.add_theme_font_size_override("font_size", 12)
+	button.add_theme_color_override("font_color", _quality_color(item))
+	button.add_theme_stylebox_override("normal", _slot_style(Color("#071116"), Color("#35C9D7"), 2))
+	button.add_theme_stylebox_override("hover", _slot_style(Color("#0B151A"), Color("#D1B850"), 2))
+	button.add_theme_stylebox_override("pressed", _slot_style(Color("#121817"), Color("#D1B850"), 3))
+	button.button_up.connect(func(): _dispatch_grid_slot(scene, source_id, index))
+	return button
+
+func _make_empty_slot(pos: Vector2, slot_size: Vector2, locked: bool = false) -> Panel:
+	var panel := Panel.new()
+	panel.position = pos
+	panel.size = slot_size
+	var border := Color("#4D575B") if locked else Color("#35C9D7")
+	panel.add_theme_stylebox_override("panel", _slot_style(Color("#071116"), border, 1))
+	if locked:
+		var label := Label.new()
+		label.text = "/"
+		label.position = Vector2.ZERO
+		label.size = slot_size
+		label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+		label.add_theme_font_size_override("font_size", 28)
+		label.add_theme_color_override("font_color", Color("#4D575B"))
+		panel.add_child(label)
+	return panel
+
+func _add_grid_footer(scene, grid_root: Control, items: Array, capacity: int, source_id: String) -> void:
+	var used := items.size()
+	var footer := Label.new()
+	footer.position = Vector2(0, grid_root.size.y - 26.0)
+	footer.size = Vector2(grid_root.size.x, 24)
+	footer.add_theme_font_size_override("font_size", 15)
+	footer.add_theme_color_override("font_color", Color("#8DB6B9"))
+	if source_id == "inventory":
+		var current_weight: float = maxf(0.0, float(scene.run_director.context.current_weight))
+		var max_weight: float = maxf(1.0, float(scene.run_director.context.weight_limit))
+		footer.text = "容量: %d/%d    负重: %.1f/%.1f" % [used, capacity, current_weight, max_weight]
+	else:
+		footer.text = "容量: %d/%d" % [used, capacity]
+	grid_root.add_child(footer)
+
+func _dispatch_grid_slot(scene, source_id: String, index: int) -> void:
+	match source_id:
+		"inventory":
+			scene._on_inventory_item_meta_clicked("inventory:%d" % index)
+		"loot":
+			scene._on_loot_item_meta_clicked("loot:%d" % index)
+		_:
+			scene._on_home_storage_item_meta_clicked("storage:%d" % index)
+
+func _slot_text(item: Dictionary) -> String:
+	var name := String(item.get("display_name", item.get("item_id", "")))
+	var amount := int(item.get("amount", 1))
+	return "%s\nx%d" % [name, amount]
+
+func _active_storage_capacity(scene) -> int:
+	if scene._is_active_outpost_storage():
+		return scene.run_director.get_outpost_storage_capacity(scene.active_outpost_storage_id)
+	if scene.run_director.home_storage_component != null:
+		return scene.run_director.home_storage_component.max_slots
+	return 0
 
 func _set_items_text(label: RichTextLabel, items: Array, source_id: String = "") -> void:
 	label.clear()
@@ -596,6 +813,20 @@ func _quality_color_hex(item: Dictionary) -> String:
 	if value is Color:
 		return value.to_html(false)
 	return "FFFFFF"
+
+func _quality_color(item: Dictionary) -> Color:
+	var value = item.get("quality_color", Color.WHITE)
+	if value is Color:
+		return value
+	match String(item.get("quality", "C")):
+		"S":
+			return Color("#D1B850")
+		"A":
+			return Color("#B9A9FF")
+		"B":
+			return Color("#6FA8DC")
+		_:
+			return Color("#D8D6CE")
 
 func _interaction_progress_text(interaction_id: String) -> String:
 	match interaction_id:
@@ -700,6 +931,21 @@ func _progress_style(bg_color: Color, border_color: Color, border_width: int) ->
 	style.corner_radius_top_right = 1
 	style.corner_radius_bottom_left = 1
 	style.corner_radius_bottom_right = 1
+	return style
+
+func _slot_style(bg_color: Color, border_color: Color, border_width: int) -> StyleBoxFlat:
+	var style := StyleBoxFlat.new()
+	style.bg_color = bg_color
+	style.border_color = border_color
+	style.set_border_width_all(border_width)
+	style.corner_radius_top_left = 0
+	style.corner_radius_top_right = 0
+	style.corner_radius_bottom_left = 0
+	style.corner_radius_bottom_right = 0
+	style.content_margin_left = 5
+	style.content_margin_top = 5
+	style.content_margin_right = 5
+	style.content_margin_bottom = 5
 	return style
 
 func _dot_style(color: Color) -> StyleBoxFlat:

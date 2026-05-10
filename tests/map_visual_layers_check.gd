@@ -15,6 +15,10 @@ func _initialize() -> void:
 	ok = _require_node(root, "WorldRoot/MapVisual/RoadVisual") and ok
 	ok = _require_node(root, "WorldRoot/MapVisual/BlockVisual") and ok
 	ok = _require_node(root, "WorldRoot/MapVisual/BuildingVisual") and ok
+	ok = _require_node(root, "WorldRoot/YSortRoot") and ok
+	ok = _require_node(root, "WorldRoot/PlayerRoot") and ok
+	ok = _require_node(root, "WorldRoot/YSortRoot/Block_Ref_06_65x24_Buildings") and ok
+	ok = _require_manual_building_art(root) and ok
 	ok = _require_node(root, "WorldRoot/MapVisual/PropVisual") and ok
 	ok = _require_node(root, "WorldRoot/MapVisual/DecalVisual") and ok
 	ok = _require_node(root, "WorldRoot/MapVisual/RoadVisual/ManualRoadPieces") and ok
@@ -67,6 +71,24 @@ func _require_node(root: Node, node_path: NodePath) -> bool:
 		return true
 	printerr("Missing node: %s" % node_path)
 	return false
+
+func _require_manual_building_art(root: Node) -> bool:
+	var y_sort_root := root.get_node_or_null("WorldRoot/YSortRoot")
+	if y_sort_root == null:
+		printerr("Missing YSortRoot for manual building art.")
+		return false
+	var building_count := 0
+	for child in y_sort_root.get_children():
+		if String(child.get_meta("placement_group", "")) == "":
+			continue
+		building_count += 1
+		if child.get_node_or_null("ArtSprite") == null:
+			printerr("Manual building root is missing ArtSprite: %s" % child.name)
+			return false
+	if building_count <= 0:
+		printerr("Expected manually placed building art under YSortRoot.")
+		return false
+	return true
 
 func _require_interactable_visual(root: Node, interact_type: String, visual_name: String) -> bool:
 	for interactable in root.interactables:
