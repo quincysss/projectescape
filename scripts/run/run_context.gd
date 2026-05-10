@@ -4,6 +4,9 @@ extends RefCounted
 var run_id: String = ""
 var seed: int = 0
 var elapsed_seconds: float = 0.0
+var run_duration_seconds: float = 180.0
+var remaining_seconds: float = 180.0
+var is_time_expired: bool = false
 
 var player_spawn_position: Vector2 = Vector2.ZERO
 var player_stability: float = 100.0
@@ -13,6 +16,7 @@ var weight_limit: float = 20.0
 var weight_stage: String = "LIGHT"
 var weight_speed_multiplier: float = 1.0
 var home_storage: Array = []
+var outpost_storage: Dictionary = {}
 
 var selected_first_outpost_id: String = ""
 var selected_second_outpost_id: String = ""
@@ -38,6 +42,9 @@ func to_debug_dictionary() -> Dictionary:
 		"run_id": run_id,
 		"seed": seed,
 		"elapsed_seconds": elapsed_seconds,
+		"run_duration_seconds": run_duration_seconds,
+		"remaining_seconds": remaining_seconds,
+		"is_time_expired": is_time_expired,
 		"player_spawn_position": player_spawn_position,
 		"player_stability": player_stability,
 		"inventory_slots_used": player_inventory.size(),
@@ -47,6 +54,7 @@ func to_debug_dictionary() -> Dictionary:
 		"weight_speed_multiplier": weight_speed_multiplier,
 		"home_storage_slots": home_storage.size(),
 		"home_storage": home_storage,
+		"outpost_storage": outpost_storage,
 		"selected_outposts": selected_outposts,
 		"selected_outpost_positions": selected_outpost_positions,
 		"outpost_states": outpost_states,

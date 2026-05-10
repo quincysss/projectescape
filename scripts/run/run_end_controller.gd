@@ -21,7 +21,7 @@ func try_extract(tree: SceneTree) -> Dictionary:
 	var result := result_builder.build_extraction_result(run_director)
 	_apply_result_to_game_state(result)
 	run_director.on_extraction_completed()
-	if tree != null:
+	if tree != null and not base_scene_path.is_empty():
 		tree.change_scene_to_file(base_scene_path)
 	return {"accepted": true, "result": result, "message": result.get("message", "")}
 
@@ -35,7 +35,20 @@ func handle_player_death(tree: SceneTree, reason: String = "stability_depleted")
 			run_director.on_player_dead(reason)
 	var result := result_builder.build_death_result(run_director, reason)
 	_apply_result_to_game_state(result)
-	if tree != null:
+	if tree != null and not base_scene_path.is_empty():
+		tree.change_scene_to_file(base_scene_path)
+	return {"accepted": true, "result": result, "message": result.get("message", "")}
+
+func handle_timeout(tree: SceneTree, reason: String = "time_expired") -> Dictionary:
+	if run_director != null and run_director.state_machine != null:
+		var state: Dictionary = run_director.state_machine.get_state_snapshot()
+		if state.get("current_phase", "") in ["FAILED", "SETTLEMENT"]:
+			return {"accepted": false, "message": "Run already finished."}
+		if state.get("current_phase", "") != "FAILED":
+			run_director.on_run_timeout(reason)
+	var result := result_builder.build_timeout_result(run_director, reason)
+	_apply_result_to_game_state(result)
+	if tree != null and not base_scene_path.is_empty():
 		tree.change_scene_to_file(base_scene_path)
 	return {"accepted": true, "result": result, "message": result.get("message", "")}
 

@@ -9,6 +9,7 @@ Use this file to choose which project documents must be read before editing docs
 - Godot project structure and initial scene: `Doc/16_Godot工程结构与代码模块规划_修订版_废土生存法则.md`
 - Data tables and TAB format: `Doc/13_数据配置表与TAB规范_修订版_废土生存法则.md`
 - Validation tools and editor plugins: `Doc/18_数据校验工具与编辑器插件规范_修订版_废土生存法则.md`
+- Worldbuilding, narrative packaging, and copy voice: `Doc/23_世界观包装_废土生存法则.md`
 
 ## Module Routing
 
@@ -30,6 +31,7 @@ Use this file to choose which project documents must be read before editing docs
 | Art resources and image prompts | `Doc/17_美术资源规格与GPT生图提示词规范_修订版_废土生存法则.md` | `assets/map/README.md`, documents 20 and 21 for UI |
 | Balance and drop weights | `Doc/19_数值平衡表与掉落权重规范_修订版_废土生存法则.md` | Use master document until split docs exist |
 | UI visual rules and sheets | `Doc/20_UI视觉规范与界面资源Sheet提示词_修订版_废土生存法则.md` | `Doc/21_UI资源Sheet生成清单与提示词包_废土生存法则.md` |
+| Worldbuilding, narrative packaging, in-game copy voice, item and place naming | `Doc/23_世界观包装_废土生存法则.md` | Use master document until split docs exist |
 
 ## V0.1 Map Mandatory Reads
 
@@ -53,9 +55,9 @@ For each listed module, read these files before implementation:
 | Outposts, materials, and repair | `Doc/06_前哨材料与前哨站修复系统/00_拆分规范与落地文档写法.md`, `Doc/06_前哨材料与前哨站修复系统/13_V0_1最小交付清单.md`, `Doc/06_前哨材料与前哨站修复系统/14_模块功能规则细化与AI开工提示词.md` |
 | Backpack, storage, and load | `Doc/07_背包_存储与负重系统/00_拆分规范与落地文档写法.md`, `Doc/07_背包_存储与负重系统/15_V0_1最小交付清单.md`, `Doc/07_背包_存储与负重系统/16_模块功能规则细化与AI开工提示词.md` |
 | Extraction and settlement | `Doc/08_撤离与结算系统/00_拆分规范与落地文档写法.md`, `Doc/08_撤离与结算系统/14_V0_1最小交付清单.md`, `Doc/08_撤离与结算系统/15_模块功能规则细化与AI开工提示词.md` |
-| Meta warehouse | `Doc/09_局外仓库系统/00_拆分规范与落地文档写法.md`, `Doc/09_局外仓库系统/14_V0_1最小交付清单.md`, `Doc/09_局外仓库系统/15_模块功能规则细化与AI开工提示词.md` |
+| Meta warehouse, merchant, and currency | `Doc/09_局外仓库系统/00_拆分规范与落地文档写法.md`, `Doc/09_局外仓库系统/14_V0_1最小交付清单.md`, `Doc/09_局外仓库系统/15_模块功能规则细化与AI开工提示词.md`, `Doc/09_局外仓库系统/16_局外商人与货币系统.md` |
 
-Key invariant: these systems are connected. Containers create loot for backpack rules. Backpack and storage feed extraction and settlement. Settlement deposits into the meta warehouse. Outposts can create safe zones and storage. Stability and vision respond to map zones, items, interactions, and outpost safety.
+Key invariant: these systems are connected. Containers create loot for backpack rules. Backpack and storage feed extraction and settlement. Settlement deposits into the meta warehouse. The merchant sells warehouse items into currency through currency_id. Outposts can create safe zones and storage. Stability and vision respond to map zones, items, interactions, and outpost safety. Any item action must select a concrete single item instance by list index before transfer, sale, consume, equip, or discard.
 
 ## V0.1 Implementation Gate
 

@@ -35,6 +35,10 @@ func create_context(
 		seed,
 	]
 	context.seed = seed
+	context.elapsed_seconds = 0.0
+	context.run_duration_seconds = config.run_duration_seconds
+	context.remaining_seconds = config.run_duration_seconds
+	context.is_time_expired = false
 	context.player_spawn_position = spawn_position
 	context.player_stability = config.max_stability
 	context.player_inventory = []
@@ -43,6 +47,7 @@ func create_context(
 	context.weight_stage = "LIGHT"
 	context.weight_speed_multiplier = 1.0
 	context.home_storage = _create_empty_slots(config.home_storage_slots)
+	context.outpost_storage = {}
 	context.selected_first_outpost_id = first_outpost_id
 	context.selected_second_outpost_id = second_outpost_id
 	context.selected_outposts = [first_outpost_id, second_outpost_id]
@@ -85,10 +90,14 @@ func _validate(
 		]
 	if config.home_storage_slots < 0:
 		return "Home storage slot count cannot be negative."
+	if config.first_outpost_storage_slots < 0 or config.second_outpost_storage_slots < 0:
+		return "Outpost storage slot count cannot be negative."
 	if config.max_stability <= 0.0:
 		return "Max stability must be greater than zero."
 	if config.base_weight_limit <= 0.0:
 		return "Base weight limit must be greater than zero."
+	if config.run_duration_seconds <= 0.0:
+		return "Run duration must be greater than zero."
 	return ""
 
 func _pick_candidate(candidates: Array, rng: RandomNumberGenerator) -> String:

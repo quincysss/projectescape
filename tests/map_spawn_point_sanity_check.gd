@@ -2,6 +2,7 @@ extends SceneTree
 
 const UNIT := 64.0
 const OUTPOST_SIZE_UNITS := Vector2(10.0, 8.0)
+const PLAYER_RADIUS_UNITS := 0.6
 
 func _initialize() -> void:
 	var ok := await _verify_map_spawn_points()
@@ -88,6 +89,7 @@ func _check_outpost_candidates(root: Node, block_rects: Array[Dictionary], stree
 		var center_blocked := _point_hits_generated_collision(root, pos)
 		var touches_street := _rect_intersects_rects(rect, street_rects)
 		var touches_block := _rect_intersects_rects(rect, block_rects)
+		var has_entry_clearance := _outpost_has_player_clearance(root, rect)
 		if point.outpost_tier == "first":
 			first_count += 1
 		else:
@@ -106,6 +108,9 @@ func _check_outpost_candidates(root: Node, block_rects: Array[Dictionary], stree
 			ok = false
 		if not touches_block:
 			push_warning("Outpost %s is not on a block; this is allowed but no longer tests the block exception rule." % id)
+		if not has_entry_clearance:
+			printerr("Outpost %s does not have enough player-radius clearance around the footprint." % id)
+			ok = false
 	if first_count < 3:
 		printerr("Expected at least 3 first outpost candidates, got %s" % first_count)
 		ok = false
@@ -156,6 +161,41 @@ func _point_hits_generated_collision(root: Node, point: Vector2) -> bool:
 			var local_point: Vector2 = shape_node.global_transform.affine_inverse() * point
 			var half_size: Vector2 = shape_node.shape.size * 0.5
 			if absf(local_point.x) <= half_size.x and absf(local_point.y) <= half_size.y:
+				return true
+	return false
+
+func _outpost_has_player_clearance(root: Node, rect: Rect2) -> bool:
+	var radius := PLAYER_RADIUS_UNITS * UNIT
+	var samples := [
+		Vector2(rect.get_center().x, rect.position.y - radius),
+		Vector2(rect.get_center().x, rect.position.y + rect.size.y + radius),
+		Vector2(rect.position.x - radius, rect.get_center().y),
+		Vector2(rect.position.x + rect.size.x + radius, rect.get_center().y),
+		Vector2(rect.get_center().x, rect.position.y + radius),
+		Vector2(rect.get_center().x, rect.position.y + rect.size.y - radius),
+		Vector2(rect.position.x + radius, rect.get_center().y),
+		Vector2(rect.position.x + rect.size.x - radius, rect.get_center().y),
+	]
+	for sample in samples:
+		if not root.player._is_position_walkable(sample):
+			return false
+		if _circle_hits_generated_collision(root, sample, radius):
+			return false
+	return true
+
+func _circle_hits_generated_collision(root: Node, point: Vector2, radius: float) -> bool:
+	var world_root := root.get_node("WorldRoot")
+	for child in world_root.get_children():
+		if not (child is StaticBody2D):
+			continue
+		for shape_node in child.get_children():
+			if not (shape_node is CollisionShape2D) or shape_node.shape == null:
+				continue
+			if not (shape_node.shape is RectangleShape2D):
+				continue
+			var local_point: Vector2 = shape_node.global_transform.affine_inverse() * point
+			var half_size: Vector2 = shape_node.shape.size * 0.5
+			if absf(local_point.x) <= half_size.x + radius and absf(local_point.y) <= half_size.y + radius:
 				return true
 	return false
 

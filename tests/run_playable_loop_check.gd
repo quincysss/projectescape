@@ -22,6 +22,7 @@ func _verify_run_loop() -> bool:
 	if root.run_director.context == null:
 		printerr("Run context missing")
 		return false
+	root.run_director.inventory_component.setup(64, 100.0)
 	root.run_director.on_safe_zone_exited("home")
 	root.run_director.on_camera_transition_finished()
 	await process_frame
@@ -60,7 +61,7 @@ func _verify_run_loop() -> bool:
 	root._on_interactable_entered(container)
 	Input.action_press("interact")
 	root._try_interact()
-	root._update_active_interaction(root.CONTAINER_OPEN_HOLD_SECONDS + 0.1)
+	root._update_active_interaction(float(container.payload.get("open_time", root.CONTAINER_OPEN_HOLD_SECONDS)) + 0.1)
 	Input.action_release("interact")
 	if not root.loot_panel.visible or not root.inventory_panel.visible:
 		printerr("Expected held container interaction to open loot and backpack panels")
@@ -75,7 +76,7 @@ func _verify_run_loop() -> bool:
 	root._on_interactable_entered(container)
 	Input.action_press("interact")
 	root._try_interact()
-	root._update_active_interaction(root.CONTAINER_OPEN_HOLD_SECONDS + 0.1)
+	root._update_active_interaction(float(container.payload.get("open_time", root.CONTAINER_OPEN_HOLD_SECONDS)) + 0.1)
 	Input.action_release("interact")
 	root._take_all_loot()
 	if root.loot_panel.visible:

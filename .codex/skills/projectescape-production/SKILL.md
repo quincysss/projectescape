@@ -29,11 +29,13 @@ For all tasks:
 3. Read `references/doc-map.md` and then the matching module docs.
 4. If implementing in Godot, read `Doc/16_Godot工程结构与代码模块规划_修订版_废土生存法则.md`.
 5. If touching assets, prompts, sprite sheets, UI art, or map art resources, read document 17 and, for UI, documents 20 and 21.
+6. If touching worldbuilding, narrative packaging, in-game copy voice, item naming, or place naming, read `Doc/23_世界观包装_废土生存法则.md`.
 
 ## Execution Discipline
 
 - Treat split documents under `Doc/02_*` to `Doc/09_*` as the operational source for implementation tasks.
 - Treat revised master documents as the source for intent and cross-module consistency.
+- All project text files must be read and written as UTF-8. On Windows, explicitly use UTF-8-aware reads/writes for Chinese docs, GDScript strings, `.tscn`, `.tab`, `.md`, and skill files; never rely on the shell default code page. Before finishing, inspect any touched Chinese text through a UTF-8 read and fix mojibake immediately.
 - Do not implement from a framework-only summary when a split landing document or V0.1 checklist exists.
 - When docs and implementation conflict, prefer the current docs and call out the conflict in the final response.
 - When the user changes a rule in the current thread, update the docs first or in the same patch as the implementation.
@@ -120,6 +122,7 @@ Mandatory rules:
 - Load is calculated from carried items and equipment, then mapped to documented load stages and penalties.
 - Home storage, outpost storage, container leftovers, carried backpack, and meta warehouse are separate scopes with documented transfer boundaries.
 - Death, extraction, and settlement must call the documented inventory/warehouse interfaces rather than directly moving arbitrary item nodes.
+- Item selection and transfer must operate on a single item instance by list index; new UI surfaces must not merge, sell, consume, or transfer by `item_id` unless the user explicitly chooses a batch action that internally iterates single-item transfers.
 
 ### Extraction And Settlement
 
@@ -142,7 +145,11 @@ Mandatory rules:
 - The meta warehouse is persistent outside-run storage; it is not the same scope as backpack, home storage, outpost storage, or container contents.
 - Warehouse capacity, grid occupancy, stack merging, sorting, discard confirmation, and overflow handling must follow documented rules.
 - Settlement deposit is the main entry path from a run into the warehouse and must respect one-click/manual priority and full-warehouse behavior.
+- Out-of-run merchant selling must use documented warehouse and currency interfaces: selectable item, selectable count, atomic item removal plus currency gain.
+- Currency must be stored by currency_id. V0.1 only has `mine_coin`, but data and save structure must allow future currencies.
+- BaseScene top tabs must follow the documented order: warehouse, merchant, research, crafting. Unfinished tabs are disabled and greyed out.
 - Research, crafting, and departure preparation may read/write warehouse items only through documented interfaces.
+- Warehouse, merchant, research, crafting, and departure preparation item actions must select a concrete warehouse item instance before selling, consuming, equipping, or moving it.
 - Save data fields must be stable and compatible with the data configuration rules.
 
 ## Art And Asset Rules

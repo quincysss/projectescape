@@ -10,10 +10,26 @@ func add_items(new_items: Array) -> Array[Dictionary]:
 	var accepted: Array[Dictionary] = []
 	for item in new_items:
 		if item is Dictionary and int(item.get("amount", 0)) > 0:
-			var stored: Dictionary = item.duplicate(true)
-			items.append(stored)
-			accepted.append(stored.duplicate(true))
+			var amount := int(item.get("amount", 1))
+			for _index in range(amount):
+				var stored: Dictionary = item.duplicate(true)
+				stored.amount = 1
+				stored.stack_limit = 1
+				items.append(stored)
+				accepted.append(stored.duplicate(true))
 	return accepted
+
+func select_item_at(index: int) -> Dictionary:
+	if index < 0 or index >= items.size():
+		return {}
+	return items[index].duplicate(true)
+
+func remove_item_at(index: int) -> Dictionary:
+	if index < 0 or index >= items.size():
+		return {}
+	var removed := items[index].duplicate(true)
+	items.remove_at(index)
+	return removed
 
 func clear() -> void:
 	items.clear()

@@ -1,0 +1,2 @@
+id	name	icon	currency_type	sort_order	enabled_version	description
+mine_coin	矿币	res://assets/icons/currency/mine_coin.png	standard	10	v0.1	废土城镇间通用的矿区铸币。

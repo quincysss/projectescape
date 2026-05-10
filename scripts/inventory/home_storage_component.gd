@@ -17,9 +17,7 @@ func can_store_item(item: Dictionary) -> bool:
 	var normalized := _normalize_item(item)
 	if normalized.item_id == &"" or normalized.amount <= 0:
 		return false
-	if _find_merge_slot(normalized) != -1:
-		return true
-	return items.size() < max_slots
+	return items.size() + int(normalized.amount) <= max_slots
 
 func store_item(item: Dictionary) -> bool:
 	var normalized := _normalize_item(item)
@@ -28,15 +26,16 @@ func store_item(item: Dictionary) -> bool:
 		print("[HomeStorageComponent] Store failed: full.")
 		return false
 
-	var merge_index := _find_merge_slot(normalized)
-	if merge_index != -1:
-		items[merge_index].amount += normalized.amount
-	else:
-		items.append(normalized)
+	var stored_amount: int = normalized.amount
+	for _index in range(stored_amount):
+		var single := normalized.duplicate(true)
+		single.amount = 1
+		single.stack_limit = 1
+		items.append(single)
 
-	item_stored.emit(normalized.item_id, normalized.amount)
+	item_stored.emit(normalized.item_id, stored_amount)
 	home_storage_changed.emit(get_items_snapshot())
-	print("[HomeStorageComponent] Stored %s x%s." % [normalized.item_id, normalized.amount])
+	print("[HomeStorageComponent] Stored %s x%s as single items." % [normalized.item_id, stored_amount])
 	return true
 
 func store_from_inventory(inventory, slot_index: int, amount: int = -1) -> bool:
@@ -55,6 +54,14 @@ func store_from_inventory(inventory, slot_index: int, amount: int = -1) -> bool:
 		return false
 	return store_item(removed)
 
+func remove_item_at(slot_index: int) -> Dictionary:
+	if slot_index < 0 or slot_index >= items.size():
+		return {}
+	var removed := items[slot_index].duplicate(true)
+	items.remove_at(slot_index)
+	home_storage_changed.emit(get_items_snapshot())
+	return removed
+
 func clear() -> void:
 	items.clear()
 	home_storage_changed.emit(get_items_snapshot())
@@ -72,10 +79,6 @@ func get_slots_snapshot() -> Array:
 	return snapshot
 
 func _find_merge_slot(item: Dictionary) -> int:
-	for i in range(items.size()):
-		if items[i].item_id == item.item_id and int(items[i].stack_limit) == int(item.stack_limit):
-			if int(items[i].amount) + int(item.amount) <= int(items[i].stack_limit):
-				return i
 	return -1
 
 func _normalize_item(item: Dictionary) -> Dictionary:
@@ -84,6 +87,6 @@ func _normalize_item(item: Dictionary) -> Dictionary:
 		"display_name": str(item.get("display_name", item.get("item_id", ""))),
 		"amount": int(item.get("amount", 1)),
 		"weight_per_unit": float(item.get("weight_per_unit", 0.0)),
-		"stack_limit": int(item.get("stack_limit", 1)),
+		"stack_limit": 1,
 		"item_type": StringName(str(item.get("item_type", "material"))),
 	}

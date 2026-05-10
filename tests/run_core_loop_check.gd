@@ -119,11 +119,15 @@ func _verify_inventory_weight_storage(director) -> bool:
 		return false
 
 	if not director.debug_add_item(_item("scrap_metal", 3, 2.0, 5)):
-		printerr("Expected scrap stack add to pass.")
+		printerr("Expected three scrap items to pass.")
 		return false
-	if inventory.items.size() != 1 or int(inventory.items[0].amount) != 3:
-		printerr("Expected one stacked scrap slot.")
+	if inventory.items.size() != 3:
+		printerr("Expected three independent scrap slots.")
 		return false
+	for item in inventory.items:
+		if int(item.amount) != 1 or int(item.stack_limit) != 1:
+			printerr("Expected inventory items to be single, non-stackable entries.")
+			return false
 	if not is_equal_approx(weight.current_weight, 6.0):
 		printerr("Expected weight 6, got %s" % weight.current_weight)
 		return false
@@ -144,14 +148,17 @@ func _verify_inventory_weight_storage(director) -> bool:
 	if not director.deposit_inventory_item_to_home(0):
 		printerr("Expected deposit first item to pass.")
 		return false
-	if inventory.items.size() != 1:
+	if inventory.items.size() != 3:
 		printerr("Expected inventory item removed after deposit.")
 		return false
 	if storage.items.size() != 1:
 		printerr("Expected one home storage item.")
 		return false
-	if not is_equal_approx(weight.current_weight, 12.0):
-		printerr("Expected weight 12 after deposit, got %s" % weight.current_weight)
+	if int(storage.items[0].amount) != 1 or int(storage.items[0].stack_limit) != 1:
+		printerr("Expected home storage item to be a single, non-stackable entry.")
+		return false
+	if not is_equal_approx(weight.current_weight, 16.0):
+		printerr("Expected weight 16 after depositing one scrap, got %s" % weight.current_weight)
 		return false
 
 	inventory.setup(1, 100.0)

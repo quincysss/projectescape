@@ -16,6 +16,7 @@ const BLOCK_ART_USE_EXPERIMENTAL_EDGES := false
 const BLOCK_ART_USE_CORNER_PIECES := false
 const BLOCK_ART_USE_TILED_FILL := false
 const BLOCK_FILL_TILE_UNITS := Vector2(4.0, 4.0)
+const OUTPOST_ENTRY_CLEARANCE_UNITS := Vector2(1.25, 1.25)
 
 var scene: Node
 var unit: float
@@ -62,7 +63,7 @@ func generate_road_visuals() -> void:
 func create_ground() -> void:
 	scene._walkable_rects.clear()
 	scene._walkable_polygons.clear()
-	scene._enterable_exception_rects = get_enterable_exception_rects()
+	scene.enterable_exception_rects = get_enterable_exception_rects()
 	_create_terrain_ground_base()
 
 	var ground := ColorRect.new()
@@ -76,7 +77,7 @@ func create_ground() -> void:
 
 	for street in get_layout_rects("StreetWalkable"):
 		_add_street_from_layout(street)
-	for exception_rect in scene._enterable_exception_rects:
+	for exception_rect in scene.enterable_exception_rects:
 		scene._walkable_rects.append(exception_rect)
 	for block in get_layout_rects("BlockSolid"):
 		_add_block_from_layout(block)
@@ -88,7 +89,15 @@ func get_enterable_exception_rects() -> Array[Rect2]:
 	var rects: Array[Rect2] = []
 	rects.append(Rect2(scene.player_root.global_position - _u(home_safe_size_units) * 0.5, _u(home_safe_size_units)))
 	for point in get_outpost_candidate_points():
-		rects.append(Rect2(point.global_position - _u(outpost_size_units) * 0.5, _u(outpost_size_units)))
+		var footprint_units: Vector2 = point.get_footprint_units() if point.has_method("get_footprint_units") else outpost_size_units
+		var footprint_rect := Rect2(point.global_position - _u(footprint_units) * 0.5, _u(footprint_units))
+		rects.append(footprint_rect)
+		rects.append(footprint_rect.grow_individual(
+			OUTPOST_ENTRY_CLEARANCE_UNITS.x * unit,
+			OUTPOST_ENTRY_CLEARANCE_UNITS.y * unit,
+			OUTPOST_ENTRY_CLEARANCE_UNITS.x * unit,
+			OUTPOST_ENTRY_CLEARANCE_UNITS.y * unit
+		))
 	for layout in get_layout_rects("Buildings"):
 		if layout.rect_kind == "home" or layout.rect_kind == "outpost" or layout.walkable:
 			rects.append(layout.get_rect_px(unit))
@@ -181,11 +190,32 @@ func _add_visual_building_from_layout(layout) -> void:
 
 func _add_road_art_from_layout(layout) -> void:
 	var road_rect: Rect2 = layout.get_rect_px(unit)
-	_add_tiled_texture_rect(scene.road_visual_root, "%s_Ground" % layout.get_rect_id(), TerrainGroundTextures, road_rect, -95)
+	_add_layout_art(scene.road_visual_root, "%s_Ground" % layout.get_rect_id(), layout, TerrainGroundTextures, road_rect, -95, true)
 
 
-func _add_tiled_texture_rect(parent: Node, prefix: String, textures: Array, rect: Rect2, z: int) -> void:
-	var tile_size: Vector2 = textures[0].get_size()
+func _add_layout_art(parent: Node, prefix: String, layout, default_textures: Array, rect: Rect2, default_z: int, default_tiled: bool) -> void:
+	if _layout_uses_child_art(layout):
+		return
+	var mode := _layout_art_mode(layout)
+	if mode == "hidden":
+		return
+	var texture := null if mode == "auto" else _layout_art_texture(layout)
+	var z := _layout_art_z(layout, default_z)
+	if texture != null:
+		if mode == "tile":
+			_add_tiled_texture_rect(parent, prefix, [texture], rect, z, _layout_art_tile_size(layout), _layout_art_tint(layout))
+		else:
+			parent.add_child(_make_scaled_sprite("CustomFill", texture, rect, z, _layout_art_tint(layout)))
+		return
+	if default_tiled:
+		_add_tiled_texture_rect(parent, prefix, default_textures, rect, default_z)
+	else:
+		parent.add_child(_make_scaled_sprite("SingleFill", _default_texture_for_layout(default_textures, layout), rect, default_z))
+
+
+func _add_tiled_texture_rect(parent: Node, prefix: String, textures: Array, rect: Rect2, z: int, tile_size_override: Vector2 = Vector2.ZERO, tint: Color = Color.WHITE) -> void:
+	var texture_size: Vector2 = textures[0].get_size()
+	var tile_size: Vector2 = tile_size_override if tile_size_override != Vector2.ZERO else texture_size
 	var cols: int = int(ceil(rect.size.x / tile_size.x))
 	var rows: int = int(ceil(rect.size.y / tile_size.y))
 	for y in range(rows):
@@ -200,21 +230,36 @@ func _add_tiled_texture_rect(parent: Node, prefix: String, textures: Array, rect
 			sprite.name = "%s_%03d_%03d" % [prefix, x, y]
 			sprite.texture = texture
 			sprite.centered = true
-			sprite.region_enabled = true
-			sprite.region_rect = Rect2(Vector2.ZERO, region_size)
+			sprite.region_enabled = tile_size_override == Vector2.ZERO
+			if sprite.region_enabled:
+				sprite.region_rect = Rect2(Vector2.ZERO, region_size)
 			sprite.position = tile_pos + region_size * 0.5
+			if tile_size_override != Vector2.ZERO:
+				sprite.scale = region_size / texture_size
+			sprite.modulate = tint
 			sprite.z_index = z
 			sprite.set_meta("_generated_road_art", true)
 			parent.add_child(sprite)
 
 
 func _add_block_art_from_layout(layout) -> void:
+	if _layout_uses_child_art(layout):
+		return
 	var block_rect: Rect2 = layout.get_rect_px(unit)
 	var art_root := Node2D.new()
 	art_root.name = "%s_Art" % layout.get_rect_id()
 	art_root.set_meta("_generated_block_visual", true)
 	scene.block_visual_root.add_child(art_root)
-	if BLOCK_ART_USE_TILED_FILL:
+	var mode := _layout_art_mode(layout)
+	if mode == "hidden":
+		return
+	var texture := null if mode == "auto" else _layout_art_texture(layout)
+	if texture != null:
+		if mode == "tile":
+			_add_tiled_texture_rect(art_root, "CustomTile", [texture], block_rect, _layout_art_z(layout, -68), _layout_art_tile_size(layout), _layout_art_tint(layout))
+		else:
+			art_root.add_child(_make_scaled_sprite("CustomFill", texture, block_rect, _layout_art_z(layout, -68), _layout_art_tint(layout)))
+	elif BLOCK_ART_USE_TILED_FILL:
 		_add_block_fill_tiles(art_root, block_rect)
 	else:
 		_add_block_single_fill(art_root, block_rect, layout.get_rect_id())
@@ -277,13 +322,14 @@ func _add_corner_sprite(parent: Node, sprite_name: String, pos: Vector2, flip_h:
 	parent.add_child(sprite)
 
 
-func _make_scaled_sprite(sprite_name: String, texture: Texture2D, rect: Rect2, z: int) -> Sprite2D:
+func _make_scaled_sprite(sprite_name: String, texture: Texture2D, rect: Rect2, z: int, tint: Color = Color.WHITE) -> Sprite2D:
 	var sprite := Sprite2D.new()
 	sprite.name = sprite_name
 	sprite.texture = texture
 	sprite.centered = true
 	sprite.position = rect.get_center()
 	sprite.scale = rect.size / texture.get_size()
+	sprite.modulate = tint
 	sprite.z_index = z
 	return sprite
 
@@ -296,6 +342,59 @@ func _make_native_sprite(sprite_name: String, texture: Texture2D, pos: Vector2, 
 	sprite.position = pos
 	sprite.z_index = z
 	return sprite
+
+
+func _layout_art_mode(layout) -> String:
+	var mode = layout.get("art_mode")
+	if mode == null or String(mode).is_empty():
+		return "auto"
+	return String(mode)
+
+
+func _layout_uses_child_art(layout) -> bool:
+	var prefer_child_art = layout.get("prefer_child_art")
+	if prefer_child_art is bool and not prefer_child_art:
+		return false
+	if layout.has_method("has_child_art"):
+		return layout.has_child_art()
+	var art_root: Node = null
+	if layout is Node:
+		art_root = layout.get_node_or_null("ArtRoot")
+	if art_root == null:
+		return false
+	for child in art_root.get_children():
+		if child is CanvasItem and child.visible:
+			return true
+	return false
+
+
+func _layout_art_texture(layout) -> Texture2D:
+	var texture = layout.get("art_texture")
+	return texture if texture is Texture2D else null
+
+
+func _layout_art_tint(layout) -> Color:
+	var tint = layout.get("art_tint")
+	return tint if tint is Color else Color.WHITE
+
+
+func _layout_art_tile_size(layout) -> Vector2:
+	var tile_size_units = layout.get("art_tile_size_units")
+	var tile_size: Vector2 = tile_size_units if tile_size_units is Vector2 else Vector2(4.0, 4.0)
+	tile_size = Vector2(maxf(tile_size.x, 0.25), maxf(tile_size.y, 0.25))
+	return tile_size * unit
+
+
+func _layout_art_z(layout, default_z: int) -> int:
+	var custom_z = layout.get("art_z_index")
+	if custom_z == null or int(custom_z) == 0:
+		return default_z
+	return int(custom_z)
+
+
+func _default_texture_for_layout(textures: Array, layout) -> Texture2D:
+	var texture_index: int = int(abs(hash(layout.get_rect_id())) % textures.size())
+	return textures[texture_index]
 
 
 func _add_layout_polygon(polygon_name: String, source_transform: Transform2D, local_polygon: PackedVector2Array, color: Color, z: int, parent: Node = null) -> Polygon2D:
@@ -334,7 +433,7 @@ func _add_solid_layout_rect(block_name: String, source_transform: Transform2D, l
 func _carve_enterable_exceptions(block_local_rect: Rect2, source_transform: Transform2D) -> Array[Rect2]:
 	var collision_rects: Array[Rect2] = [block_local_rect]
 	var inverse_transform := source_transform.affine_inverse()
-	for exception_rect in scene._enterable_exception_rects:
+	for exception_rect in scene.enterable_exception_rects:
 		var exception_local_rect := _rect_to_local(exception_rect, inverse_transform)
 		var next_rects: Array[Rect2] = []
 		for collision_rect in collision_rects:

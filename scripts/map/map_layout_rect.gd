@@ -12,6 +12,13 @@ extends Node2D
 @export_enum("inner", "middle", "outer", "far_outer") var ring: String = "inner"
 @export var walkable: bool = false
 @export var has_collision: bool = false
+@export_group("Art Override")
+@export_enum("auto", "stretch", "tile", "hidden") var art_mode: String = "auto"
+@export var art_texture: Texture2D
+@export var art_tint: Color = Color.WHITE
+@export var art_tile_size_units: Vector2 = Vector2(4.0, 4.0)
+@export var art_z_index: int = 0
+@export var prefer_child_art: bool = true
 @export_group("Editor Box")
 @export var editor_unit_px: float = 64.0:
 	set(value):
@@ -67,7 +74,7 @@ func _draw_center_cross() -> void:
 
 func _draw_editor_label(rect: Rect2) -> void:
 	var text := "%s  %.1fx%.1f" % [get_rect_id(), size_units.x, size_units.y]
-	draw_string(ThemeDB.fallback_font, rect.position + Vector2(8.0, -8.0), text, HORIZONTAL_ALIGNMENT_LEFT, -1.0, 16.0, _editor_outline_color())
+	draw_string(ThemeDB.fallback_font, rect.position + Vector2(8.0, -8.0), text, HORIZONTAL_ALIGNMENT_LEFT, -1, 16, _editor_outline_color())
 
 func _editor_color() -> Color:
 	match rect_kind:
@@ -128,3 +135,12 @@ func get_rect_px(unit_size: float) -> Rect2:
 		max_pos.x = maxf(max_pos.x, corner.x)
 		max_pos.y = maxf(max_pos.y, corner.y)
 	return Rect2(min_pos, max_pos - min_pos)
+
+func has_child_art() -> bool:
+	var art_root := get_node_or_null("ArtRoot")
+	if art_root == null:
+		return false
+	for child in art_root.get_children():
+		if child is CanvasItem and child.visible:
+			return true
+	return false

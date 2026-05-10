@@ -33,28 +33,15 @@ func can_accept_item(item: Dictionary) -> Dictionary:
 		return {"accepted": false, "reason": "invalid_amount"}
 	if normalized.weight_per_unit < 0.0:
 		return {"accepted": false, "reason": "invalid_weight"}
-	if normalized.stack_limit <= 0:
-		return {"accepted": false, "reason": "invalid_stack_limit"}
-
 	var additional_weight := _stack_weight(normalized)
 	var weight_limit: float = weight_component.max_weight if weight_component else max_weight
 	var current_weight: float = get_current_weight()
 	if current_weight + additional_weight > weight_limit:
 		return {"accepted": false, "reason": "over_weight"}
 
-	var remaining_amount: int = normalized.amount
-	for stack in items:
-		if _can_stack_together(stack, normalized):
-			remaining_amount -= max(0, int(stack.stack_limit) - int(stack.amount))
-			if remaining_amount <= 0:
-				return {"accepted": true, "reason": ""}
-
-	var empty_slots := max_slots - items.size()
-	while remaining_amount > 0 and empty_slots > 0:
-		remaining_amount -= normalized.stack_limit
-		empty_slots -= 1
-
-	if remaining_amount > 0:
+	var required_slots: int = normalized.amount
+	var empty_slots: int = max_slots - items.size()
+	if required_slots > empty_slots:
 		return {"accepted": false, "reason": "no_slot"}
 	return {"accepted": true, "reason": ""}
 
@@ -66,24 +53,15 @@ func add_item(item: Dictionary) -> bool:
 		print("[InventoryComponent] Add failed %s: %s." % [normalized.get("item_id", &""), result.reason])
 		return false
 
-	var remaining_amount: int = normalized.amount
-	for i in range(items.size()):
-		if remaining_amount <= 0:
-			break
-		if _can_stack_together(items[i], normalized):
-			var free_space := int(items[i].stack_limit) - int(items[i].amount)
-			var moved := mini(free_space, remaining_amount)
-			items[i].amount += moved
-			remaining_amount -= moved
-
-	while remaining_amount > 0:
+	var added_amount: int = normalized.amount
+	for _index in range(added_amount):
 		var stack := normalized.duplicate(true)
-		stack.amount = mini(normalized.stack_limit, remaining_amount)
+		stack.amount = 1
+		stack.stack_limit = 1
 		items.append(stack)
-		remaining_amount -= stack.amount
 
 	_refresh_weight()
-	print("[InventoryComponent] Added %s x%s." % [normalized.item_id, normalized.amount])
+	print("[InventoryComponent] Added %s x%s as single items." % [normalized.item_id, added_amount])
 	inventory_changed.emit(get_items_snapshot())
 	return true
 
@@ -152,12 +130,16 @@ func _normalize_item(item: Dictionary) -> Dictionary:
 		"display_name": str(item.get("display_name", item.get("item_id", ""))),
 		"amount": int(item.get("amount", 1)),
 		"weight_per_unit": float(item.get("weight_per_unit", 0.0)),
-		"stack_limit": int(item.get("stack_limit", 1)),
+		"stack_limit": 1,
 		"item_type": StringName(str(item.get("item_type", "material"))),
+		"quality": StringName(str(item.get("quality", "C"))),
+		"quality_color": item.get("quality_color", Color.WHITE),
+		"tags": item.get("tags", []),
+		"icon": str(item.get("icon", "")),
 	}
 
 func _can_stack_together(a: Dictionary, b: Dictionary) -> bool:
-	return a.item_id == b.item_id and int(a.amount) < int(a.stack_limit) and int(a.stack_limit) == int(b.stack_limit)
+	return false
 
 func _stack_weight(stack: Dictionary) -> float:
 	return maxf(0.0, float(stack.get("weight_per_unit", 0.0))) * maxi(0, int(stack.get("amount", 0)))

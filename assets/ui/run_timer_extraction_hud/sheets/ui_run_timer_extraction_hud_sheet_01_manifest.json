@@ -1,0 +1,249 @@
+﻿{
+    "id":  "ui_run_timer_extraction_hud_01",
+    "source_mockup":  "assets/ui/_mockups/ig_0785fddc4c6e9089016a00430051548190ba1fea0d35bf2000.png",
+    "source_crop_windows":  {
+                                "timer_countdown_xywh":  [
+                                                             676,
+                                                             23,
+                                                             325,
+                                                             87
+                                                         ],
+                                "extraction_status_xywh":  [
+                                                               684,
+                                                               111,
+                                                               298,
+                                                               50
+                                                           ]
+                            },
+    "output_rule":  "Strict extraction from supplied HUD reference. Text is intentionally removed for localization and runtime state styling.",
+    "sheet":  "assets/ui/run_timer_extraction_hud/sheets/ui_run_timer_extraction_hud_sheet_01.png",
+    "sheet_size":  [
+                       1024,
+                       512
+                   ],
+    "preview":  "assets/ui/run_timer_extraction_hud/previews/ui_run_timer_extraction_hud_extract_preview_01.png",
+    "colors":  {
+                   "timer_text_gray_white":  {
+                                                 "fill":  "#D7D0C3",
+                                                 "shadow":  "#1A1714",
+                                                 "usage":  "default countdown text"
+                                             },
+                   "timer_text_black_red":  {
+                                                "fill":  "#2A0709",
+                                                "stroke":  "#8F3038",
+                                                "shadow":  "#080304",
+                                                "usage":  "urgent or failure countdown state; use stroke/outline for readability on dark frame"
+                                            },
+                   "extraction_dot_unavailable_dark_gray":  {
+                                                                "fill_dark":  "#242422",
+                                                                "fill_mid":  "#3B3B37",
+                                                                "fill_light":  "#55554F",
+                                                                "edge":  "#141412",
+                                                                "usage":  "locked or unavailable extraction status dot"
+                                                            },
+                   "extraction_dot_available_black_green":  {
+                                                                "fill_dark":  "#0A2219",
+                                                                "fill_mid":  "#123C2A",
+                                                                "fill_light":  "#1C583B"
+                                                            },
+                   "panel_dark":  "#151513",
+                   "worn_edge":  "#C7BFAE"
+               },
+    "typography":  {
+                       "countdown_font":  {
+                                              "primary":  "JetBrains Mono",
+                                              "fallback":  [
+                                                               "IBM Plex Mono",
+                                                               "Roboto Mono"
+                                                           ],
+                                              "weight":  "Bold",
+                                              "reference_size_px":  54,
+                                              "align":  "center"
+                                          },
+                       "extraction_status_font":  {
+                                                      "zh":  "Noto Sans SC",
+                                                      "en":  "Inter",
+                                                      "jp":  "Noto Sans JP",
+                                                      "weight":  "Medium",
+                                                      "reference_size_px":  18,
+                                                      "align":  "left"
+                                                  }
+                   },
+    "slicing":  {
+                    "timer_countdown_frame_empty":  {
+                                                        "size":  [
+                                                                     325,
+                                                                     87
+                                                                 ],
+                                                        "nine_patch_margin_ltrb":  [
+                                                                                       30,
+                                                                                       18,
+                                                                                       24,
+                                                                                       14
+                                                                                   ],
+                                                        "text_rect_xywh":  [
+                                                                               61,
+                                                                               18,
+                                                                               194,
+                                                                               50
+                                                                           ]
+                                                    },
+                    "extraction_status_frame":  {
+                                                    "mode":  "horizontal 3-slice for localization",
+                                                    "height":  50,
+                                                    "left":  {
+                                                                 "asset":  "extraction_status_frame_left",
+                                                                 "width":  76
+                                                             },
+                                                    "center_tile":  {
+                                                                        "asset":  "extraction_status_frame_center_tile",
+                                                                        "width":  32,
+                                                                        "compose":  "repeat or stretch horizontally"
+                                                                    },
+                                                    "right":  {
+                                                                  "asset":  "extraction_status_frame_right",
+                                                                  "width":  24
+                                                              },
+                                                    "default_full_width":  298,
+                                                    "min_width":  180,
+                                                    "dot_center_xy":  [
+                                                                          31,
+                                                                          24
+                                                                      ],
+                                                    "dot_asset_size":  [
+                                                                           30,
+                                                                           30
+                                                                       ],
+                                                    "dot_draw_xy":  [
+                                                                        17,
+                                                                        10
+                                                                    ],
+                                                    "text_start_x":  64,
+                                                    "text_baseline_hint_y":  31,
+                                                    "right_padding":  24,
+                                                    "recommended_width_formula":  "max(min_width, text_start_x + localized_text_width + right_padding)"
+                                                }
+                },
+    "assets":  [
+                   {
+                       "id":  "timer_countdown_frame_empty",
+                       "file":  "assets/ui/run_timer_extraction_hud/components/ui_run_timer_countdown_frame_empty_01.png",
+                       "size":  [
+                                    325,
+                                    87
+                                ],
+                       "sheet_rect":  [
+                                          32,
+                                          32,
+                                          325,
+                                          87
+                                      ]
+                   },
+                   {
+                       "id":  "extraction_status_frame_full_empty",
+                       "file":  "assets/ui/run_timer_extraction_hud/components/ui_run_extraction_status_frame_full_empty_01.png",
+                       "size":  [
+                                    298,
+                                    50
+                                ],
+                       "sheet_rect":  [
+                                          32,
+                                          160,
+                                          298,
+                                          50
+                                      ]
+                   },
+                   {
+                       "id":  "extraction_status_frame_left",
+                       "file":  "assets/ui/run_timer_extraction_hud/components/ui_run_extraction_status_frame_left_01.png",
+                       "size":  [
+                                    76,
+                                    50
+                                ],
+                       "sheet_rect":  [
+                                          32,
+                                          260,
+                                          76,
+                                          50
+                                      ]
+                   },
+                   {
+                       "id":  "extraction_status_frame_center_tile",
+                       "file":  "assets/ui/run_timer_extraction_hud/components/ui_run_extraction_status_frame_center_tile_01.png",
+                       "size":  [
+                                    32,
+                                    50
+                                ],
+                       "sheet_rect":  [
+                                          144,
+                                          260,
+                                          32,
+                                          50
+                                      ]
+                   },
+                   {
+                       "id":  "extraction_status_frame_right",
+                       "file":  "assets/ui/run_timer_extraction_hud/components/ui_run_extraction_status_frame_right_01.png",
+                       "size":  [
+                                    24,
+                                    50
+                                ],
+                       "sheet_rect":  [
+                                          224,
+                                          260,
+                                          24,
+                                          50
+                                      ]
+                   },
+                   {
+                       "id":  "extraction_status_dot_unavailable",
+                       "file":  "assets/ui/run_timer_extraction_hud/components/ui_run_extraction_status_dot_unavailable_01.png",
+                       "size":  [
+                                    30,
+                                    30
+                                ],
+                       "sheet_rect":  [
+                                          304,
+                                          264,
+                                          30,
+                                          30
+                                      ]
+                   },
+                   {
+                       "id":  "extraction_status_dot_available",
+                       "file":  "assets/ui/run_timer_extraction_hud/components/ui_run_extraction_status_dot_available_01.png",
+                       "size":  [
+                                    30,
+                                    30
+                                ],
+                       "sheet_rect":  [
+                                          352,
+                                          264,
+                                          30,
+                                          30
+                                      ]
+                   }
+               ],
+    "states":  {
+                   "extraction_unavailable":  {
+                                                  "frame":  "extraction_status_frame_*",
+                                                  "dot":  "extraction_status_dot_unavailable",
+                                                  "text_color":  "timer_text_gray_white",
+                                                  "text_key_example":  "extraction.unavailable"
+                                              },
+                   "extraction_available":  {
+                                                "frame":  "extraction_status_frame_*",
+                                                "dot":  "extraction_status_dot_available",
+                                                "text_color":  "timer_text_gray_white",
+                                                "text_key_example":  "extraction.available"
+                                            },
+                   "countdown_default":  {
+                                             "frame":  "timer_countdown_frame_empty",
+                                             "text_color":  "timer_text_gray_white"
+                                         },
+                   "countdown_warning":  {
+                                             "frame":  "timer_countdown_frame_empty",
+                                             "text_color":  "timer_text_black_red"
+                                         }
+               }
+}

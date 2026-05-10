@@ -273,7 +273,7 @@ P2：
 | 大楼 | 1024x1024 / 1536x1536 | 大型遮挡或地标 |
 | 家 / 安全屋 | 768x768 / 1024x1024 | 可见内部结构，安全地点 |
 | 前哨站 | 768x768 / 1024x1024 | 需要修复前与修复后两版 |
-| UI 图标 | 128x128 | 背包、装备、消耗品 |
+| UI 图标 | 128x128 | 背包、装备、消耗品、货币 |
 | 角色立绘参考 | 1024x1024 | 用于角色风格定义 |
 | 角色局内 sprite | 128x128 / 256x256 | 需后续拆动画 |
 
@@ -501,6 +501,7 @@ res://assets/map/roads/road_cross_01.png
 res://assets/map/props/streetlamp_01.png
 res://assets/map/props/planter_box_01.png
 res://assets/icons/items/scrap_metal.png
+res://assets/icons/currency/mine_coin.png
 res://assets/icons/equipment/backpack_small_reinforced.png
 res://assets/sprites/player/player_idle_down.png
 ```
@@ -959,11 +960,21 @@ Avoid: glossy candy art, bright cartoon, photorealism, complex shadow.
 
 ```text
 Create a UI icon for a dark hand-drawn 2D wasteland game.
-Subject: [inventory / safe storage / extract / research / crafting / earphone signal].
+Subject: [inventory / safe storage / extract / merchant / mine coin currency / research / crafting / earphone signal].
 Style: rough black ink line icon, dirty grayscale fill, minimal shape, small purple or blue accent only if useful.
 Background: transparent.
 Requirements: readable at 32x32, no text, no watermark, simple strong silhouette.
 Avoid: glossy app icon, 3D render, bright color, complex illustration.
+```
+
+矿币 icon 补充要求：
+
+```text
+Subject: mine coin currency icon, a small rough metal coin or ore-stamped token used in a wasteland mining town.
+Style: dark hand-drawn manga line art, thick black outline, scratched dull metal, muted grey and dirty brass, tiny warm yellow edge highlight.
+Background: transparent.
+Requirements: readable at 32x32 and 64x64, no text, no watermark, not a shiny fantasy gold coin.
+Use path: res://assets/icons/currency/mine_coin.png
 ```
 
 ---
@@ -1110,7 +1121,19 @@ item_type
 quality
 tags
 icon
+sellable
+sell_currency_id
+sell_value
 appearance_scene
+```
+
+货币 icon 从 `data/currencies.tab` 读取：
+
+```text
+id
+name
+icon
+currency_type
 ```
 
 场景拆件建议后续增加：

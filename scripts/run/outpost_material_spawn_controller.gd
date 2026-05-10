@@ -50,7 +50,7 @@ func spawn_for_outposts(requirements_by_outpost: Dictionary, outpost_positions: 
 				material_color(String(item_id))
 			)
 			pickup.payload = {
-				"item": make_item.call(item_id, data.display_name, data.amount, data.weight, 5)
+				"item": make_item.call(item_id, data.display_name, data.amount, data.weight, 1)
 			}
 			outpost_root.add_child(pickup)
 			spawned.append(pickup)

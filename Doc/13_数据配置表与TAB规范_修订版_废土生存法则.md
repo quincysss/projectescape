@@ -117,6 +117,7 @@ project-escape/data/
 
 ```text
 data/items.tab
+data/currencies.tab
 data/materials.tab
 data/equipment.tab
 data/consumables.tab
@@ -128,7 +129,9 @@ data/drop_tables.tab
 data/outpost_requirements.tab
 ```
 
-V0.3 初期可以先做前 8 张表。
+V0.1 局外商人开工时必须先有 `data/currencies.tab`。
+
+V0.3 初期可以先做 `items.tab`、`currencies.tab`、`materials.tab`、`equipment.tab`、`consumables.tab`、`effects.tab`、`research.tab`、`recipes.tab`。
 
 `drop_tables.tab` 和 `outpost_requirements.tab` 可以在局内刷新和前哨配置复杂后再拆。
 
@@ -254,7 +257,7 @@ blueprints.tab 的 id 必须能在 items.tab 中找到。
 
 ```text
 定义所有物品的基础信息。
-背包、仓库、掉落、结算、UI 都优先读取这张表。
+背包、仓库、掉落、结算、商人、UI 都优先读取这张表。
 ```
 
 建议字段：
@@ -269,20 +272,83 @@ blueprints.tab 的 id 必须能在 items.tab 中找到。
 | stack_limit | int | 堆叠上限 |
 | weight | float | 单个重量 |
 | icon | path | 图标路径 |
+| sellable | bool | 是否可出售给局外商人 |
+| sell_currency_id | string | 售卖获得的货币 ID，V0.1 默认 mine_coin |
+| sell_value | int | 单个物品基础售价 |
 | description | string | 描述文本 |
 | tags | list | 标签 |
 | enabled_version | string | 启用版本 |
 
+当前 V0.1 规则覆写：
+
+```text
+所有可进入背包、家中存储、容器掉落、材料拾取、结算或仓库的道具都不可堆叠。
+items.tab 中所有数据行的 stackable 必须为 false。
+items.tab 中所有数据行的 stack_limit 必须为 1。
+当掉落、材料需求或奖励配置产生多个同 ID 道具时，运行时必须拆分为多个 amount=1 的单件实例。
+背包格子、家中存储格子、负重判断和后续 UI 选择都按单件实例处理，不按同 ID 叠加组处理。
+```
+
 示例表头：
 
 ```text
-id	item_type	name	quality	stackable	stack_limit	weight	icon	description	tags	enabled_version
+id	item_type	name	quality	stackable	stack_limit	weight	icon	sellable	sell_currency_id	sell_value	description	tags	enabled_version
 ```
 
 示例行：
 
 ```text
-scrap_metal	material	废金属	C	true	99	0.1	res://assets/icons/items/scrap_metal.png	常见的金属废料，可用于修复和制作。	material;craft	v0.3
+scrap_metal	material	废金属	C	false	1	0.1	res://assets/icons/items/scrap_metal.png	true	mine_coin	3	常见的金属废料，可用于修复和制作。	material;craft	v0.3
+```
+
+---
+
+## 5.1.5 currencies.tab
+
+用途：
+
+```text
+定义货币静态信息。
+玩家实际持有数量不写在表里，只按 currency_id 保存在存档中。
+```
+
+V0.1 只有一种货币：
+
+```text
+mine_coin / 矿币
+```
+
+建议字段：
+
+| 字段 | 类型 | 说明 |
+|---|---|---|
+| id | string | 货币唯一 ID |
+| name | string | 显示名 |
+| icon | path | 图标路径 |
+| currency_type | enum | standard/premium/event/debug |
+| sort_order | int | UI 显示排序 |
+| enabled_version | string | 启用版本 |
+| description | string | 描述文本 |
+
+示例表头：
+
+```text
+id	name	icon	currency_type	sort_order	enabled_version	description
+```
+
+示例行：
+
+```text
+mine_coin	矿币	res://assets/icons/currency/mine_coin.png	standard	10	v0.1	废土城镇间通用的矿区铸币。
+```
+
+规则：
+
+```text
+存档保存 currency_id -> amount。
+不要在存档中保存 name、icon、currency_type。
+后续新增货币时新增 currencies.tab 行，并在玩家存档 currencies 字典中增加对应 key。
+currency_id 一旦进入存档，按稳定接口处理，不随意改名。
 ```
 
 ---
@@ -643,6 +709,9 @@ drop_tables.tab
 
 outpost_requirements.tab
   items.tab
+
+currencies.tab
+  items.tab.sell_currency_id
 ```
 
 ---
@@ -661,6 +730,10 @@ Godot 启动或开发调试时必须校验：
 所有 effect_id 必须存在于 effects.tab，除非该效果由代码内置并明确登记。
 所有 recipe.output_item 必须存在于 items.tab。
 所有 required_items 中的 item_id 必须存在于 items.tab。
+所有 items.tab.sell_currency_id 必须存在于 currencies.tab。
+所有 currencies.tab.id 不重复。
+所有 sellable = true 的物品 sell_value 必须大于 0。
+所有 sell_value > 0 的物品必须有 sell_currency_id。
 所有 required_research 必须存在于 research.tab。
 所有 required_blueprint 必须存在于 blueprints.tab。
 所有 icon 路径允许为空，但填写后资源必须存在。
@@ -899,6 +972,7 @@ prototype：只在开发模式加载。
 ```text
 item_id
 item_instance_id
+currency_id
 count
 durability_current
 source
@@ -1318,8 +1392,9 @@ V0.3 若要开始配置表系统，最小需要：
 
 ```text
 TabDataLoader 可读取 .tab。
-DataRegistry 可加载 items.tab。
-ItemDefinition 可被背包、仓库、结算引用。
+DataRegistry 可加载 items.tab 和 currencies.tab。
+ItemDefinition 可被背包、仓库、结算、商人引用。
+CurrencyDefinition 可被商人、局外顶部货币栏和存档读取引用。
 equipment.tab 可生成 EquipmentDefinition。
 consumables.tab 可生成 ConsumableDefinition。
 effects.tab 可注册基础效果。

@@ -75,7 +75,7 @@ func _on_add_scrap_pressed() -> void:
 		"display_name": "Scrap Metal",
 		"amount": 1,
 		"weight_per_unit": 2.0,
-		"stack_limit": 5,
+		"stack_limit": 1,
 		"item_type": "material",
 	})
 	_refresh()

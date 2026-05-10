@@ -9,11 +9,14 @@ signal stability_changed(current: float, max_value: float, stage: int)
 signal inventory_changed(items: Array)
 signal weight_changed(current_weight: float, max_weight: float, stage: int)
 signal home_storage_changed(items: Array)
+signal outpost_storage_changed(outpost_id: String, items: Array)
 
 const RunConfigScript := preload("res://scripts/run/run_config.gd")
 const RunInitializerScript := preload("res://scripts/run/run_initializer.gd")
 const RunStateMachineScript := preload("res://scripts/run/run_state_machine.gd")
 const WeightComponentScript := preload("res://scripts/inventory/weight_component.gd")
+const ItemTransferServiceScript := preload("res://scripts/inventory/item_transfer_service.gd")
+const OutpostStorageControllerScript := preload("res://scripts/outpost/outpost_storage_controller.gd")
 
 @export var spawn_position: Vector2 = Vector2.ZERO
 @export var first_outpost_candidates: Array = ["OutpostA_01", "OutpostA_02", "OutpostA_03"]
@@ -36,6 +39,8 @@ var camera_controller
 var inventory_component
 var weight_component
 var home_storage_component
+var item_transfer_service = ItemTransferServiceScript.new()
+var outpost_storage_controller = OutpostStorageControllerScript.new()
 
 func _ready() -> void:
 	state_machine = get_node_or_null("RunStateMachine")
@@ -49,6 +54,7 @@ func _ready() -> void:
 	state_machine.run_finished.connect(_on_run_finished)
 	state_machine.invalid_transition_requested.connect(_on_invalid_transition_requested)
 	initializer.initialization_failed.connect(_on_initialization_failed)
+	outpost_storage_controller.outpost_storage_changed.connect(_on_outpost_storage_changed)
 	_resolve_runtime_components()
 	_connect_safe_zones()
 	call_deferred("_connect_safe_zones")
@@ -140,6 +146,15 @@ func on_player_dead(reason: String = "stability_depleted") -> void:
 		stability_component.stop()
 	state_machine.on_player_dead(reason)
 
+func on_run_timeout(reason: String = "time_expired") -> void:
+	_log("Event: run_timeout %s" % reason)
+	if context:
+		context.is_time_expired = true
+		context.remaining_seconds = 0.0
+	if stability_component and stability_component.has_method("stop"):
+		stability_component.stop()
+	state_machine.on_run_timeout(reason)
+
 func get_debug_snapshot() -> Dictionary:
 	var snapshot := {
 		"state_machine": state_machine.get_state_snapshot() if state_machine else {},
@@ -177,6 +192,65 @@ func deposit_inventory_item_to_home(slot_index: int, amount: int = -1) -> bool:
 	if not stored:
 		_log("Deposit failed.")
 	return stored
+
+func deposit_inventory_item_to_home_by_selection(slot_index: int) -> Dictionary:
+	if context and context.active_safe_zone_id != "home":
+		return {"accepted": false, "reason": "not_home", "item": {}}
+	var result: Dictionary = item_transfer_service.transfer_inventory_to_storage(inventory_component, slot_index, home_storage_component)
+	if not result.accepted:
+		_log("Selected deposit failed: %s" % result.reason)
+	return result
+
+func withdraw_home_storage_item_to_inventory(slot_index: int) -> Dictionary:
+	if context and context.active_safe_zone_id != "home":
+		return {"accepted": false, "reason": "not_home", "item": {}}
+	var result: Dictionary = item_transfer_service.transfer_storage_to_inventory(home_storage_component, slot_index, inventory_component)
+	if not result.accepted:
+		_log("Selected withdraw failed: %s" % result.reason)
+	return result
+
+func ensure_outpost_storage(outpost_id: String):
+	if context == null or not _is_repaired_outpost_id(outpost_id):
+		return null
+	return outpost_storage_controller.ensure_storage(outpost_id, get_outpost_storage_capacity(outpost_id))
+
+func get_outpost_storage_capacity(outpost_id: String) -> int:
+	if context != null and outpost_id == context.selected_first_outpost_id:
+		return config.first_outpost_storage_slots
+	if context != null and outpost_id == context.selected_second_outpost_id:
+		return config.second_outpost_storage_slots
+	return config.first_outpost_storage_slots
+
+func get_outpost_storage_items_snapshot(outpost_id: String) -> Array:
+	var storage = outpost_storage_controller.get_storage(outpost_id)
+	if storage == null:
+		return []
+	return storage.get_items_snapshot()
+
+func get_all_outpost_storage_items_snapshot() -> Array:
+	return outpost_storage_controller.get_all_items_snapshot()
+
+func deposit_inventory_item_to_outpost(outpost_id: String, slot_index: int) -> Dictionary:
+	if context == null or context.active_safe_zone_id != outpost_id:
+		return {"accepted": false, "reason": "not_outpost", "item": {}}
+	if not _is_repaired_outpost_id(outpost_id):
+		return {"accepted": false, "reason": "outpost_inactive", "item": {}}
+	var storage = ensure_outpost_storage(outpost_id)
+	var result: Dictionary = item_transfer_service.transfer_inventory_to_storage(inventory_component, slot_index, storage)
+	if not result.accepted:
+		_log("Outpost deposit failed: %s" % result.reason)
+	return result
+
+func withdraw_outpost_storage_item_to_inventory(outpost_id: String, slot_index: int) -> Dictionary:
+	if context == null or context.active_safe_zone_id != outpost_id:
+		return {"accepted": false, "reason": "not_outpost", "item": {}}
+	if not _is_repaired_outpost_id(outpost_id):
+		return {"accepted": false, "reason": "outpost_inactive", "item": {}}
+	var storage = ensure_outpost_storage(outpost_id)
+	var result: Dictionary = item_transfer_service.transfer_storage_to_inventory(storage, slot_index, inventory_component)
+	if not result.accepted:
+		_log("Outpost withdraw failed: %s" % result.reason)
+	return result
 
 func get_candidate_summary() -> Dictionary:
 	return {
@@ -290,6 +364,7 @@ func _connect_safe_zones() -> void:
 			zone.safe_zone_exited.connect(_on_safe_zone_exited)
 
 func _initialize_runtime_components() -> void:
+	outpost_storage_controller.clear()
 	if weight_component:
 		weight_component.set_weight(0.0, config.base_weight_limit)
 	if inventory_component:
@@ -382,6 +457,11 @@ func _on_home_storage_changed(items: Array) -> void:
 func _on_home_storage_full() -> void:
 	_log("Home storage is full.")
 
+func _on_outpost_storage_changed(outpost_id: String, items: Array) -> void:
+	if context:
+		context.outpost_storage[outpost_id] = _snapshot_to_context(outpost_storage_controller.get_slots_snapshot(outpost_id))
+	outpost_storage_changed.emit(outpost_id, items)
+
 func _sync_inventory_context() -> void:
 	if context == null:
 		return
@@ -394,6 +474,12 @@ func _sync_inventory_context() -> void:
 		context.weight_speed_multiplier = weight_component.speed_multiplier
 	if home_storage_component:
 		context.home_storage = _snapshot_to_context(home_storage_component.get_slots_snapshot())
+	context.outpost_storage = outpost_storage_controller.get_debug_snapshot()
+
+func _is_repaired_outpost_id(outpost_id: String) -> bool:
+	if context == null:
+		return false
+	return str(context.outpost_states.get(outpost_id, "")) == "repaired"
 
 func _snapshot_to_context(items: Array) -> Array:
 	var snapshot: Array = []

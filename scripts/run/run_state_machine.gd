@@ -23,6 +23,7 @@ enum RunResult {
 	NONE,
 	EXTRACTED,
 	DEAD,
+	TIMEOUT_FAILED,
 	ABORTED,
 }
 
@@ -154,6 +155,16 @@ func on_player_dead(reason: String = "stability_depleted") -> bool:
 		_finish_run_once()
 	return transitioned
 
+func on_run_timeout(reason: String = "time_expired") -> bool:
+	if _has_finished_run:
+		return false
+	is_player_alive = false
+	run_result = RunResult.TIMEOUT_FAILED
+	var transitioned := request_transition(RunPhase.FAILED, reason)
+	if transitioned:
+		_finish_run_once()
+	return transitioned
+
 func get_state_snapshot() -> Dictionary:
 	return {
 		"previous_phase": phase_name(previous_phase),
@@ -256,6 +267,8 @@ static func result_name(result: int) -> String:
 			return "EXTRACTED"
 		RunResult.DEAD:
 			return "DEAD"
+		RunResult.TIMEOUT_FAILED:
+			return "TIMEOUT_FAILED"
 		RunResult.ABORTED:
 			return "ABORTED"
 		_:

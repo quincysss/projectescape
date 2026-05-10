@@ -1,0 +1,106 @@
+﻿{
+    "id":  "ui_run_character_hud_character_status_01",
+    "source_mockup":  "assets/ui/_mockups/ig_0785fddc4c6e9089016a00430051548190ba1fea0d35bf2000.png",
+    "source_crop_windows":  {
+                                "portrait_frame_xywh":  [
+                                                            25,
+                                                            24,
+                                                            168,
+                                                            184
+                                                        ],
+                                "stability_bar_xywh":  [
+                                                           185,
+                                                           50,
+                                                           405,
+                                                           100
+                                                       ]
+                            },
+    "output_rule":  "Strict extraction from supplied reference mockup. No freehand redraw. Current scope only: empty portrait frame and stability progress bar.",
+    "sheet":  "assets/ui/run_character_hud/character_status/sheets/ui_run_character_hud_top_left_ref_sheet_01.png",
+    "sheet_size":  [
+                       1024,
+                       512
+                   ],
+    "preview":  "assets/ui/run_character_hud/character_status/previews/ui_run_character_hud_top_left_extract_preview_ref_01.png",
+    "assets":  [
+                   {
+                       "id":  "portrait_frame_empty",
+                       "file":  "assets/ui/run_character_hud/character_status/components/ui_run_character_portrait_frame_empty_ref_01.png",
+                       "size":  [
+                                    168,
+                                    184
+                                ],
+                       "sheet_rect":  [
+                                          32,
+                                          32,
+                                          168,
+                                          184
+                                      ]
+                   },
+                   {
+                       "id":  "stability_bar_full_reference",
+                       "file":  "assets/ui/run_character_hud/character_status/components/ui_run_character_stability_bar_full_ref_01.png",
+                       "size":  [
+                                    405,
+                                    100
+                                ],
+                       "sheet_rect":  [
+                                          240,
+                                          32,
+                                          405,
+                                          100
+                                      ]
+                   },
+                   {
+                       "id":  "stability_bar_frame_empty",
+                       "file":  "assets/ui/run_character_hud/character_status/components/ui_run_character_stability_bar_frame_empty_ref_01.png",
+                       "size":  [
+                                    405,
+                                    100
+                                ],
+                       "sheet_rect":  [
+                                          240,
+                                          164,
+                                          405,
+                                          100
+                                      ]
+                   },
+                   {
+                       "id":  "stability_fill_overlay_current",
+                       "file":  "assets/ui/run_character_hud/character_status/components/ui_run_character_stability_fill_overlay_current_ref_01.png",
+                       "size":  [
+                                    405,
+                                    100
+                                ],
+                       "sheet_rect":  [
+                                          240,
+                                          296,
+                                          405,
+                                          100
+                                      ]
+                   },
+                   {
+                       "id":  "stability_fill_strip_current",
+                       "file":  "assets/ui/run_character_hud/character_status/components/ui_run_character_stability_fill_strip_current_ref_01.png",
+                       "size":  [
+                                    217,
+                                    35
+                                ],
+                       "sheet_rect":  [
+                                          696,
+                                          328,
+                                          217,
+                                          35
+                                      ],
+                       "reference_offset_in_bar":  [
+                                                       22,
+                                                       19
+                                                   ]
+                   }
+               ],
+    "usage":  {
+                  "portrait":  "Use portrait_frame_empty as an overlay above a future character portrait texture clipped to the transparent inner aperture.",
+                  "stability_one_piece":  "Use stability_bar_full_reference for visual approval or temporary static HUD.",
+                  "stability_dynamic":  "Draw stability_bar_frame_empty, then draw/clamp stability_fill_overlay_current or stretch/tile stability_fill_strip_current under it. The bar preserves the reference tick/number layout, including the duplicated 35 visible in the reference."
+              }
+}

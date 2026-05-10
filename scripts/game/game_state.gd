@@ -27,6 +27,18 @@ func get_warehouse_text() -> String:
 	_bind_warehouse_manager()
 	return warehouse_manager.get_warehouse_text()
 
+func get_warehouse_items_snapshot() -> Array[Dictionary]:
+	_bind_warehouse_manager()
+	return warehouse_manager.get_items_snapshot()
+
+func select_warehouse_item(index: int) -> Dictionary:
+	_bind_warehouse_manager()
+	return warehouse_manager.select_item_at(index)
+
+func remove_warehouse_item(index: int) -> Dictionary:
+	_bind_warehouse_manager()
+	return warehouse_manager.remove_item_at(index)
+
 func _bind_warehouse_manager() -> void:
 	if warehouse_manager == null:
 		warehouse_manager = WarehouseManagerScript.new()

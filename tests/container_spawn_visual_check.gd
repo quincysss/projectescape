@@ -38,6 +38,15 @@ func _verify_container_spawn_and_visuals() -> bool:
 		if _container_count(root) != before_count:
 			printerr("Expected occupied-point spawn rejection to keep container count unchanged.")
 			ok = false
+		root._open_container(first_container)
+		first_container.payload.lifetime = 0.01
+		root._update_container_lifetimes(1.0)
+		if root.interactables.has(first_container) or (is_instance_valid(first_container) and first_container.visible):
+			printerr("Expected opened container to keep counting down and expire.")
+			ok = false
+		if root.loot_panel.visible:
+			printerr("Expected expired opened container to close loot panel.")
+			ok = false
 
 	root.queue_free()
 	await process_frame
@@ -47,6 +56,9 @@ func _check_container_visual(root: Node, container: Node) -> bool:
 	var visual := container.get_node_or_null("ContainerVisual") as ColorRect
 	var fill := container.get_node_or_null("ContainerLifetimeFill") as ColorRect
 	var lifetime_label := container.get_node_or_null("ContainerLifetimeLabel") as Label
+	var lifetime_background := container.get_node_or_null("ContainerLifetimeLabelBackground") as ColorRect
+	var nameplate_label := container.get_node_or_null("ContainerNameplateLabel") as Label
+	var nameplate_background := container.get_node_or_null("ContainerNameplateBackground") as ColorRect
 	var marker_label := container.get_node_or_null("MarkerLabel") as Label
 	var ok := true
 	if visual == null or fill == null:
@@ -55,11 +67,26 @@ func _check_container_visual(root: Node, container: Node) -> bool:
 	if lifetime_label == null:
 		printerr("Expected container lifetime seconds label.")
 		ok = false
-	if marker_label == null or marker_label.get_theme_font_size("font_size") < 48:
-		printerr("Expected larger container grade marker label.")
+	if lifetime_background == null:
+		printerr("Expected readable lifetime label background.")
 		ok = false
-	if visual != null and visual.size.x < 200.0:
-		printerr("Expected larger container visual size.")
+	if nameplate_label != null or nameplate_background != null:
+		printerr("Expected container to omit the extra nameplate.")
+		ok = false
+	if marker_label == null or ["S", "A", "B", "C"].has(marker_label.text):
+		printerr("Expected container type marker instead of S/A/B/C grade marker.")
+		ok = false
+	elif marker_label.get_theme_font_size("font_size") < 40:
+		printerr("Expected container marker font to stay readable in home overview.")
+		ok = false
+	if visual != null and visual.size.x < 120.0:
+		printerr("Expected configured container visual size.")
+		ok = false
+	if not container.payload.has("type_id") or not container.payload.has("open_time"):
+		printerr("Expected container payload to include configured type_id and open_time.")
+		ok = false
+	if not container.payload.has("container_color") or container.payload.container_color != Color("#3A8DFF"):
+		printerr("Expected configured unified blue container color.")
 		ok = false
 	if visual != null and fill != null:
 		container.payload.lifetime = float(container.payload.lifetime_max) * 0.5
@@ -67,7 +94,7 @@ func _check_container_visual(root: Node, container: Node) -> bool:
 		if absf(fill.size.x - visual.size.x * 0.5) > 0.5:
 			printerr("Expected lifetime fill width to track remaining lifetime.")
 			ok = false
-		if lifetime_label != null and not lifetime_label.text.ends_with("s"):
+		if lifetime_label != null and (not lifetime_label.text.begins_with("剩 ") or not lifetime_label.text.ends_with("s")):
 			printerr("Expected lifetime label to show seconds.")
 			ok = false
 	return ok
