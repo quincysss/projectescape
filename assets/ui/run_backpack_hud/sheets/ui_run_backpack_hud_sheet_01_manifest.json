@@ -1,0 +1,140 @@
+﻿{
+    "sheet":  "sheets/ui_run_backpack_hud_sheet_01.png",
+    "sheet_size":  {
+                       "height":  512,
+                       "width":  1024
+                   },
+    "source_reference":  "right-bottom red-box backpack HUD region from current user reference image",
+    "generation_note":  "redrawn component sheet, not cropped from mockup; program renders numbers, slash, load text, and localization strings",
+    "colors":  {
+                   "panel_dark":  "#121211",
+                   "edge_paper":  "#BEB5A0",
+                   "inner_weathered_line":  "#5A544B",
+                   "load_purple_left":  "#846CD2",
+                   "load_purple_right":  "#4E3797",
+                   "runtime_number":  "#D8D1C4"
+               },
+    "runtime_rules":  {
+                          "backpack_panel_size":  "360x126 px",
+                          "backpack_icon_size":  "96x96 px source; recommended runtime display 82-90 px inside panel left side",
+                          "count_frame_size":  "58x36 px; draw occupied and capacity numbers centered using JetBrains Mono or Noto Sans Mono, 22-24 px, #D8D1C4; draw slash in code between frames",
+                          "count_frame_gap":  "slash center gap 12-16 px; keep occupied frame and capacity frame aligned to the top-middle of panel",
+                          "load_bar_frame_size":  "204x24 px; draw fill clipped from left to right inside 5 px horizontal padding and 5 px vertical padding",
+                          "load_fill_size":  "128x14 px sample fill; stretch/crop horizontally by current_load / max_load; do not scale vertically",
+                          "text":  "No baked text in component PNGs. Program renders current/max values and load labels for localization."
+                      },
+    "sprites":  [
+                    {
+                        "name":  "ui_run_backpack_panel_frame_empty_01",
+                        "file":  "components/ui_run_backpack_panel_frame_empty_01.png",
+                        "size":  {
+                                     "height":  126,
+                                     "width":  360
+                                 },
+                        "sheet_rect":  {
+                                           "y":  32,
+                                           "width":  360,
+                                           "height":  126,
+                                           "x":  32
+                                       }
+                    },
+                    {
+                        "name":  "ui_run_backpack_icon_01",
+                        "file":  "components/ui_run_backpack_icon_01.png",
+                        "size":  {
+                                     "height":  96,
+                                     "width":  96
+                                 },
+                        "sheet_rect":  {
+                                           "y":  40,
+                                           "width":  96,
+                                           "height":  96,
+                                           "x":  432
+                                       }
+                    },
+                    {
+                        "name":  "ui_run_backpack_count_frame_empty_01",
+                        "file":  "components/ui_run_backpack_count_frame_empty_01.png",
+                        "size":  {
+                                     "height":  36,
+                                     "width":  58
+                                 },
+                        "sheet_rect":  {
+                                           "y":  50,
+                                           "width":  58,
+                                           "height":  36,
+                                           "x":  568
+                                       }
+                    },
+                    {
+                        "name":  "ui_run_backpack_occupied_count_frame_empty_01",
+                        "file":  "components/ui_run_backpack_occupied_count_frame_empty_01.png",
+                        "size":  {
+                                     "height":  36,
+                                     "width":  58
+                                 },
+                        "sheet_rect":  {
+                                           "y":  50,
+                                           "width":  58,
+                                           "height":  36,
+                                           "x":  658
+                                       }
+                    },
+                    {
+                        "name":  "ui_run_backpack_capacity_count_frame_empty_01",
+                        "file":  "components/ui_run_backpack_capacity_count_frame_empty_01.png",
+                        "size":  {
+                                     "height":  36,
+                                     "width":  58
+                                 },
+                        "sheet_rect":  {
+                                           "y":  50,
+                                           "width":  58,
+                                           "height":  36,
+                                           "x":  748
+                                       }
+                    },
+                    {
+                        "name":  "ui_run_load_bar_frame_empty_01",
+                        "file":  "components/ui_run_load_bar_frame_empty_01.png",
+                        "size":  {
+                                     "height":  24,
+                                     "width":  204
+                                 },
+                        "sheet_rect":  {
+                                           "y":  208,
+                                           "width":  204,
+                                           "height":  24,
+                                           "x":  32
+                                       }
+                    },
+                    {
+                        "name":  "ui_run_load_bar_fill_strip_purple_01",
+                        "file":  "components/ui_run_load_bar_fill_strip_purple_01.png",
+                        "size":  {
+                                     "height":  14,
+                                     "width":  128
+                                 },
+                        "sheet_rect":  {
+                                           "y":  214,
+                                           "width":  128,
+                                           "height":  14,
+                                           "x":  272
+                                       }
+                    },
+                    {
+                        "name":  "ui_run_load_bar_fill_overlay_current_01",
+                        "file":  "components/ui_run_load_bar_fill_overlay_current_01.png",
+                        "size":  {
+                                     "height":  14,
+                                     "width":  128
+                                 },
+                        "sheet_rect":  {
+                                           "y":  214,
+                                           "width":  128,
+                                           "height":  14,
+                                           "x":  432
+                                       }
+                    }
+                ]
+}
