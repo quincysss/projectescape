@@ -124,6 +124,7 @@ var _status_prompt: String = ""
 var home_storage_user_closed: bool = false
 var active_outpost_storage_id: String = ""
 var _extract_button_held: bool = false
+var _ui_refresh_queued: bool = false
 
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_WM_SIZE_CHANGED:
@@ -491,7 +492,7 @@ func _try_interact() -> void:
 		"container":
 			_begin_container_open(nearest_interactable)
 		"material":
-			_open_material(nearest_interactable)
+			_pick_material(nearest_interactable)
 		"outpost":
 			_begin_outpost_repair(nearest_interactable)
 
@@ -547,13 +548,16 @@ func _open_container(container) -> void:
 	_open_loot_transfer_panels()
 	_refresh_ui()
 
-func _open_material(pickup) -> void:
-	if not loot_interaction_controller.open_material(pickup):
-		prompt_label.text = loot_interaction_controller.last_prompt
-		return
-	_play_player_interact_once(pickup)
-	_sync_loot_state()
-	_open_loot_transfer_panels()
+func _pick_material(pickup) -> void:
+	if loot_interaction_controller.pick_material_immediate(
+		pickup,
+		run_director.inventory_component,
+		Callable(self, "_remove_interactable")
+	):
+		_play_player_interact_once(pickup)
+		_status_prompt = "材料已放入背包。"
+	else:
+		_status_prompt = loot_interaction_controller.last_prompt
 	_refresh_ui()
 
 func _take_all_loot() -> void:
@@ -671,15 +675,6 @@ func _set_container_lifetime_paused(container, paused: bool) -> void:
 	if container.get("interact_type") != "container":
 		return
 	container.payload["lifetime_paused"] = paused
-
-func _pick_material(pickup) -> void:
-	loot_interaction_controller.pick_material_immediate(
-		pickup,
-		run_director.inventory_component,
-		Callable(self, "_remove_interactable")
-	)
-	_sync_loot_state()
-	_refresh_ui()
 
 func _sync_loot_state() -> void:
 	if loot_interaction_controller == null:
@@ -970,6 +965,15 @@ func _on_weight_changed(_current_weight: float, _max_weight: float, _stage: int)
 		player.speed_multiplier = run_director.weight_component.speed_multiplier
 
 func _refresh_ui() -> void:
+	if _ui_refresh_queued:
+		return
+	_ui_refresh_queued = true
+	call_deferred("_flush_ui_refresh")
+
+func _flush_ui_refresh() -> void:
+	_ui_refresh_queued = false
+	if not is_inside_tree():
+		return
 	run_ui_controller.refresh(self)
 
 func _item(id: String, display_name: String, amount: int, weight: float, _stack_limit: int) -> Dictionary:

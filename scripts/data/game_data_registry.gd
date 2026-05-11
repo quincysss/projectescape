@@ -98,6 +98,9 @@ func make_item_stack(item_id: String, amount: int = 1) -> Dictionary:
 		"quality_color": get_item_quality_color(quality),
 		"tags": TabDataLoader.split_list(String(item.get("tags", ""))),
 		"icon": String(item.get("icon", "")),
+		"sellable": TabDataLoader.parse_bool(String(item.get("sellable", "false")), false),
+		"sell_currency_id": String(item.get("sell_currency_id", "mine_coin")),
+		"sell_value": int(item.get("sell_value", 0)),
 	}
 
 func _load_rows(path: String) -> Array[Dictionary]:

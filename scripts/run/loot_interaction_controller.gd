@@ -70,11 +70,17 @@ func take_loot_at(index: int, inventory_component, remove_interactable: Callable
 
 func pick_material_immediate(pickup, inventory_component, remove_interactable: Callable) -> bool:
 	var item: Dictionary = pickup.payload.get("item", {})
-	if item.is_empty() or inventory_component == null:
+	if item.is_empty():
+		last_prompt = "材料已空。"
+		return false
+	if inventory_component == null:
+		last_prompt = "背包不可用。"
 		return false
 	if not inventory_component.add_item(item):
+		last_prompt = "背包空间或负重不足。"
 		return false
 	remove_interactable.call(pickup)
+	last_prompt = ""
 	return true
 
 func close() -> void:

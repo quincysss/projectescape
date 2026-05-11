@@ -77,6 +77,7 @@ func _verify_outpost_safe_zone_and_extract_ui() -> bool:
 	root.run_director.context.is_extraction_unlocked = true
 	root.run_director.on_safe_zone_entered("home")
 	root._refresh_ui()
+	await process_frame
 	if root.extract_hud_button.disabled:
 		printerr("Expected HUD extraction button enabled at home after unlock.")
 		return false

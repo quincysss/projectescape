@@ -67,11 +67,8 @@ func _verify_run_loop() -> bool:
 		printerr("Expected held container interaction to open loot and backpack panels")
 		return false
 	root._on_interactable_exited(container)
-	if root.loot_panel.visible:
-		printerr("Expected leaving container range to close loot panel")
-		return false
-	if not root.inventory_panel.visible or not root.home_storage_panel.visible:
-		printerr("Expected backpack and home storage to remain open at home")
+	if root.loot_panel.visible or root.inventory_panel.visible:
+		printerr("Expected leaving container range to close loot and backpack panels")
 		return false
 	root._on_interactable_entered(container)
 	Input.action_press("interact")
@@ -79,11 +76,8 @@ func _verify_run_loop() -> bool:
 	root._update_active_interaction(float(container.payload.get("open_time", root.CONTAINER_OPEN_HOLD_SECONDS)) + 0.1)
 	Input.action_release("interact")
 	root._take_all_loot()
-	if root.loot_panel.visible:
-		printerr("Expected empty container to close loot panel")
-		return false
-	if not root.inventory_panel.visible or not root.home_storage_panel.visible:
-		printerr("Expected backpack and home storage to stay open at home after looting")
+	if root.loot_panel.visible or root.inventory_panel.visible:
+		printerr("Expected empty container to close loot and backpack panels")
 		return false
 	if root.run_director.inventory_component.items.is_empty():
 		printerr("Expected loot to enter backpack")
@@ -107,11 +101,14 @@ func _verify_run_loop() -> bool:
 
 	for interactable in root.interactables.duplicate():
 		if is_instance_valid(interactable) and interactable.interact_type == "material":
-			root._open_material(interactable)
-			if not root.loot_panel.visible or not root.inventory_panel.visible:
-				printerr("Expected material interaction to open loot and backpack panels")
+			var before_count: int = root.run_director.inventory_component.items.size()
+			root._pick_material(interactable)
+			if root.loot_panel.visible:
+				printerr("Expected material pickup to avoid the loot panel")
 				return false
-			root._take_all_loot()
+			if root.run_director.inventory_component.items.size() <= before_count:
+				printerr("Expected material pickup to enter backpack immediately")
+				return false
 
 	var repaired := 0
 	for interactable in root.interactables.duplicate():

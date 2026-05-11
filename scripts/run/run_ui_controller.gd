@@ -687,6 +687,7 @@ func _set_panel_title(panel: Panel, title: String) -> void:
 
 func _set_items_grid(scene, grid_root: Control, items: Array, source_id: String, capacity: int) -> void:
 	for child in grid_root.get_children():
+		grid_root.remove_child(child)
 		child.queue_free()
 	capacity = maxi(capacity, items.size())
 	var columns := INVENTORY_GRID_COLUMNS

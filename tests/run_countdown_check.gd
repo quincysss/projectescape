@@ -40,6 +40,7 @@ func _verify_run_countdown() -> bool:
 
 	root._update_run_timer(61.0)
 	root._refresh_ui()
+	await process_frame
 	if countdown.text != "01:59":
 		printerr("Expected countdown 01:59 after 61 seconds, got %s." % countdown.text)
 		return false
