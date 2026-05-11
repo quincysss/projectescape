@@ -1,0 +1,32 @@
+﻿{
+    "id":  "ui_run_character_portraits_01",
+    "output_rule":  "Character portrait resources fit under ui_run_character_portrait_frame_empty_ref_01. Portrait PNGs are frame-sized with transparent outer margin; frame is drawn separately above.",
+    "source_reference":  "C:/Users/Administrator/AppData/Roaming/xiezuo/ImageTempCache/xiezuo20260429-175605.png",
+    "sheet":  "assets/ui/run_character_hud/character_status/sheets/ui_run_character_portraits_sheet_01.png",
+    "sheet_size":  [
+                       512,
+                       256
+                   ],
+    "assets":  [
+                   {
+                       "id":  "portrait_male_01",
+                       "size":  [
+                                    168,
+                                    184
+                                ],
+                       "frame_overlay":  "assets/ui/run_character_hud/character_status/components/ui_run_character_portrait_frame_empty_ref_01.png",
+                       "sheet_rect":  [
+                                          32,
+                                          32,
+                                          168,
+                                          184
+                                      ],
+                       "runtime_rule":  "Draw portrait first, then draw portrait_frame_empty_ref_01 above it. The portrait already has transparent outer padding to avoid rectangular leakage.",
+                       "file":  "assets/ui/run_character_hud/character_status/components/ui_run_character_portrait_male_01.png"
+                   }
+               ],
+    "style":  {
+                  "palette":  "grayscale dirty manga portrait, charcoal background, low-saturation skin/shirt, black messy hair, small purple-blue electronic glints",
+                  "avoid":  "no text, no frame baked into portrait, no bright clean anime color, no full-body crop"
+              }
+}
