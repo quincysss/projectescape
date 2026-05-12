@@ -15,7 +15,7 @@
                                                            100
                                                        ]
                             },
-    "output_rule":  "Reference-aligned generated redraw from the supplied HUD mockup. Existing file names, sizes, sheet rects, and runtime usage are preserved. Current scope only: empty portrait frame, stability fill, tick marks, and stability frame.",
+    "output_rule":  "Reference-aligned generated redraw from the supplied HUD mockup. Existing file names, sizes, sheet rects, and runtime usage are preserved. Stability bar art no longer bakes tick marks or numeric labels because max stability can change through tech research.",
     "sheet":  "assets/ui/run_character_hud/character_status/sheets/ui_run_character_hud_top_left_ref_sheet_01.png",
     "sheet_size":  [
                        1024,
@@ -100,7 +100,7 @@
                ],
     "usage":  {
                   "portrait":  "Use portrait_frame_empty as an overlay above a future character portrait texture clipped to the transparent inner aperture.",
-                  "stability_one_piece":  "Use stability_bar_full_reference for visual approval or temporary static HUD.",
-                  "stability_dynamic":  "Draw stability_bar_frame_empty, then draw/clamp stability_fill_overlay_current or stretch/tile stability_fill_strip_current under it. The bar preserves the current approved tick/number layout: 0 / 25 / 50 / 75 / 100 from left to right."
+                  "stability_one_piece":  "Use stability_bar_full_reference only as a temporary visual sample. It has no baked ticks or numbers; runtime should draw tick marks and labels based on current max stability.",
+                  "stability_dynamic":  "Draw stability_bar_frame_empty as the backing frame, then draw/clamp stability_fill_overlay_current or stretch/tile stability_fill_strip_current above it within the bar interior. Draw tick marks and numeric labels in code using current_max_stability, because research can increase the maximum value."
               }
 }
