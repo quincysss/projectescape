@@ -19,11 +19,11 @@ func _verify_run_countdown() -> bool:
 	if context == null:
 		printerr("Expected run context.")
 		return false
-	if not is_equal_approx(context.run_duration_seconds, 180.0):
-		printerr("Expected run duration 180, got %s." % context.run_duration_seconds)
+	if not is_equal_approx(context.run_duration_seconds, 300.0):
+		printerr("Expected run duration 300, got %s." % context.run_duration_seconds)
 		return false
-	if context.remaining_seconds > 180.0 or context.remaining_seconds < 179.0:
-		printerr("Expected initial remaining seconds to stay near 180, got %s." % context.remaining_seconds)
+	if context.remaining_seconds > 300.0 or context.remaining_seconds < 299.0:
+		printerr("Expected initial remaining seconds to stay near 300, got %s." % context.remaining_seconds)
 		return false
 
 	var countdown := root.get_node_or_null("RunUIRoot/CenterStatusHUD/CountdownPanel/CountdownLabel") as Label
@@ -34,19 +34,19 @@ func _verify_run_countdown() -> bool:
 	if center_hud == null or center_hud.anchor_left != 0.5 or center_hud.anchor_right != 0.5:
 		printerr("Expected center status HUD to be anchored at top center.")
 		return false
-	if countdown.text != "03:00":
-		printerr("Expected initial countdown 03:00, got %s." % countdown.text)
+	if countdown.text != "05:00":
+		printerr("Expected initial countdown 05:00, got %s." % countdown.text)
 		return false
 
 	root._update_run_timer(61.0)
 	root._refresh_ui()
 	await process_frame
-	if countdown.text != "01:59":
-		printerr("Expected countdown 01:59 after 61 seconds, got %s." % countdown.text)
+	if countdown.text != "03:59":
+		printerr("Expected countdown 03:59 after 61 seconds, got %s." % countdown.text)
 		return false
 
 	root.run_end_controller.base_scene_path = ""
-	root._update_run_timer(119.0)
+	root._update_run_timer(239.0)
 	var state: Dictionary = root.run_director.state_machine.get_state_snapshot()
 	if state.get("current_phase") != "FAILED":
 		printerr("Expected timeout to enter FAILED, got %s." % state.get("current_phase"))

@@ -1,0 +1,22 @@
+research_id	display_name	category	level	max_level	required_items	required_currency_id	required_currency_amount	effect_type	effect_value	enabled	enabled_version	description
+move_speed	行动训练 I	mobility	1	3	scrap_metal:3;cloth_dirty:2	mine_coin	20	player_move_speed_multiplier	1.05	true	v0.2	永久提高玩家基础移动速度 5%。
+move_speed	行动训练 II	mobility	2	3	wire_coil:2;tool_parts:2;cloth_dirty:3	mine_coin	45	player_move_speed_multiplier	1.10	true	v0.2	永久提高玩家基础移动速度 10%。
+move_speed	行动训练 III	mobility	3	3	battery_old:2;tool_parts:4;wire_coil:3	mine_coin	80	player_move_speed_multiplier	1.16	true	v0.2	永久提高玩家基础移动速度 16%。
+inventory_slots	背包改装 I	storage	1	3	reinforced_strap:2;duct_tape_roll:2;cloth_dirty:4	mine_coin	60	inventory_slots	12	true	v0.2	永久提高玩家局内背包容量至 12 格。
+inventory_slots	背包改装 II	storage	2	3	backpack_small_reinforced:1;reinforced_strap:4;tool_parts:3;wire_coil:2	mine_coin	130	inventory_slots	16	true	v0.2	永久提高玩家局内背包容量至 16 格。
+inventory_slots	背包改装 III	storage	3	3	thermal_scope_module:1;outpost_servo_pack:1;pulse_battery:3;signal_resonator_coil:3	mine_coin	260	inventory_slots	20	true	v0.2	永久提高玩家局内背包容量至 20 格。
+home_storage_slots	家用安全箱 I	storage	1	3	scrap_metal:6;rusted_bolts:4;duct_tape_roll:2	mine_coin	50	home_storage_slots	2	true	v0.2	永久提高家中安全箱容量至 2 格。
+home_storage_slots	家用安全箱 II	storage	2	3	tool_parts:5;reinforced_strap:2;pulse_battery:2;street_map_fragment:1	mine_coin	120	home_storage_slots	3	true	v0.2	永久提高家中安全箱容量至 3 格。
+home_storage_slots	家用安全箱 III	storage	3	3	outpost_filter:2;outpost_servo_pack:1;survey_drone_core:1;gold_data_chip:1	mine_coin	240	home_storage_slots	4	true	v0.2	永久提高家中安全箱容量至 4 格。
+outpost_storage_slots	前哨安全箱 I	outpost	1	2	outpost_filter:1;scrap_metal:5;wire_coil:3;signal_resonator_coil:1	mine_coin	90	outpost_storage_slots	1	true	v0.2	激活已修复前哨站存储功能，并提供 1 格容量。
+outpost_storage_slots	前哨安全箱 II	outpost	2	2	outpost_servo_pack:2;pulse_battery:3;survey_drone_core:1;sealed_medkit:1	mine_coin	220	outpost_storage_slots	2	true	v0.2	永久提高已修复前哨站安全箱容量至 2 格。
+max_stability	稳定训练 I	survival	1	5	medicine_powder:3;field_bandage:2;ration_bar:2	mine_coin	45	max_stability	120	true	v0.2	永久提高玩家稳定值上限至 120。
+max_stability	稳定训练 II	survival	2	5	stability_candy:2;sterile_patch:2;medicine_powder:4	mine_coin	100	max_stability	140	true	v0.2	永久提高玩家稳定值上限至 140。
+max_stability	稳定训练 III	survival	3	5	signal_injector:1;sealed_medkit:1;stability_candy:3;street_map_fragment:1	mine_coin	210	max_stability	160	true	v0.2	永久提高玩家稳定值上限至 160。
+max_stability	稳定训练 IV	survival	4	5	anomaly_heart_shard:1;signal_injector:3;blackbox_memory_core:1;sealed_medkit:2	mine_coin	420	max_stability	180	true	v0.2	永久提高玩家稳定值上限至 180。
+max_stability	稳定训练 V	survival	5	5	anomaly_heart_shard:2;sanctuary_nav_chip:1;prefall_access_key:1;blackbox_memory_core:2	mine_coin	760	max_stability	200	true	v0.2	永久提高玩家稳定值上限至 200。
+warehouse_capacity	仓库整理 I	warehouse	1	5	scrap_metal:8;cloth_dirty:4;rusted_bolts:4	mine_coin	40	warehouse_capacity	130	true	v0.2	永久提高局外仓库容量至 130 格。
+warehouse_capacity	仓库整理 II	warehouse	2	5	tool_parts:6;duct_tape_roll:4;reinforced_strap:2	mine_coin	110	warehouse_capacity	140	true	v0.2	永久提高局外仓库容量至 140 格。
+warehouse_capacity	仓库整理 III	warehouse	3	5	battery_old:4;pulse_battery:2;signal_resonator_coil:2;street_map_fragment:1	mine_coin	230	warehouse_capacity	150	true	v0.2	永久提高局外仓库容量至 150 格。
+warehouse_capacity	仓库整理 IV	warehouse	4	5	outpost_servo_pack:2;survey_drone_core:2;thermal_scope_module:1;gold_data_chip:1	mine_coin	480	warehouse_capacity	160	true	v0.2	永久提高局外仓库容量至 160 格。
+warehouse_capacity	仓库整理 V	warehouse	5	5	sanctuary_nav_chip:1;blackbox_memory_core:2;prefall_access_key:1;anomaly_heart_shard:1	mine_coin	820	warehouse_capacity	170	true	v0.2	永久提高局外仓库容量至 170 格。

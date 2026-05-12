@@ -517,29 +517,30 @@ restore_stability	instant	stability	amount:15	none	0	res://assets/icons/effects/
 
 | 字段 | 类型 | 说明 |
 |---|---|---|
-| id | string | 研究ID |
-| name | string | 研究名 |
+| research_id | string | 研究线 ID，同一研究多档共用同一个 ID |
+| display_name | string | 当前档位显示名 |
 | category | enum | storage/crafting/consumable/equipment/outpost |
 | level | int | 当前等级 |
 | max_level | int | 最大等级 |
-| prerequisites | list | 前置研究ID列表 |
 | required_items | requirements | 材料需求 |
-| required_blueprints | list | 前置图纸 |
-| effect_ids | list | 解锁效果ID列表 |
-| effect_values | params | 解锁效果参数 |
-| description | string | 描述 |
+| required_currency_id | string | 货币 ID，例如 mine_coin |
+| required_currency_amount | int | 货币消耗 |
+| effect_type | string | 研究效果类型 |
+| effect_value | float | 最终生效值，不是增量 |
+| enabled | bool | 是否启用 |
 | enabled_version | string | 启用版本 |
+| description | string | 描述 |
 
 示例表头：
 
 ```text
-id	name	category	level	max_level	prerequisites	required_items	required_blueprints	effect_ids	effect_values	description	enabled_version
+research_id	display_name	category	level	max_level	required_items	required_currency_id	required_currency_amount	effect_type	effect_value	enabled	enabled_version	description
 ```
 
 示例行：
 
 ```text
-research_consumable_slot_1	便携药袋	consumable	1	1		scrap_metal:2;cloth_dirty:1		unlock_consumable_slot	amount:1	解锁第一个消耗品携带栏。	v0.3
+inventory_slots	背包改装 I	storage	1	3	reinforced_strap:2;duct_tape_roll:2;cloth_dirty:4	mine_coin	60	inventory_slots	12	true	v0.2	永久提高玩家局内背包容量至 12 格。
 ```
 
 ---
@@ -675,6 +676,87 @@ V0.3 如果前哨需求仍然很少，可以先保留在脚本或 JSON 配置中
 
 ```text
 id	outpost_id	stage	required_items	reward_effects	description	enabled_version
+```
+
+---
+
+## 5.11 scene_random_events.tab
+
+用途：
+
+```text
+定义从第 3 日开始进入事件池的场景随机事件。
+```
+
+建议字段：
+
+| 字段 | 类型 | 说明 |
+|---|---|---|
+| event_id | string | 事件 ID |
+| display_name | string | 调试/提示显示名 |
+| slot | enum | threat/time_modifier/map_blocker/weather/hazard/reward |
+| min_day | int | 最早自然出现日 |
+| guaranteed_day | int | 必出日，可空 |
+| daily_chance | float | 自然概率 |
+| conflict_group | string | 互斥组，可空 |
+| can_stack | bool | 是否可与其他槽位叠加 |
+| gm_forceable | bool | GM 是否可强制 |
+| payload | keyvalue | 事件参数 |
+| notes | string | 策划备注 |
+
+示例表头：
+
+```text
+event_id	display_name	slot	min_day	guaranteed_day	daily_chance	conflict_group	can_stack	gm_forceable	payload	notes
+```
+
+当前建议行：
+
+```text
+monster_presence	怪物出现	threat	3	3	0.50		false	true	monster_count=4;spawn_group=monster_spawn_street	第三日必出
+super_time	超级时间	time_modifier	3		0.10	run_duration	false	true	duration_seconds=480	本局8分钟
+short_time	超短时间	time_modifier	3		0.10	run_duration	false	true	duration_seconds=210	本局3分30秒
+road_obstacle	随机障碍	map_blocker	3		0.30		true	true	count_min=2;count_max=4;spawn_group=random_obstacle_spawn	玩家阻挡怪物忽略
+```
+
+---
+
+## 5.12 monster_defs.tab
+
+用途：
+
+```text
+定义怪物基础移动、视野、警戒和碰撞伤害参数。
+```
+
+示例表头：
+
+```text
+monster_id	display_name	patrol_speed	charge_speed	vision_angle	vision_radius	warning_seconds	stability_damage	patrol_radius
+```
+
+---
+
+## 5.13 random_obstacle_defs.tab
+
+用途：
+
+```text
+定义随机障碍可用资源、阻挡形状、碰撞规则和权重。
+```
+
+示例表头：
+
+```text
+obstacle_id	display_name	texture_path	block_shape	collider_size	player_blocks	monster_blocks	weight
+```
+
+规则：
+
+```text
+player_blocks 必须为 true。
+monster_blocks 必须为 false。
+ground_decal_overlay_002.png 作为障碍时必须配合不可见碰撞体。
 ```
 
 ---

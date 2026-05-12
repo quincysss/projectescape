@@ -80,17 +80,45 @@ func _check_outpost_requirement_bubble_spacing(outpost: Node) -> bool:
 	if bubbles == null:
 		printerr("Expected outpost requirement bubbles.")
 		return false
+	if absf(bubbles.scale.x - 3.0) > 0.01 or absf(bubbles.scale.y - 3.0) > 0.01:
+		printerr("Expected outpost requirement bubbles to scale as one centered panel.")
+		return false
+	var background := bubbles.get_node_or_null("RequirementBubbleBackground") as ColorRect
+	if background == null:
+		printerr("Expected outpost requirement panel background.")
+		return false
+	var panel_center := background.position + background.size * 0.5
+	if panel_center.length() > 0.01:
+		printerr("Expected outpost requirement panel center to match outpost center. center=%s" % panel_center)
+		return false
 	var labels: Array[Label] = []
+	var title: Label = null
 	for child in bubbles.get_children():
 		if child is Label:
-			labels.append(child)
+			var label := child as Label
+			if label.name == "RequirementBubbleTitle":
+				title = label
+			elif label.name.begins_with("RequirementBubbleMaterial"):
+				labels.append(label)
+			if label.text.contains("包"):
+				printerr("Expected requirement panel not to show backpack shorthand.")
+				return false
+	if title == null or title.text != "前哨站":
+		printerr("Expected outpost requirement panel title.")
+		return false
+	if title.get_theme_font_size("font_size") < 52:
+		printerr("Expected larger outpost requirement title font.")
+		return false
 	if labels.size() < 2:
-		printerr("Expected at least two requirement bubble labels.")
+		printerr("Expected at least two material requirement labels.")
 		return false
 	labels.sort_custom(func(a, b): return a.position.x < b.position.x)
 	for label in labels:
-		if label.get_theme_font_size("font_size") < 44:
-			printerr("Expected larger requirement bubble font.")
+		if not label.text.begins_with("需要") or not label.text.contains("：") or not label.text.contains("/"):
+			printerr("Expected material requirement label format.")
+			return false
+		if label.get_theme_font_size("font_size") < 36:
+			printerr("Expected readable requirement material font.")
 			return false
 	for index in range(labels.size() - 1):
 		var current := labels[index]
@@ -100,4 +128,9 @@ func _check_outpost_requirement_bubble_spacing(outpost: Node) -> bool:
 		if gap < 20.0:
 			printerr("Expected scaled requirement bubbles not to overlap.")
 			return false
+	var title_bottom := title.position.y + title.size.y * title.scale.y
+	var first_material_top := labels[0].position.y
+	if first_material_top <= title_bottom:
+		printerr("Expected requirement title and material row to stay on separate lines. title_y=%s title_h=%s title_scale=%s material_y=%s material_h=%s material_scale=%s" % [title.position.y, title.size.y, title.scale.y, labels[0].position.y, labels[0].size.y, labels[0].scale.y])
+		return false
 	return true

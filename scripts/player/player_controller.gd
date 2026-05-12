@@ -16,6 +16,7 @@ const DIRECTIONS := ["down", "left", "right", "up"]
 var speed_multiplier: float = 1.0
 var walkable_rects: Array[Rect2] = []
 var walkable_polygons: Array[PackedVector2Array] = []
+var blocked_rects: Array[Rect2] = []
 var last_direction: String = "down"
 var sprite: AnimatedSprite2D
 var _is_interacting: bool = false
@@ -44,12 +45,18 @@ func set_walkable_rects(rects: Array[Rect2]) -> void:
 func set_walkable_polygons(polygons: Array[PackedVector2Array]) -> void:
 	walkable_polygons = polygons
 
+func set_blocked_rects(rects: Array[Rect2]) -> void:
+	blocked_rects = rects
+
 func face_towards(world_position: Vector2) -> void:
 	var direction_vector := world_position - global_position
 	if direction_vector.length_squared() > 0.001:
 		last_direction = _direction_from_vector(direction_vector)
 
 func _is_position_walkable(world_position: Vector2) -> bool:
+	for rect in blocked_rects:
+		if rect.has_point(world_position):
+			return false
 	if walkable_rects.is_empty() and walkable_polygons.is_empty():
 		return true
 	for polygon in walkable_polygons:

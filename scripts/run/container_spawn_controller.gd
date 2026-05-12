@@ -5,6 +5,8 @@ const GameDataRegistryScript := preload("res://scripts/data/game_data_registry.g
 
 const INITIAL_SPAWN_COUNT := 6
 const RESPAWN_INTERVAL_SECONDS := 12.0
+const RESPAWN_MIN_COUNT := 1
+const RESPAWN_MAX_COUNT := 3
 const CONTAINER_LIFETIME_SECONDS := 45.0
 
 var container_root: Node
@@ -18,6 +20,7 @@ var container_index: int = 0
 var respawn_timer: float = 0.0
 var last_spawn_point_index: int = 0
 var data_registry
+var ss_loot_director
 var rng := RandomNumberGenerator.new()
 
 func setup(
@@ -38,17 +41,14 @@ func setup(
 	data_registry = GameDataRegistryScript.new()
 	data_registry.load_all()
 
+func setup_ss_loot_director(director) -> void:
+	ss_loot_director = director
+
 func spawn_initial() -> void:
-	var points: Array = _spawn_points()
-	var spawned_count := 0
-	for spawn_point in points:
-		if not (spawn_point is Node2D):
+	for _index in range(INITIAL_SPAWN_COUNT):
+		if spawn_next_container() != null:
 			continue
-		if _is_position_occupied(spawn_point.global_position):
-			continue
-		if spawn_container_for_point(spawn_point) != null:
-			spawned_count += 1
-		if spawned_count >= INITIAL_SPAWN_COUNT:
+		else:
 			return
 
 func update(delta: float, interactables: Array) -> void:
@@ -57,7 +57,7 @@ func update(delta: float, interactables: Array) -> void:
 	if respawn_timer < RESPAWN_INTERVAL_SECONDS:
 		return
 	respawn_timer = 0.0
-	spawn_next_container()
+	spawn_refresh_round()
 
 func update_lifetimes(delta: float, interactables: Array) -> void:
 	for interactable in interactables.duplicate():
@@ -85,7 +85,7 @@ func spawn_container(pos: Vector2, container_type_id: String = "", ring: String 
 		float(container_def.get("open_time_min", 0.8)),
 		float(container_def.get("open_time_max", 1.6))
 	)
-	var rewards := _generate_rewards(container_def, ring)
+	var loot_seed := rng.randi()
 	var container = make_interactable.call(
 		"container_%s" % container_index,
 		"container",
@@ -100,10 +100,12 @@ func spawn_container(pos: Vector2, container_type_id: String = "", ring: String 
 		"container_def": container_def.duplicate(true),
 		"container_color": visual_color,
 		"ring": ring,
+		"loot_seed": loot_seed,
+		"loot_generated": false,
 		"lifetime": lifetime,
 		"lifetime_max": lifetime,
 		"open_time": open_time,
-		"rewards": rewards,
+		"rewards": [],
 	}
 	container_root.add_child(container)
 	return container
@@ -120,21 +122,52 @@ func spawn_next_container():
 		return null
 	return spawn_container_for_point(spawn_point)
 
+func spawn_refresh_round() -> Array:
+	var spawned: Array = []
+	var spawn_count := rng.randi_range(RESPAWN_MIN_COUNT, RESPAWN_MAX_COUNT)
+	for _index in range(spawn_count):
+		var container = spawn_next_container()
+		if container == null:
+			break
+		spawned.append(container)
+	return spawned
+
+func ensure_container_rewards(container) -> Array[Dictionary]:
+	if not is_instance_valid(container):
+		return []
+	var payload = container.get("payload")
+	if not (payload is Dictionary):
+		return []
+	if bool(payload.get("loot_generated", false)):
+		return payload.get("rewards", [])
+	var reward_rng := RandomNumberGenerator.new()
+	reward_rng.seed = int(payload.get("loot_seed", rng.randi()))
+	var container_def: Dictionary = payload.get("container_def", {})
+	var ring := String(payload.get("ring", "inner"))
+	var rewards := _generate_rewards(container_def, ring, reward_rng)
+	payload.rewards = rewards
+	payload.loot_generated = true
+	return rewards
+
 func next_spawn_point() -> Node2D:
 	var points: Array = _spawn_points()
 	if points.is_empty():
 		return null
-	for offset in range(points.size()):
-		var index := (last_spawn_point_index + 1 + offset) % points.size()
+	var available_indices: Array[int] = []
+	for index in range(points.size()):
 		var candidate = points[index]
 		if not (candidate is Node2D):
 			continue
 		var spawn_point: Node2D = candidate
 		if _is_position_occupied(spawn_point.global_position):
 			continue
-		last_spawn_point_index = index
-		return spawn_point
-	return null
+		available_indices.append(index)
+	if available_indices.is_empty():
+		return null
+	var selected_index: int = available_indices[rng.randi_range(0, available_indices.size() - 1)]
+	last_spawn_point_index = selected_index
+	var selected_point: Node2D = points[selected_index]
+	return selected_point
 
 func next_spawn_position() -> Vector2:
 	var points: Array = _spawn_points()
@@ -166,6 +199,8 @@ func rarity_color(rarity: String) -> Color:
 			return Color(0.78, 0.58, 1.0)
 		"S":
 			return Color(1.0, 0.84, 0.36)
+		"SS":
+			return Color("#FF4A4A")
 		_:
 			return Color.WHITE
 
@@ -209,13 +244,20 @@ func _container_definition(container_type_id: String, ring: String) -> Dictionar
 			return explicit_def
 	return data_registry.pick_container_type_for_ring(ring, rng)
 
-func _generate_rewards(container_def: Dictionary, ring: String) -> Array[Dictionary]:
+func _generate_rewards(container_def: Dictionary, ring: String, reward_rng: RandomNumberGenerator) -> Array[Dictionary]:
+	var rewards: Array[Dictionary] = []
+	if ss_loot_director != null and ss_loot_director.has_method("try_generate_ss"):
+		var ss_stack: Dictionary = ss_loot_director.try_generate_ss(container_def, ring, reward_rng)
+		if not ss_stack.is_empty():
+			rewards.append(ss_stack)
 	if data_registry != null and not container_def.is_empty():
-		var generated: Array[Dictionary] = data_registry.generate_container_loot(container_def, ring, rng)
+		var generated: Array[Dictionary] = data_registry.generate_container_loot(container_def, ring, reward_rng)
 		if not generated.is_empty():
-			return generated
+			rewards.append_array(generated)
+	if not rewards.is_empty():
+		return rewards
 	return [
-		make_item.call("scrap_metal", "废金属", 1 + rng.randi_range(0, 1), 0.1, 99),
+		make_item.call("scrap_metal", "废金属", 1 + reward_rng.randi_range(0, 1), 0.1, 99),
 	]
 
 func _container_color(container_def: Dictionary) -> Color:

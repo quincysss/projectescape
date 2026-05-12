@@ -45,7 +45,10 @@ func _verify_config_driven_container_spawn() -> bool:
 	if float(container.payload.get("open_time", 0.0)) < 3.6:
 		printerr("Expected large_safe open time from table.")
 		ok = false
-	var rewards: Array = container.payload.get("rewards", [])
+	if bool(container.payload.get("loot_generated", true)):
+		printerr("Expected configured container loot to wait until opening.")
+		ok = false
+	var rewards: Array = controller.ensure_container_rewards(container)
 	if rewards.size() < 2:
 		printerr("Expected large_safe loot to generate single-item rewards, got %s." % rewards.size())
 		ok = false

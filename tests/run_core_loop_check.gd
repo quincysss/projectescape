@@ -74,8 +74,8 @@ func _verify_run_scene_points() -> bool:
 		printerr("Expected stability 100, got %s" % context.player_stability)
 		root.queue_free()
 		return false
-	if context.home_storage.size() != 4:
-		printerr("Expected 4 home storage slots, got %s" % context.home_storage.size())
+	if context.home_storage.size() != 1:
+		printerr("Expected 1 base home storage slot, got %s" % context.home_storage.size())
 		root.queue_free()
 		return false
 	if context.selected_outpost_positions.size() != 2:
@@ -170,7 +170,7 @@ func _verify_inventory_weight_storage(director) -> bool:
 		return false
 
 	director.start_new_run()
-	for i in range(4):
+	for i in range(1):
 		if not director.debug_add_item(_item("stored_%s" % i, 1, 1.0, 1)):
 			printerr("Expected storage fill source item %s to add." % i)
 			return false

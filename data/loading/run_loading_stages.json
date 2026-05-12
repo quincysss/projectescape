@@ -1,0 +1,12 @@
+[
+	{"stage_id": "lock_departure", "progress": 0.05, "text": "校验出发装备..."},
+	{"stage_id": "build_run_context", "progress": 0.15, "text": "升降通道启动中..."},
+	{"stage_id": "load_map", "progress": 0.30, "text": "同步地表地图..."},
+	{"stage_id": "load_player", "progress": 0.42, "text": "整备随身物资..."},
+	{"stage_id": "init_systems", "progress": 0.58, "text": "暗潮读数稳定中..."},
+	{"stage_id": "init_outposts", "progress": 0.70, "text": "扫描前哨信号..."},
+	{"stage_id": "init_loot", "progress": 0.82, "text": "标记容器与资源信号..."},
+	{"stage_id": "preload_ui_audio", "progress": 0.90, "text": "接入作战界面..."},
+	{"stage_id": "prewarm_frame", "progress": 0.98, "text": "渲染地表首帧..."},
+	{"stage_id": "ready_to_continue", "progress": 1.00, "text": "按下任意按钮继续"}
+]

@@ -2,7 +2,7 @@
 class_name MapLayoutPoint
 extends Marker2D
 
-@export_enum("container", "material", "anomaly", "spawn", "extract") var point_type: String = "container"
+@export_enum("container", "material", "monster", "anomaly", "spawn", "extract") var point_type: String = "container"
 @export var point_id: String = "":
 	set(value):
 		point_id = value
@@ -39,6 +39,15 @@ extends Marker2D
 	set(value):
 		editor_label_offset_px = value
 		queue_redraw()
+@export_group("Monster Patrol Preview")
+@export var show_patrol_path_preview: bool = true:
+	set(value):
+		show_patrol_path_preview = value
+		queue_redraw()
+@export var patrol_path_color: Color = Color(1.0, 0.46, 0.18, 0.72):
+	set(value):
+		patrol_path_color = value
+		queue_redraw()
 
 func _ready() -> void:
 	if not enabled:
@@ -60,6 +69,9 @@ func _draw() -> void:
 	match point_type:
 		"material":
 			_draw_diamond(size_px, color, outline)
+		"monster":
+			_draw_triangle(size_px, color, outline)
+			_draw_patrol_path_preview()
 		"spawn":
 			_draw_triangle(size_px, color, outline)
 		"extract":
@@ -85,6 +97,8 @@ func get_preview_size_units() -> Vector2:
 			return Vector2(2.2, 1.6)
 		"material":
 			return Vector2(1.5, 1.5)
+		"monster":
+			return Vector2(2.0, 2.0)
 		"spawn", "extract":
 			return Vector2(1.4, 1.4)
 		_:
@@ -114,6 +128,8 @@ func _editor_color() -> Color:
 					return Color(0.8, 0.8, 0.8, alpha)
 		"material":
 			return Color(0.25, 0.95, 0.45, alpha)
+		"monster":
+			return Color(1.0, 0.35, 0.20, alpha)
 		"anomaly":
 			return Color(1.0, 0.25, 0.25, alpha)
 		"spawn":
@@ -153,3 +169,33 @@ func _draw_cross(size_px: Vector2, fill: Color, outline: Color) -> void:
 
 func _draw_center_dot() -> void:
 	draw_circle(Vector2.ZERO, 5.0, Color(0.0, 0.0, 0.0, 0.9))
+
+func _draw_patrol_path_preview() -> void:
+	if not show_patrol_path_preview:
+		return
+	var path_points := _patrol_path_points_local()
+	if path_points.is_empty():
+		return
+	var points := PackedVector2Array([Vector2.ZERO])
+	for point in path_points:
+		points.append(point)
+	if points.size() >= 2:
+		draw_polyline(points, patrol_path_color, 5.0)
+	for point in path_points:
+		draw_circle(point, 9.0, patrol_path_color)
+		draw_arc(point, 13.0, 0.0, TAU, 20, Color(0.02, 0.02, 0.02, 0.85), 3.0)
+
+func _patrol_path_points_local() -> Array[Vector2]:
+	var result: Array[Vector2] = []
+	for child in find_children("*", "Node2D", true, false):
+		if _is_patrol_path_marker(child):
+			result.append(to_local(child.global_position))
+	return result
+
+func _is_patrol_path_marker(node: Node) -> bool:
+	if not (node is Node2D):
+		return false
+	var normalized_name := String(node.name).to_snake_case().to_lower()
+	if normalized_name.begins_with("patrol_path"):
+		return false
+	return normalized_name.begins_with("patrol") or normalized_name.contains("_patrol_")

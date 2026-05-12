@@ -8,6 +8,7 @@ signal item_stored(item_id: StringName, amount: int)
 @export var max_slots: int = 4
 
 var items: Array[Dictionary] = []
+var slots: Array = []
 
 func setup(slot_count: int) -> void:
 	max_slots = maxi(0, slot_count)
@@ -17,7 +18,7 @@ func can_store_item(item: Dictionary) -> bool:
 	var normalized := _normalize_item(item)
 	if normalized.item_id == &"" or normalized.amount <= 0:
 		return false
-	return items.size() + int(normalized.amount) <= max_slots
+	return _empty_slot_count() >= int(normalized.amount)
 
 func store_item(item: Dictionary) -> bool:
 	var normalized := _normalize_item(item)
@@ -31,11 +32,35 @@ func store_item(item: Dictionary) -> bool:
 		var single := normalized.duplicate(true)
 		single.amount = 1
 		single.stack_limit = 1
-		items.append(single)
+		var target_slot := _first_empty_slot()
+		if target_slot < 0:
+			home_storage_full.emit()
+			return false
+		slots[target_slot] = single
 
+	_sync_items_from_slots()
 	item_stored.emit(normalized.item_id, stored_amount)
 	home_storage_changed.emit(get_items_snapshot())
 	print("[HomeStorageComponent] Stored %s x%s as single items." % [normalized.item_id, stored_amount])
+	return true
+
+func store_item_at(item: Dictionary, target_slot: int) -> bool:
+	var normalized := _normalize_item(item)
+	if target_slot < 0 or target_slot >= max_slots:
+		return false
+	if not _is_slot_empty(target_slot):
+		home_storage_full.emit()
+		return false
+	if normalized.item_id == &"" or normalized.amount != 1:
+		return false
+	var single := normalized.duplicate(true)
+	single.amount = 1
+	single.stack_limit = 1
+	slots[target_slot] = single
+	_sync_items_from_slots()
+	item_stored.emit(normalized.item_id, 1)
+	home_storage_changed.emit(get_items_snapshot())
+	print("[HomeStorageComponent] Stored %s at slot %s." % [normalized.item_id, target_slot])
 	return true
 
 func store_from_inventory(inventory, slot_index: int, amount: int = -1) -> bool:
@@ -54,17 +79,53 @@ func store_from_inventory(inventory, slot_index: int, amount: int = -1) -> bool:
 		return false
 	return store_item(removed)
 
+func store_from_inventory_at(inventory, slot_index: int, target_slot: int, amount: int = -1) -> bool:
+	if inventory == null:
+		return false
+	if slot_index < 0 or slot_index >= inventory.items.size():
+		return false
+	if target_slot < 0 or target_slot >= max_slots:
+		return false
+	if not _is_slot_empty(target_slot):
+		home_storage_full.emit()
+		return false
+	var source: Dictionary = inventory.items[slot_index].duplicate(true)
+	if amount > 0:
+		source.amount = mini(amount, int(source.amount))
+	if int(source.amount) != 1 or not can_store_item(source):
+		home_storage_full.emit()
+		return false
+	var removed: Dictionary = inventory.remove_item_at(slot_index, int(source.amount))
+	if removed.is_empty():
+		return false
+	return store_item_at(removed, target_slot)
+
 func remove_item_at(slot_index: int) -> Dictionary:
-	if slot_index < 0 or slot_index >= items.size():
+	if slot_index < 0 or slot_index >= slots.size():
 		return {}
-	var removed := items[slot_index].duplicate(true)
-	items.remove_at(slot_index)
+	var item = slots[slot_index]
+	if not item is Dictionary:
+		return {}
+	var removed: Dictionary = item.duplicate(true)
+	slots[slot_index] = null
+	_sync_items_from_slots()
 	home_storage_changed.emit(get_items_snapshot())
 	return removed
 
 func clear() -> void:
 	items.clear()
+	slots.clear()
+	for _index in range(max_slots):
+		slots.append(null)
 	home_storage_changed.emit(get_items_snapshot())
+
+func select_item_at(slot_index: int) -> Dictionary:
+	if slot_index < 0 or slot_index >= slots.size():
+		return {}
+	var item = slots[slot_index]
+	if item is Dictionary:
+		return item.duplicate(true)
+	return {}
 
 func get_items_snapshot() -> Array:
 	var snapshot: Array = []
@@ -73,7 +134,12 @@ func get_items_snapshot() -> Array:
 	return snapshot
 
 func get_slots_snapshot() -> Array:
-	var snapshot := get_items_snapshot()
+	var snapshot: Array = []
+	for slot in slots:
+		if slot is Dictionary:
+			snapshot.append(slot.duplicate(true))
+		else:
+			snapshot.append(null)
 	while snapshot.size() < max_slots:
 		snapshot.append(null)
 	return snapshot
@@ -89,4 +155,39 @@ func _normalize_item(item: Dictionary) -> Dictionary:
 		"weight_per_unit": float(item.get("weight_per_unit", 0.0)),
 		"stack_limit": 1,
 		"item_type": StringName(str(item.get("item_type", "material"))),
+		"quality": StringName(str(item.get("quality", "C"))),
+		"quality_color": item.get("quality_color", Color.WHITE),
+		"tags": item.get("tags", []),
+		"icon": str(item.get("icon", "")),
+		"sellable": _parse_bool(item.get("sellable", false)),
+		"sell_currency_id": str(item.get("sell_currency_id", "mine_coin")),
+		"sell_value": int(item.get("sell_value", 0)),
 	}
+
+func _empty_slot_count() -> int:
+	var count := 0
+	for index in range(max_slots):
+		if _is_slot_empty(index):
+			count += 1
+	return count
+
+func _first_empty_slot() -> int:
+	for index in range(max_slots):
+		if _is_slot_empty(index):
+			return index
+	return -1
+
+func _is_slot_empty(slot_index: int) -> bool:
+	return slot_index >= 0 and slot_index < slots.size() and slots[slot_index] == null
+
+func _sync_items_from_slots() -> void:
+	items.clear()
+	for slot in slots:
+		if slot is Dictionary:
+			items.append(slot.duplicate(true))
+
+func _parse_bool(value: Variant) -> bool:
+	if value is bool:
+		return value
+	var normalized := String(value).strip_edges().to_lower()
+	return normalized == "true" or normalized == "1" or normalized == "yes"

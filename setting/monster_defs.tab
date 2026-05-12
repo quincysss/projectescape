@@ -1,0 +1,2 @@
+monster_id	display_name	scene_path	spawn_count	patrol_radius_px	patrol_speed_px	charge_speed_px	vision_radius_px	vision_angle_degrees	warning_seconds	stability_damage	hit_radius_px	patrol_target_reach_distance_px	enabled
+black_tide_boundary_essence	黑潮边界残影	res://scenes/entities/monsters/MonsterBasic.tscn	4	520	42	420	420	70	5.0	20	96	28	true

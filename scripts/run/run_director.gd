@@ -10,6 +10,8 @@ signal inventory_changed(items: Array)
 signal weight_changed(current_weight: float, max_weight: float, stage: int)
 signal home_storage_changed(items: Array)
 signal outpost_storage_changed(outpost_id: String, items: Array)
+signal scene_events_resolved(context)
+signal monster_hit_player(monster_id: String, damage: float)
 
 const RunConfigScript := preload("res://scripts/run/run_config.gd")
 const RunInitializerScript := preload("res://scripts/run/run_initializer.gd")
@@ -17,6 +19,10 @@ const RunStateMachineScript := preload("res://scripts/run/run_state_machine.gd")
 const WeightComponentScript := preload("res://scripts/inventory/weight_component.gd")
 const ItemTransferServiceScript := preload("res://scripts/inventory/item_transfer_service.gd")
 const OutpostStorageControllerScript := preload("res://scripts/outpost/outpost_storage_controller.gd")
+const GameDataRegistryScript := preload("res://scripts/data/game_data_registry.gd")
+const SSRunChanceDirectorScript := preload("res://scripts/run/ss_run_chance_director.gd")
+const SSLootDirectorScript := preload("res://scripts/run/ss_loot_director.gd")
+const SceneRandomEventDirectorScript := preload("res://scripts/events/scene_random_event_director.gd")
 
 @export var spawn_position: Vector2 = Vector2.ZERO
 @export var first_outpost_candidates: Array = ["OutpostA_01", "OutpostA_02", "OutpostA_03"]
@@ -41,6 +47,11 @@ var weight_component
 var home_storage_component
 var item_transfer_service = ItemTransferServiceScript.new()
 var outpost_storage_controller = OutpostStorageControllerScript.new()
+var data_registry = GameDataRegistryScript.new()
+var ss_run_chance_director = SSRunChanceDirectorScript.new()
+var ss_loot_director = SSLootDirectorScript.new()
+var scene_random_event_director = SceneRandomEventDirectorScript.new()
+var _data_registry_loaded := false
 
 func _ready() -> void:
 	state_machine = get_node_or_null("RunStateMachine")
@@ -62,6 +73,7 @@ func _ready() -> void:
 func start_new_run() -> bool:
 	_log("Starting new run.")
 	state_machine.start_new_run()
+	_apply_meta_research_to_config()
 	var scene_spawn_position := _resolve_spawn_position()
 	var first_candidates := _resolve_outpost_candidates("first")
 	var second_candidates := _resolve_outpost_candidates("second")
@@ -74,6 +86,8 @@ func start_new_run() -> bool:
 	if context == null:
 		return false
 
+	_initialize_ss_run()
+	_initialize_scene_random_events()
 	run_context_created.emit(context)
 	run_initialized.emit(context)
 	_log("Run initialized: %s" % context.to_debug_dictionary())
@@ -159,8 +173,24 @@ func get_debug_snapshot() -> Dictionary:
 	var snapshot := {
 		"state_machine": state_machine.get_state_snapshot() if state_machine else {},
 		"context": context.to_debug_dictionary() if context else {},
+		"ss_loot": ss_loot_director.get_debug_snapshot() if ss_loot_director != null else {},
 	}
 	return snapshot
+
+func get_ss_loot_director():
+	return ss_loot_director
+
+func apply_monster_stability_damage(damage: float, monster_id: String = "") -> void:
+	var safe_damage := maxf(0.0, damage)
+	if safe_damage <= 0.0:
+		return
+	if stability_component != null and stability_component.has_method("add_stability"):
+		stability_component.add_stability(-safe_damage)
+	if context != null:
+		context.monster_hit_count += 1
+		context.active_monster_ids.erase(monster_id)
+	monster_hit_player.emit(monster_id, safe_damage)
+	_log("Monster hit player: %s damage=%.1f" % [monster_id, safe_damage])
 
 func debug_add_item(item: Dictionary) -> bool:
 	if inventory_component == null:
@@ -172,14 +202,23 @@ func debug_deposit_first_inventory_item() -> bool:
 	return deposit_inventory_item_to_home(0)
 
 func debug_drop_first_inventory_item() -> bool:
+	return bool(discard_inventory_item_at(0).get("accepted", false))
+
+func discard_inventory_item_at(slot_index: int) -> Dictionary:
 	if inventory_component == null:
-		return false
-	var removed: Dictionary = inventory_component.remove_item_at(0)
+		return {"accepted": false, "reason": "missing_inventory", "item": {}}
+	var removed: Dictionary = inventory_component.remove_item_at(slot_index)
 	if removed.is_empty():
-		_log("No inventory item to drop.")
-		return false
-	_log("Dropped %s x%s." % [removed.item_id, removed.amount])
-	return true
+		_log("No inventory item to discard.")
+		return {"accepted": false, "reason": "invalid_item", "item": {}}
+	_log("Discarded %s x%s." % [removed.item_id, removed.amount])
+	return {
+		"accepted": true,
+		"reason": "discarded",
+		"discarded_count": int(removed.get("amount", 1)),
+		"removed_stack": true,
+		"item": removed,
+	}
 
 func deposit_inventory_item_to_home(slot_index: int, amount: int = -1) -> bool:
 	if inventory_component == null or home_storage_component == null:
@@ -193,10 +232,10 @@ func deposit_inventory_item_to_home(slot_index: int, amount: int = -1) -> bool:
 		_log("Deposit failed.")
 	return stored
 
-func deposit_inventory_item_to_home_by_selection(slot_index: int) -> Dictionary:
+func deposit_inventory_item_to_home_by_selection(slot_index: int, target_storage_slot: int = -1) -> Dictionary:
 	if context and context.active_safe_zone_id != "home":
 		return {"accepted": false, "reason": "not_home", "item": {}}
-	var result: Dictionary = item_transfer_service.transfer_inventory_to_storage(inventory_component, slot_index, home_storage_component)
+	var result: Dictionary = item_transfer_service.transfer_inventory_to_storage(inventory_component, slot_index, home_storage_component, target_storage_slot)
 	if not result.accepted:
 		_log("Selected deposit failed: %s" % result.reason)
 	return result
@@ -212,7 +251,10 @@ func withdraw_home_storage_item_to_inventory(slot_index: int) -> Dictionary:
 func ensure_outpost_storage(outpost_id: String):
 	if context == null or not _is_repaired_outpost_id(outpost_id):
 		return null
-	return outpost_storage_controller.ensure_storage(outpost_id, get_outpost_storage_capacity(outpost_id))
+	var capacity := get_outpost_storage_capacity(outpost_id)
+	if capacity <= 0:
+		return null
+	return outpost_storage_controller.ensure_storage(outpost_id, capacity)
 
 func get_outpost_storage_capacity(outpost_id: String) -> int:
 	if context != null and outpost_id == context.selected_first_outpost_id:
@@ -227,16 +269,24 @@ func get_outpost_storage_items_snapshot(outpost_id: String) -> Array:
 		return []
 	return storage.get_items_snapshot()
 
+func get_outpost_storage_slots_snapshot(outpost_id: String) -> Array:
+	var storage = outpost_storage_controller.get_storage(outpost_id)
+	if storage == null:
+		return []
+	return storage.get_slots_snapshot()
+
 func get_all_outpost_storage_items_snapshot() -> Array:
 	return outpost_storage_controller.get_all_items_snapshot()
 
-func deposit_inventory_item_to_outpost(outpost_id: String, slot_index: int) -> Dictionary:
+func deposit_inventory_item_to_outpost(outpost_id: String, slot_index: int, target_storage_slot: int = -1) -> Dictionary:
 	if context == null or context.active_safe_zone_id != outpost_id:
 		return {"accepted": false, "reason": "not_outpost", "item": {}}
 	if not _is_repaired_outpost_id(outpost_id):
 		return {"accepted": false, "reason": "outpost_inactive", "item": {}}
+	if get_outpost_storage_capacity(outpost_id) <= 0:
+		return {"accepted": false, "reason": "outpost_storage_locked", "item": {}}
 	var storage = ensure_outpost_storage(outpost_id)
-	var result: Dictionary = item_transfer_service.transfer_inventory_to_storage(inventory_component, slot_index, storage)
+	var result: Dictionary = item_transfer_service.transfer_inventory_to_storage(inventory_component, slot_index, storage, target_storage_slot)
 	if not result.accepted:
 		_log("Outpost deposit failed: %s" % result.reason)
 	return result
@@ -246,6 +296,8 @@ func withdraw_outpost_storage_item_to_inventory(outpost_id: String, slot_index: 
 		return {"accepted": false, "reason": "not_outpost", "item": {}}
 	if not _is_repaired_outpost_id(outpost_id):
 		return {"accepted": false, "reason": "outpost_inactive", "item": {}}
+	if get_outpost_storage_capacity(outpost_id) <= 0:
+		return {"accepted": false, "reason": "outpost_storage_locked", "item": {}}
 	var storage = ensure_outpost_storage(outpost_id)
 	var result: Dictionary = item_transfer_service.transfer_storage_to_inventory(storage, slot_index, inventory_component)
 	if not result.accepted:
@@ -283,9 +335,13 @@ func _resolve_outpost_candidates(tier: String) -> Array:
 		var candidate_position := Vector2.ZERO
 		if node is Node2D:
 			candidate_position = node.global_position
+		var footprint_units := Vector2.ZERO
+		if node.has_method("get_footprint_units"):
+			footprint_units = node.get_footprint_units()
 		candidates.append({
 			"id": candidate_id,
 			"position": candidate_position,
+			"footprint_units": footprint_units,
 		})
 	return candidates
 
@@ -356,6 +412,83 @@ func _find_node_by_name(root: Node, target_name: String) -> Node:
 			return found
 	return null
 
+func _apply_meta_research_to_config() -> void:
+	var game_state := get_node_or_null("/root/GameState")
+	if game_state == null:
+		return
+	if game_state.has_method("get_inventory_slot_count"):
+		config.inventory_slots = int(game_state.get_inventory_slot_count(config.inventory_slots))
+	if game_state.has_method("get_home_storage_slot_count"):
+		config.home_storage_slots = int(game_state.get_home_storage_slot_count(config.home_storage_slots))
+	if game_state.has_method("get_outpost_storage_slot_count"):
+		config.first_outpost_storage_slots = int(game_state.get_outpost_storage_slot_count(config.first_outpost_storage_slots))
+		config.second_outpost_storage_slots = int(game_state.get_outpost_storage_slot_count(config.second_outpost_storage_slots))
+	if game_state.has_method("get_player_max_stability"):
+		config.max_stability = float(game_state.get_player_max_stability(config.max_stability))
+
+func _initialize_ss_run() -> void:
+	if context == null:
+		return
+	_ensure_data_registry_loaded()
+	ss_run_chance_director.setup(data_registry)
+	var game_state := get_node_or_null("/root/GameState")
+	var day := 1
+	if game_state != null and game_state.has_method("get_current_day"):
+		day = int(game_state.get_current_day())
+	var ss_rng := RandomNumberGenerator.new()
+	ss_rng.seed = maxi(1, int(abs(context.seed)) + day * 100003 + 99173)
+	var roll_result: Dictionary = ss_run_chance_director.roll_for_run(game_state, ss_rng)
+	ss_loot_director.setup(data_registry, context)
+	ss_loot_director.begin_run(roll_result)
+	_log("SS roll: active=%s chance=%.3f roll=%.3f budget=%d/%d tier=%d next=%d miss_next=%d" % [
+		bool(roll_result.get("active", false)),
+		float(roll_result.get("chance", 0.0)),
+		float(roll_result.get("roll_value", 0.0)),
+		int(roll_result.get("budget_used", 0)),
+		int(roll_result.get("budget_total", 0)),
+		int(roll_result.get("chance_tier", 0)),
+		int(roll_result.get("next_chance_tier", 0)),
+		int(roll_result.get("next_miss_count", 0)),
+	])
+
+func _initialize_scene_random_events() -> void:
+	if context == null:
+		return
+	var game_state := get_node_or_null("/root/GameState")
+	var forced_events: Dictionary = {}
+	if game_state != null and game_state.has_method("consume_forced_scene_events_for_next_run"):
+		forced_events = game_state.consume_forced_scene_events_for_next_run()
+	scene_random_event_director.load_config()
+	var event_context = scene_random_event_director.resolve_for_run(
+		game_state,
+		config.run_duration_seconds,
+		context.seed,
+		forced_events
+	)
+	context.run_day_index = event_context.run_day_index
+	context.run_duration_seconds = event_context.run_duration_seconds
+	context.remaining_seconds = event_context.run_duration_seconds
+	context.scene_events = event_context.scene_events.duplicate(true)
+	context.active_time_event_id = event_context.active_time_event_id
+	context.monster_event_active = event_context.monster_event_active
+	context.monster_type_id = event_context.monster_type_id
+	context.monster_spawn_count = event_context.monster_spawn_count
+	context.monster_spawn_group = event_context.monster_spawn_group
+	context.monster_spawn_point_ids = event_context.monster_spawn_point_ids.duplicate()
+	context.active_monster_ids = event_context.active_monster_ids.duplicate()
+	context.event_trigger_reasons = event_context.trigger_reasons.duplicate()
+	config.run_duration_seconds = event_context.run_duration_seconds
+	scene_events_resolved.emit(context)
+	_log("Scene events: %s" % event_context.to_dictionary())
+
+func _ensure_data_registry_loaded() -> bool:
+	if _data_registry_loaded:
+		return true
+	_data_registry_loaded = data_registry.load_all()
+	if not _data_registry_loaded:
+		_log("Data registry load failed for SS rules: %s" % str(data_registry.load_errors))
+	return _data_registry_loaded
+
 func _connect_safe_zones() -> void:
 	for zone in get_tree().get_nodes_in_group("safe_zones"):
 		if zone.has_signal("safe_zone_entered") and not zone.safe_zone_entered.is_connected(_on_safe_zone_entered):
@@ -410,14 +543,15 @@ func _on_safe_zone_exited(zone_id: StringName, _zone_type: StringName) -> void:
 	on_safe_zone_exited(str(zone_id))
 
 func _on_stability_changed(current: float, max_value: float, stage: int) -> void:
+	if vision_controller:
+		vision_controller.set_vision_from_stability(current, max_value, stage)
 	if context:
 		context.player_stability = current
 		context.stability_stage = StabilityComponent.stage_name(stage)
+		context.vision_radius = vision_controller.current_radius if vision_controller else context.vision_radius
 	stability_changed.emit(current, max_value, stage)
 
 func _on_stability_stage_changed(_old_stage: int, new_stage: int) -> void:
-	if vision_controller:
-		vision_controller.set_vision_stage(new_stage)
 	if context:
 		context.stability_stage = StabilityComponent.stage_name(new_stage)
 		context.vision_radius = vision_controller.current_radius if vision_controller else context.vision_radius

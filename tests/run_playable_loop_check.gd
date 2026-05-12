@@ -130,16 +130,47 @@ func _verify_run_loop() -> bool:
 
 	root.run_director.on_safe_zone_entered("home")
 	root._deposit_all()
+	var warehouse_count_before_return: int = game_state.get_warehouse_items_snapshot().size()
 	Input.action_press("extract")
 	root._try_extract()
 	root._update_active_interaction(root.EXTRACTION_HOLD_SECONDS + 0.1)
 	Input.action_release("extract")
 	await process_frame
-	if game_state.warehouse_items.is_empty():
-		printerr("Expected warehouse items after extraction")
+	if game_state.get_warehouse_items_snapshot().size() != warehouse_count_before_return:
+		printerr("Expected extraction to wait for settlement return loading before writing warehouse")
 		return false
+	if root.settlement_result_screen == null or not is_instance_valid(root.settlement_result_screen):
+		printerr("Expected settlement result screen after extraction")
+		return false
+	if root.settlement_result_screen.title_label.text != "成功返回404哨所":
+		printerr("Expected success settlement title before return loading")
+		return false
+	root.settlement_result_screen.return_button.emit_signal("pressed")
+	await process_frame
+	if root.return_to_base_loading_screen == null or not is_instance_valid(root.return_to_base_loading_screen):
+		printerr("Expected return-to-base loading screen after settlement button")
+		return false
+	for _index in range(160):
+		if root.return_to_base_loading_screen.is_ready_to_continue():
+			break
+		await process_frame
+		await physics_frame
+	if not root.return_to_base_loading_screen.is_ready_to_continue():
+		printerr("Expected return-to-base loading to reach ready state")
+		return false
+	if game_state.get_warehouse_items_snapshot().size() <= warehouse_count_before_return:
+		printerr("Expected warehouse items after return loading commits settlement")
+		return false
+	root.return_to_base_loading_screen._input(_key(KEY_ENTER))
+	await process_frame
 	print("Run playable loop verified.")
 	return true
+
+func _key(keycode: Key) -> InputEventKey:
+	var event := InputEventKey.new()
+	event.keycode = keycode
+	event.pressed = true
+	return event
 
 func _find_interactable(root, interact_type: String):
 	for interactable in root.interactables:

@@ -708,6 +708,8 @@ Avoid: dark abandoned state, closed roof hiding the interior, full city map, pho
 家是长期安全，前哨是临时安全。
 ```
 
+落地规则：前哨站美术不挂在逻辑 `Area2D` 下面，而是作为 `WorldRoot/YSortRoot/Outpost*_Visual/ArtSprite` 直接子节点摆放；`candidate_id` 绑定对应的前哨站候选逻辑点。所有候选点都常驻显示 broken 资源，被本局抽中的点位才有逻辑交互和修复气泡。修复气泡采用一个整体面板：标题“前哨站”较大，下方一行显示 `需要材料A：n/N        需要材料B：n/N`，不显示背包数量或调试缩写。修复完成时只替换同一个 `ArtSprite.texture` 为 repaired 资源，不自动覆盖编辑器里调好的缩放和位置。前哨站表现保持 `z_index = 0` 参与 YSort，和其他建筑互相遮挡时按脚点排序。
+
 ---
 
 ## 8.3 道路拆件

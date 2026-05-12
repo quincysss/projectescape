@@ -1,8 +1,8 @@
 type_id	display_name	size_class	asset_min_px	asset_max_px	icon_px	visual_color_hex	quality_label_enabled	lifetime_seconds	open_time_min	open_time_max	interaction_radius	loot_slots_min	loot_slots_max	allowed_rings	loot_context	signal_profile	notes	enabled_version
 cardboard_box	纸箱	small	128	192	128	#3A8DFF	false	60	0.4	1.0	1.6	1	2	inner;middle	container_cardboard	weak_blue	教学和基础材料容器；无容器品质等级。	v0.1
-wooden_crate	木箱	medium	192	256	128	#3A8DFF	false	60	0.8	1.6	1.8	1	3	inner;middle	container_wooden	blue	普通材料容器；体积比纸箱大，交互更久。	v0.1
-tool_cabinet	工具柜	medium	256	384	128	#3A8DFF	false	45	1.2	2.4	2.0	1	3	middle;outer	container_tool	blue	工具和制作相关容器；适合较大竖向图标。	v0.1
-medical_cabinet	医疗柜	medium	256	384	128	#3A8DFF	false	45	1.0	2.2	2.0	1	2	middle;outer	container_medical	blue	医疗和稳定类容器；产出格较少但类型集中。	v0.1
-small_safe	小保险箱	medium	192	256	128	#3A8DFF	false	40	2.4	3.6	1.8	1	3	outer	container_small_safe	strong_blue	中高价值机会；不保底高品质道具。	v0.1
+wooden_crate	木箱	medium	192	256	128	#3A8DFF	false	60	0.8	1.6	1.8	1	3	inner;middle;outer	container_wooden	blue	普通材料容器；体积比纸箱大，交互更久。	v0.1
+tool_cabinet	工具柜	medium	256	384	128	#3A8DFF	false	45	1.2	2.4	2.0	1	3	middle;outer;far_outer	container_tool	blue	工具和制作相关容器；适合较大竖向图标。	v0.1
+medical_cabinet	医疗柜	medium	256	384	128	#3A8DFF	false	45	1.0	2.2	2.0	1	2	middle;outer;far_outer	container_medical	blue	医疗和稳定类容器；产出格较少但类型集中。	v0.1
+small_safe	小保险箱	medium	192	256	128	#3A8DFF	false	40	2.4	3.6	1.8	1	3	outer;far_outer	container_small_safe	strong_blue	中高价值机会；不保底高品质道具。	v0.1
 large_safe	大保险柜	large	384	512	128	#3A8DFF	false	30	3.6	4.8	2.4	2	4	outer;far_outer	container_large_safe	strong_blue	最大容器尺寸；交互最长，产出格最多。	v0.1
 anomaly_case	异常箱	large	256	512	128	#3A8DFF	false	30	3.6	4.8	2.2	1	3	far_outer	container_anomaly	pulse_blue	特殊收益容器；视觉仍统一蓝色，不显示SABC。	v0.1

@@ -51,7 +51,7 @@ func repair(station) -> Dictionary:
 		station.payload.repaired = true
 		station.payload.repair_state = STATE_ACTIVE
 		repaired_outposts[station.interact_id] = true
-		station.modulate = Color(0.3, 1.0, 0.5)
+		station.modulate = Color.WHITE
 		run_director.on_outpost_repaired(station.interact_id)
 		return {
 			"accepted": true,
@@ -63,7 +63,7 @@ func repair(station) -> Dictionary:
 		}
 	station.payload.repaired = false
 	station.payload.repair_state = STATE_PARTIAL_DELIVERED
-	station.modulate = Color(1.0, 0.92, 0.55)
+	station.modulate = Color.WHITE
 	return {
 		"accepted": true,
 		"activated": false,
@@ -77,7 +77,7 @@ func mark_repairing(station) -> void:
 	if station == null or not is_instance_valid(station):
 		return
 	station.payload.repair_state = STATE_REPAIRING
-	station.modulate = Color(1.0, 0.86, 0.35)
+	station.modulate = Color.WHITE
 	if run_director != null:
 		run_director.on_outpost_repair_started(station.interact_id)
 

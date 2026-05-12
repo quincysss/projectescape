@@ -21,14 +21,33 @@ func _verify_outpost_safe_zone_and_extract_ui() -> bool:
 	if root.deposit_button.get_parent() != root.home_storage_panel or root.extract_button.get_parent() != root.home_storage_panel:
 		printerr("Expected home action buttons under home storage panel.")
 		return false
-	if not root.inventory_panel.visible or not root.home_storage_panel.visible:
-		printerr("Expected backpack and home storage to auto-open at home.")
+	if root.inventory_panel.visible or root.home_storage_panel.visible:
+		printerr("Expected backpack and home storage to stay closed when entering home.")
+		return false
+	if not root.home_backpack_hint_label.visible or not root.home_backpack_hint_label.text.contains("TAB"):
+		printerr("Expected home backpack hint below extraction signal.")
+		return false
+	if root.extract_button.visible:
+		printerr("Expected storage-side extract button to stay hidden.")
 		return false
 	root._toggle_inventory_panel()
+	await process_frame
+	if not root.inventory_panel.visible or not root.home_storage_panel.visible:
+		printerr("Expected TAB to open backpack and home storage at home.")
+		return false
+	if root.home_backpack_hint_label.visible:
+		printerr("Expected home backpack hint hidden while backpack is open.")
+		return false
+	root._toggle_inventory_panel()
+	await process_frame
 	if root.inventory_panel.visible or root.home_storage_panel.visible:
 		printerr("Expected manual backpack close to also close home storage.")
 		return false
 	root._toggle_inventory_panel()
+	await process_frame
+	if not root.inventory_panel.visible or not root.home_storage_panel.visible:
+		printerr("Expected TAB to reopen backpack and home storage before leaving home.")
+		return false
 
 	var outpost = _find_interactable(root, "outpost")
 	if outpost == null:
@@ -75,14 +94,32 @@ func _verify_outpost_safe_zone_and_extract_ui() -> bool:
 		return false
 
 	root.run_director.context.is_extraction_unlocked = true
+	root.run_director.state_machine.is_extraction_unlocked = true
 	root.run_director.on_safe_zone_entered("home")
 	root._refresh_ui()
 	await process_frame
-	if root.extract_hud_button.disabled:
-		printerr("Expected HUD extraction button enabled at home after unlock.")
+	if root.extraction_status_button.disabled:
+		printerr("Expected extraction signal button enabled at home after unlock.")
 		return false
-	if not root.prompt_label.text.contains("撤离已准备"):
-		printerr("Expected extraction ready prompt at home.")
+	if not root.extraction_status_label.text.contains("长按 E"):
+		printerr("Expected extraction signal to explain held E extraction.")
+		return false
+	if not root.extraction_progress_bar.visible or root.extraction_progress_bar.value != 0.0:
+		printerr("Expected extraction progress bar ready at zero.")
+		return false
+	Input.action_press("extract")
+	root._try_extract()
+	root._update_active_interaction(root.EXTRACTION_HOLD_SECONDS * 0.5)
+	root._refresh_ui()
+	await process_frame
+	if root.extraction_progress_bar.value <= 0.0 or not root.extraction_status_label.text.contains("撤离中"):
+		printerr("Expected extraction signal progress while holding E.")
+		return false
+	Input.action_release("extract")
+	root._update_active_interaction(0.1)
+	await process_frame
+	if root.interaction_progress_controller.is_active():
+		printerr("Expected extraction hold to cancel when E is released.")
 		return false
 
 	root.queue_free()

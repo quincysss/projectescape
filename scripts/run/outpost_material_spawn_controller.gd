@@ -1,10 +1,13 @@
 class_name OutpostMaterialSpawnController
 extends RefCounted
 
+const MATERIAL_LIFETIME_SECONDS := 120.0
+
 var outpost_root: Node
 var get_spawn_points: Callable
 var make_interactable: Callable
 var make_item: Callable
+var remove_interactable: Callable
 var unit: float = 64.0
 
 func setup(
@@ -12,12 +15,14 @@ func setup(
 	p_get_spawn_points: Callable,
 	p_make_interactable: Callable,
 	p_make_item: Callable,
+	p_remove_interactable: Callable,
 	p_unit: float
 ) -> void:
 	outpost_root = p_outpost_root
 	get_spawn_points = p_get_spawn_points
 	make_interactable = p_make_interactable
 	make_item = p_make_item
+	remove_interactable = p_remove_interactable
 	unit = p_unit
 
 func build_requirements(first_outpost_id: String, second_outpost_id: String) -> Dictionary:
@@ -50,13 +55,74 @@ func spawn_for_outposts(requirements_by_outpost: Dictionary, outpost_positions: 
 				material_color(String(item_id))
 			)
 			pickup.payload = {
-				"item": make_item.call(item_id, data.display_name, data.amount, data.weight, 1)
+				"item": make_item.call(item_id, data.display_name, data.amount, data.weight, 1),
+				"outpost_id": outpost_id,
+				"item_id": String(item_id),
+				"lifetime": MATERIAL_LIFETIME_SECONDS,
+				"lifetime_max": MATERIAL_LIFETIME_SECONDS,
 			}
 			outpost_root.add_child(pickup)
 			spawned.append(pickup)
 			used_positions.append(pos)
 			offset += 1
 	return spawned
+
+func update_lifetimes(delta: float, interactables: Array) -> void:
+	for interactable in interactables.duplicate():
+		if not is_instance_valid(interactable) or interactable.get("interact_type") != "material":
+			continue
+		var payload: Dictionary = interactable.get("payload")
+		if not payload.has("lifetime"):
+			continue
+		payload["lifetime"] = float(payload.get("lifetime", 0.0)) - maxf(0.0, delta)
+		if float(payload.get("lifetime", 0.0)) > 0.0:
+			continue
+		var outpost_id := String(payload.get("outpost_id", ""))
+		var item_id := String(payload.get("item_id", payload.get("item", {}).get("item_id", "")))
+		var item: Dictionary = payload.get("item", {})
+		var old_pos: Vector2 = interactable.global_position if interactable is Node2D else Vector2.INF
+		if remove_interactable.is_valid():
+			remove_interactable.call(interactable)
+		_respawn_material(outpost_id, item_id, item, old_pos)
+
+func _respawn_material(outpost_id: String, item_id: String, item: Dictionary, old_pos: Vector2):
+	if item_id.is_empty() or item.is_empty():
+		return null
+	var base_pos := _base_position_for_outpost(outpost_id, old_pos)
+	var used_positions: Array[Vector2] = _existing_material_positions()
+	if old_pos != Vector2.INF:
+		used_positions.append(old_pos)
+	var pos := _next_material_position(base_pos, used_positions, 0)
+	var display_name := String(item.get("display_name", item_id))
+	var pickup = make_interactable.call(
+		"pickup_%s" % item_id,
+		"material",
+		display_name,
+		pos,
+		material_color(item_id)
+	)
+	pickup.payload = {
+		"item": item.duplicate(true),
+		"outpost_id": outpost_id,
+		"item_id": item_id,
+		"lifetime": MATERIAL_LIFETIME_SECONDS,
+		"lifetime_max": MATERIAL_LIFETIME_SECONDS,
+	}
+	if outpost_root != null:
+		outpost_root.add_child(pickup)
+	return pickup
+
+func _base_position_for_outpost(outpost_id: String, fallback_pos: Vector2) -> Vector2:
+	if outpost_root == null:
+		return fallback_pos if fallback_pos != Vector2.INF else Vector2.ZERO
+	for child in outpost_root.get_children():
+		if not is_instance_valid(child) or not (child is Node2D):
+			continue
+		if child.get("interact_type") != "outpost":
+			continue
+		if String(child.get("interact_id")) == outpost_id:
+			return child.global_position
+	return fallback_pos if fallback_pos != Vector2.INF else Vector2.ZERO
 
 func _next_material_position(base_pos: Vector2, used_positions: Array[Vector2], fallback_offset: int) -> Vector2:
 	var material_points: Array = _material_points_for_outpost(base_pos)

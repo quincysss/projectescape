@@ -56,6 +56,8 @@ project-escape/
     inventory/
     storage/
     outpost/
+    monsters/
+    events/
     extraction/
     research/
     crafting/
@@ -63,6 +65,7 @@ project-escape/
     consumables/
     audio/
     save/
+    flow/
     ui/
     debug/
   tests/
@@ -380,6 +383,10 @@ ConsumableManager
 AudioManager
 InteractionHighlightService
 SaveManager
+RunLoadingController
+SceneRandomEventDirector
+MonsterManager
+RandomObstacleManager
 ```
 
 原则：
@@ -603,6 +610,7 @@ scenes/ui/warehouse/
 scenes/ui/research/
 scenes/ui/crafting/
 scenes/ui/settlement/
+scenes/ui/loading/
 ```
 
 UI 原则：
@@ -623,6 +631,14 @@ UI 关闭时释放输入锁。
 ```text
 重新加载数据表。
 生成测试容器。
+本日必出怪物。
+强制超级时间。
+强制超短时间。
+强制随机障碍。
+显示怪物点位。
+显示怪物视野。
+显示障碍点位。
+验证障碍路径。
 设置稳定值。
 传送到撤离点。
 模拟撤离成功。
@@ -677,6 +693,7 @@ ExtractionManager。
 SettlementManager。
 WarehouseManager。
 SaveManager。
+RunLoadingController。
 ```
 
 可以暂缓：

@@ -16,7 +16,7 @@ const BLOCK_ART_USE_EXPERIMENTAL_EDGES := false
 const BLOCK_ART_USE_CORNER_PIECES := false
 const BLOCK_ART_USE_TILED_FILL := false
 const BLOCK_FILL_TILE_UNITS := Vector2(4.0, 4.0)
-const OUTPOST_ENTRY_CLEARANCE_UNITS := Vector2(1.25, 1.25)
+const OUTPOST_ENTRY_CLEARANCE_UNITS := Vector2(1.5, 1.5)
 
 var scene: Node
 var unit: float
@@ -62,6 +62,7 @@ func generate_road_visuals() -> void:
 
 
 func create_ground() -> void:
+	scene._blocked_rects.clear()
 	scene._walkable_rects.clear()
 	scene._walkable_polygons.clear()
 	scene.enterable_exception_rects = get_enterable_exception_rects()
@@ -436,6 +437,7 @@ func _add_solid_layout_rect(block_name: String, source_transform: Transform2D, l
 	body.add_child(visual)
 	var block_local_rect := Rect2(local_polygon[0], local_polygon[2] - local_polygon[0])
 	for collision_rect in _carve_enterable_exceptions(block_local_rect, source_transform):
+		scene._blocked_rects.append(_rect_to_world(collision_rect, source_transform))
 		var shape := CollisionShape2D.new()
 		var rect := RectangleShape2D.new()
 		rect.size = collision_rect.size
@@ -471,6 +473,23 @@ func _rect_to_local(world_rect: Rect2, inverse_transform: Transform2D) -> Rect2:
 		min_pos.y = minf(min_pos.y, local_corner.y)
 		max_pos.x = maxf(max_pos.x, local_corner.x)
 		max_pos.y = maxf(max_pos.y, local_corner.y)
+	return Rect2(min_pos, max_pos - min_pos)
+
+func _rect_to_world(local_rect: Rect2, source_transform: Transform2D) -> Rect2:
+	var corners := [
+		local_rect.position,
+		local_rect.position + Vector2(local_rect.size.x, 0.0),
+		local_rect.position + local_rect.size,
+		local_rect.position + Vector2(0.0, local_rect.size.y),
+	]
+	var min_pos: Vector2 = source_transform * corners[0]
+	var max_pos := min_pos
+	for corner in corners:
+		var world_corner: Vector2 = source_transform * corner
+		min_pos.x = minf(min_pos.x, world_corner.x)
+		min_pos.y = minf(min_pos.y, world_corner.y)
+		max_pos.x = maxf(max_pos.x, world_corner.x)
+		max_pos.y = maxf(max_pos.y, world_corner.y)
 	return Rect2(min_pos, max_pos - min_pos)
 
 

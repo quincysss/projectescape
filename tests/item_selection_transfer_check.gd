@@ -20,8 +20,8 @@ func _verify_transfer_service() -> bool:
 	storage.setup(4)
 
 	var source: Array = [
-		_item("scrap_metal", "废金属", 1.0),
-		_item("cloth_dirty", "脏布条", 0.5),
+		_item("scrap_metal", "Scrap Metal", 1.0),
+		_item("cloth_dirty", "Dirty Cloth", 0.5),
 	]
 	var result: Dictionary = service.transfer_index_to_inventory(source, 1, inventory)
 	if not result.accepted or source.size() != 1 or inventory.items.size() != 1:
@@ -41,8 +41,26 @@ func _verify_transfer_service() -> bool:
 		printerr("Expected selected home storage item to move back into inventory.")
 		return false
 
+	inventory.clear()
+	storage.clear()
+	var blue_item := _item("signal_core", "Signal Core", 1.0).merged({"quality": "B", "quality_color": Color("#6FA8DC")}, true)
+	if not inventory.add_item(blue_item):
+		printerr("Expected blue quality item to enter inventory.")
+		return false
+	result = service.transfer_inventory_to_storage(inventory, 0, storage, 2)
+	if not result.accepted or not storage.select_item_at(2).get("quality_color", Color.WHITE).is_equal_approx(Color("#6FA8DC")):
+		printerr("Expected selected inventory item to move into requested home slot with quality color preserved.")
+		return false
+	if not (storage.get_slots_snapshot()[2] is Dictionary):
+		printerr("Expected requested home slot to contain the item.")
+		return false
+	result = service.transfer_storage_to_inventory(storage, 2, inventory)
+	if not result.accepted or not inventory.items[0].get("quality_color", Color.WHITE).is_equal_approx(Color("#6FA8DC")):
+		printerr("Expected quality color to survive storage round trip.")
+		return false
+
 	inventory.setup(1, 10.0)
-	if not inventory.add_item(_item("slot_a", "占格物", 1.0)):
+	if not inventory.add_item(_item("slot_a", "Slot Item", 1.0)):
 		printerr("Expected setup item add to pass.")
 		return false
 	result = service.transfer_index_to_inventory(source, 0, inventory)
@@ -55,7 +73,7 @@ func _verify_warehouse_selection() -> bool:
 	var warehouse = WarehouseManagerScript.new()
 	var items: Array[Dictionary] = []
 	warehouse.bind_items(items)
-	warehouse.add_items([_item("scrap_metal", "废金属", 1.0).merged({"amount": 3}, true)])
+	warehouse.add_items([_item("scrap_metal", "Scrap Metal", 1.0).merged({"amount": 3}, true)])
 	if items.size() != 3:
 		printerr("Expected warehouse add to split amount into single items.")
 		return false
@@ -78,4 +96,5 @@ func _item(item_id: String, display_name: String, weight: float) -> Dictionary:
 		"stack_limit": 1,
 		"item_type": "material",
 		"quality": "C",
+		"quality_color": Color("#D8D6CE"),
 	}

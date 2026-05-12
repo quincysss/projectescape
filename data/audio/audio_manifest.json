@@ -1,0 +1,67 @@
+{
+  "version": "v0.1",
+  "bgm": {
+    "base_safe_house": {
+      "display_name": "局外安全屋 BGM",
+      "path": "res://assets/audio/bgm/base_safe_house_bgm.wav",
+      "loop": true,
+      "volume_db": -2.0
+    },
+    "run_safe_house": {
+      "display_name": "局内安全屋 BGM",
+      "path": "res://assets/audio/bgm/run_safe_house_bgm.wav",
+      "loop": true,
+      "volume_db": -2.0
+    },
+    "run_exploration": {
+      "display_name": "局内探索时 BGM",
+      "path": "res://assets/audio/bgm/run_exploration_bgm.wav",
+      "loop": true,
+      "volume_db": -2.0
+    }
+  },
+  "sfx": {
+    "stability_critical_loop": {
+      "display_name": "濒临崩溃音效",
+      "path": "res://assets/audio/sfx/stability_critical_loop.wav",
+      "loop": true,
+      "volume_db": -5.0,
+      "priority": 20
+    },
+    "container_open_loop": {
+      "display_name": "容器打开读条 loop音效",
+      "path": "res://assets/audio/sfx/container_open_loop.wav",
+      "loop": true,
+      "volume_db": -10.0,
+      "priority": 50
+    },
+    "container_open_complete": {
+      "display_name": "容器打开完成音效",
+      "path": "res://assets/audio/sfx/container_open_complete.wav",
+      "loop": false,
+      "volume_db": -4.0,
+      "priority": 60
+    },
+    "outpost_repair_complete": {
+      "display_name": "前哨站修复完成音效",
+      "path": "res://assets/audio/sfx/outpost_repair_complete.wav",
+      "loop": false,
+      "volume_db": -3.0,
+      "priority": 70
+    },
+    "cue_extraction_success": {
+      "display_name": "撤离成功短 cue",
+      "path": "res://assets/audio/sfx/cue_extraction_success.wav",
+      "loop": false,
+      "volume_db": -3.0,
+      "priority": 90
+    },
+    "cue_player_death": {
+      "display_name": "死亡短 cue",
+      "path": "res://assets/audio/sfx/cue_player_death.wav",
+      "loop": false,
+      "volume_db": -2.0,
+      "priority": 100
+    }
+  }
+}

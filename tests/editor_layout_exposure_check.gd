@@ -16,6 +16,7 @@ func _verify_editor_layout_exposure() -> bool:
 	var ok := true
 	ok = _check_map_points(root, "ContainerSpawnPoints") and ok
 	ok = _check_map_points(root, "MaterialSpawnPoints") and ok
+	ok = _check_map_points(root, "MonsterSpawnPoints") and ok
 	ok = _check_outpost_candidates(root) and ok
 
 	root.queue_free()

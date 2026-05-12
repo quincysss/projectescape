@@ -1,0 +1,25 @@
+{
+  "id": "black_tide_boundary_essence",
+  "cn_name": "????",
+  "type": "monster_visual_asset",
+  "frame_size": [
+    512,
+    384
+  ],
+  "idle_frames": [
+    "res://assets/sprites/monsters/black_tide_boundary_essence/idle/frames/black_tide_boundary_essence_idle_8f_01_frame_01.png",
+    "res://assets/sprites/monsters/black_tide_boundary_essence/idle/frames/black_tide_boundary_essence_idle_8f_01_frame_02.png",
+    "res://assets/sprites/monsters/black_tide_boundary_essence/idle/frames/black_tide_boundary_essence_idle_8f_01_frame_03.png",
+    "res://assets/sprites/monsters/black_tide_boundary_essence/idle/frames/black_tide_boundary_essence_idle_8f_01_frame_04.png",
+    "res://assets/sprites/monsters/black_tide_boundary_essence/idle/frames/black_tide_boundary_essence_idle_8f_01_frame_05.png",
+    "res://assets/sprites/monsters/black_tide_boundary_essence/idle/frames/black_tide_boundary_essence_idle_8f_01_frame_06.png",
+    "res://assets/sprites/monsters/black_tide_boundary_essence/idle/frames/black_tide_boundary_essence_idle_8f_01_frame_07.png",
+    "res://assets/sprites/monsters/black_tide_boundary_essence/idle/frames/black_tide_boundary_essence_idle_8f_01_frame_08.png"
+  ],
+  "idle_fps": 8,
+  "source_concept": "res://assets/sprites/monsters/black_tide_boundary_essence/_source/black_tide_boundary_essence_concept_01.png",
+  "cutout": "res://assets/sprites/monsters/black_tide_boundary_essence/black_tide_boundary_essence_cutout_01.png",
+  "sheet": "res://assets/sprites/monsters/black_tide_boundary_essence/sheets/black_tide_boundary_essence_idle_8f_01_sheet.png",
+  "scene": "res://scenes/entities/monsters/BlackTideBoundaryEssence.tscn",
+  "notes": "Transparent PNG idle frames generated from the approved concept art; intended as a first in-game visual asset."
+}

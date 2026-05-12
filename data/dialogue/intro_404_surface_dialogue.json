@@ -1,0 +1,25 @@
+{
+	"dialogue_id": "intro_404_surface",
+	"skippable": true,
+	"entries": [
+		{"speaker_id": "operator_404", "speaker_name": "404 哨所调度员", "text": "2050 年，世界爆发了史无前例的核战争。"},
+		{"speaker_id": "operator_404", "speaker_name": "404 哨所调度员", "text": "地表城市在火光里断裂，海岸线被抹平，天空连续燃烧了七十多个昼夜。"},
+		{"speaker_id": "operator_404", "speaker_name": "404 哨所调度员", "text": "幸存下来的人类退入地下。矿井、避难所、旧地铁、军方仓库……能封住门的地方，都成了家。"},
+		{"speaker_id": "operator_404", "speaker_name": "404 哨所调度员", "text": "但我们从来没有真正放弃地面。"},
+		{"speaker_id": "operator_404", "speaker_name": "404 哨所调度员", "text": "只是，战争结束后，地表出现了一种新的东西。我们叫它——暗潮。"},
+		{"speaker_id": "operator_404", "speaker_name": "404 哨所调度员", "text": "它不像烟，也不像水。它无处不在，贴着建筑缝隙流动，钻进呼吸面罩，吞掉暴露在地表的人。"},
+		{"speaker_id": "operator_404", "speaker_name": "404 哨所调度员", "text": "普通人撑不了多久。几分钟，甚至几十秒，身体和意识就会被暗潮拖走。"},
+		{"speaker_id": "operator_404", "speaker_name": "404 哨所调度员", "text": "但少数被辐射改变过的人，出现了异常体质。他们能短暂抵御暗潮的侵蚀。"},
+		{"speaker_id": "operator_404", "speaker_name": "404 哨所调度员", "text": "你就是其中之一。"},
+		{"speaker_id": "player", "speaker_name": "主角", "text": "所以这就是你们选中我的理由？"},
+		{"speaker_id": "operator_404", "speaker_name": "404 哨所调度员", "text": "不是选中。是 404 哨所已经没有多少选择了。"},
+		{"speaker_id": "operator_404", "speaker_name": "404 哨所调度员", "text": "我们的水滤芯快报废了，药品库存不足，主通风井也撑不了太久。"},
+		{"speaker_id": "operator_404", "speaker_name": "404 哨所调度员", "text": "404 哨所里的每个人，能不能继续活下去，能不能有一天回到地面，全靠你们这些还能走上去的人。"},
+		{"speaker_id": "operator_404", "speaker_name": "404 哨所调度员", "text": "你现在需要前往地面，寻找物资，修复地面的两处前哨站。"},
+		{"speaker_id": "operator_404", "speaker_name": "404 哨所调度员", "text": "注意，升降通道启动后会受到暗潮反冲，回来的通道会暂时损坏。"},
+		{"speaker_id": "operator_404", "speaker_name": "404 哨所调度员", "text": "你必须修复两处前哨站，重新建立地面信号链，通道才能被再次激活。"},
+		{"speaker_id": "operator_404", "speaker_name": "404 哨所调度员", "text": "不要在外面待太久。"},
+		{"speaker_id": "operator_404", "speaker_name": "404 哨所调度员", "text": "暗潮随时会要了你的小命。"},
+		{"speaker_id": "player", "speaker_name": "主角", "text": "明白。打开通道吧。"}
+	]
+}

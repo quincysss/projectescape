@@ -1,0 +1,8 @@
+{
+	"chapter_id": "chapter_1",
+	"title": "第一章：买下旧制造机",
+	"goal_type": "unlock_feature",
+	"feature_id": "manufacturing_station",
+	"currency_id": "mine_coin",
+	"currency_cost": 5000
+}

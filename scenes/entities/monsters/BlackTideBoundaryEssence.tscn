@@ -1,0 +1,19 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/monsters/black_tide_boundary_essence_visual.gd" id="1_visual"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_core"]
+radius = 42.0
+
+[node name="BlackTideBoundaryEssence" type="CharacterBody2D"]
+script = ExtResource("1_visual")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(72, 18)
+shape = SubResource("CircleShape2D_core")
+
+[node name="BodySprite" type="AnimatedSprite2D" parent="."]
+z_index = 8
+
+[node name="EyeFocus" type="Marker2D" parent="."]
+position = Vector2(72, 18)

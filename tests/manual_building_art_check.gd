@@ -2,6 +2,7 @@ extends SceneTree
 
 const UNIT := 64.0
 const YSORT_ITEM_Z_INDEX := 0
+const PLAYER_ALWAYS_IN_FRONT_Z_INDEX := -1
 
 func _initialize() -> void:
 	var scene := load("res://scenes/run/RunScene.tscn")
@@ -76,11 +77,13 @@ func _check_building_node(building: Node, y_sort_root: Node, block_id: String, g
 		printerr("%s must be a Node2D building root." % building.name)
 		return false
 	var building_2d := building as Node2D
+	var player_always_in_front := bool(building.get_meta("player_always_in_front", false))
+	var expected_z_index := PLAYER_ALWAYS_IN_FRONT_Z_INDEX if player_always_in_front else YSORT_ITEM_Z_INDEX
 	if building_2d.get_parent() != y_sort_root:
 		printerr("%s must be a direct YSortRoot child for per-building depth sorting." % building.name)
 		ok = false
-	if building_2d.z_index != YSORT_ITEM_Z_INDEX:
-		printerr("%s must keep z_index %d so YSort controls depth." % [building.name, YSORT_ITEM_Z_INDEX])
+	if building_2d.z_index != expected_z_index:
+		printerr("%s must keep z_index %d for its configured player layering." % [building.name, expected_z_index])
 		ok = false
 	if String(building.get_meta("host_block_id", "")) != block_id:
 		printerr("%s must declare host_block_id %s." % [building.name, block_id])

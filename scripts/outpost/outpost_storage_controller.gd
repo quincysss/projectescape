@@ -11,7 +11,7 @@ func clear() -> void:
 	storages.clear()
 
 func ensure_storage(outpost_id: String, capacity_slots: int):
-	if outpost_id.is_empty():
+	if outpost_id.is_empty() or capacity_slots <= 0:
 		return null
 	if storages.has(outpost_id):
 		return storages[outpost_id]

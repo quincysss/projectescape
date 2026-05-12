@@ -11,13 +11,14 @@ config_version=5
 [application]
 
 config/name="ProjectEscape"
-run/main_scene="res://scenes/base/BaseScene.tscn"
+run/main_scene="res://scenes/ui/MainMenuScene.tscn"
 config/features=PackedStringArray("4.6", "Forward Plus")
 config/icon="res://icon.svg"
 
 [autoload]
 
 GameState="*res://scripts/game/game_state.gd"
+AudioManager="*res://scripts/audio/audio_manager.gd"
 
 [display]
 

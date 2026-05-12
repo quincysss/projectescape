@@ -25,6 +25,9 @@ func _verify_map_spawn_points() -> bool:
 
 	ok = _check_point_pool(root, "ContainerSpawnPoints", block_rects, street_rects, exception_rects, false) and ok
 	ok = _check_point_pool(root, "MaterialSpawnPoints", block_rects, street_rects, exception_rects, false) and ok
+	ok = _check_point_pool(root, "MonsterSpawnPoints", block_rects, street_rects, exception_rects, false) and ok
+	ok = _check_monster_point_count(root) and ok
+	ok = _check_monster_patrol_paths(root, block_rects, street_rects) and ok
 	ok = _check_outpost_candidates(root, block_rects, street_rects, exception_rects) and ok
 
 	root.queue_free()
@@ -68,6 +71,56 @@ func _check_point_pool(root: Node, section_name: String, block_rects: Array[Dict
 			printerr("%s %s is inside block %s at %s" % [section_name, id, block.id, _fmt_units(pos)])
 			ok = false
 	return ok
+
+func _check_monster_point_count(root: Node) -> bool:
+	var section := root.get_node_or_null("WorldRoot/MapLayout/Points/MonsterSpawnPoints")
+	if section == null:
+		printerr("Missing point section: MonsterSpawnPoints")
+		return false
+	var enabled_count := 0
+	for point in section.get_children():
+		if point is Node2D and point.has_method("get_point_id") and point.enabled:
+			enabled_count += 1
+	if enabled_count != 10:
+		printerr("Expected 10 enabled monster street points, got %s." % enabled_count)
+		return false
+	return true
+
+func _check_monster_patrol_paths(root: Node, block_rects: Array[Dictionary], street_rects: Array[Dictionary]) -> bool:
+	var section := root.get_node_or_null("WorldRoot/MapLayout/Points/MonsterSpawnPoints")
+	if section == null:
+		printerr("Missing point section: MonsterSpawnPoints")
+		return false
+	var ok := true
+	for point in section.get_children():
+		if not (point is Node2D) or not point.has_method("get_point_id") or not point.enabled:
+			continue
+		var path_count := 0
+		for child in point.find_children("*", "Node2D", true, false):
+			if not _is_patrol_path_marker(child):
+				continue
+			path_count += 1
+			var pos: Vector2 = child.global_position
+			var inside_street := _point_in_rects(pos, street_rects)
+			var block := _first_containing_rect(pos, block_rects)
+			if not inside_street:
+				printerr("Monster patrol point %s/%s is outside StreetWalkable: %s" % [point.get_point_id(), child.name, _fmt_units(pos)])
+				ok = false
+			if not block.is_empty():
+				printerr("Monster patrol point %s/%s is inside block %s at %s" % [point.get_point_id(), child.name, block.id, _fmt_units(pos)])
+				ok = false
+		if path_count < 2:
+			printerr("Monster point %s should expose at least 2 patrol child points." % point.get_point_id())
+			ok = false
+	return ok
+
+func _is_patrol_path_marker(node: Node) -> bool:
+	if not (node is Node2D):
+		return false
+	var normalized_name := String(node.name).to_snake_case().to_lower()
+	if normalized_name.begins_with("patrol_path"):
+		return false
+	return normalized_name.begins_with("patrol") or normalized_name.contains("_patrol_")
 
 func _check_outpost_candidates(root: Node, block_rects: Array[Dictionary], street_rects: Array[Dictionary], exception_rects: Array[Rect2]) -> bool:
 	var candidates_root := root.get_node_or_null("WorldRoot/OutpostRoot/OutpostCandidates")

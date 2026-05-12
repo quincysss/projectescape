@@ -1,0 +1,12 @@
+{
+	"cinematic_id": "opening_intro_cinematic",
+	"resource_path": "res://assets/cinematics/source/opening_intro_cinematic_720p.mp4",
+	"fallback_resource_path": "res://assets/cinematics/opening_intro_cinematic_720p.ogv",
+	"placeholder": {
+		"type": "black_screen_16x9",
+		"duration_seconds": 2.0,
+		"resolution": "1280x720"
+	},
+	"skip_label": "跳过影像",
+	"next_flow": "world_intro_dialogue"
+}

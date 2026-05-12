@@ -136,6 +136,9 @@ func _normalize_item(item: Dictionary) -> Dictionary:
 		"quality_color": item.get("quality_color", Color.WHITE),
 		"tags": item.get("tags", []),
 		"icon": str(item.get("icon", "")),
+		"sellable": _parse_bool(item.get("sellable", false)),
+		"sell_currency_id": str(item.get("sell_currency_id", "mine_coin")),
+		"sell_value": int(item.get("sell_value", 0)),
 	}
 
 func _can_stack_together(a: Dictionary, b: Dictionary) -> bool:
@@ -143,3 +146,9 @@ func _can_stack_together(a: Dictionary, b: Dictionary) -> bool:
 
 func _stack_weight(stack: Dictionary) -> float:
 	return maxf(0.0, float(stack.get("weight_per_unit", 0.0))) * maxi(0, int(stack.get("amount", 0)))
+
+func _parse_bool(value: Variant) -> bool:
+	if value is bool:
+		return value
+	var normalized := String(value).strip_edges().to_lower()
+	return normalized == "true" or normalized == "1" or normalized == "yes"

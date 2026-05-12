@@ -10,6 +10,7 @@ const STABILITY_TICKS := [
 	{"label": "100", "ratio": 1.0},
 ]
 const CHARACTER_HUD_PORTRAIT_FRAME := preload("res://assets/ui/run_character_hud/character_status/components/ui_run_character_portrait_frame_empty_ref_01.png")
+const CHARACTER_HUD_DEFAULT_PORTRAIT := preload("res://assets/ui/run_character_hud/character_status/components/ui_run_character_portrait_male_01.png")
 const CHARACTER_HUD_STABILITY_FRAME := preload("res://assets/ui/run_character_hud/character_status/components/ui_run_character_stability_bar_frame_empty_ref_01.png")
 const CHARACTER_HUD_STABILITY_FILL := preload("res://assets/ui/run_character_hud/character_status/components/ui_run_character_stability_fill_strip_current_ref_01.png")
 const TIMER_COUNTDOWN_FRAME := preload("res://assets/ui/run_timer_extraction_hud/components/ui_run_timer_countdown_frame_empty_01.png")
@@ -27,6 +28,11 @@ const INVENTORY_GRID_SLOT_GAP := 10.0
 const INVENTORY_BACKPACK_DISPLAY_SLOTS := 30
 const INVENTORY_PANEL_TOP := 292.0
 const INVENTORY_LOOT_PANEL_TOP := 374.0
+const PORTRAIT_SIZE := Vector2(168.0, 184.0)
+const OBJECTIVE_HUD_POSITION := Vector2(2.0, 242.0)
+const OBJECTIVE_HUD_SIZE := Vector2(356.0, 136.0)
+const OBJECTIVE_HUD_HOME_ALPHA := 1.0
+const OBJECTIVE_HUD_FIELD_ALPHA := 0.58
 
 func build(scene) -> void:
 	_build_character_status_hud(scene)
@@ -42,7 +48,6 @@ func refresh(scene) -> void:
 		return
 	_refresh_stability_hud(scene)
 	_refresh_countdown(scene)
-	_refresh_extraction_status(scene)
 	_refresh_outpost_status_hud(scene)
 	_refresh_backpack_status(scene)
 	_refresh_prompt(scene)
@@ -54,13 +59,24 @@ func refresh(scene) -> void:
 	scene.deposit_button.disabled = not is_storage_zone
 	scene.deposit_button.text = "存入前哨" if scene._is_active_outpost_storage() else "存入家中"
 	scene.extract_button.disabled = not extraction_ready_at_home
-	scene.extract_button.visible = not scene._is_active_outpost_storage()
+	scene.extract_button.visible = false
 	scene.extract_hud_button.disabled = not extraction_ready_at_home
 	scene.extract_hud_button.text = "撤离(E)" if extraction_ready_at_home else ("返回家中" if scene.run_director.context.is_extraction_unlocked else "撤离未解锁")
+	scene.extraction_status_button.disabled = not extraction_ready_at_home
+	_refresh_extraction_status(scene)
 	_layout_inventory_surfaces(scene, is_storage_zone, scene.loot_panel.visible)
+	_refresh_inventory_actions(scene)
 	_set_items_grid(scene, scene.inventory_label, scene.run_director.inventory_component.get_items_snapshot(), "inventory", scene.run_director.inventory_component.max_slots)
 	_set_items_grid(scene, scene.home_storage_label, scene.get_active_storage_items_snapshot(), scene.get_active_storage_source_id(), _active_storage_capacity(scene))
 	_set_items_grid(scene, scene.loot_label, scene.opened_loot, "loot", maxi(scene.opened_loot.size(), 8))
+
+func outpost_material_pickup_prompt(scene, outpost_id: String = "") -> String:
+	var target_id := outpost_id if not outpost_id.is_empty() else _objective_target_outpost_id(scene)
+	var counts := _objective_material_counts(scene, target_id)
+	var required := int(counts.get("required", 0))
+	if required <= 0:
+		return "前哨材料已获得"
+	return "前哨材料已获得 %d/%d" % [int(counts.get("covered", 0)), required]
 
 func _build_character_status_hud(scene) -> void:
 	scene.character_hud_root = Control.new()
@@ -118,26 +134,26 @@ func _build_character_status_hud(scene) -> void:
 	scene.stability_stage_label.visible = false
 	scene.stability_hud_root.add_child(scene.stability_stage_label)
 
+	var character_assets := _selected_character_hud_assets()
+	scene.portrait_image = TextureRect.new()
+	scene.portrait_image.name = "PortraitImage"
+	scene.portrait_image.position = Vector2.ZERO
+	scene.portrait_image.size = PORTRAIT_SIZE
+	scene.portrait_image.texture = _load_texture_or_default(String(character_assets.get("portrait_path", "")), CHARACTER_HUD_DEFAULT_PORTRAIT)
+	scene.portrait_image.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	scene.portrait_image.stretch_mode = TextureRect.STRETCH_SCALE
+	scene.portrait_image.z_index = 4
+	scene.character_hud_root.add_child(scene.portrait_image)
+
 	scene.portrait_frame = TextureRect.new()
 	scene.portrait_frame.name = "PortraitFrame"
 	scene.portrait_frame.position = Vector2(0, 0)
-	scene.portrait_frame.size = Vector2(168, 184)
-	scene.portrait_frame.texture = CHARACTER_HUD_PORTRAIT_FRAME
+	scene.portrait_frame.size = PORTRAIT_SIZE
+	scene.portrait_frame.texture = _load_texture_or_default(String(character_assets.get("portrait_frame_path", "")), CHARACTER_HUD_PORTRAIT_FRAME)
 	scene.portrait_frame.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	scene.portrait_frame.stretch_mode = TextureRect.STRETCH_SCALE
 	scene.portrait_frame.z_index = 5
 	scene.character_hud_root.add_child(scene.portrait_frame)
-
-	var portrait_placeholder := Label.new()
-	portrait_placeholder.name = "PortraitPlaceholder"
-	portrait_placeholder.text = "头像"
-	portrait_placeholder.position = Vector2(24, 24)
-	portrait_placeholder.size = Vector2(120, 136)
-	portrait_placeholder.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	portrait_placeholder.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	portrait_placeholder.add_theme_font_size_override("font_size", 18)
-	portrait_placeholder.add_theme_color_override("font_color", Color(0.55, 0.54, 0.5))
-	scene.portrait_frame.add_child(portrait_placeholder)
 
 func _add_corrected_stability_ticks(scene) -> void:
 	var label_mask := ColorRect.new()
@@ -160,6 +176,23 @@ func _add_corrected_stability_ticks(scene) -> void:
 		label.add_theme_color_override("font_color", Color(0.78, 0.74, 0.68))
 		scene.stability_bar.add_child(label)
 
+func _selected_character_hud_assets() -> Dictionary:
+	var tree := Engine.get_main_loop() as SceneTree
+	if tree != null:
+		var game_state := tree.root.get_node_or_null("GameState")
+		if game_state != null and game_state.has_method("get_selected_character_hud_assets"):
+			return game_state.get_selected_character_hud_assets()
+	return {
+		"portrait_path": CHARACTER_HUD_DEFAULT_PORTRAIT.resource_path,
+		"portrait_frame_path": CHARACTER_HUD_PORTRAIT_FRAME.resource_path,
+	}
+
+func _load_texture_or_default(path: String, default_texture: Texture2D) -> Texture2D:
+	if path.is_empty():
+		return default_texture
+	var texture := load(path) as Texture2D
+	return texture if texture != null else default_texture
+
 func _build_center_status_hud(scene) -> void:
 	scene.center_hud_root = Control.new()
 	scene.center_hud_root.name = "CenterStatusHUD"
@@ -168,7 +201,7 @@ func _build_center_status_hud(scene) -> void:
 	scene.center_hud_root.offset_left = -190.0
 	scene.center_hud_root.offset_top = 10.0
 	scene.center_hud_root.offset_right = 190.0
-	scene.center_hud_root.offset_bottom = 150.0
+	scene.center_hud_root.offset_bottom = 176.0
 	scene.ui_root.add_child(scene.center_hud_root)
 
 	scene.countdown_panel = TextureRect.new()
@@ -244,42 +277,67 @@ func _build_center_status_hud(scene) -> void:
 	scene.extraction_status_label.add_theme_color_override("font_color", Color("#D7D0C3"))
 	scene.extraction_status_panel.add_child(scene.extraction_status_label)
 
+	scene.extraction_progress_bar = ProgressBar.new()
+	scene.extraction_progress_bar.name = "ExtractionHoldProgress"
+	scene.extraction_progress_bar.position = Vector2(64, 38)
+	scene.extraction_progress_bar.size = Vector2(EXTRACTION_STATUS_WIDTH - 96.0, 7)
+	scene.extraction_progress_bar.min_value = 0.0
+	scene.extraction_progress_bar.max_value = 1.0
+	scene.extraction_progress_bar.value = 0.0
+	scene.extraction_progress_bar.show_percentage = false
+	scene.extraction_progress_bar.visible = false
+	scene.extraction_progress_bar.add_theme_stylebox_override("background", _progress_style(Color(0.02, 0.02, 0.018, 0.92), Color(0.28, 0.27, 0.24), 1))
+	scene.extraction_progress_bar.add_theme_stylebox_override("fill", _progress_style(Color(0.18, 0.66, 0.34, 0.96), Color(0.18, 0.66, 0.34), 0))
+	scene.extraction_status_panel.add_child(scene.extraction_progress_bar)
+
+	scene.extraction_status_button = Button.new()
+	scene.extraction_status_button.name = "ExtractionStatusButton"
+	scene.extraction_status_button.position = Vector2.ZERO
+	scene.extraction_status_button.size = scene.extraction_status_panel.size
+	scene.extraction_status_button.text = ""
+	scene.extraction_status_button.focus_mode = Control.FOCUS_NONE
+	scene.extraction_status_button.tooltip_text = "按住撤离"
+	for style_name in ["normal", "hover", "pressed", "disabled", "focus"]:
+		scene.extraction_status_button.add_theme_stylebox_override(style_name, _transparent_button_style())
+	scene.extraction_status_button.button_down.connect(scene._begin_extraction_hold_from_button)
+	scene.extraction_status_button.button_up.connect(scene._release_extraction_hold_button)
+	scene.extraction_status_panel.add_child(scene.extraction_status_button)
+
+	scene.home_backpack_hint_label = Label.new()
+	scene.home_backpack_hint_label.name = "HomeBackpackHint"
+	scene.home_backpack_hint_label.position = Vector2(41, 140)
+	scene.home_backpack_hint_label.size = Vector2(EXTRACTION_STATUS_WIDTH, 24)
+	scene.home_backpack_hint_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	scene.home_backpack_hint_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	scene.home_backpack_hint_label.text = "按 TAB 打开背包界面"
+	scene.home_backpack_hint_label.add_theme_font_size_override("font_size", 16)
+	scene.home_backpack_hint_label.add_theme_color_override("font_color", Color("#D7D0C3"))
+	scene.home_backpack_hint_label.add_theme_color_override("font_shadow_color", Color("#1A1714"))
+	scene.home_backpack_hint_label.add_theme_constant_override("shadow_offset_x", 1)
+	scene.home_backpack_hint_label.add_theme_constant_override("shadow_offset_y", 1)
+	scene.home_backpack_hint_label.visible = false
+	scene.center_hud_root.add_child(scene.home_backpack_hint_label)
+
 func _build_outpost_status_hud(scene) -> void:
 	scene.outpost_hud_root = Panel.new()
-	scene.outpost_hud_root.name = "OutpostRepairHUD"
-	scene.outpost_hud_root.position = Vector2(18, 214)
-	scene.outpost_hud_root.size = Vector2(166, 184)
+	scene.outpost_hud_root.name = "ObjectiveChainHUD"
+	scene.outpost_hud_root.position = OBJECTIVE_HUD_POSITION
+	scene.outpost_hud_root.size = OBJECTIVE_HUD_SIZE
 	scene.outpost_hud_root.add_theme_stylebox_override("panel", _panel_style(Color(0.055, 0.052, 0.046, 0.88), Color(0.92, 0.74, 0.18, 0.96), 2))
 	scene.ui_root.add_child(scene.outpost_hud_root)
 
-	scene.outpost_count_label = Label.new()
-	scene.outpost_count_label.name = "OutpostCount"
-	scene.outpost_count_label.position = Vector2(18, 16)
-	scene.outpost_count_label.size = Vector2(130, 28)
-	scene.outpost_count_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	scene.outpost_count_label.add_theme_font_size_override("font_size", 20)
-	scene.outpost_count_label.add_theme_color_override("font_color", Color(0.84, 0.80, 0.70))
-	scene.outpost_hud_root.add_child(scene.outpost_count_label)
+	scene.objective_title_label = _make_objective_label("ObjectiveTitle", Vector2(18, 16), Vector2(320, 30), 16, Color(0.96, 0.86, 0.48))
+	scene.outpost_hud_root.add_child(scene.objective_title_label)
 
-	scene.outpost_first_icon = _make_outpost_icon("I")
-	scene.outpost_first_icon.position = Vector2(20, 66)
-	scene.outpost_hud_root.add_child(scene.outpost_first_icon)
+	scene.objective_next_step_label = _make_objective_label("ObjectiveNextStep", Vector2(18, 62), Vector2(320, 28), 15, Color(0.84, 0.80, 0.70))
+	scene.outpost_hud_root.add_child(scene.objective_next_step_label)
 
-	scene.outpost_first_status_label = _make_outpost_status_label("OutpostOneStatus", Vector2(64, 58))
-	scene.outpost_hud_root.add_child(scene.outpost_first_status_label)
+	scene.objective_extraction_label = _make_objective_label("ObjectiveExtraction", Vector2(18, 100), Vector2(320, 24), 15, Color(0.64, 0.62, 0.56))
+	scene.outpost_hud_root.add_child(scene.objective_extraction_label)
 
-	scene.outpost_first_progress_bar = _make_outpost_progress_bar(Vector2(64, 90))
-	scene.outpost_hud_root.add_child(scene.outpost_first_progress_bar)
-
-	scene.outpost_second_icon = _make_outpost_icon("II")
-	scene.outpost_second_icon.position = Vector2(20, 136)
-	scene.outpost_hud_root.add_child(scene.outpost_second_icon)
-
-	scene.outpost_second_status_label = _make_outpost_status_label("OutpostTwoStatus", Vector2(64, 128))
-	scene.outpost_hud_root.add_child(scene.outpost_second_status_label)
-
-	scene.outpost_second_progress_bar = _make_outpost_progress_bar(Vector2(64, 160))
-	scene.outpost_hud_root.add_child(scene.outpost_second_progress_bar)
+	scene.outpost_count_label = scene.objective_title_label
+	scene.outpost_first_status_label = scene.objective_next_step_label
+	scene.outpost_second_status_label = scene.objective_extraction_label
 
 func _build_backpack_status_hud(scene) -> void:
 	scene.backpack_hud_root = Panel.new()
@@ -382,6 +440,17 @@ func _build_inventory_panels(scene) -> void:
 	scene.inventory_panel = _make_panel(Vector2(16, 154), Vector2(390, 360), "背包")
 	scene.inventory_label = _make_grid_area(Vector2(16, 86), Vector2(358, 196))
 	scene.inventory_panel.add_child(scene.inventory_label)
+	scene.inventory_selection_label = Label.new()
+	scene.inventory_selection_label.name = "InventorySelectionLabel"
+	scene.inventory_selection_label.add_theme_font_size_override("font_size", 15)
+	scene.inventory_selection_label.add_theme_color_override("font_color", Color("#D7D0C3"))
+	scene.inventory_panel.add_child(scene.inventory_selection_label)
+	scene.discard_button = Button.new()
+	scene.discard_button.name = "DiscardSelectedButton"
+	scene.discard_button.text = "丢弃"
+	scene.discard_button.disabled = true
+	scene.discard_button.pressed.connect(scene._discard_selected_inventory_item)
+	scene.inventory_panel.add_child(scene.discard_button)
 	scene.ui_root.add_child(scene.inventory_panel)
 	scene.inventory_panel.visible = false
 
@@ -442,22 +511,167 @@ func _refresh_countdown(scene) -> void:
 	scene.countdown_label.add_theme_color_override("font_color", text_color)
 
 func _refresh_extraction_status(scene) -> void:
-	var can_extract: bool = scene.run_director.context.is_extraction_unlocked
+	var context = scene.run_director.context
+	var can_extract: bool = context.is_extraction_unlocked
+	var is_home_safe_zone: bool = context.active_safe_zone_id == "home"
+	var is_extracting: bool = (
+		scene.interaction_progress_controller != null
+		and scene.interaction_progress_controller.is_active()
+		and scene.interaction_progress_controller.active_id == "extract"
+	)
+	var extraction_progress: float = scene.interaction_progress_controller.get_progress() if is_extracting else 0.0
 	scene.extraction_status_dot.texture = EXTRACTION_STATUS_DOT_AVAILABLE if can_extract else EXTRACTION_STATUS_DOT_UNAVAILABLE
-	scene.extraction_status_label.text = "可返回家中撤离" if can_extract else "不可撤离"
+	if is_extracting:
+		scene.extraction_status_label.text = "撤离中 %d%%" % int(round(extraction_progress * 100.0))
+	elif can_extract and is_home_safe_zone:
+		scene.extraction_status_label.text = "长按 E 键进行撤离"
+	elif can_extract:
+		scene.extraction_status_label.text = "返回家中可撤离"
+	else:
+		scene.extraction_status_label.text = "撤离未激活"
 	scene.extraction_status_label.add_theme_color_override("font_color", Color("#D7D0C3"))
+	scene.extraction_progress_bar.visible = can_extract and (is_home_safe_zone or is_extracting)
+	scene.extraction_progress_bar.value = extraction_progress
+	scene.home_backpack_hint_label.visible = (
+		is_home_safe_zone
+		and not scene.inventory_panel.visible
+		and not scene.home_storage_panel.visible
+	)
 
 func _refresh_outpost_status_hud(scene) -> void:
 	if scene.outpost_hud_root == null:
 		return
+	var view := _objective_chain_view(scene)
+	scene.objective_title_label.text = String(view.get("title", ""))
+	scene.objective_next_step_label.text = String(view.get("next_step", ""))
+	scene.objective_extraction_label.text = String(view.get("extraction", ""))
+	scene.outpost_hud_root.self_modulate = Color(
+		1.0,
+		1.0,
+		1.0,
+		OBJECTIVE_HUD_HOME_ALPHA if String(scene.run_director.context.active_safe_zone_id) == "home" else OBJECTIVE_HUD_FIELD_ALPHA
+	)
+	match String(view.get("stage", "")):
+		"repairable":
+			scene.objective_title_label.add_theme_color_override("font_color", Color(1.0, 0.86, 0.42))
+			scene.objective_next_step_label.add_theme_color_override("font_color", Color(1.0, 0.86, 0.42))
+		"repairing":
+			scene.objective_title_label.add_theme_color_override("font_color", Color(0.95, 0.58, 0.34))
+			scene.objective_next_step_label.add_theme_color_override("font_color", Color(0.95, 0.74, 0.46))
+		"extract_ready":
+			scene.objective_title_label.add_theme_color_override("font_color", Color(0.56, 0.94, 0.58))
+			scene.objective_next_step_label.add_theme_color_override("font_color", Color(0.82, 0.90, 0.76))
+		_:
+			scene.objective_title_label.add_theme_color_override("font_color", Color(0.96, 0.86, 0.48))
+			scene.objective_next_step_label.add_theme_color_override("font_color", Color(0.84, 0.80, 0.70))
+	scene.objective_extraction_label.add_theme_color_override(
+		"font_color",
+		Color(0.56, 0.94, 0.58) if scene.run_director.context.is_extraction_unlocked else Color(0.64, 0.62, 0.56)
+	)
+
+func _objective_chain_view(scene) -> Dictionary:
 	var context = scene.run_director.context
-	var first_id: String = String(context.selected_first_outpost_id)
-	var second_id: String = String(context.selected_second_outpost_id)
-	var repaired_count: int = int(context.repaired_outpost_count)
-	var total_count := 2
-	scene.outpost_count_label.text = "前哨  %d/%d" % [repaired_count, total_count]
-	_refresh_outpost_row(scene, first_id, scene.outpost_first_status_label, scene.outpost_first_progress_bar)
-	_refresh_outpost_row(scene, second_id, scene.outpost_second_status_label, scene.outpost_second_progress_bar)
+	var extraction_text := _objective_extraction_text(scene)
+	if bool(context.is_extraction_unlocked):
+		return {
+			"title": "当前目标：撤离已解锁",
+			"next_step": "下一步：长按 E 撤离" if String(context.active_safe_zone_id) == "home" else "下一步：返回家中撤离",
+			"extraction": extraction_text,
+			"stage": "extract_ready",
+		}
+	var repair_progress := _active_outpost_repair_progress(scene)
+	if bool(repair_progress.get("active", false)):
+		return {
+			"title": "当前目标：修复前哨站 %d%%" % int(round(float(repair_progress.get("progress", 0.0)) * 100.0)),
+			"next_step": "下一步：保持按住直到完成",
+			"extraction": extraction_text,
+			"stage": "repairing",
+		}
+	var target_id := _objective_target_outpost_id(scene)
+	if target_id.is_empty():
+		return {
+			"title": "当前目标：寻找前哨站",
+			"next_step": "下一步：确认前哨位置",
+			"extraction": extraction_text,
+			"stage": "missing",
+		}
+	var counts := _objective_material_counts(scene, target_id)
+	var covered := int(counts.get("covered", 0))
+	var required := int(counts.get("required", 0))
+	if required > 0 and covered >= required:
+		return {
+			"title": "当前目标：前往前哨站",
+			"next_step": "下一步：长按修复前哨站",
+			"extraction": extraction_text,
+			"stage": "repairable",
+		}
+	return {
+		"title": "当前目标：收集前哨站材料（菱形） %d/%d" % [covered, required],
+		"next_step": "下一步：前哨站修复",
+		"extraction": extraction_text,
+		"stage": "collect_material",
+	}
+
+func _objective_extraction_text(scene) -> String:
+	var context = scene.run_director.context
+	if not bool(context.is_extraction_unlocked):
+		return "解锁撤离：未解锁"
+	if String(context.active_safe_zone_id) == "home":
+		return "解锁撤离：可撤离"
+	return "解锁撤离：已解锁"
+
+func _objective_target_outpost_id(scene) -> String:
+	var context = scene.run_director.context
+	var first_id := String(context.selected_first_outpost_id)
+	var second_id := String(context.selected_second_outpost_id)
+	if not _objective_outpost_repaired(scene, first_id):
+		return first_id
+	if not _objective_outpost_repaired(scene, second_id):
+		return second_id
+	return ""
+
+func _objective_outpost_repaired(scene, outpost_id: String) -> bool:
+	if outpost_id.is_empty():
+		return true
+	var station = _find_outpost_station(scene, outpost_id)
+	if station != null:
+		return bool(station.get("payload").get("repaired", false))
+	return String(scene.run_director.context.outpost_states.get(outpost_id, "")) == "repaired"
+
+func _objective_material_counts(scene, outpost_id: String) -> Dictionary:
+	var station = _find_outpost_station(scene, outpost_id)
+	if station == null:
+		return {"covered": 0, "required": 0}
+	var requirements: Dictionary = station.get("payload").get("requirements", {})
+	var delivered: Dictionary = station.get("payload").get("delivered_materials", {})
+	var required := 0
+	var covered := 0
+	for item_id in requirements.keys():
+		var item_key := str(item_id)
+		var need := int(requirements[item_id].get("amount", 0))
+		if need <= 0:
+			continue
+		required += 1
+		var submitted := mini(need, int(delivered.get(item_key, 0)))
+		var carried := _objective_inventory_count(scene, item_key)
+		if submitted + carried >= need:
+			covered += 1
+	return {"covered": covered, "required": required}
+
+func _objective_inventory_count(scene, item_id: String) -> int:
+	if scene.run_director == null or scene.run_director.inventory_component == null:
+		return 0
+	var count := 0
+	for stack in scene.run_director.inventory_component.items:
+		if str(stack.get("item_id", "")) == item_id:
+			count += int(stack.get("amount", 1))
+	return count
+
+func _active_outpost_repair_progress(scene) -> Dictionary:
+	if scene.interaction_progress_controller != null and scene.interaction_progress_controller.is_active():
+		if scene.interaction_progress_controller.active_id == "repair_outpost":
+			return {"active": true, "progress": scene.interaction_progress_controller.get_progress()}
+	return {"active": false, "progress": 0.0}
 
 func _refresh_outpost_row(scene, outpost_id: String, status_label: Label, progress_bar: ProgressBar) -> void:
 	var status := _get_outpost_repair_status(scene, outpost_id)
@@ -632,16 +846,26 @@ func _sync_storage_ui(scene, is_storage_zone: bool) -> void:
 		if was_storage_panel_visible and not scene.loot_panel.visible:
 			scene.inventory_panel.visible = false
 		return
+	if scene._is_active_outpost_storage():
+		if scene.home_storage_user_closed:
+			scene.home_storage_panel.visible = false
+			return
+		scene.inventory_panel.visible = true
+		scene.home_storage_panel.visible = true
+		return
 	if scene.home_storage_user_closed:
 		scene.home_storage_panel.visible = false
 		return
-	scene.inventory_panel.visible = true
-	scene.home_storage_panel.visible = true
+	scene.home_storage_panel.visible = scene.inventory_panel.visible
 
 func _layout_inventory_surfaces(scene, is_storage_zone: bool, loot_open: bool) -> void:
 	_configure_panel_anchor_right(scene.inventory_panel, Vector2(390, 650), 20.0, INVENTORY_PANEL_TOP)
 	scene.inventory_label.position = Vector2(28, 136)
 	scene.inventory_label.size = Vector2(334, 426)
+	scene.inventory_selection_label.position = Vector2(28, 586)
+	scene.inventory_selection_label.size = Vector2(210, 28)
+	scene.discard_button.position = Vector2(256, 582)
+	scene.discard_button.size = Vector2(106, 36)
 	if is_storage_zone:
 		_configure_panel_anchor_right(scene.home_storage_panel, Vector2(390, 316), 432.0, INVENTORY_PANEL_TOP)
 		scene.home_storage_label.position = Vector2(24, 68)
@@ -710,7 +934,7 @@ func _set_items_grid(scene, grid_root: Control, items: Array, source_id: String,
 		if item is Dictionary:
 			grid_root.add_child(_make_item_slot(scene, slot_pos, Vector2(slot_size, slot_size), item, index, source_id))
 		else:
-			grid_root.add_child(_make_empty_slot(slot_pos, Vector2(slot_size, slot_size), index >= capacity))
+			grid_root.add_child(_make_empty_slot(scene, slot_pos, Vector2(slot_size, slot_size), index >= capacity, source_id, index))
 	_add_grid_footer(scene, grid_root, items, capacity, source_id)
 
 func _display_slot_count(source_id: String, capacity: int) -> int:
@@ -722,17 +946,36 @@ func _make_item_slot(scene, pos: Vector2, slot_size: Vector2, item: Dictionary, 
 	var button := Button.new()
 	button.position = pos
 	button.size = slot_size
-	button.text = _slot_text(item)
-	button.clip_text = true
+	button.text = ""
+	button.clip_text = false
 	button.add_theme_font_size_override("font_size", 12)
 	button.add_theme_color_override("font_color", _quality_color(item))
-	button.add_theme_stylebox_override("normal", _slot_style(Color("#071116"), Color("#35C9D7"), 2))
+	var selected := source_id == "inventory" and index == int(scene.selected_inventory_index)
+	var border_color := Color("#D1B850") if selected else Color("#35C9D7")
+	var border_width := 3 if selected else 2
+	button.add_theme_stylebox_override("normal", _slot_style(Color("#071116"), border_color, border_width))
 	button.add_theme_stylebox_override("hover", _slot_style(Color("#0B151A"), Color("#D1B850"), 2))
 	button.add_theme_stylebox_override("pressed", _slot_style(Color("#121817"), Color("#D1B850"), 3))
+	_add_item_slot_content(button, slot_size, item)
 	button.button_up.connect(func(): _dispatch_grid_slot(scene, source_id, index))
 	return button
 
-func _make_empty_slot(pos: Vector2, slot_size: Vector2, locked: bool = false) -> Panel:
+func _refresh_inventory_actions(scene) -> void:
+	var has_selection: bool = scene.has_selected_inventory_item()
+	scene.discard_button.disabled = not has_selection
+	scene.inventory_selection_label.text = scene.selected_inventory_item_summary()
+
+func _make_empty_slot(scene, pos: Vector2, slot_size: Vector2, locked: bool = false, source_id: String = "", index: int = -1) -> Control:
+	if not locked and _empty_slot_accepts_click(source_id):
+		var button := Button.new()
+		button.position = pos
+		button.size = slot_size
+		button.text = ""
+		button.add_theme_stylebox_override("normal", _slot_style(Color("#071116"), Color("#35C9D7"), 1))
+		button.add_theme_stylebox_override("hover", _slot_style(Color("#0B151A"), Color("#D1B850"), 2))
+		button.add_theme_stylebox_override("pressed", _slot_style(Color("#121817"), Color("#D1B850"), 3))
+		button.button_up.connect(func(): _dispatch_grid_slot(scene, source_id, index))
+		return button
 	var panel := Panel.new()
 	panel.position = pos
 	panel.size = slot_size
@@ -751,7 +994,7 @@ func _make_empty_slot(pos: Vector2, slot_size: Vector2, locked: bool = false) ->
 	return panel
 
 func _add_grid_footer(scene, grid_root: Control, items: Array, capacity: int, source_id: String) -> void:
-	var used := items.size()
+	var used := _occupied_item_count(items)
 	var footer := Label.new()
 	footer.position = Vector2(0, grid_root.size.y - 26.0)
 	footer.size = Vector2(grid_root.size.x, 24)
@@ -764,6 +1007,16 @@ func _add_grid_footer(scene, grid_root: Control, items: Array, capacity: int, so
 	else:
 		footer.text = "容量: %d/%d" % [used, capacity]
 	grid_root.add_child(footer)
+
+func _empty_slot_accepts_click(source_id: String) -> bool:
+	return source_id == "storage"
+
+func _occupied_item_count(items: Array) -> int:
+	var count := 0
+	for item in items:
+		if item is Dictionary:
+			count += 1
+	return count
 
 func _dispatch_grid_slot(scene, source_id: String, index: int) -> void:
 	match source_id:
@@ -778,6 +1031,88 @@ func _slot_text(item: Dictionary) -> String:
 	var name := String(item.get("display_name", item.get("item_id", "")))
 	var amount := int(item.get("amount", 1))
 	return "%s\nx%d" % [name, amount]
+
+func _add_item_slot_content(button: Button, slot_size: Vector2, item: Dictionary) -> void:
+	var texture := _item_icon_texture(item)
+	var icon_size := maxf(24.0, minf(slot_size.x - 28.0, slot_size.y * 0.48))
+	var icon_pos := Vector2((slot_size.x - icon_size) * 0.5, 4.0)
+	if texture != null:
+		var icon := TextureRect.new()
+		icon.position = icon_pos
+		icon.size = Vector2(icon_size, icon_size)
+		icon.texture = texture
+		icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		button.add_child(icon)
+	else:
+		var fallback := Label.new()
+		fallback.position = icon_pos
+		fallback.size = Vector2(icon_size, icon_size)
+		fallback.text = String(item.get("quality", "C"))
+		fallback.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		fallback.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+		fallback.add_theme_font_size_override("font_size", 18)
+		fallback.add_theme_color_override("font_color", _quality_color(item))
+		fallback.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		button.add_child(fallback)
+
+	_add_slot_text_box(
+		button,
+		_slot_display_name(String(item.get("display_name", item.get("item_id", "")))),
+		Vector2(3.0, slot_size.y - 25.0),
+		Vector2(slot_size.x - 6.0, 14.0),
+		8,
+		_quality_color(item)
+	)
+	_add_slot_text_box(
+		button,
+		"x%d" % maxi(1, int(item.get("amount", 1))),
+		Vector2(3.0, slot_size.y - 12.0),
+		Vector2(slot_size.x - 6.0, 10.0),
+		9,
+		Color("#D8D6CE")
+	)
+
+func _item_icon_texture(item: Dictionary) -> Texture2D:
+	var icon_path := String(item.get("icon", ""))
+	if icon_path.is_empty() or not ResourceLoader.exists(icon_path):
+		return null
+	var resource := load(icon_path)
+	return resource as Texture2D
+
+func _add_slot_text_box(button: Button, text: String, pos: Vector2, box_size: Vector2, font_size: int, color: Color) -> void:
+	var box := Control.new()
+	box.position = pos
+	box.size = box_size
+	box.clip_contents = true
+	box.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	button.add_child(box)
+
+	var label := Label.new()
+	label.text = text
+	label.position = Vector2(0.0, -4.0)
+	label.size = Vector2(box_size.x, box_size.y + 8.0)
+	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	label.clip_text = true
+	label.add_theme_font_size_override("font_size", font_size)
+	label.add_theme_color_override("font_color", color)
+	label.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0.85))
+	label.add_theme_constant_override("shadow_offset_x", 1)
+	label.add_theme_constant_override("shadow_offset_y", 1)
+	label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	box.add_child(label)
+
+func _compact_item_name(name: String) -> String:
+	if name.length() <= 4:
+		return name
+	return name.substr(0, 4) + "..."
+
+func _slot_display_name(name: String) -> String:
+	if name.length() <= 6:
+		return name
+	return name.substr(0, 6)
 
 func _active_storage_capacity(scene) -> int:
 	if scene._is_active_outpost_storage():
@@ -848,6 +1183,21 @@ func _interact_prompt_prefix(interact_type: String) -> String:
 			return "按住 F"
 		_:
 			return "按 F"
+
+func _make_objective_label(node_name: String, pos: Vector2, label_size: Vector2, font_size: int, color: Color) -> Label:
+	var label := Label.new()
+	label.name = node_name
+	label.position = pos
+	label.size = label_size
+	label.autowrap_mode = TextServer.AUTOWRAP_OFF
+	label.clip_text = false
+	label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	label.add_theme_font_size_override("font_size", font_size)
+	label.add_theme_color_override("font_color", color)
+	label.add_theme_color_override("font_shadow_color", Color(0.0, 0.0, 0.0))
+	label.add_theme_constant_override("shadow_offset_x", 1)
+	label.add_theme_constant_override("shadow_offset_y", 1)
+	return label
 
 func _make_outpost_icon(text: String) -> Panel:
 	var icon := Panel.new()
@@ -932,6 +1282,17 @@ func _progress_style(bg_color: Color, border_color: Color, border_width: int) ->
 	style.corner_radius_top_right = 1
 	style.corner_radius_bottom_left = 1
 	style.corner_radius_bottom_right = 1
+	return style
+
+func _transparent_button_style() -> StyleBoxFlat:
+	var style := StyleBoxFlat.new()
+	style.bg_color = Color(0, 0, 0, 0)
+	style.border_color = Color(0, 0, 0, 0)
+	style.set_border_width_all(0)
+	style.content_margin_left = 0
+	style.content_margin_top = 0
+	style.content_margin_right = 0
+	style.content_margin_bottom = 0
 	return style
 
 func _slot_style(bg_color: Color, border_color: Color, border_width: int) -> StyleBoxFlat:

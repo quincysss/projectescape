@@ -23,6 +23,41 @@ func _verify_registry() -> bool:
 	if registry.containers_by_id.size() < 7:
 		printerr("Expected seven configured container types.")
 		ok = false
+	if registry.shop_stock_rows.size() < 8:
+		printerr("Expected configured merchant shop stock rows.")
+		ok = false
+	if registry.research_rows.size() < 3:
+		printerr("Expected configured research rows.")
+		ok = false
+	for row in registry.get_research_rows():
+		var requirements := String(row.get("required_items", ""))
+		if requirements.is_empty():
+			printerr("Research row must declare required_items: %s" % row.get("research_id", ""))
+			ok = false
+		for part in requirements.split(";", false):
+			var cells := String(part).split(":", false, 1)
+			if cells.size() != 2 or registry.get_item(String(cells[0])).is_empty() or int(cells[1]) <= 0:
+				printerr("Research row has invalid required item: %s" % part)
+				ok = false
+		if String(row.get("required_currency_id", "")).is_empty() or int(row.get("required_currency_amount", 0)) <= 0:
+			printerr("Research row must require a positive currency cost: %s" % row.get("research_id", ""))
+			ok = false
+		if String(row.get("effect_type", "")) == "player_move_speed_multiplier" and float(row.get("effect_value", 0.0)) <= 1.0:
+			printerr("Move speed research must increase speed multiplier.")
+			ok = false
+	for row in registry.shop_stock_rows:
+		var item := registry.get_item(String(row.get("item_id", "")))
+		if item.is_empty():
+			printerr("Shop stock row references missing item: %s" % row.get("item_id", ""))
+			ok = false
+			continue
+		var item_type := String(item.get("item_type", ""))
+		if item_type != "material" and item_type != "outpost_material":
+			printerr("Shop stock row must sell only resources: %s" % row.get("item_id", ""))
+			ok = false
+		if int(row.get("buy_price", 0)) <= 0:
+			printerr("Shop stock row must have positive buy_price: %s" % row.get("item_id", ""))
+			ok = false
 	for container in registry.containers_by_id.values():
 		if container.has("quality") or container.has("grade") or container.has("rarity"):
 			printerr("Container config must not expose S/A/B/C grade fields.")

@@ -130,19 +130,31 @@ func _require_outpost_requirement_bubbles(root: Node) -> bool:
 		if bubbles == null:
 			printerr("Missing outpost requirement bubbles on %s." % interactable.name)
 			return false
-		var labels: int = 0
+		var has_title := false
+		var material_labels: int = 0
 		for child in bubbles.get_children():
 			if child is Label:
-				labels += 1
 				var label := child as Label
-				if label == null or not label.text.contains("/"):
-					printerr("Expected requirement bubble label to show have/need on %s." % interactable.name)
+				if label == null:
+					continue
+				if label.text.contains("包"):
+					printerr("Expected requirement panel to hide backpack shorthand on %s." % interactable.name)
 					return false
-				if label.get_theme_font_size("font_size") < 44:
-					printerr("Expected larger requirement bubble font on %s." % interactable.name)
-					return false
-		if labels < 2:
-			printerr("Expected at least two requirement bubbles on %s." % interactable.name)
+				if label.name == "RequirementBubbleTitle":
+					has_title = label.text == "前哨站" and label.get_theme_font_size("font_size") >= 52
+				elif label.name.begins_with("RequirementBubbleMaterial"):
+					material_labels += 1
+					if not label.text.begins_with("需要") or not label.text.contains("：") or not label.text.contains("/"):
+						printerr("Expected material requirement line to show need and have/need on %s." % interactable.name)
+						return false
+					if label.get_theme_font_size("font_size") < 36:
+						printerr("Expected readable material requirement font on %s." % interactable.name)
+						return false
+		if not has_title:
+			printerr("Expected outpost requirement panel title on %s." % interactable.name)
+			return false
+		if material_labels < 2:
+			printerr("Expected at least two material requirement labels on %s." % interactable.name)
 			return false
 		return true
 	printerr("Missing outpost for requirement bubble check.")

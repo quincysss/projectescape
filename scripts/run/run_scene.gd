@@ -14,6 +14,9 @@ const InteractableVisualBuilderScript := preload("res://scripts/run/interactable
 const RunUiControllerScript := preload("res://scripts/run/run_ui_controller.gd")
 const RunTimerControllerScript := preload("res://scripts/run/run_timer_controller.gd")
 const RunMapBuilderScript := preload("res://scripts/map/run_map_builder.gd")
+const MonsterSpawnControllerScript := preload("res://scripts/monsters/monster_spawn_controller.gd")
+const SettlementResultScreenScript := preload("res://scripts/ui/settlement_result_screen.gd")
+const ReturnToBaseLoadingScreenScript := preload("res://scripts/ui/return_to_base_loading_screen.gd")
 const UNIT := 64.0
 const MAP_UNITS := Vector2(280.0, 220.0)
 const MAP_ORIGIN_UNITS := Vector2(-140.0, -110.0)
@@ -31,8 +34,9 @@ const HOME_OVERVIEW_READABLE_UI_MAX_SCALE := 3.0
 const CAMERA_TRANSITION_SECONDS := 0.5
 const CONTAINER_OPEN_HOLD_SECONDS := 0.8
 const OUTPOST_REPAIR_HOLD_SECONDS := 1.5
-const EXTRACTION_HOLD_SECONDS := 1.2
+const EXTRACTION_HOLD_SECONDS := 3.0
 const SHOW_DEBUG_VISION_CIRCLE := false
+const PLAYER_ALWAYS_IN_FRONT_BUILDING_Z_INDEX := -1
 
 @onready var run_director: RunDirector = $RunDirector
 @onready var world_root: Node2D = $WorldRoot
@@ -60,12 +64,15 @@ var opened_loot: Array[Dictionary] = []
 var repaired_outposts: Dictionary = {}
 var outpost_requirements: Dictionary = {}
 var outpost_safe_zones: Dictionary = {}
+var outpost_visual_anchors: Dictionary = {}
+var _blocked_rects: Array[Rect2] = []
 var _walkable_rects: Array[Rect2] = []
 var _walkable_polygons: Array[PackedVector2Array] = []
 var enterable_exception_rects: Array[Rect2] = []
 
 var hud_label: Label
 var character_hud_root: Control
+var portrait_image: TextureRect
 var portrait_frame: TextureRect
 var stability_hud_root: Control
 var stability_bar: Control
@@ -83,6 +90,9 @@ var extraction_status_frame_center: TextureRect
 var extraction_status_frame_right: TextureRect
 var extraction_status_dot: TextureRect
 var extraction_status_label: Label
+var extraction_status_button: Button
+var extraction_progress_bar: ProgressBar
+var home_backpack_hint_label: Label
 var outpost_hud_root: Panel
 var outpost_count_label: Label
 var outpost_first_icon: Panel
@@ -91,6 +101,9 @@ var outpost_first_progress_bar: ProgressBar
 var outpost_second_icon: Panel
 var outpost_second_status_label: Label
 var outpost_second_progress_bar: ProgressBar
+var objective_title_label: Label
+var objective_next_step_label: Label
+var objective_extraction_label: Label
 var backpack_hud_root: Panel
 var backpack_icon_placeholder: Panel
 var backpack_slot_label: Label
@@ -99,11 +112,13 @@ var weight_value_label: Label
 var prompt_label: Label
 var inventory_panel: Panel
 var inventory_label: Control
+var inventory_selection_label: Label
 var loot_panel: Panel
 var loot_label: Control
 var home_storage_panel: Panel
 var home_storage_label: Control
 var take_all_button: Button
+var discard_button: Button
 var deposit_button: Button
 var extract_button: Button
 var extract_hud_button: Button
@@ -116,13 +131,20 @@ var outpost_repair_controller
 var interaction_progress_controller
 var container_spawn_controller
 var outpost_material_spawn_controller
+var monster_spawn_controller
 var interactable_visual_builder
 var run_ui_controller
 var run_timer_controller
 var map_builder
 var _status_prompt: String = ""
+var _timed_status_prompt_text: String = ""
+var _status_prompt_clear_time_msec: int = 0
+var settlement_result_screen: SettlementResultScreen
+var return_to_base_loading_screen: ReturnToBaseLoadingScreen
+var _pending_run_result: Dictionary = {}
 var home_storage_user_closed: bool = false
 var active_outpost_storage_id: String = ""
+var selected_inventory_index: int = -1
 var _extract_button_held: bool = false
 var _ui_refresh_queued: bool = false
 
@@ -135,16 +157,23 @@ func _ready() -> void:
 	_game_state = get_node_or_null("/root/GameState")
 	_create_runtime_controllers()
 	_build_run_world()
+	_configure_monster_spawn_controller()
 	_build_ui()
 	_connect_runtime()
 	run_director.start_new_run()
 	_spawn_selected_outposts()
 	_spawn_initial_containers()
 	_spawn_requirement_materials()
+	_spawn_monsters_for_run()
 	if camera:
 		camera.zoom = _home_overview_zoom()
 		camera.position = _home_overview_offset()
+	_play_run_safe_house_bgm()
 	_refresh_ui()
+
+func _exit_tree() -> void:
+	_audio_manager_call("stop_container_open_loop")
+	_audio_manager_call("set_stability_critical_loop_active", [false])
 
 func _create_runtime_controllers() -> void:
 	loot_interaction_controller = LootInteractionControllerScript.new()
@@ -175,6 +204,19 @@ func _create_runtime_controllers() -> void:
 		Callable(self, "_get_material_spawn_points"),
 		Callable(self, "_make_interactable"),
 		Callable(self, "_item"),
+		Callable(self, "_remove_interactable"),
+		UNIT
+	)
+	monster_spawn_controller = MonsterSpawnControllerScript.new()
+
+func _configure_monster_spawn_controller() -> void:
+	if monster_spawn_controller == null:
+		monster_spawn_controller = MonsterSpawnControllerScript.new()
+	monster_spawn_controller.setup(
+		y_sort_root,
+		Callable(self, "_get_monster_spawn_points"),
+		player,
+		run_director,
 		UNIT
 	)
 
@@ -208,11 +250,17 @@ func _add_key_action(action_name: String, keycode: Key) -> void:
 	InputMap.action_add_event(action_name, key_event)
 
 func _process(delta: float) -> void:
+	_update_status_prompt_timeout()
+	if _is_settlement_flow_active():
+		return
 	_update_run_timer(delta)
 	_update_active_interaction(delta)
 	if container_spawn_controller != null:
 		container_spawn_controller.update(delta, interactables)
+	if outpost_material_spawn_controller != null:
+		outpost_material_spawn_controller.update_lifetimes(delta, interactables)
 	_update_container_lifetime_visuals()
+	_update_material_lifetime_visuals()
 	_update_outpost_requirement_bubbles()
 	_update_readable_world_ui_scale()
 	if Input.is_action_just_pressed("interact"):
@@ -225,10 +273,73 @@ func _process(delta: float) -> void:
 
 func _build_run_world() -> void:
 	map_builder.build()
+	_setup_outpost_visual_anchors()
+	_apply_building_draw_overrides()
 	_create_home_visual()
 	_create_player()
 	_create_camera()
 	_create_vision_circle()
+
+func _apply_building_draw_overrides() -> void:
+	for child in y_sort_root.get_children():
+		if not (child is CanvasItem):
+			continue
+		if bool(child.get_meta("outpost_uses_normal_ysort", false)):
+			child.set_meta("occludes_player", false)
+		if bool(child.get_meta("player_always_in_front", false)):
+			var canvas_item := child as CanvasItem
+			canvas_item.z_index = PLAYER_ALWAYS_IN_FRONT_BUILDING_Z_INDEX
+			child.set_meta("occludes_player", false)
+		elif bool(child.get_meta("outpost_uses_normal_ysort", false)):
+			var ysort_canvas_item := child as CanvasItem
+			ysort_canvas_item.z_index = 0
+
+func _setup_outpost_visual_anchors() -> void:
+	outpost_visual_anchors.clear()
+	for child in y_sort_root.get_children():
+		if not (child.has_method("get_candidate_id") and child.has_method("set_repaired")):
+			continue
+		var candidate_id := String(child.get_candidate_id())
+		if candidate_id.is_empty():
+			continue
+		outpost_visual_anchors[candidate_id] = child
+		child.set_meta("player_always_in_front", true)
+		child.set_meta("outpost_uses_normal_ysort", true)
+		child.set_meta("occludes_player", false)
+		if child is CanvasItem:
+			(child as CanvasItem).z_index = PLAYER_ALWAYS_IN_FRONT_BUILDING_Z_INDEX
+		if child.has_method("set_selected"):
+			child.set_selected(false)
+
+func _reset_outpost_visual_anchors() -> void:
+	for anchor in outpost_visual_anchors.values():
+		if anchor == null or not is_instance_valid(anchor):
+			continue
+		if anchor.has_method("set_repaired"):
+			anchor.set_repaired(false)
+		if anchor.has_method("set_selected"):
+			anchor.set_selected(false)
+
+func _get_outpost_visual_anchor(outpost_id: String) -> Node2D:
+	var anchor = outpost_visual_anchors.get(outpost_id, null)
+	if anchor is Node2D and is_instance_valid(anchor):
+		return anchor
+	return null
+
+func _sync_outpost_visual_anchor(station) -> void:
+	if station == null or not is_instance_valid(station):
+		return
+	var anchor := _get_outpost_visual_anchor(station.interact_id)
+	if anchor == null:
+		return
+	var payload: Dictionary = station.payload
+	payload["visual_anchor_path"] = anchor.get_path()
+	if anchor.has_method("set_selected"):
+		anchor.set_selected(true)
+	else:
+		anchor.visible = true
+	if anchor.has_method("set_repaired"):
+		anchor.set_repaired(bool(payload.get("repaired", false)))
 
 func _get_enterable_exception_rects() -> Array[Rect2]:
 	return map_builder.get_enterable_exception_rects()
@@ -266,10 +377,15 @@ func _create_home_visual() -> void:
 func _create_player() -> void:
 	player = BasicPlayerScene.instantiate()
 	player.name = "Player"
-	player.base_speed = 12.0 * UNIT
+	var speed_multiplier := 1.0
+	var game_state := get_node_or_null("/root/GameState")
+	if game_state != null and game_state.has_method("get_player_move_speed_multiplier"):
+		speed_multiplier = maxf(1.0, float(game_state.get_player_move_speed_multiplier()))
+	player.base_speed = 12.0 * UNIT * speed_multiplier
 	y_sort_root.add_child(player)
 	player.global_position = $WorldRoot/PlayerRoot/PlayerSpawn.global_position
 	_walkable_rects.append(Rect2(player_root.global_position - _u(HOME_SAFE_SIZE_UNITS) * 0.5, _u(HOME_SAFE_SIZE_UNITS)))
+	player.set_blocked_rects(_blocked_rects)
 	player.set_walkable_rects(_walkable_rects)
 	player.set_walkable_polygons(_walkable_polygons)
 
@@ -326,19 +442,35 @@ func _on_run_initialized(context) -> void:
 	if run_timer_controller == null or run_director == null:
 		return
 	run_timer_controller.setup(context, run_director.config.run_duration_seconds)
+	if container_spawn_controller != null and run_director.has_method("get_ss_loot_director"):
+		container_spawn_controller.setup_ss_loot_director(run_director.get_ss_loot_director())
 
 func _update_run_timer(delta: float) -> void:
 	if run_timer_controller != null:
 		run_timer_controller.update(delta)
 
 func _on_run_time_expired() -> void:
+	if _is_settlement_flow_active():
+		return
 	if interaction_progress_controller != null and interaction_progress_controller.is_active():
 		interaction_progress_controller.cancel()
 		_end_player_interact_animation()
 	if run_end_controller != null:
-		run_end_controller.handle_timeout(get_tree(), "time_expired")
+		var result: Dictionary = run_end_controller.handle_timeout(get_tree(), "time_expired")
+		if bool(result.get("accepted", false)):
+			var run_result: Dictionary = result.get("result", {})
+			_show_settlement_result(run_result)
+		else:
+			_status_prompt = String(result.get("message", ""))
+			_refresh_ui()
 	else:
-		get_tree().change_scene_to_file("res://scenes/base/BaseScene.tscn")
+		_show_settlement_result({
+			"result_type": "TIMEOUT_FAILED",
+			"reason": "time_expired",
+			"warehouse_items": [],
+			"lost_items": [],
+			"message": "探索失败：对局时间耗尽。",
+		})
 
 func _spawn_initial_containers() -> void:
 	if container_spawn_controller == null:
@@ -356,6 +488,9 @@ func _spawn_selected_outposts() -> void:
 		return
 	outpost_requirements.clear()
 	outpost_safe_zones.clear()
+	if outpost_visual_anchors.is_empty():
+		_setup_outpost_visual_anchors()
+	_reset_outpost_visual_anchors()
 	var first_id: String = context.selected_first_outpost_id
 	var second_id: String = context.selected_second_outpost_id
 	if outpost_material_spawn_controller:
@@ -371,6 +506,7 @@ func _spawn_selected_outposts() -> void:
 			"delivered_materials": {},
 			"footprint_units": footprint_units,
 		}
+		_sync_outpost_visual_anchor(station)
 		interactable_visual_builder.refresh_outpost_requirement_bubbles(station, Callable(self, "_inventory_count"))
 		_attach_outpost_safe_zone(station)
 		outpost_root.add_child(station)
@@ -383,6 +519,11 @@ func _spawn_requirement_materials() -> void:
 		run_director.context.selected_outpost_positions
 	)
 
+func _spawn_monsters_for_run() -> void:
+	if monster_spawn_controller == null or run_director.context == null:
+		return
+	monster_spawn_controller.spawn_for_context(run_director.context)
+
 func _get_material_points_for_outpost(base_pos: Vector2, count: int) -> Array:
 	var points := _get_material_spawn_points()
 	points.sort_custom(func(a, b): return a.global_position.distance_squared_to(base_pos) < b.global_position.distance_squared_to(base_pos))
@@ -393,6 +534,9 @@ func _get_container_spawn_points() -> Array:
 
 func _get_material_spawn_points() -> Array:
 	return _get_layout_points("MaterialSpawnPoints")
+
+func _get_monster_spawn_points() -> Array:
+	return _get_layout_points("MonsterSpawnPoints")
 
 func _make_interactable(id: String, type: String, label_text: String, pos: Vector2, color: Color, size_units: Vector2 = Vector2.ZERO):
 	var area := Area2D.new()
@@ -436,6 +580,10 @@ func _attach_outpost_safe_zone(station) -> void:
 	outpost_safe_zones[station.interact_id] = safe_zone
 
 func _get_outpost_footprint_units(outpost_id: String) -> Vector2:
+	if run_director.context != null:
+		var context_footprint = run_director.context.selected_outpost_footprints.get(outpost_id, Vector2.ZERO)
+		if context_footprint is Vector2 and context_footprint != Vector2.ZERO:
+			return context_footprint
 	for point in _get_outpost_candidate_points():
 		if point.has_method("get_candidate_id") and point.get_candidate_id() == outpost_id:
 			if point.has_method("get_footprint_units"):
@@ -514,7 +662,10 @@ func _begin_container_open(container) -> void:
 		return
 	if not is_instance_valid(container):
 		return
-	if container.payload.get("state", "") == "depleted" or container.payload.get("rewards", []).is_empty():
+	if container.payload.get("state", "") == "depleted" or (
+		bool(container.payload.get("loot_generated", false))
+		and container.payload.get("rewards", []).is_empty()
+	):
 		_status_prompt = "容器已不可开启。"
 		_refresh_ui()
 		return
@@ -528,16 +679,22 @@ func _begin_container_open(container) -> void:
 	):
 		_status_prompt = ""
 		_begin_player_interact_animation(container)
+		_audio_manager_call("start_container_open_loop")
 	_refresh_ui()
 
 func _complete_held_container_open(container) -> void:
+	_audio_manager_call("stop_container_open_loop")
 	_open_container(container)
+	_audio_manager_call("play_container_open_complete")
 	_status_prompt = "容器已打开。"
 
 func _cancel_held_container_open(container) -> void:
+	_audio_manager_call("stop_container_open_loop")
 	_set_container_lifetime_paused(container, false)
 
 func _open_container(container) -> void:
+	if container_spawn_controller != null:
+		container_spawn_controller.ensure_container_rewards(container)
 	if not loot_interaction_controller.open_container(container):
 		_set_container_lifetime_paused(container, false)
 		prompt_label.text = loot_interaction_controller.last_prompt
@@ -549,13 +706,14 @@ func _open_container(container) -> void:
 	_refresh_ui()
 
 func _pick_material(pickup) -> void:
+	var pickup_outpost_id := String(pickup.payload.get("outpost_id", "")) if pickup != null and is_instance_valid(pickup) else ""
 	if loot_interaction_controller.pick_material_immediate(
 		pickup,
 		run_director.inventory_component,
 		Callable(self, "_remove_interactable")
 	):
 		_play_player_interact_once(pickup)
-		_status_prompt = "材料已放入背包。"
+		_set_timed_status_prompt(run_ui_controller.outpost_material_pickup_prompt(self, pickup_outpost_id), 1.8)
 	else:
 		_status_prompt = loot_interaction_controller.last_prompt
 	_refresh_ui()
@@ -580,14 +738,17 @@ func _on_loot_item_meta_clicked(meta: Variant) -> void:
 func _on_inventory_item_meta_clicked(meta: Variant) -> void:
 	var index := _item_meta_index(meta, "inventory")
 	if index >= 0:
-		_deposit_inventory_item_at(index)
+		_select_inventory_item_at(index)
 
 func _on_home_storage_item_meta_clicked(meta: Variant) -> void:
 	var index := _item_meta_index(meta, "storage")
 	if index < 0:
 		index = _item_meta_index(meta, "home")
 	if index >= 0:
-		_withdraw_active_storage_item_at(index)
+		if has_selected_inventory_item():
+			_deposit_inventory_item_at(index, selected_inventory_index)
+		else:
+			_withdraw_active_storage_item_at(index)
 
 func _take_loot_item_at(index: int) -> void:
 	var result: Dictionary = loot_interaction_controller.take_loot_at(
@@ -605,18 +766,84 @@ func _take_loot_item_at(index: int) -> void:
 		_status_prompt = loot_interaction_controller.last_prompt
 	_refresh_ui()
 
-func _deposit_inventory_item_at(index: int) -> void:
+func _deposit_inventory_item_at(index: int, inventory_index: int = -1) -> void:
 	var result: Dictionary
 	var storage_name := _active_storage_display_name()
+	var source_inventory_index := inventory_index if inventory_index >= 0 else index
+	var target_storage_index := index if inventory_index >= 0 else -1
 	if _is_active_outpost_storage():
-		result = run_director.deposit_inventory_item_to_outpost(active_outpost_storage_id, index)
+		result = run_director.deposit_inventory_item_to_outpost(active_outpost_storage_id, source_inventory_index, target_storage_index)
 	else:
-		result = run_director.deposit_inventory_item_to_home_by_selection(index)
+		result = run_director.deposit_inventory_item_to_home_by_selection(source_inventory_index, target_storage_index)
 	if bool(result.get("accepted", false)):
+		if selected_inventory_index == source_inventory_index:
+			selected_inventory_index = -1
 		_status_prompt = "已存入%s：%s" % [storage_name, result.item.get("display_name", result.item.get("item_id", ""))]
 	else:
 		_status_prompt = _selection_transfer_reason_text(str(result.get("reason", "")))
+		_sync_inventory_selection_state()
 	_refresh_ui()
+
+func _select_inventory_item_at(index: int) -> void:
+	if run_director == null or run_director.inventory_component == null:
+		selected_inventory_index = -1
+		_status_prompt = "背包不可用。"
+		_refresh_ui()
+		return
+	if index < 0 or index >= run_director.inventory_component.items.size():
+		selected_inventory_index = -1
+		_status_prompt = "道具不可用。"
+		_refresh_ui()
+		return
+	selected_inventory_index = index
+	var item: Dictionary = run_director.inventory_component.items[index]
+	_status_prompt = "已选中：%s" % item.get("display_name", item.get("item_id", ""))
+	_refresh_ui()
+
+func _discard_selected_inventory_item() -> void:
+	if not has_selected_inventory_item():
+		_status_prompt = "请先选择背包道具。"
+		_refresh_ui()
+		return
+	var result: Dictionary = run_director.discard_inventory_item_at(selected_inventory_index)
+	if bool(result.get("accepted", false)):
+		selected_inventory_index = -1
+		_status_prompt = "已丢弃：%s" % result.item.get("display_name", result.item.get("item_id", ""))
+	else:
+		_status_prompt = _inventory_discard_reason_text(str(result.get("reason", "")))
+		_sync_inventory_selection_state()
+	_refresh_ui()
+
+func has_selected_inventory_item() -> bool:
+	return not _selected_inventory_item().is_empty()
+
+func selected_inventory_item_summary() -> String:
+	var item := _selected_inventory_item()
+	if item.is_empty():
+		return ""
+	return "已选：%s" % item.get("display_name", item.get("item_id", ""))
+
+func _selected_inventory_item() -> Dictionary:
+	if run_director == null or run_director.inventory_component == null:
+		return {}
+	if selected_inventory_index < 0 or selected_inventory_index >= run_director.inventory_component.items.size():
+		return {}
+	return run_director.inventory_component.items[selected_inventory_index]
+
+func _sync_inventory_selection_state() -> void:
+	if selected_inventory_index < 0:
+		return
+	if inventory_panel == null or not inventory_panel.visible or _selected_inventory_item().is_empty():
+		selected_inventory_index = -1
+
+func _inventory_discard_reason_text(reason: String) -> String:
+	match reason:
+		"missing_inventory":
+			return "背包不可用。"
+		"invalid_item":
+			return "道具不可用。"
+		_:
+			return "无法丢弃该道具。"
 
 func _withdraw_active_storage_item_at(index: int) -> void:
 	var result: Dictionary
@@ -644,6 +871,8 @@ func _selection_transfer_reason_text(reason: String) -> String:
 			return "请进入已修复前哨站整理物品。"
 		"outpost_inactive":
 			return "前哨站尚未修复，无法存储。"
+		"outpost_storage_locked":
+			return "前哨站安全箱尚未研究。"
 		"storage_rejected":
 			return "%s空间不足。" % _active_storage_display_name()
 		"inventory_rejected":
@@ -727,6 +956,21 @@ func _update_active_interaction(delta: float) -> void:
 		if _status_prompt.is_empty():
 			_status_prompt = _interaction_complete_message(interaction_id)
 
+func _set_timed_status_prompt(text: String, seconds: float) -> void:
+	_status_prompt = text
+	_timed_status_prompt_text = text
+	_status_prompt_clear_time_msec = Time.get_ticks_msec() + int(maxf(0.0, seconds) * 1000.0)
+
+func _update_status_prompt_timeout() -> void:
+	if _status_prompt_clear_time_msec <= 0:
+		return
+	if Time.get_ticks_msec() < _status_prompt_clear_time_msec:
+		return
+	if _status_prompt == _timed_status_prompt_text:
+		_status_prompt = ""
+	_timed_status_prompt_text = ""
+	_status_prompt_clear_time_msec = 0
+
 func _should_continue_active_interaction(interaction_id: String, target) -> bool:
 	match interaction_id:
 		"open_container", "repair_outpost":
@@ -777,8 +1021,10 @@ func _try_repair_outpost(station) -> void:
 	var result: Dictionary = outpost_repair_controller.repair(station)
 	_status_prompt = result.message
 	if bool(result.get("activated", false)):
+		_audio_manager_call("play_outpost_repair_complete")
 		_activate_outpost_safe_zone(station)
-		run_director.ensure_outpost_storage(station.interact_id)
+		if run_director.get_outpost_storage_capacity(station.interact_id) > 0:
+			run_director.ensure_outpost_storage(station.interact_id)
 	if bool(result.get("activated", false)) and _is_player_inside_outpost_safe_zone(station):
 		_enter_repaired_outpost_safe_zone(station)
 	_update_outpost_requirement_bubbles()
@@ -798,10 +1044,15 @@ func _enter_repaired_outpost_safe_zone(station) -> void:
 	if run_director.context.active_safe_zone_id == station.interact_id:
 		return
 	run_director.on_safe_zone_entered(station.interact_id)
-	run_director.ensure_outpost_storage(station.interact_id)
-	active_outpost_storage_id = station.interact_id
-	home_storage_user_closed = false
-	_status_prompt = "前哨站安全区：稳定值正在恢复。"
+	_play_run_safe_house_bgm()
+	if run_director.get_outpost_storage_capacity(station.interact_id) > 0:
+		run_director.ensure_outpost_storage(station.interact_id)
+		active_outpost_storage_id = station.interact_id
+		home_storage_user_closed = false
+		_status_prompt = "前哨站安全区：稳定值正在恢复，安全箱已开启。"
+	else:
+		active_outpost_storage_id = ""
+		_status_prompt = "前哨站安全区：稳定值正在恢复，安全箱尚未研究。"
 
 func _exit_repaired_outpost_safe_zone(station) -> void:
 	if run_director.context == null:
@@ -809,6 +1060,7 @@ func _exit_repaired_outpost_safe_zone(station) -> void:
 	if run_director.context.active_safe_zone_id != station.interact_id:
 		return
 	run_director.on_safe_zone_exited(station.interact_id)
+	_play_run_exploration_bgm()
 
 func _activate_outpost_safe_zone(station) -> void:
 	var safe_zone: Area2D = _get_outpost_safe_zone(station)
@@ -828,7 +1080,9 @@ func _is_player_inside_outpost_safe_zone(station) -> bool:
 	if player == null or station == null or not is_instance_valid(station):
 		return false
 	var local_pos: Vector2 = station.to_local(player.global_position)
-	return Rect2(_u(OUTPOST_SIZE_UNITS) * -0.5, _u(OUTPOST_SIZE_UNITS)).has_point(local_pos)
+	var footprint_units: Vector2 = station.payload.get("footprint_units", OUTPOST_SIZE_UNITS)
+	var footprint_size: Vector2 = _u(footprint_units)
+	return Rect2(footprint_size * -0.5, footprint_size).has_point(local_pos)
 
 func _has_requirements(requirements: Dictionary) -> bool:
 	return outpost_repair_controller.has_requirements(requirements)
@@ -842,6 +1096,9 @@ func _inventory_count(item_id: String) -> int:
 func _deposit_all() -> void:
 	if not is_storage_zone_active():
 		prompt_label.text = "请进入家中或已修复前哨站存放物品。"
+		return
+	if has_selected_inventory_item():
+		_deposit_inventory_item_at(selected_inventory_index)
 		return
 	var index := 0
 	while index < run_director.inventory_component.items.size():
@@ -878,9 +1135,9 @@ func _is_active_outpost_storage() -> bool:
 
 func get_active_storage_items_snapshot() -> Array:
 	if _is_active_outpost_storage():
-		return run_director.get_outpost_storage_items_snapshot(active_outpost_storage_id)
+		return run_director.get_outpost_storage_slots_snapshot(active_outpost_storage_id)
 	if run_director.home_storage_component != null:
-		return run_director.home_storage_component.get_items_snapshot()
+		return run_director.home_storage_component.get_slots_snapshot()
 	return []
 
 func get_active_storage_source_id() -> String:
@@ -916,11 +1173,14 @@ func _release_extraction_hold_button() -> void:
 func _begin_extraction_hold() -> void:
 	if run_end_controller == null:
 		return
+	if _is_run_terminal():
+		return
 	if interaction_progress_controller != null and interaction_progress_controller.is_active():
 		return
 	var validation: Dictionary = run_end_controller.validate_extraction()
 	if not validation.accepted:
-		prompt_label.text = validation.message
+		_status_prompt = validation.message
+		_refresh_ui()
 		return
 	if interaction_progress_controller == null:
 		_complete_held_extract(run_director)
@@ -933,6 +1193,7 @@ func _begin_extraction_hold() -> void:
 		Callable(self, "_cancel_held_extract")
 	):
 		_status_prompt = ""
+		run_director.on_extraction_started()
 		_begin_player_interact_animation()
 	_refresh_ui()
 
@@ -940,25 +1201,101 @@ func _complete_held_extract(_target) -> void:
 	if run_end_controller == null:
 		return
 	var result: Dictionary = run_end_controller.try_extract(get_tree())
-	if bool(result.get("accepted", false)) and run_timer_controller != null:
-		run_timer_controller.stop()
+	if bool(result.get("accepted", false)):
+		_audio_manager_call("play_extraction_success_cue")
+		if run_timer_controller != null:
+			run_timer_controller.stop()
+		_extract_button_held = false
+		var run_result: Dictionary = result.get("result", {})
+		_show_settlement_result(run_result)
 	if not result.accepted:
-		prompt_label.text = result.message
+		_status_prompt = result.message
+		_refresh_ui()
 
 func _cancel_held_extract(_target) -> void:
-	pass
+	_extract_button_held = false
+	if run_director != null and _is_current_run_phase("EXTRACT"):
+		run_director.on_extraction_interrupted()
+
+func _is_current_run_phase(phase_name: String) -> bool:
+	if run_director == null or run_director.state_machine == null:
+		return false
+	return RunStateMachine.phase_name(run_director.state_machine.current_phase) == phase_name
+
+func _is_run_terminal() -> bool:
+	if run_director == null or run_director.state_machine == null:
+		return false
+	var phase_name: String = RunStateMachine.phase_name(run_director.state_machine.current_phase)
+	return phase_name in ["SETTLEMENT", "FAILED"]
+
+func _is_settlement_flow_active() -> bool:
+	return (
+		(settlement_result_screen != null and is_instance_valid(settlement_result_screen))
+		or (return_to_base_loading_screen != null and is_instance_valid(return_to_base_loading_screen))
+	)
+
+func _show_settlement_result(result: Dictionary) -> void:
+	if result.is_empty():
+		return
+	if _is_settlement_flow_active():
+		return
+	_pending_run_result = result.duplicate(true)
+	_status_prompt = ""
+	_timed_status_prompt_text = ""
+	_status_prompt_clear_time_msec = 0
+	home_storage_panel.visible = false
+	inventory_panel.visible = false
+	loot_panel.visible = false
+	if interaction_progress_controller != null and interaction_progress_controller.is_active():
+		interaction_progress_controller.cancel()
+		_end_player_interact_animation()
+	settlement_result_screen = SettlementResultScreenScript.new()
+	ui_root.add_child(settlement_result_screen)
+	settlement_result_screen.return_to_base_requested.connect(_begin_return_to_base_loading)
+	settlement_result_screen.show_result(_pending_run_result)
+
+func _begin_return_to_base_loading() -> void:
+	if _pending_run_result.is_empty():
+		return
+	if settlement_result_screen != null and is_instance_valid(settlement_result_screen):
+		settlement_result_screen.queue_free()
+	settlement_result_screen = null
+	return_to_base_loading_screen = ReturnToBaseLoadingScreenScript.new()
+	ui_root.add_child(return_to_base_loading_screen)
+	return_to_base_loading_screen.return_failed.connect(_on_return_to_base_loading_failed)
+	return_to_base_loading_screen.begin_return(_pending_run_result, _game_state)
+
+func _on_return_to_base_loading_failed(reason: String) -> void:
+	_status_prompt = "返回哨所失败：%s" % reason
 
 func _on_stability_changed(current: float, _max_value: float, _stage: int) -> void:
+	_audio_manager_call("set_stability_critical_loop_active", [current > 0.0 and _stage >= 3])
 	if current <= 0.0:
 		call_deferred("_return_to_base_after_death", "stability_depleted")
 
 func _return_to_base_after_death(reason: String = "stability_depleted") -> void:
+	if _is_settlement_flow_active():
+		return
+	_audio_manager_call("set_stability_critical_loop_active", [false])
+	_audio_manager_call("play_player_death_cue")
 	if run_timer_controller != null:
 		run_timer_controller.stop()
 	if run_end_controller:
-		run_end_controller.handle_player_death(get_tree(), reason)
+		var result: Dictionary = run_end_controller.handle_player_death(get_tree(), reason)
+		if bool(result.get("accepted", false)):
+			var run_result: Dictionary = result.get("result", {})
+			_show_settlement_result(run_result)
+		else:
+			_status_prompt = String(result.get("message", ""))
+			_refresh_ui()
 	else:
-		get_tree().change_scene_to_file("res://scenes/base/BaseScene.tscn")
+		_show_settlement_result({
+			"result_type": "DEAD",
+			"reason": reason,
+			"warehouse_items": [],
+			"lost_items": [],
+			"message": "探索失败：稳定值耗尽。",
+		})
 
 func _on_weight_changed(_current_weight: float, _max_weight: float, _stage: int) -> void:
 	if player and run_director.weight_component:
@@ -974,6 +1311,7 @@ func _flush_ui_refresh() -> void:
 	_ui_refresh_queued = false
 	if not is_inside_tree():
 		return
+	_sync_inventory_selection_state()
 	run_ui_controller.refresh(self)
 
 func _item(id: String, display_name: String, amount: int, weight: float, _stack_limit: int) -> Dictionary:
@@ -995,10 +1333,24 @@ func _toggle_inventory_panel() -> void:
 	run_ui_controller.toggle_inventory(self)
 
 func _switch_camera_home() -> void:
+	_play_run_safe_house_bgm()
 	_tween_camera(_home_overview_zoom(), _home_overview_offset())
 
 func _switch_camera_follow() -> void:
+	_play_run_exploration_bgm()
 	_tween_camera(PLAYER_FOLLOW_ZOOM, Vector2.ZERO)
+
+func _play_run_safe_house_bgm() -> void:
+	_audio_manager_call("play_run_safe_house_bgm")
+
+func _play_run_exploration_bgm() -> void:
+	_audio_manager_call("play_run_exploration_bgm")
+
+func _audio_manager_call(method_name: String, args: Array = []) -> Variant:
+	var audio_manager := get_node_or_null("/root/AudioManager")
+	if audio_manager == null or not audio_manager.has_method(method_name):
+		return null
+	return audio_manager.callv(method_name, args)
 
 func _tween_camera(target_zoom: Vector2, target_position: Vector2) -> void:
 	if camera == null:
@@ -1074,12 +1426,24 @@ func _update_container_lifetime_visuals() -> void:
 func _refresh_container_lifetime_visual(container: Node) -> void:
 	interactable_visual_builder.refresh_container_lifetime_visual(container)
 
+func _update_material_lifetime_visuals() -> void:
+	for material in outpost_root.get_children():
+		if not is_instance_valid(material) or not (material is Node2D):
+			continue
+		if material.get("interact_type") != "material":
+			continue
+		_refresh_material_lifetime_visual(material)
+
+func _refresh_material_lifetime_visual(material: Node) -> void:
+	interactable_visual_builder.refresh_material_lifetime_visual(material)
+
 func _update_outpost_requirement_bubbles() -> void:
 	if interactable_visual_builder == null:
 		return
 	for outpost in outpost_root.get_children():
 		if not is_instance_valid(outpost) or outpost.get("interact_type") != "outpost":
 			continue
+		_sync_outpost_visual_anchor(outpost)
 		interactable_visual_builder.refresh_outpost_requirement_bubbles(outpost, Callable(self, "_inventory_count"))
 
 func _update_readable_world_ui_scale() -> void:

@@ -55,6 +55,10 @@ func create_context(
 		first_outpost_id: _candidate_position(first_outpost_candidates, first_outpost_id),
 		second_outpost_id: _candidate_position(second_outpost_candidates, second_outpost_id),
 	}
+	context.selected_outpost_footprints = {
+		first_outpost_id: _candidate_footprint_units(first_outpost_candidates, first_outpost_id),
+		second_outpost_id: _candidate_footprint_units(second_outpost_candidates, second_outpost_id),
+	}
 	context.outpost_states = {
 		first_outpost_id: "unrepaired",
 		second_outpost_id: "unrepaired",
@@ -110,6 +114,12 @@ func _candidate_position(candidates: Array, candidate_id: String) -> Vector2:
 	for candidate in candidates:
 		if candidate is Dictionary and str(candidate.get("id", "")) == candidate_id:
 			return candidate.get("position", Vector2.ZERO)
+	return Vector2.ZERO
+
+func _candidate_footprint_units(candidates: Array, candidate_id: String) -> Vector2:
+	for candidate in candidates:
+		if candidate is Dictionary and str(candidate.get("id", "")) == candidate_id:
+			return candidate.get("footprint_units", Vector2.ZERO)
 	return Vector2.ZERO
 
 func _create_empty_slots(slot_count: int) -> Array:
