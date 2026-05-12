@@ -7,6 +7,7 @@
 - BGM 使用 `snake_case_bgm.wav`。
 - 循环音效使用 `snake_case_loop.wav`。
 - 一次性短音效使用 `snake_case.wav`。
+- UI 点击音效使用 `ui_snake_case.wav`。
 - 结算/死亡等短提示使用 `cue_snake_case.wav`。
 - 当前统一预期格式为 `.wav`。
 
@@ -21,3 +22,5 @@
 - `res://assets/audio/sfx/outpost_repair_complete.wav`
 - `res://assets/audio/sfx/cue_extraction_success.wav`
 - `res://assets/audio/sfx/cue_player_death.wav`
+- `res://assets/audio/sfx/ui_button_click.wav`
+- `res://assets/audio/sfx/ui_item_click.wav`
