@@ -127,9 +127,22 @@ func _spawn_one(point: Node2D, index: int, definition: Dictionary, id_suffix: St
 func _on_monster_removed(monster_id: String, spawn_point_id: String, removal_reason: String) -> void:
 	if run_director != null and run_director.context != null:
 		run_director.context.active_monster_ids.erase(monster_id)
-	get_active_monsters()
+	_remove_active_monster(monster_id)
 	if removal_reason == "hit_player":
 		_schedule_hit_respawn(spawn_point_id)
+
+func _remove_active_monster(monster_id: String) -> void:
+	if monster_id.is_empty():
+		get_active_monsters()
+		return
+	var remaining: Array[Node] = []
+	for monster in active_monsters:
+		if monster == null or not is_instance_valid(monster):
+			continue
+		if String(monster.get("monster_id")) == monster_id:
+			continue
+		remaining.append(monster)
+	active_monsters = remaining
 
 func _schedule_hit_respawn(spawn_point_id: String) -> void:
 	if spawn_point_id.is_empty():

@@ -56,6 +56,8 @@ func _verify_monster_spawn_and_behavior() -> bool:
 			return _fail_with_restore("Monster visual facing should not flip the Visual root or desync EyeFocus.", game_state, original_profile, run_root)
 		if not _verify_centerline_warning_facing_stability(monster, run_root.player):
 			return _fail_with_restore("Monster warning facing should not flicker when player is near the centerline.", game_state, original_profile, run_root)
+		if not _verify_monster_visual_collision_disabled(monster):
+			return _fail_with_restore("Monster visual should not physically collide with player.", game_state, original_profile, run_root)
 
 	var first_monster = monsters[0]
 	var first_spawn_point_id := String(first_monster.spawn_point_id)
@@ -185,6 +187,23 @@ func _verify_monster_visual_flip_stability(monster: Node) -> bool:
 		printerr("BodySprite should face right and EyeFocus should mirror right.")
 		return false
 	return monster.vision_cone.global_position.distance_to(monster.get_vision_origin_global()) <= 0.5
+
+func _verify_monster_visual_collision_disabled(monster: Node) -> bool:
+	var visual := monster.get_node_or_null("Visual") as CharacterBody2D
+	if visual == null:
+		printerr("Monster visual should remain available for art and anchors.")
+		return false
+	if int(visual.collision_layer) != 0 or int(visual.collision_mask) != 0:
+		printerr("Monster visual collision layer/mask should be 0, got layer=%d mask=%d." % [int(visual.collision_layer), int(visual.collision_mask)])
+		return false
+	var collision_shape := visual.get_node_or_null("CollisionShape2D") as CollisionShape2D
+	if collision_shape == null:
+		printerr("Monster visual should keep its placeholder collision shape.")
+		return false
+	if not collision_shape.disabled:
+		printerr("Monster visual placeholder collision shape should be disabled.")
+		return false
+	return true
 
 func _verify_centerline_warning_facing_stability(monster: Node, player: Node2D) -> bool:
 	if player == null:

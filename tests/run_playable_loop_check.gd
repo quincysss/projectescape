@@ -101,13 +101,13 @@ func _verify_run_loop() -> bool:
 
 	for interactable in root.interactables.duplicate():
 		if is_instance_valid(interactable) and interactable.interact_type == "material":
-			var before_count: int = root.run_director.inventory_component.items.size()
+			var before_count: int = root.run_director.inventory_component.repair_material_items.size()
 			root._pick_material(interactable)
 			if root.loot_panel.visible:
 				printerr("Expected material pickup to avoid the loot panel")
 				return false
-			if root.run_director.inventory_component.items.size() <= before_count:
-				printerr("Expected material pickup to enter backpack immediately")
+			if root.run_director.inventory_component.repair_material_items.size() <= before_count:
+				printerr("Expected material pickup to enter material backpack immediately")
 				return false
 
 	var repaired := 0

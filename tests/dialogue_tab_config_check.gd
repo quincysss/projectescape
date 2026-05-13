@@ -54,6 +54,21 @@ func _verify() -> bool:
 		printerr("Expected first return dialogue to carry the chapter motivation.")
 		return false
 
+	var second_day: Dictionary = service.load_sequence("res://setting/dialogues.tab#second_day_black_tide_reveal_dialogue")
+	if second_day.is_empty() or not bool(second_day.get("skippable", false)):
+		printerr("Expected second day black tide reveal dialogue to load as skippable.")
+		return false
+	var second_day_entries: Array = Array(second_day.get("entries", []))
+	if second_day_entries.size() != 5:
+		printerr("Expected 5 second day reveal entries, got %d." % second_day_entries.size())
+		return false
+	if String(Dictionary(second_day_entries[0]).get("speaker_id", "")) != "player":
+		printerr("Expected second day reveal to be player monologue.")
+		return false
+	if not String(Dictionary(second_day_entries[4]).get("text", "")).contains("能带回去的"):
+		printerr("Expected second day reveal to use current document copy.")
+		return false
+
 	if not service.load_sequence("res://setting/dialogues.tab#missing_dialogue").is_empty():
 		printerr("Expected missing dialogue_id to return an empty sequence.")
 		return false

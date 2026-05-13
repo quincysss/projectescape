@@ -69,6 +69,9 @@ func default_profile(username: String) -> Dictionary:
 		"first_departure_outpost_dialogue_seen": false,
 		"first_intro_dialogue_seen": false,
 		"first_return_dialogue_seen": false,
+		"second_day_black_tide_reveal_seen": false,
+		"merchant_unlocked": false,
+		"research_station_unlocked": false,
 		"chapter_1_goal_active": false,
 		"manufacturing_station_unlocked": false,
 		"chapter_1_completed": false,
@@ -86,6 +89,8 @@ func _with_defaults(profile: Dictionary) -> Dictionary:
 	var had_intro_cinematic := profile.has("intro_cinematic_seen")
 	var had_world_intro := profile.has("world_intro_dialogue_seen")
 	var had_first_departure := profile.has("first_departure_outpost_dialogue_seen")
+	var had_merchant_unlocked := profile.has("merchant_unlocked")
+	var had_research_station_unlocked := profile.has("research_station_unlocked")
 	var merged := default_profile(String(profile.get("username", "玩家")))
 	for key in profile.keys():
 		merged[key] = profile[key]
@@ -95,6 +100,10 @@ func _with_defaults(profile: Dictionary) -> Dictionary:
 		merged["world_intro_dialogue_seen"] = bool(merged.get("first_intro_dialogue_seen", false))
 	if not had_first_departure:
 		merged["first_departure_outpost_dialogue_seen"] = false
+	if not had_merchant_unlocked:
+		merged["merchant_unlocked"] = bool(merged.get("first_return_dialogue_seen", false))
+	if not had_research_station_unlocked:
+		merged["research_station_unlocked"] = bool(merged.get("first_return_dialogue_seen", false))
 	merged["currencies"] = Dictionary(merged.get("currencies", {}))
 	if not merged["currencies"].has(DEFAULT_CURRENCY_ID):
 		merged["currencies"][DEFAULT_CURRENCY_ID] = 0

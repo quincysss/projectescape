@@ -83,7 +83,7 @@ world_intro_dialogue	false	10	operator_404	404 哨所调度员	你回来了。	t
 
 ```text
 speaker_id	display_name	portrait_path	portrait_side	nameplate_color	enabled_version	notes
-player	玩家	res://assets/characters/dialogue/player/player_dialogue_bust_01.png	right	#c8d4dc	v0.1	主角默认对白半身原画
+player	玩家	res://assets/characters/dialogue/player/player_dialogue_bust_01.png	left	#c8d4dc	v0.1	主角默认对白半身原画
 operator_404	404 哨所管理员	res://assets/characters/dialogue/operator_404/operator_404_dialogue_bust_01.png	left	#d6c07a	v0.1	兼容 dialogues.tab 中的 operator_404
 ```
 
@@ -92,7 +92,7 @@ operator_404	404 哨所管理员	res://assets/characters/dialogue/operator_404/o
 - `speaker_id`：必须能匹配 `dialogues.tab.speaker_id`。
 - `display_name`：非玩家说话人显示名；`player` 运行时优先使用 PlayerProfile.username。
 - `portrait_path`：对白半身原画 PNG。
-- `portrait_side`：默认站位，V0.1 支持 `left/right`。
+- `portrait_side`：默认站位，V0.1 统一使用 `left`；所有对白立绘都放在屏幕最左侧并左对齐。
 - `nameplate_color`：说话人名牌强调色。
 - `enabled_version`：启用版本。
 - `notes`：备注。
@@ -183,9 +183,11 @@ DialogueSpeakerRegistry：
 
 DialoguePortraitController：
 
-- 根据当前对白行 `speaker_id` 控制左右角色原画。
+- 根据当前对白行 `speaker_id` 控制左侧角色原画。
 - 当前说话者高亮，非说话者弱化。
 - 玩家独白时只显示主角原画。
+- 所有角色原画必须锚定屏幕最左侧左对齐，不使用主角右侧站位。
+- `DialoguePanel` 中 `PORTRAIT_SLOT_CENTER_X_RATIO` 必须固定为 `0.26`；该值是人工调好的左侧主立绘槽位中心，不得在常规代码整理、响应式适配或 AI 重写时改动。
 - 跳过对白、对白结束、进入 loading 或局外界面时隐藏所有原画。
 
 BaseFeatureUnlockService：
@@ -318,7 +320,7 @@ Debug 操作必须只在 Debug 模式显示。
 5. 新档创建后播放 opening_intro_cinematic；视频可跳过，跳过后仍进入 world_intro_dialogue。该 DialogueSequence 的剧情定位是“回到404哨所与背景故事”：必须交代背景故事，但要通过自然对白呈现，不写成百科式世界观说明。
 6. world_intro_dialogue 完成后进入局外仓库/出发准备界面；商人和研究所仍为锁定状态，不允许点击。
 7. 玩家第一次点击出发探索且校验通过后，播放 first_departure_outpost_dialogue。
-8. DialoguePanel 必须从 setting/dialogue_speakers.tab 读取主角和 404 哨所管理员原画；player 说话显示主角，operator_404 说话显示 404 哨所管理员，当前说话者高亮。
+8. DialoguePanel 必须从 setting/dialogue_speakers.tab 读取主角和 404 哨所管理员原画；player 说话显示主角，operator_404 说话显示 404 哨所管理员；所有立绘统一放在屏幕最左侧左对齐，当前说话者高亮；立绘槽位中心常量保持 `PORTRAIT_SLOT_CENTER_X_RATIO := 0.26`。
 9. first_departure_outpost_dialogue 完成后进入 RunLoadingScreen，由 RunLoadingController 加载局内资源。
 10. 出发加载到 100% 后显示“按下任意按钮继续”，并展示操作提示与稳定值/视野说明。
 11. 玩家按任意按钮后才提交 IN_RUN、surface_day +1，并保存 run_start。
@@ -334,7 +336,7 @@ Debug 操作必须只在 Debug 模式显示。
 - 新档创建、保存、重启读取正常。
 - 开场视频、回到404哨所与背景故事对白、首次出发任务对白、首次返回剧情只触发一次。
 - 新档第一天商人和研究所锁定；首次成功返回剧情结束后才解锁。
-- 剧情对白能显示主角和 404 哨所管理员原画，并随 speaker_id 正确切换高亮。
+- 剧情对白能显示主角和 404 哨所管理员原画，并随 speaker_id 正确切换高亮；所有立绘均在最左侧左对齐，`PORTRAIT_SLOT_CENTER_X_RATIO` 保持 `0.26`。
 - 确认出发后进入加载界面，加载完成后等待任意按钮才进入可操作局内。
 - 第二日首次进入局内时会播放暗潮物质视频和主角独白，期间所有局内计时冻结。
 - 结算返回哨所进入 loading，加载完成后等待任意按钮才回到局外。

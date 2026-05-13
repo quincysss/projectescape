@@ -133,6 +133,9 @@ func _make_dirty_local_data(game_state: Node) -> bool:
 	game_state.first_departure_outpost_dialogue_seen = true
 	game_state.first_intro_dialogue_seen = true
 	game_state.first_return_dialogue_seen = true
+	game_state.second_day_black_tide_reveal_seen = true
+	game_state.merchant_unlocked = true
+	game_state.research_station_unlocked = true
 	game_state.chapter_1_goal_active = true
 	game_state.manufacturing_station_unlocked = true
 	game_state.chapter_1_completed = true
@@ -184,8 +187,12 @@ func _expect_clean_runtime(game_state: Node, require_merchant_empty: bool) -> bo
 		or game_state.first_departure_outpost_dialogue_seen
 		or game_state.first_intro_dialogue_seen
 		or game_state.first_return_dialogue_seen
+		or game_state.second_day_black_tide_reveal_seen
 	):
 		printerr("Expected story flags to reset.")
+		ok = false
+	if game_state.merchant_unlocked or game_state.research_station_unlocked:
+		printerr("Expected merchant and research unlock state to reset.")
 		ok = false
 	if game_state.chapter_1_goal_active or game_state.manufacturing_station_unlocked or game_state.chapter_1_completed:
 		printerr("Expected chapter and manufacturing state to reset.")

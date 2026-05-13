@@ -12,6 +12,7 @@ func _verify() -> bool:
 		push_error("GameState autoload is missing.")
 		return false
 
+	await process_frame
 	game_state.reset_day()
 	game_state.clear_warehouse()
 	game_state.clear_currencies()
@@ -39,6 +40,14 @@ func _verify() -> bool:
 		push_error("Merchant stock should be cleared when a new day starts.")
 		return false
 	if not await _expect_base_day_text("第 2 天"):
+		return false
+
+	var second_run_commit: Dictionary = game_state.commit_run_start(false)
+	if not bool(second_run_commit.get("ok", false)):
+		push_error("Expected second run start to commit successfully.")
+		return false
+	if game_state.get_current_day() != 2 or int(second_run_commit.get("surface_day", 0)) != 2:
+		push_error("Second run start should keep the active run on day 2, got %d." % game_state.get_current_day())
 		return false
 
 	game_state.apply_run_result({

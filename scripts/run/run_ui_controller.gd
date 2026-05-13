@@ -51,18 +51,19 @@ func refresh(scene) -> void:
 	_refresh_outpost_status_hud(scene)
 	_refresh_backpack_status(scene)
 	_refresh_prompt(scene)
+	var story_paused: bool = scene.has_method("is_run_story_paused") and bool(scene.is_run_story_paused())
 	var is_home_safe_zone: bool = scene.is_home_storage_active()
 	var is_storage_zone: bool = scene.is_storage_zone_active()
 	_set_panel_title(scene.home_storage_panel, scene.get_active_storage_title())
 	_sync_storage_ui(scene, is_storage_zone)
 	var extraction_ready_at_home: bool = scene.run_director.context.is_extraction_unlocked and is_home_safe_zone
-	scene.deposit_button.disabled = not is_storage_zone
+	scene.deposit_button.disabled = story_paused or not is_storage_zone
 	scene.deposit_button.text = "存入前哨" if scene._is_active_outpost_storage() else "存入家中"
-	scene.extract_button.disabled = not extraction_ready_at_home
+	scene.extract_button.disabled = story_paused or not extraction_ready_at_home
 	scene.extract_button.visible = false
-	scene.extract_hud_button.disabled = not extraction_ready_at_home
+	scene.extract_hud_button.disabled = story_paused or not extraction_ready_at_home
 	scene.extract_hud_button.text = "撤离(E)" if extraction_ready_at_home else ("返回家中" if scene.run_director.context.is_extraction_unlocked else "撤离未解锁")
-	scene.extraction_status_button.disabled = not extraction_ready_at_home
+	scene.extraction_status_button.disabled = story_paused or not extraction_ready_at_home
 	_refresh_extraction_status(scene)
 	_layout_inventory_surfaces(scene, is_storage_zone, scene.loot_panel.visible)
 	_refresh_inventory_actions(scene)
@@ -457,6 +458,8 @@ func _build_hidden_action_buttons(scene) -> void:
 	scene.ui_root.add_child(scene.extract_hud_button)
 
 func _on_backpack_status_hud_gui_input(scene, event: InputEvent) -> void:
+	if scene.has_method("is_run_story_paused") and bool(scene.is_run_story_paused()):
+		return
 	if event is InputEventMouseButton:
 		var mouse_event := event as InputEventMouseButton
 		if mouse_event.button_index == MOUSE_BUTTON_LEFT and mouse_event.pressed:
@@ -1051,7 +1054,8 @@ func _make_item_slot(scene, pos: Vector2, slot_size: Vector2, item: Dictionary, 
 
 func _refresh_inventory_actions(scene) -> void:
 	var has_selection: bool = scene.has_selected_inventory_item()
-	scene.discard_button.disabled = not has_selection
+	var story_paused: bool = scene.has_method("is_run_story_paused") and bool(scene.is_run_story_paused())
+	scene.discard_button.disabled = story_paused or not has_selection
 	scene.inventory_selection_label.text = scene.selected_inventory_item_summary()
 
 func _make_empty_slot(scene, pos: Vector2, slot_size: Vector2, locked: bool = false, source_id: String = "", index: int = -1) -> Control:

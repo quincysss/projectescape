@@ -35,12 +35,28 @@ func _verify() -> bool:
 		printerr("Expected saved profile to reload username.")
 		_restore_profile(game_state, original_profile)
 		return false
+	var legacy_failed_return_profile := reloaded_profile.duplicate(true)
+	legacy_failed_return_profile["surface_day"] = 1
+	legacy_failed_return_profile["first_departure_outpost_dialogue_seen"] = true
+	legacy_failed_return_profile["first_return_dialogue_seen"] = false
+	legacy_failed_return_profile["pending_first_return_dialogue"] = false
+	legacy_failed_return_profile["run_start_pending_result"] = false
+	game_state._apply_profile_to_runtime(legacy_failed_return_profile)
+	if game_state.get_current_day() != 2 or not game_state.should_play_first_return_dialogue():
+		printerr("Expected legacy first-failure return saves to repair to day 2 and queue first return dialogue.")
+		_restore_profile(game_state, original_profile)
+		return false
+	game_state._apply_profile_to_runtime(reloaded_profile)
 	if not game_state.should_play_intro_cinematic() or not game_state.should_play_world_intro_dialogue():
 		printerr("Expected new profile to require opening cinematic and world intro dialogue.")
 		_restore_profile(game_state, original_profile)
 		return false
 	if not game_state.should_play_first_departure_outpost_dialogue():
 		printerr("Expected new profile to require first departure outpost dialogue.")
+		_restore_profile(game_state, original_profile)
+		return false
+	if game_state.is_merchant_unlocked() or game_state.is_research_station_unlocked():
+		printerr("Expected new profile to keep merchant and research locked until first return.")
 		_restore_profile(game_state, original_profile)
 		return false
 	game_state.mark_intro_cinematic_seen()
@@ -116,23 +132,31 @@ func _verify() -> bool:
 		return false
 	var commit_result: Dictionary = game_state.commit_run_start(false)
 	if not bool(commit_result.get("ok", false)) or game_state.get_current_day() != day_before + 1:
-		printerr("Expected successful loading commit to advance surface_day once.")
+		printerr("Expected first loading commit to normalize the active run to day 1.")
 		_restore_profile(game_state, original_profile)
 		return false
 
 	game_state.apply_run_result({
-		"result_type": "EXTRACTED",
-		"message": "撤离成功",
+		"result_type": "DEAD",
+		"message": "探索失败",
 		"warehouse_items": [],
 	})
+	if game_state.get_current_day() != day_before + 2:
+		printerr("Expected first run result, even failure, to advance the base display to day 2.")
+		_restore_profile(game_state, original_profile)
+		return false
 	if not game_state.should_play_first_return_dialogue():
-		printerr("Expected first extracted run to queue return dialogue.")
+		printerr("Expected first completed run, even failure, to queue return dialogue.")
 		_restore_profile(game_state, original_profile)
 		return false
 	game_state.mark_first_return_dialogue_seen_and_activate_chapter()
 	var snapshot: Dictionary = game_state.get_chapter_goal_snapshot()
 	if not bool(snapshot.get("active", false)):
 		printerr("Expected first return dialogue to activate chapter 1 goal.")
+		_restore_profile(game_state, original_profile)
+		return false
+	if not game_state.is_merchant_unlocked() or not game_state.is_research_station_unlocked():
+		printerr("Expected first return dialogue to unlock merchant and research.")
 		_restore_profile(game_state, original_profile)
 		return false
 
@@ -157,7 +181,7 @@ func _verify() -> bool:
 		return false
 	if (
 		crafting_unlock.text != "解锁制造所"
-		or not crafting_status.text.contains("救出妹妹")
+		or not crafting_status.text.contains("妹妹还有救")
 		or not crafting_status.text.contains("积攒 5000 矿币")
 		or not crafting_status.text.contains("解锁制造所")
 	):

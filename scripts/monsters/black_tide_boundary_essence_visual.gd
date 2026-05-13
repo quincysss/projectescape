@@ -17,6 +17,10 @@ var _facing_sign: float = 1.0
 func _ready() -> void:
 	add_to_group("monster_visual_assets")
 	add_to_group("black_tide_boundary_essence")
+	collision_layer = 0
+	collision_mask = 0
+	if collision_shape != null:
+		collision_shape.disabled = true
 	body_sprite.sprite_frames = _build_sprite_frames()
 	body_sprite.centered = true
 	_apply_visual_scale()

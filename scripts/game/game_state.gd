@@ -29,6 +29,9 @@ var world_intro_dialogue_seen: bool = false
 var first_departure_outpost_dialogue_seen: bool = false
 var first_intro_dialogue_seen: bool = false
 var first_return_dialogue_seen: bool = false
+var second_day_black_tide_reveal_seen: bool = false
+var merchant_unlocked: bool = false
+var research_station_unlocked: bool = false
 var chapter_1_goal_active: bool = false
 var manufacturing_station_unlocked: bool = false
 var chapter_1_completed: bool = false
@@ -72,7 +75,7 @@ func apply_run_result(result: Dictionary) -> void:
 	last_run_result = str(result.get("message", ""))
 	warehouse_manager.add_items(result.get("warehouse_items", []))
 	advance_day_after_run(result)
-	if String(result.get("result_type", "")) == "EXTRACTED" and not first_return_dialogue_seen:
+	if _should_queue_first_return_dialogue(result):
 		pending_first_return_dialogue = true
 	save_profile()
 
@@ -86,11 +89,7 @@ func get_day_display_text() -> String:
 func advance_day_after_run(_result: Dictionary = {}) -> int:
 	if _run_start_pending_result:
 		_run_start_pending_result = false
-		merchant_shop_offers.clear()
-		_bind_merchant_service()
-		save_profile()
-		return current_day
-	current_day = get_current_day() + 1
+	current_day = maxi(1, get_current_day()) + 1
 	merchant_shop_offers.clear()
 	_bind_merchant_service()
 	save_profile()
@@ -106,7 +105,7 @@ func reset_day(day: int = 1) -> void:
 func commit_run_start(debug_run: bool = false) -> Dictionary:
 	if debug_run:
 		return {"ok": true, "surface_day": get_current_day(), "debug": true}
-	current_day = get_current_day() + 1
+	current_day = maxi(1, get_current_day())
 	_run_start_pending_result = true
 	merchant_shop_offers.clear()
 	_bind_merchant_service()
@@ -114,6 +113,12 @@ func commit_run_start(debug_run: bool = false) -> Dictionary:
 	if not bool(save_result.get("ok", true)):
 		return save_result
 	return {"ok": true, "surface_day": current_day}
+
+func _should_queue_first_return_dialogue(result: Dictionary) -> bool:
+	if first_return_dialogue_seen:
+		return false
+	var result_type := String(result.get("result_type", ""))
+	return ["EXTRACTED", "DEAD", "TIMEOUT_FAILED", "ABORTED"].has(result_type)
 
 func has_profile() -> bool:
 	return profile_service != null and profile_service.has_profile()
@@ -168,6 +173,9 @@ func _reset_runtime_to_empty_profile_state() -> void:
 	first_departure_outpost_dialogue_seen = false
 	first_intro_dialogue_seen = false
 	first_return_dialogue_seen = false
+	second_day_black_tide_reveal_seen = false
+	merchant_unlocked = false
+	research_station_unlocked = false
 	chapter_1_goal_active = false
 	manufacturing_station_unlocked = false
 	chapter_1_completed = false
@@ -224,8 +232,26 @@ func should_play_first_return_dialogue() -> bool:
 func mark_first_return_dialogue_seen_and_activate_chapter() -> Dictionary:
 	first_return_dialogue_seen = true
 	pending_first_return_dialogue = false
+	merchant_unlocked = true
+	research_station_unlocked = true
 	chapter_1_goal_active = true
 	current_chapter = 1
+	return save_profile()
+
+func is_merchant_unlocked() -> bool:
+	return merchant_unlocked
+
+func is_research_station_unlocked() -> bool:
+	return research_station_unlocked
+
+func should_play_second_day_black_tide_reveal(run_day_index: int = -1) -> bool:
+	var resolved_day := run_day_index
+	if resolved_day <= 0:
+		resolved_day = get_current_day()
+	return resolved_day == 2 and not second_day_black_tide_reveal_seen
+
+func mark_second_day_black_tide_reveal_seen() -> Dictionary:
+	second_day_black_tide_reveal_seen = true
 	return save_profile()
 
 func reset_story_flags() -> void:
@@ -234,6 +260,9 @@ func reset_story_flags() -> void:
 	first_departure_outpost_dialogue_seen = false
 	first_intro_dialogue_seen = false
 	first_return_dialogue_seen = false
+	second_day_black_tide_reveal_seen = false
+	merchant_unlocked = false
+	research_station_unlocked = false
 	pending_first_return_dialogue = false
 	chapter_1_goal_active = false
 	chapter_1_completed = false
@@ -242,6 +271,8 @@ func reset_story_flags() -> void:
 
 func activate_chapter_1_goal_debug() -> void:
 	current_chapter = 1
+	merchant_unlocked = true
+	research_station_unlocked = true
 	chapter_1_goal_active = true
 	chapter_1_completed = false
 	manufacturing_station_unlocked = false
@@ -531,11 +562,15 @@ func _apply_profile_to_runtime(loaded_profile: Dictionary) -> void:
 	first_departure_outpost_dialogue_seen = bool(loaded_profile.get("first_departure_outpost_dialogue_seen", false))
 	first_intro_dialogue_seen = world_intro_dialogue_seen
 	first_return_dialogue_seen = bool(loaded_profile.get("first_return_dialogue_seen", false))
+	second_day_black_tide_reveal_seen = bool(loaded_profile.get("second_day_black_tide_reveal_seen", false))
+	merchant_unlocked = bool(loaded_profile.get("merchant_unlocked", first_return_dialogue_seen))
+	research_station_unlocked = bool(loaded_profile.get("research_station_unlocked", first_return_dialogue_seen))
 	chapter_1_goal_active = bool(loaded_profile.get("chapter_1_goal_active", false))
 	manufacturing_station_unlocked = bool(loaded_profile.get("manufacturing_station_unlocked", false))
 	chapter_1_completed = bool(loaded_profile.get("chapter_1_completed", false))
 	pending_first_return_dialogue = bool(loaded_profile.get("pending_first_return_dialogue", false))
 	_run_start_pending_result = bool(loaded_profile.get("run_start_pending_result", false))
+	_repair_legacy_first_run_return_state()
 
 	warehouse_items.clear()
 	for item in Array(loaded_profile.get("warehouse_items", [])):
@@ -567,6 +602,16 @@ func _apply_profile_to_runtime(loaded_profile: Dictionary) -> void:
 	var loaded_ss_result: Dictionary = ss_state.get("last_roll_result", loaded_profile.get("ss_last_roll_result", {}))
 	ss_last_roll_result = loaded_ss_result.duplicate(true)
 
+func _repair_legacy_first_run_return_state() -> void:
+	if first_return_dialogue_seen or pending_first_return_dialogue or _run_start_pending_result:
+		return
+	if not first_departure_outpost_dialogue_seen:
+		return
+	if current_day != 1:
+		return
+	current_day = 2
+	pending_first_return_dialogue = true
+
 func _sync_runtime_to_profile() -> void:
 	if profile.is_empty():
 		return
@@ -581,6 +626,9 @@ func _sync_runtime_to_profile() -> void:
 	profile["first_departure_outpost_dialogue_seen"] = first_departure_outpost_dialogue_seen
 	profile["first_intro_dialogue_seen"] = world_intro_dialogue_seen
 	profile["first_return_dialogue_seen"] = first_return_dialogue_seen
+	profile["second_day_black_tide_reveal_seen"] = second_day_black_tide_reveal_seen
+	profile["merchant_unlocked"] = merchant_unlocked
+	profile["research_station_unlocked"] = research_station_unlocked
 	profile["chapter_1_goal_active"] = chapter_1_goal_active
 	profile["manufacturing_station_unlocked"] = manufacturing_station_unlocked
 	profile["chapter_1_completed"] = chapter_1_completed

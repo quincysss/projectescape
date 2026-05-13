@@ -24,11 +24,17 @@ var force_fail := false
 var slow_mode := false
 var _loaded_run_scene: PackedScene
 var _ready_to_continue := false
+var _loading_active := false
+var _continue_submitted := false
 
 func _ready() -> void:
 	_build()
 	set_process(true)
 	set_process_input(true)
+
+func _exit_tree() -> void:
+	_loading_active = false
+	_ready_to_continue = false
 
 func begin_loading(options: Dictionary = {}) -> void:
 	if progress_bar == null:
@@ -36,6 +42,8 @@ func begin_loading(options: Dictionary = {}) -> void:
 		return
 	force_fail = bool(options.get("force_fail", false))
 	slow_mode = bool(options.get("slow_mode", false))
+	_loading_active = true
+	_continue_submitted = false
 	_ready_to_continue = false
 	target_progress = 0.0
 	display_progress = 0.0
@@ -61,10 +69,12 @@ func _process(delta: float) -> void:
 		percent_label.text = "100%"
 
 func _input(event: InputEvent) -> void:
-	if not _ready_to_continue:
+	if not _ready_to_continue or _continue_submitted:
 		return
 	if not _is_continue_event(event):
 		return
+	_continue_submitted = true
+	_loading_active = false
 	_ready_to_continue = false
 	get_viewport().set_input_as_handled()
 	loading_completed.emit(_loaded_run_scene)
@@ -169,6 +179,8 @@ func _build() -> void:
 func _run_loading() -> void:
 	var start_ticks := Time.get_ticks_msec()
 	for stage in _load_stages():
+		if not _can_continue_loading():
+			return
 		if not (stage is Dictionary):
 			continue
 		var stage_dict: Dictionary = stage
@@ -180,18 +192,26 @@ func _run_loading() -> void:
 		if stage_id == "load_map":
 			_loaded_run_scene = load(RUN_SCENE_PATH)
 			if _loaded_run_scene == null:
+				_loading_active = false
 				loading_failed.emit("run_scene_missing")
 				queue_free()
 				return
 		if force_fail and stage_id == "init_loot":
+			_loading_active = false
 			loading_failed.emit("debug_forced_failure")
 			queue_free()
 			return
-		await _stage_wait()
+		if not await _stage_wait():
+			return
 	while Time.get_ticks_msec() - start_ticks < 1000:
-		await get_tree().process_frame
-	await get_tree().process_frame
-	await get_tree().physics_frame
+		if not await _wait_process_frame():
+			return
+	if not await _wait_process_frame():
+		return
+	if not await _wait_physics_frame():
+		return
+	if not _can_continue_loading():
+		return
 	target_progress = 1.0
 	display_progress = 1.0
 	progress_bar.value = 100.0
@@ -201,10 +221,43 @@ func _run_loading() -> void:
 	continue_label.visible = true
 	_ready_to_continue = true
 
-func _stage_wait() -> void:
-	await get_tree().process_frame
+func _stage_wait() -> bool:
+	if not await _wait_process_frame():
+		return false
 	if slow_mode:
-		await get_tree().create_timer(0.12).timeout
+		if not await _wait_seconds(0.12):
+			return false
+	return true
+
+func _wait_process_frame() -> bool:
+	if not _can_continue_loading():
+		return false
+	var tree := get_tree()
+	if tree == null:
+		return false
+	await tree.process_frame
+	return _can_continue_loading()
+
+func _wait_physics_frame() -> bool:
+	if not _can_continue_loading():
+		return false
+	var tree := get_tree()
+	if tree == null:
+		return false
+	await tree.physics_frame
+	return _can_continue_loading()
+
+func _wait_seconds(seconds: float) -> bool:
+	if not _can_continue_loading():
+		return false
+	var tree := get_tree()
+	if tree == null:
+		return false
+	await tree.create_timer(seconds).timeout
+	return _can_continue_loading()
+
+func _can_continue_loading() -> bool:
+	return _loading_active and is_inside_tree() and not is_queued_for_deletion()
 
 func _load_stages() -> Array:
 	if not FileAccess.file_exists(STAGES_PATH):

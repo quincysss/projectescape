@@ -28,6 +28,9 @@ func _verify_black_tide_boundary_essence_asset() -> bool:
 	if not (monster is CharacterBody2D):
 		printerr("Expected BlackTideBoundaryEssence root to be CharacterBody2D.")
 		ok = false
+	elif int(monster.collision_layer) != 0 or int(monster.collision_mask) != 0:
+		printerr("Monster visual should not physically collide with the player.")
+		ok = false
 	if not monster.is_in_group("monster_visual_assets"):
 		printerr("Expected BlackTideBoundaryEssence to join monster_visual_assets group.")
 		ok = false
@@ -44,8 +47,12 @@ func _verify_black_tide_boundary_essence_asset() -> bool:
 	if monster.get_node_or_null("EyeFocus") == null:
 		printerr("Expected EyeFocus marker.")
 		ok = false
-	if monster.get_node_or_null("CollisionShape2D") == null:
+	var collision_shape := monster.get_node_or_null("CollisionShape2D") as CollisionShape2D
+	if collision_shape == null:
 		printerr("Expected placeholder collision shape.")
+		ok = false
+	elif not collision_shape.disabled:
+		printerr("Monster visual placeholder collision shape should be disabled.")
 		ok = false
 
 	monster.queue_free()

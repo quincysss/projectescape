@@ -17,6 +17,8 @@ const RunMapBuilderScript := preload("res://scripts/map/run_map_builder.gd")
 const MonsterSpawnControllerScript := preload("res://scripts/monsters/monster_spawn_controller.gd")
 const SettlementResultScreenScript := preload("res://scripts/ui/settlement_result_screen.gd")
 const ReturnToBaseLoadingScreenScript := preload("res://scripts/ui/return_to_base_loading_screen.gd")
+const DialogueServiceScript := preload("res://scripts/dialogue/dialogue_service.gd")
+const DialoguePanelScene := preload("res://scenes/ui/DialoguePanel.tscn")
 const UNIT := 64.0
 const MAP_UNITS := Vector2(280.0, 220.0)
 const MAP_ORIGIN_UNITS := Vector2(-140.0, -110.0)
@@ -36,8 +38,13 @@ const CAMERA_TRANSITION_SECONDS := 0.5
 const CONTAINER_OPEN_HOLD_SECONDS := 0.8
 const OUTPOST_REPAIR_HOLD_SECONDS := 1.5
 const EXTRACTION_HOLD_SECONDS := 3.0
+const STATUS_PROMPT_VISIBLE_SECONDS := 3.0
 const SHOW_DEBUG_VISION_CIRCLE := false
 const PLAYER_ALWAYS_IN_FRONT_BUILDING_Z_INDEX := -1
+const SECOND_DAY_BLACK_TIDE_DIALOGUE_PATH := "res://setting/dialogues.tab#second_day_black_tide_reveal_dialogue"
+const SECOND_DAY_BLACK_TIDE_CINEMATIC_PATH := "res://assets/cinematics/source/second_day_black_tide_reveal_720p.mp4"
+const SECOND_DAY_BLACK_TIDE_CINEMATIC_FALLBACK_PATH := "res://assets/cinematics/second_day_black_tide_reveal_720p.ogv"
+const SECOND_DAY_BLACK_TIDE_PLACEHOLDER_SECONDS := 1.2
 
 @onready var run_director: RunDirector = $RunDirector
 @onready var world_root: Node2D = $WorldRoot
@@ -139,9 +146,14 @@ var interactable_visual_builder
 var run_ui_controller
 var run_timer_controller
 var map_builder
-var _status_prompt: String = ""
+var dialogue_service = DialogueServiceScript.new()
 var _timed_status_prompt_text: String = ""
 var _status_prompt_clear_time_msec: int = 0
+var _status_prompt: String = "":
+	set(value):
+		_status_prompt = value
+		_timed_status_prompt_text = ""
+		_status_prompt_clear_time_msec = 0
 var settlement_result_screen: SettlementResultScreen
 var return_to_base_loading_screen: ReturnToBaseLoadingScreen
 var _pending_run_result: Dictionary = {}
@@ -150,10 +162,18 @@ var active_outpost_storage_id: String = ""
 var selected_inventory_index: int = -1
 var _extract_button_held: bool = false
 var _ui_refresh_queued: bool = false
+var _story_pause_tokens: Dictionary = {}
+var _story_gate_running: bool = false
+var _story_video_overlay: Control
+var _story_video_player: VideoStreamPlayer
+var _story_video_finish_timer: Timer
+var _story_video_bgm_paused: bool = false
+var _active_story_dialogue_panel: Control
 
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_WM_SIZE_CHANGED:
 		_refresh_camera_for_viewport()
+		_refresh_story_video_cover()
 
 func _ready() -> void:
 	_ensure_input_actions()
@@ -168,13 +188,16 @@ func _ready() -> void:
 	_spawn_initial_containers()
 	_spawn_requirement_materials()
 	_spawn_monsters_for_run()
+	_prepare_initial_story_gate()
 	if camera:
 		camera.zoom = _home_overview_zoom()
 		camera.position = _home_overview_offset()
 	_play_run_safe_house_bgm()
 	_refresh_ui()
+	call_deferred("_maybe_start_run_story_gate")
 
 func _exit_tree() -> void:
+	_resume_bgm_after_story_video()
 	_audio_manager_call("stop_container_open_loop")
 	_audio_manager_call("set_stability_critical_loop_active", [false])
 
@@ -256,6 +279,10 @@ func _add_key_action(action_name: String, keycode: Key) -> void:
 func _process(delta: float) -> void:
 	_update_status_prompt_timeout()
 	if _is_settlement_flow_active():
+		return
+	if _is_story_paused():
+		_update_readable_world_ui_scale()
+		_refresh_ui()
 		return
 	_update_run_timer(delta)
 	_update_active_interaction(delta)
@@ -449,6 +476,306 @@ func _on_run_initialized(context) -> void:
 	if container_spawn_controller != null and run_director.has_method("get_ss_loot_director"):
 		container_spawn_controller.setup_ss_loot_director(run_director.get_ss_loot_director())
 
+func _prepare_initial_story_gate() -> void:
+	if _should_trigger_second_day_black_tide_story():
+		_acquire_story_pause("second_day_black_tide_reveal")
+
+func _maybe_start_run_story_gate() -> void:
+	if _story_gate_running:
+		return
+	await get_tree().process_frame
+	if not _should_trigger_second_day_black_tide_story():
+		_release_story_pause("second_day_black_tide_reveal")
+		return
+	_story_gate_running = true
+	_acquire_story_pause("second_day_black_tide_reveal")
+	await _play_second_day_black_tide_story()
+	_story_gate_running = false
+
+func _should_trigger_second_day_black_tide_story() -> bool:
+	if _game_state == null or run_director == null or run_director.context == null:
+		return false
+	var run_day_index := int(run_director.context.run_day_index)
+	if _game_state.has_method("should_play_second_day_black_tide_reveal"):
+		return bool(_game_state.should_play_second_day_black_tide_reveal(run_day_index))
+	return run_day_index == 2 and not bool(_game_state.get("second_day_black_tide_reveal_seen"))
+
+func _play_second_day_black_tide_story() -> void:
+	_show_second_day_black_tide_cinematic()
+	while is_instance_valid(_story_video_overlay):
+		await get_tree().process_frame
+	await _play_run_story_dialogue(SECOND_DAY_BLACK_TIDE_DIALOGUE_PATH)
+	if _game_state != null and _game_state.has_method("mark_second_day_black_tide_reveal_seen"):
+		_game_state.mark_second_day_black_tide_reveal_seen()
+	_release_story_pause("second_day_black_tide_reveal")
+	_refresh_ui()
+
+func _show_second_day_black_tide_cinematic() -> void:
+	if is_instance_valid(_story_video_overlay):
+		return
+	var overlay := Control.new()
+	overlay.name = "SecondDayBlackTideCinematicOverlay"
+	overlay.anchor_right = 1.0
+	overlay.anchor_bottom = 1.0
+	overlay.mouse_filter = Control.MOUSE_FILTER_STOP
+	overlay.z_index = 200
+	ui_root.add_child(overlay)
+	_story_video_overlay = overlay
+
+	var background := ColorRect.new()
+	background.name = "SecondDayBlackTideCinematicBackground"
+	background.color = Color("#050505")
+	background.anchor_right = 1.0
+	background.anchor_bottom = 1.0
+	overlay.add_child(background)
+
+	var frame := ColorRect.new()
+	frame.name = "SecondDayBlackTideCinematicPlaceholder16x9"
+	frame.color = Color("#120E0E")
+	frame.anchor_right = 1.0
+	frame.anchor_bottom = 1.0
+	overlay.add_child(frame)
+
+	var placeholder_label := Label.new()
+	placeholder_label.name = "SecondDayBlackTideCinematicPlaceholderLabel"
+	placeholder_label.text = "暗潮影像同步中"
+	placeholder_label.anchor_left = 0.5
+	placeholder_label.anchor_right = 0.5
+	placeholder_label.anchor_top = 0.5
+	placeholder_label.anchor_bottom = 0.5
+	placeholder_label.offset_left = -180.0
+	placeholder_label.offset_top = -18.0
+	placeholder_label.offset_right = 180.0
+	placeholder_label.offset_bottom = 18.0
+	placeholder_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	placeholder_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	placeholder_label.add_theme_font_size_override("font_size", 18)
+	placeholder_label.add_theme_color_override("font_color", Color(0.82, 0.80, 0.76, 0.5))
+	overlay.add_child(placeholder_label)
+
+	var video_loaded := _add_second_day_black_tide_video(background, frame, placeholder_label)
+	var skip_button := Button.new()
+	skip_button.name = "SkipSecondDayBlackTideCinematicButton"
+	skip_button.text = "跳过影像"
+	skip_button.anchor_left = 1.0
+	skip_button.anchor_right = 1.0
+	skip_button.anchor_top = 1.0
+	skip_button.anchor_bottom = 1.0
+	skip_button.offset_left = -164.0
+	skip_button.offset_top = -72.0
+	skip_button.offset_right = -36.0
+	skip_button.offset_bottom = -34.0
+	skip_button.pressed.connect(func(): _finish_second_day_black_tide_cinematic(true))
+	overlay.add_child(skip_button)
+
+	if not video_loaded:
+		push_warning("Second day black tide cinematic is missing or unsupported; continuing with placeholder.")
+		_story_video_finish_timer = Timer.new()
+		_story_video_finish_timer.one_shot = true
+		_story_video_finish_timer.wait_time = SECOND_DAY_BLACK_TIDE_PLACEHOLDER_SECONDS
+		_story_video_finish_timer.timeout.connect(func(): _finish_second_day_black_tide_cinematic(false))
+		overlay.add_child(_story_video_finish_timer)
+		_story_video_finish_timer.start()
+
+func _add_second_day_black_tide_video(background: ColorRect, frame: ColorRect, placeholder_label: Label) -> bool:
+	var stream := _load_first_story_video_stream([
+		SECOND_DAY_BLACK_TIDE_CINEMATIC_PATH,
+		SECOND_DAY_BLACK_TIDE_CINEMATIC_FALLBACK_PATH,
+	])
+	if stream == null:
+		return false
+	var video_player := VideoStreamPlayer.new()
+	video_player.name = "SecondDayBlackTideCinematicVideoPlayer"
+	video_player.stream = stream
+	video_player.expand = true
+	video_player.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	video_player.finished.connect(func(): _finish_second_day_black_tide_cinematic(false))
+	_story_video_overlay.add_child(video_player)
+	_story_video_player = video_player
+	_fit_control_to_16x9_cover(video_player)
+	background.visible = false
+	frame.visible = false
+	placeholder_label.visible = false
+	_pause_bgm_for_story_video()
+	video_player.play()
+	return true
+
+func _finish_second_day_black_tide_cinematic(_skipped: bool = false) -> void:
+	if is_instance_valid(_story_video_finish_timer):
+		_story_video_finish_timer.stop()
+	if is_instance_valid(_story_video_player):
+		_story_video_player.stop()
+	if is_instance_valid(_story_video_overlay):
+		_story_video_overlay.queue_free()
+	_story_video_finish_timer = null
+	_story_video_player = null
+	_story_video_overlay = null
+	_resume_bgm_after_story_video()
+
+func _pause_bgm_for_story_video() -> void:
+	if _story_video_bgm_paused:
+		return
+	var audio_manager := get_node_or_null("/root/AudioManager")
+	if audio_manager != null and audio_manager.has_method("pause_bgm"):
+		audio_manager.pause_bgm()
+		_story_video_bgm_paused = true
+
+func _resume_bgm_after_story_video() -> void:
+	if not _story_video_bgm_paused:
+		return
+	_story_video_bgm_paused = false
+	var audio_manager := get_node_or_null("/root/AudioManager")
+	if audio_manager != null and audio_manager.has_method("resume_bgm"):
+		audio_manager.resume_bgm()
+
+func _load_first_story_video_stream(paths: Array) -> VideoStream:
+	for path in paths:
+		var stream := _load_story_video_stream(String(path))
+		if stream != null:
+			return stream
+	return null
+
+func _load_story_video_stream(path: String) -> VideoStream:
+	if path.is_empty() or not FileAccess.file_exists(path):
+		return null
+	if path.get_extension().to_lower() == "ogv" and not _is_ogg_theora_video(path):
+		push_warning("Video is not a valid Ogg Theora file: %s" % path)
+		return null
+	var resource := ResourceLoader.load(path, "VideoStream")
+	if resource is VideoStream:
+		return resource
+	resource = load(path)
+	if resource is VideoStream:
+		return resource
+	push_warning("Video stream could not be loaded. MP4 playback requires the FFmpeg GDExtension: %s" % path)
+	return null
+
+func _is_ogg_theora_video(path: String) -> bool:
+	if not FileAccess.file_exists(path):
+		return false
+	var file := FileAccess.open(path, FileAccess.READ)
+	if file == null:
+		return false
+	var header := file.get_buffer(512)
+	return _buffer_starts_with_ascii(header, "OggS") and _buffer_has_ascii(header, "theora")
+
+func _buffer_starts_with_ascii(buffer: PackedByteArray, value: String) -> bool:
+	var bytes := value.to_ascii_buffer()
+	if buffer.size() < bytes.size():
+		return false
+	for index in range(bytes.size()):
+		if buffer[index] != bytes[index]:
+			return false
+	return true
+
+func _buffer_has_ascii(buffer: PackedByteArray, value: String) -> bool:
+	var needle := value.to_ascii_buffer()
+	if needle.is_empty() or buffer.size() < needle.size():
+		return false
+	for start in range(buffer.size() - needle.size() + 1):
+		var found := true
+		for offset in range(needle.size()):
+			if buffer[start + offset] != needle[offset]:
+				found = false
+				break
+		if found:
+			return true
+	return false
+
+func _play_run_story_dialogue(path: String) -> void:
+	var sequence: Dictionary = dialogue_service.load_sequence(path)
+	if sequence.is_empty():
+		push_warning("Run story dialogue sequence is missing: %s" % path)
+		return
+	var panel = DialoguePanelScene.instantiate()
+	panel.name = "RunStoryDialoguePanel"
+	_active_story_dialogue_panel = panel
+	ui_root.add_child(panel)
+	var dialogue_finished := false
+	panel.dialogue_finished.connect(func(_dialogue_id: String, _skipped: bool):
+		dialogue_finished = true
+	)
+	panel.tree_exiting.connect(func():
+		if _active_story_dialogue_panel == panel:
+			_active_story_dialogue_panel = null
+	)
+	panel.play_sequence(sequence)
+	while not dialogue_finished and is_instance_valid(panel):
+		await get_tree().process_frame
+	if _active_story_dialogue_panel == panel:
+		_active_story_dialogue_panel = null
+
+func _acquire_story_pause(token: String) -> void:
+	if token.is_empty():
+		return
+	var was_paused := _is_story_paused()
+	_story_pause_tokens[token] = true
+	if not was_paused:
+		_apply_story_pause_state(true)
+
+func _release_story_pause(token: String) -> void:
+	if token.is_empty():
+		return
+	_story_pause_tokens.erase(token)
+	if _story_pause_tokens.is_empty():
+		_apply_story_pause_state(false)
+
+func _apply_story_pause_state(paused: bool) -> void:
+	_extract_button_held = false
+	if paused:
+		if interaction_progress_controller != null and interaction_progress_controller.is_active():
+			interaction_progress_controller.cancel()
+			_end_player_interact_animation()
+		_audio_manager_call("stop_container_open_loop")
+	if player != null and is_instance_valid(player):
+		player.set_physics_process(not paused)
+		if paused:
+			if player is CharacterBody2D:
+				player.velocity = Vector2.ZERO
+			if player.has_method("end_interact_animation"):
+				player.end_interact_animation()
+	_set_story_simulation_nodes_paused(paused)
+
+func _set_story_simulation_nodes_paused(paused: bool) -> void:
+	if run_director != null and run_director.stability_component != null:
+		run_director.stability_component.set_process(not paused)
+	if monster_spawn_controller != null:
+		for monster in monster_spawn_controller.get_active_monsters():
+			if monster != null and is_instance_valid(monster):
+				monster.set_process(not paused)
+		var pending_respawn_timers: Dictionary = monster_spawn_controller.get("_pending_respawn_timers")
+		for timer in pending_respawn_timers.values():
+			if timer is Timer and is_instance_valid(timer):
+				timer.paused = paused
+
+func _is_story_paused() -> bool:
+	return not _story_pause_tokens.is_empty()
+
+func is_run_story_paused() -> bool:
+	return _is_story_paused()
+
+func _refresh_story_video_cover() -> void:
+	if is_instance_valid(_story_video_player):
+		_fit_control_to_16x9_cover(_story_video_player)
+
+func _fit_control_to_16x9_cover(control: Control) -> void:
+	var viewport_size := get_viewport_rect().size
+	if viewport_size.x <= 0.0 or viewport_size.y <= 0.0:
+		return
+	var width := viewport_size.x
+	var height := width * 9.0 / 16.0
+	if height < viewport_size.y:
+		height = viewport_size.y
+		width = height * 16.0 / 9.0
+	control.anchor_left = 0.5
+	control.anchor_right = 0.5
+	control.anchor_top = 0.5
+	control.anchor_bottom = 0.5
+	control.offset_left = -width * 0.5
+	control.offset_right = width * 0.5
+	control.offset_top = -height * 0.5
+	control.offset_bottom = height * 0.5
+
 func _update_run_timer(delta: float) -> void:
 	if run_timer_controller != null:
 		run_timer_controller.update(delta)
@@ -636,6 +963,8 @@ func _is_player_body(body: Node) -> bool:
 	return body != null and (body.is_in_group("player") or body.name == "Player")
 
 func _try_interact() -> void:
+	if _is_story_paused():
+		return
 	if nearest_interactable == null:
 		return
 	if interaction_progress_controller != null and interaction_progress_controller.is_active():
@@ -661,6 +990,8 @@ func _end_player_interact_animation() -> void:
 		player.end_interact_animation()
 
 func _begin_container_open(container) -> void:
+	if _is_story_paused():
+		return
 	if interaction_progress_controller == null:
 		_open_container(container)
 		return
@@ -710,6 +1041,8 @@ func _open_container(container) -> void:
 	_refresh_ui()
 
 func _pick_material(pickup) -> void:
+	if _is_story_paused():
+		return
 	var pickup_outpost_id := String(pickup.payload.get("outpost_id", "")) if pickup != null and is_instance_valid(pickup) else ""
 	if loot_interaction_controller.pick_material_immediate(
 		pickup,
@@ -723,6 +1056,8 @@ func _pick_material(pickup) -> void:
 	_refresh_ui()
 
 func _take_all_loot() -> void:
+	if _is_story_paused():
+		return
 	var transfer_finished: bool = loot_interaction_controller.take_all_loot(
 		run_director.inventory_component,
 		Callable(self, "_remove_interactable")
@@ -755,6 +1090,8 @@ func _on_home_storage_item_meta_clicked(meta: Variant) -> void:
 			_withdraw_active_storage_item_at(index)
 
 func _take_loot_item_at(index: int) -> void:
+	if _is_story_paused():
+		return
 	var result: Dictionary = loot_interaction_controller.take_loot_at(
 		index,
 		run_director.inventory_component,
@@ -771,6 +1108,8 @@ func _take_loot_item_at(index: int) -> void:
 	_refresh_ui()
 
 func _deposit_inventory_item_at(index: int, inventory_index: int = -1) -> void:
+	if _is_story_paused():
+		return
 	var result: Dictionary
 	var storage_name := _active_storage_display_name()
 	var source_inventory_index := inventory_index if inventory_index >= 0 else index
@@ -789,6 +1128,8 @@ func _deposit_inventory_item_at(index: int, inventory_index: int = -1) -> void:
 	_refresh_ui()
 
 func _select_inventory_item_at(index: int) -> void:
+	if _is_story_paused():
+		return
 	if run_director == null or run_director.inventory_component == null:
 		selected_inventory_index = -1
 		_status_prompt = "背包不可用。"
@@ -805,6 +1146,8 @@ func _select_inventory_item_at(index: int) -> void:
 	_refresh_ui()
 
 func _discard_selected_inventory_item() -> void:
+	if _is_story_paused():
+		return
 	if not has_selected_inventory_item():
 		_status_prompt = "请先选择背包道具。"
 		_refresh_ui()
@@ -850,6 +1193,8 @@ func _inventory_discard_reason_text(reason: String) -> String:
 			return "无法丢弃该道具。"
 
 func _withdraw_active_storage_item_at(index: int) -> void:
+	if _is_story_paused():
+		return
 	var result: Dictionary
 	if _is_active_outpost_storage():
 		result = run_director.withdraw_outpost_storage_item_to_inventory(active_outpost_storage_id, index)
@@ -918,6 +1263,8 @@ func _sync_loot_state() -> void:
 	opened_loot = loot_interaction_controller.opened_loot
 
 func _begin_outpost_repair(station) -> void:
+	if _is_story_paused():
+		return
 	if interaction_progress_controller == null or outpost_repair_controller == null:
 		_try_repair_outpost(station)
 		return
@@ -966,7 +1313,13 @@ func _set_timed_status_prompt(text: String, seconds: float) -> void:
 	_status_prompt_clear_time_msec = Time.get_ticks_msec() + int(maxf(0.0, seconds) * 1000.0)
 
 func _update_status_prompt_timeout() -> void:
-	if _status_prompt_clear_time_msec <= 0:
+	if _status_prompt.is_empty():
+		_timed_status_prompt_text = ""
+		_status_prompt_clear_time_msec = 0
+		return
+	if _status_prompt_clear_time_msec <= 0 or _status_prompt != _timed_status_prompt_text:
+		_timed_status_prompt_text = _status_prompt
+		_status_prompt_clear_time_msec = Time.get_ticks_msec() + int(STATUS_PROMPT_VISIBLE_SECONDS * 1000.0)
 		return
 	if Time.get_ticks_msec() < _status_prompt_clear_time_msec:
 		return
@@ -989,11 +1342,14 @@ func _should_continue_active_interaction(interaction_id: String, target) -> bool
 			return false
 
 func _is_extraction_hold_pressed() -> bool:
+	if _is_story_paused():
+		return false
 	return Input.is_action_pressed("extract") or _extract_button_held
 
 func _can_continue_extraction_hold() -> bool:
 	return (
-		run_director != null
+		not _is_story_paused()
+		and run_director != null
 		and run_director.context != null
 		and run_director.context.is_extraction_unlocked
 		and run_director.context.active_safe_zone_id == "home"
@@ -1098,6 +1454,8 @@ func _inventory_count(item_id: String) -> int:
 	return outpost_repair_controller.inventory_count(item_id)
 
 func _deposit_all() -> void:
+	if _is_story_paused():
+		return
 	if not is_storage_zone_active():
 		prompt_label.text = "请进入家中或已修复前哨站存放物品。"
 		return
@@ -1165,9 +1523,13 @@ func _close_outpost_storage_ui(outpost_id: String) -> void:
 		inventory_panel.visible = false
 
 func _try_extract() -> void:
+	if _is_story_paused():
+		return
 	_begin_extraction_hold()
 
 func _begin_extraction_hold_from_button() -> void:
+	if _is_story_paused():
+		return
 	_extract_button_held = true
 	_begin_extraction_hold()
 
@@ -1175,6 +1537,9 @@ func _release_extraction_hold_button() -> void:
 	_extract_button_held = false
 
 func _begin_extraction_hold() -> void:
+	if _is_story_paused():
+		_extract_button_held = false
+		return
 	if run_end_controller == null:
 		return
 	if _is_run_terminal():
@@ -1334,6 +1699,8 @@ func _random_container_position() -> Vector2:
 	return container_spawn_controller.next_spawn_position()
 
 func _toggle_inventory_panel() -> void:
+	if _is_story_paused():
+		return
 	run_ui_controller.toggle_inventory(self)
 
 func _switch_camera_home() -> void:

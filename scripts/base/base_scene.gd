@@ -104,6 +104,7 @@ var esc_settings_button: Button
 var _esc_settings_popup: Control
 var _debug_slow_next_loading := false
 var _debug_fail_next_loading := false
+var _active_run_loading_screen: RunLoadingScreen
 var tooltip_layer: Control
 var item_tooltip_panel: Panel
 var item_tooltip_icon: TextureRect
@@ -183,9 +184,15 @@ func _on_warehouse_tab_pressed() -> void:
 	_show_tab(TAB_WAREHOUSE)
 
 func _on_merchant_tab_pressed() -> void:
+	if not _is_merchant_tab_available():
+		_show_locked_tab_notice("商人将在第一次地表回收返回后开放。")
+		return
 	_show_tab(TAB_MERCHANT)
 
 func _on_research_tab_pressed() -> void:
+	if not _is_research_tab_available():
+		_show_locked_tab_notice("研究所将在第一次地表回收返回后开放。")
+		return
 	_show_tab(TAB_RESEARCH)
 
 func _on_crafting_tab_pressed() -> void:
@@ -208,7 +215,10 @@ func _on_first_departure_dialogue_finished(_dialogue_id: String = "", _skipped: 
 	_begin_run_loading()
 
 func _begin_run_loading() -> void:
+	if is_instance_valid(_active_run_loading_screen) and _active_run_loading_screen.is_inside_tree():
+		return
 	var loading = RunLoadingScreenScene.instantiate()
+	_active_run_loading_screen = loading
 	add_child(loading)
 	loading.loading_completed.connect(_on_run_loading_completed)
 	loading.loading_failed.connect(_on_run_loading_failed)
@@ -220,6 +230,7 @@ func _begin_run_loading() -> void:
 	_debug_fail_next_loading = false
 
 func _on_run_loading_completed(run_scene: PackedScene) -> void:
+	_active_run_loading_screen = null
 	if _game_state != null and _game_state.has_method("commit_run_start"):
 		var commit_result: Dictionary = _game_state.commit_run_start(false)
 		if not bool(commit_result.get("ok", false)):
@@ -233,6 +244,7 @@ func _on_run_loading_completed(run_scene: PackedScene) -> void:
 		get_tree().change_scene_to_file("res://scenes/run/RunScene.tscn")
 
 func _on_run_loading_failed(reason: String) -> void:
+	_active_run_loading_screen = null
 	_refresh()
 	result_label.visible = true
 	result_label.text = "地表通道同步失败，请返回哨所重试。(%s)" % reason
@@ -300,7 +312,7 @@ func _is_debug_panel_enabled() -> bool:
 	return OS.is_debug_build() and not OS.has_feature("web")
 
 func _show_chapter_goal_popup() -> void:
-	var popup := _make_overlay_popup("第一章目标", "解锁制造所\n\n出售可售物资，积攒 5000 矿币。\n制造所解锁后，才有机会推进救出妹妹的计划。")
+	var popup := _make_overlay_popup("第一章目标", "解锁制造所\n\n出售可售物资，积攒 5000 矿币。\n制造所解锁后，也许妹妹还有救。")
 	var panel := popup.get_node("PopupPanel") as Panel
 	var ok_button := _make_popup_button("知道了", Vector2(176, 258), func(): popup.queue_free())
 	var merchant_button := _make_popup_button("前往商人", Vector2(332, 258), func():
@@ -312,7 +324,7 @@ func _show_chapter_goal_popup() -> void:
 	add_child(popup)
 
 func _show_chapter_complete_popup(surface_day: int) -> void:
-	var text := "你用了 %d 天，成功购买了旧时代制造机。\n也许，救出妹妹的路终于有了第一盏灯。\n\n第一章节结束，后续章节开发中" % surface_day
+	var text := "你用了 %d 天，成功购买了旧时代制造机。\n也许，一切都还来得及。\n\n第一章节结束，后续章节开发中" % surface_day
 	var popup := _make_overlay_popup("第一章结束", text, Vector2(680, 380))
 	var panel := popup.get_node("PopupPanel") as Panel
 	var continue_button := _make_popup_button("继续游戏", Vector2(200, 300), func(): popup.queue_free())
@@ -465,11 +477,25 @@ func _is_left_mouse_pressed(event: InputEvent) -> bool:
 	return event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT
 
 func _show_tab(tab_id: String) -> void:
+	var locked_message := ""
+	if tab_id == TAB_MERCHANT and not _is_merchant_tab_available():
+		tab_id = TAB_WAREHOUSE
+		locked_message = "商人将在第一次地表回收返回后开放。"
+	if tab_id == TAB_RESEARCH and not _is_research_tab_available():
+		tab_id = TAB_WAREHOUSE
+		locked_message = "研究所将在第一次地表回收返回后开放。"
 	if tab_id == TAB_CRAFTING and not _is_crafting_tab_available():
 		tab_id = TAB_WAREHOUSE
+		locked_message = "制造所将在首次返回后作为第一章目标开放。"
 	_hide_item_tooltip("switch_tab")
 	_active_tab = tab_id
 	_refresh()
+	if not locked_message.is_empty():
+		_show_locked_tab_notice(locked_message)
+
+func _show_locked_tab_notice(message: String) -> void:
+	result_label.visible = true
+	result_label.text = message
 
 func _refresh() -> void:
 	_refresh_tabs()
@@ -508,7 +534,13 @@ func _refresh() -> void:
 
 func _refresh_tabs() -> void:
 	_hide_item_tooltip("refresh_tabs")
+	var merchant_available := _is_merchant_tab_available()
+	var research_available := _is_research_tab_available()
 	var crafting_available := _is_crafting_tab_available()
+	if _active_tab == TAB_MERCHANT and not merchant_available:
+		_active_tab = TAB_WAREHOUSE
+	if _active_tab == TAB_RESEARCH and not research_available:
+		_active_tab = TAB_WAREHOUSE
 	if _active_tab == TAB_CRAFTING and not crafting_available:
 		_active_tab = TAB_WAREHOUSE
 	warehouse_label.visible = false
@@ -526,9 +558,26 @@ func _refresh_tabs() -> void:
 	merchant_tab_button.text = "商人"
 	research_tab_button.text = "研究所"
 	crafting_tab_button.text = "制造所"
-	research_tab_button.disabled = false
+	merchant_tab_button.disabled = not merchant_available
+	research_tab_button.disabled = not research_available
 	crafting_tab_button.disabled = not crafting_available
+	merchant_tab_button.tooltip_text = "" if merchant_available else "等待第一次地表回收后开放。"
+	research_tab_button.tooltip_text = "" if research_available else "等待第一次地表回收后开放。"
 	crafting_tab_button.tooltip_text = "" if crafting_available else "完成首次地面返回剧情后解锁制造所。"
+
+func _is_merchant_tab_available() -> bool:
+	if _game_state == null:
+		return false
+	if _game_state.has_method("is_merchant_unlocked"):
+		return bool(_game_state.is_merchant_unlocked())
+	return bool(_game_state.get("merchant_unlocked"))
+
+func _is_research_tab_available() -> bool:
+	if _game_state == null:
+		return false
+	if _game_state.has_method("is_research_station_unlocked"):
+		return bool(_game_state.is_research_station_unlocked())
+	return bool(_game_state.get("research_station_unlocked"))
 
 func _is_crafting_tab_available() -> bool:
 	if _game_state == null:
@@ -834,6 +883,7 @@ func _style_label(label: Label, font_size: int, color: Color) -> void:
 func _style_button(button: Button, important: bool) -> void:
 	button.add_theme_font_size_override("font_size", 16)
 	button.add_theme_color_override("font_color", Color("#D8D6CE"))
+	button.add_theme_color_override("font_disabled_color", Color(0.55, 0.54, 0.50, 0.62))
 	var border := Color("#D1B850") if important else Color("#35C9D7")
 	button.add_theme_stylebox_override("normal", _panel_style(Color("#071116"), border, 1))
 	button.add_theme_stylebox_override("hover", _panel_style(Color("#0B151A"), Color("#D1B850"), 2))
@@ -1639,7 +1689,7 @@ func _update_chapter_goal_view() -> void:
 		return
 	var snapshot: Dictionary = _game_state.get_chapter_goal_snapshot()
 	if bool(snapshot.get("active", false)):
-		chapter_goal_label.text = "第一章：救出妹妹\n目标：解锁制造所\n矿币 %d / %d" % [
+		chapter_goal_label.text = "第一章：解锁制造所\n目标：购买制造机，解锁制造所\n矿币 %d / %d" % [
 			int(snapshot.get("current_currency", 0)),
 			int(snapshot.get("required_currency", MANUFACTURING_UNLOCK_COST)),
 		]
@@ -1659,7 +1709,7 @@ func _update_crafting_panel() -> void:
 	var unlocked := bool(_game_state.get("manufacturing_station_unlocked"))
 	var goal_active := bool(_game_state.get("chapter_1_goal_active"))
 	if unlocked:
-		crafting_status_label.text = "制造所已解锁。\n\n旧时代制造机已经接入哨所电力。也许，救出妹妹的路终于有了第一盏灯。"
+		crafting_status_label.text = "制造所已解锁。\n\n旧时代制造机已经接入哨所电力。也许，一切都还来得及。"
 		crafting_unlock_button.visible = false
 		crafting_result_label.text = ""
 		return
@@ -1667,7 +1717,7 @@ func _update_crafting_panel() -> void:
 	if not goal_active:
 		crafting_status_label.text = "制造所尚未开放。\n\n先完成首次地面探索并返回基地。首次返回剧情结束后，第一章目标会正式开启。"
 	else:
-		crafting_status_label.text = "当前目标：为救出妹妹，解锁制造所\n\n出售可售物资，积攒 5000 矿币。制造所解锁后，才有机会推进救出妹妹的计划。\n\n矿币：%d / %d" % [
+		crafting_status_label.text = "当前目标：购买旧时代制造机，解锁制造所\n\n出售可售物资，积攒 5000 矿币。制造所解锁后，也许妹妹还有救。\n\n矿币：%d / %d" % [
 			current_coin,
 			MANUFACTURING_UNLOCK_COST,
 		]
@@ -1678,7 +1728,7 @@ func _update_crafting_panel() -> void:
 	elif current_coin < MANUFACTURING_UNLOCK_COST:
 		crafting_result_label.text = "还差 %d 矿币。去商人页签出售带回的道具。" % (MANUFACTURING_UNLOCK_COST - current_coin)
 	else:
-		crafting_result_label.text = "矿币已足够。确认解锁制造所，推进救出妹妹的计划。"
+		crafting_result_label.text = "矿币已足够。确认购买旧时代制造机，解锁制造所。"
 
 func _clear_research_requirement_slots() -> void:
 	if research_requirement_grid_root == null:

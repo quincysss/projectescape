@@ -2,7 +2,7 @@ class_name RunConfig
 extends Resource
 
 @export var max_stability: float = 100.0
-@export var stability_decay_per_second: float = 1.0
+@export var stability_decay_per_second: float = 1.5
 @export var stability_recover_per_second: float = 10.0
 @export var base_weight_limit: float = 20.0
 @export var inventory_slots: int = 8

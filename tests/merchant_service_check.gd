@@ -118,15 +118,15 @@ func _verify_base_merchant_tab(game_state: Node, registry) -> bool:
 		printerr("Expected top tab order: 仓库, 商人, 研究所, 制造所.")
 		base_root.queue_free()
 		return false
-	if research_tab.disabled or not crafting_tab.disabled:
-		printerr("Expected research to be clickable and manufacturing to stay locked before chapter 1 objective.")
+	if not merchant_tab.disabled or not research_tab.disabled or not crafting_tab.disabled:
+		printerr("Expected merchant, research, and manufacturing to stay locked before first return.")
 		base_root.queue_free()
 		return false
-	game_state.activate_chapter_1_goal_debug()
+	game_state.mark_first_return_dialogue_seen_and_activate_chapter()
 	base_root._refresh()
 	await process_frame
-	if crafting_tab.disabled:
-		printerr("Expected manufacturing tab to unlock after chapter 1 objective is active.")
+	if merchant_tab.disabled or research_tab.disabled or crafting_tab.disabled:
+		printerr("Expected first return to unlock merchant, research, and the chapter 1 manufacturing objective tab.")
 		base_root.queue_free()
 		return false
 

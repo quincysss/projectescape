@@ -3,10 +3,12 @@ extends SceneTree
 const OPENING_CINEMATIC_PATH := "res://assets/cinematics/source/opening_intro_cinematic_720p.mp4"
 const OPENING_CINEMATIC_FALLBACK_PATH := "res://assets/cinematics/opening_intro_cinematic_720p.ogv"
 const MAIN_MENU_BACKGROUND_PATH := "res://assets/cinematics/main_menu/main_menu_background_loop_1080p.mp4"
+const SECOND_DAY_BLACK_TIDE_PATH := "res://assets/cinematics/source/second_day_black_tide_reveal_720p.mp4"
 
 func _initialize() -> void:
 	var ok := _verify_opening_cinematic()
 	ok = _verify_main_menu_background() and ok
+	ok = _verify_second_day_black_tide_cinematic() and ok
 	print("Cinematic asset verified." if ok else "Cinematic asset check failed.")
 	quit(0 if ok else 1)
 
@@ -19,6 +21,9 @@ func _verify_opening_cinematic() -> bool:
 
 func _verify_main_menu_background() -> bool:
 	return _verify_mp4_video_stream(MAIN_MENU_BACKGROUND_PATH, "main menu background")
+
+func _verify_second_day_black_tide_cinematic() -> bool:
+	return _verify_mp4_video_stream(SECOND_DAY_BLACK_TIDE_PATH, "second day black tide reveal cinematic")
 
 func _verify_mp4_video_stream(path: String, label: String) -> bool:
 	if not FileAccess.file_exists(path):
