@@ -2,7 +2,9 @@
 
 ## 2026-05-13 怪物速度与警戒调参补充
 
-怪物当前数值配置以 `setting/monster_defs.tab` 为准：`patrol_speed_px = 168`，`charge_speed_px = 1680`，`warning_seconds = 2.0`。脚本默认值与 `monster_spawn_controller.gd` 的兜底配置需要保持同值，避免数据表缺失时回退到旧节奏。
+怪物当前数值配置以 `setting/monster_defs.tab` 为准：`patrol_speed_px = 168`，`charge_speed_px = 1680`，`vision_radius_px = 920`，`warning_seconds = 1.0`。脚本默认值与 `monster_spawn_controller.gd` 的兜底配置需要保持同值，避免数据表缺失时回退到旧节奏。
+
+怪物命中玩家后补刷由 `monster_spawn_controller.gd` 负责，固定延迟 `30 秒`，只响应怪物移除原因 `hit_player`。实现时不要做成全局循环刷怪，也不要在普通清理怪物时触发补刷。
 
 > 目标：整理场景随机事件系统的脚本、场景、配置表、信号和总开工提示词，覆盖怪物、时间事件、随机障碍三条落地线。
 
@@ -88,7 +90,7 @@ road_obstacle	随机障碍	map_blocker	3		0.30		true	true	count_min=2;count_max=
 
 ```text
 monster_id	display_name	patrol_speed	charge_speed	vision_angle	vision_radius	warning_seconds	stability_damage	patrol_radius
-basic_shadow	暗潮游荡体	168	1680	100	720	2	20	520
+basic_shadow	暗潮游荡体	168	1680	100	920	1	20	520
 ```
 
 `random_obstacle_defs.tab` 建议字段：
@@ -207,8 +209,9 @@ Doc/03_地图与安全区规则/15_随机障碍点位.md
 - 第 1/2/3/4 日事件规则。
 - 默认 05:00、超级时间 08:00、超短时间 03:30。
 - 怪物事件命中生成 4 个怪物。
-- 玩家进扇形 2 秒触发冲撞。
+- 玩家进扇形 1 秒触发冲撞。
 - 碰撞后稳定值 -20，怪物消失。
+- 怪物因命中消失后，原出生点 30 秒后补刷 1 只；同一出生点等待期间不重复创建补刷任务。
 - 随机障碍生成 2-4 个，玩家无法通过，怪物可通过。
 - 障碍不会堵死主流程路线。
 ```
@@ -271,9 +274,9 @@ Godot --headless --path . --script res://tests/base_debug_panel_check.gd
 | `patrol_radius_px` | 520 |
 | `patrol_speed_px` | 168 |
 | `charge_speed_px` | 1680 |
-| `vision_radius_px` | 720 |
+| `vision_radius_px` | 920 |
 | `vision_angle_degrees` | 100 |
-| `warning_seconds` | 2.0 |
+| `warning_seconds` | 1.0 |
 | `hit_radius_px` | 128 |
 | `patrol_target_reach_distance_px` | 40 |
 
