@@ -100,7 +100,7 @@ IntroCinematicController：
 - 在新档创建后播放开场视频剧情。
 - 支持跳过视频。
 - 视频结束或跳过后写入 `intro_cinematic_seen=true`。
-- 通知 `GameFlowController` 进入第一段世界观对白。
+- 通知 `GameFlowController` 进入第一段“回到404哨所与背景故事”对白。
 
 DialogueService：
 
@@ -179,7 +179,7 @@ V0.1 可以先拆文件保存，但必须由统一 SaveService 组织。
 
 - 清除本地档案。
 - 重置开场视频 flag。
-- 重置世界观对白 flag。
+- 重置回到404哨所与背景故事对白 flag。
 - 重置首次出发任务对白 flag。
 - 重置首次返回剧情 flag。
 - 增加 5000 矿币。
@@ -204,7 +204,7 @@ Debug 操作必须只在 Debug 模式显示。
 2. 建立 ProfileService、SaveStorageAdapter、DialogueService、ChapterProgressService、ManufacturingUnlockService、RunLoadingController。
 3. 玩家档案保存 username、surface_day、intro_cinematic_seen、world_intro_dialogue_seen、first_departure_outpost_dialogue_seen、first_return_dialogue_seen、manufacturing_station_unlocked、chapter_1_completed。
 4. 桌面保存到 user://profile/profile.json；Web 通过 WebSaveStorageAdapter 适配，不在 UI 中写平台判断。
-5. 新档创建后播放 opening_intro_cinematic；视频可跳过，跳过后仍进入 world_intro_dialogue。
+5. 新档创建后播放 opening_intro_cinematic；视频可跳过，跳过后仍进入 world_intro_dialogue。该 DialogueSequence 的剧情定位是“回到404哨所与背景故事”：必须交代背景故事，但要通过自然对白呈现，不写成百科式世界观说明。
 6. world_intro_dialogue 完成后进入局外仓库/商人/研究所/出发准备界面。
 7. 玩家第一次点击出发探索且校验通过后，播放 first_departure_outpost_dialogue。
 8. first_departure_outpost_dialogue 完成后进入 RunLoadingScreen，由 RunLoadingController 加载局内资源。
@@ -219,7 +219,7 @@ Debug 操作必须只在 Debug 模式显示。
 ## 9. 验收标准
 
 - 新档创建、保存、重启读取正常。
-- 开场视频、世界观对白、首次出发任务对白、首次返回剧情只触发一次。
+- 开场视频、回到404哨所与背景故事对白、首次出发任务对白、首次返回剧情只触发一次。
 - 确认出发后进入加载界面，加载完成后等待任意按钮才进入可操作局内。
 - 结算返回哨所进入 loading，加载完成后等待任意按钮才回到局外。
 - 加载失败能回滚待出发装备，不增加 surface_day。

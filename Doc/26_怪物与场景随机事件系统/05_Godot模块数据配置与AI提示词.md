@@ -1,5 +1,9 @@
 # 26-05 Godot 模块、数据配置与 AI/MCP 提示词
 
+## 2026-05-13 怪物速度与警戒调参补充
+
+怪物当前数值配置以 `setting/monster_defs.tab` 为准：`patrol_speed_px = 168`，`charge_speed_px = 1680`，`warning_seconds = 2.0`。脚本默认值与 `monster_spawn_controller.gd` 的兜底配置需要保持同值，避免数据表缺失时回退到旧节奏。
+
 > 目标：整理场景随机事件系统的脚本、场景、配置表、信号和总开工提示词，覆盖怪物、时间事件、随机障碍三条落地线。
 
 ## 1. 推荐模块
@@ -84,7 +88,7 @@ road_obstacle	随机障碍	map_blocker	3		0.30		true	true	count_min=2;count_max=
 
 ```text
 monster_id	display_name	patrol_speed	charge_speed	vision_angle	vision_radius	warning_seconds	stability_damage	patrol_radius
-basic_shadow	暗潮游荡体	45	180	70	220	5	20	180
+basic_shadow	暗潮游荡体	168	1680	100	720	2	20	520
 ```
 
 `random_obstacle_defs.tab` 建议字段：
@@ -203,7 +207,7 @@ Doc/03_地图与安全区规则/15_随机障碍点位.md
 - 第 1/2/3/4 日事件规则。
 - 默认 05:00、超级时间 08:00、超短时间 03:30。
 - 怪物事件命中生成 4 个怪物。
-- 玩家进扇形 5 秒触发冲撞。
+- 玩家进扇形 2 秒触发冲撞。
 - 碰撞后稳定值 -20，怪物消失。
 - 随机障碍生成 2-4 个，玩家无法通过，怪物可通过。
 - 障碍不会堵死主流程路线。
@@ -258,3 +262,19 @@ Godot --headless --path . --script res://tests/run_core_loop_check.gd
 Godot --headless --path . --script res://tests/run_playable_loop_check.gd
 Godot --headless --path . --script res://tests/base_debug_panel_check.gd
 ```
+## 2026-05-12 怪物危机感调参补充
+
+当前怪物威胁数值以 `res://setting/monster_defs.tab` 为准：
+
+| 字段 | 当前值 |
+| --- | ---: |
+| `patrol_radius_px` | 520 |
+| `patrol_speed_px` | 168 |
+| `charge_speed_px` | 1680 |
+| `vision_radius_px` | 720 |
+| `vision_angle_degrees` | 100 |
+| `warning_seconds` | 2.0 |
+| `hit_radius_px` | 128 |
+| `patrol_target_reach_distance_px` | 40 |
+
+表现资源 `black_tide_boundary_essence_visual.gd` 当前默认 `visual_scale = Vector2(1.05, 1.05)`。怪物转向只能翻转 `BodySprite.flip_h`，不能翻转 `Visual.scale.x`，否则 `EyeFocus` 与扇形视野会抖动。
