@@ -55,7 +55,7 @@ func _expected_items_by_quality() -> Dictionary:
 	return {
 		"C": ["ration_bar", "cracked_lens", "duct_tape_roll", "rusted_bolts", "cracked_compass"],
 		"B": ["sterile_patch", "reinforced_strap", "pulse_battery", "street_map_fragment", "signal_resonator_coil"],
-		"A": ["sealed_medkit", "survey_drone_core", "outpost_servo_pack", "thermal_scope_module"],
+		"A": ["sealed_medkit", "survey_drone_core", "thermal_scope_module"],
 		"S": ["blackbox_memory_core", "prefall_access_key", "anomaly_heart_shard", "sanctuary_nav_chip"],
 	}
 
@@ -66,7 +66,7 @@ func _expected_quality_count(quality: String) -> int:
 		"B":
 			return 5
 		"A":
-			return 4
+			return 3
 		"S":
 			return 4
 	return 0
@@ -86,7 +86,7 @@ func _verify_context_contents(registry) -> bool:
 		"container_tool": ["pulse_battery", "signal_resonator_coil", "thermal_scope_module"],
 		"container_medical": ["sterile_patch", "sealed_medkit"],
 		"container_small_safe": ["street_map_fragment", "survey_drone_core", "prefall_access_key"],
-		"container_large_safe": ["sealed_medkit", "survey_drone_core", "outpost_servo_pack", "blackbox_memory_core", "sanctuary_nav_chip"],
+		"container_large_safe": ["sealed_medkit", "survey_drone_core", "blackbox_memory_core", "sanctuary_nav_chip"],
 		"container_anomaly": ["anomaly_heart_shard", "blackbox_memory_core", "sanctuary_nav_chip", "prefall_access_key"],
 	}
 	for context in expected_contexts.keys():

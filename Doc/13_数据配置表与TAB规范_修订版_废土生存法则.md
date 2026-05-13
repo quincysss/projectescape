@@ -267,7 +267,7 @@ blueprints.tab 的 id 必须能在 items.tab 中找到。
 | id | string | 物品唯一ID |
 | item_type | enum | material/outpost_material/equipment/consumable/blueprint/rare |
 | name | string | 显示名 |
-| quality | enum | C/B/A/S |
+| quality | enum | C/B/A/S/SS |
 | stackable | bool | 是否可堆叠 |
 | stack_limit | int | 堆叠上限 |
 | weight | float | 单个重量 |
@@ -299,6 +299,17 @@ id	item_type	name	quality	stackable	stack_limit	weight	icon	sellable	sell_curren
 
 ```text
 scrap_metal	material	废金属	C	false	1	0.1	res://assets/icons/items/scrap_metal.png	true	mine_coin	3	常见的金属废料，可用于修复和制作。	material;craft	v0.3
+```
+
+局外道具详情 Tooltip 读取规则：
+
+```text
+局外仓库、商人、研究所、制作所中的道具图标 hover Tooltip 不新增表字段。
+道具图标、名称、品质、售价、描述都从 items.tab 读取。
+货币显示名和图标从 currencies.tab 读取。
+sellable=false 或 sell_value<=0 时，Tooltip 价格区显示“不可出售”。
+description 为空时，Tooltip 显示“暂无记录。”。
+SS 品质必须保留为 quality=SS，不得降级成 S；Tooltip 需要能显示红色品质识别。
 ```
 
 ---

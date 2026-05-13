@@ -217,7 +217,7 @@ func get_shop_stock_rows_for_level(shop_level: int, shop_id: String = "base_merc
 		if item.is_empty():
 			continue
 		var item_type := String(item.get("item_type", ""))
-		if item_type != "material" and item_type != "outpost_material":
+		if item_type != "material":
 			continue
 		result.append(row)
 	return result

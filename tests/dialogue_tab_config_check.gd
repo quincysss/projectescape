@@ -44,11 +44,14 @@ func _verify() -> bool:
 		printerr("Expected first return dialogue to load as skippable.")
 		return false
 	var return_entries: Array = Array(first_return.get("entries", []))
-	if return_entries.size() != 9:
-		printerr("Expected 9 first return entries, got %d." % return_entries.size())
+	if return_entries.size() != 10:
+		printerr("Expected 10 first return entries, got %d." % return_entries.size())
 		return false
-	if not String(Dictionary(return_entries[4]).get("text", "")).contains("把他换给商人"):
+	if not String(Dictionary(return_entries[4]).get("text", "")).contains("能卖的就换成矿币"):
 		printerr("Expected first return dialogue to match current document copy.")
+		return false
+	if not String(Dictionary(return_entries[9]).get("text", "")).contains("这是救出她的第一步"):
+		printerr("Expected first return dialogue to carry the chapter motivation.")
 		return false
 
 	if not service.load_sequence("res://setting/dialogues.tab#missing_dialogue").is_empty():

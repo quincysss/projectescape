@@ -1,0 +1,103 @@
+{
+  "source_table": "res://setting/container_types.tab",
+  "assets": [
+    {
+      "type_id": "cardboard_box",
+      "display_name": "纸箱",
+      "size_class": "small",
+      "asset_min_px": 128,
+      "asset_max_px": 192,
+      "icon_px": 128,
+      "visual_color_hex": "#3A8DFF",
+      "signal_profile": "weak_blue",
+      "loot_context": "container_cardboard",
+      "asset_path": "res://assets/map/interactables/containers/cardboard_box.png",
+      "icon_path": "res://assets/ui/containericon/cardboard_box.png",
+      "source_raw_path": "res://assets/map/interactables/containers_raw_gpt2/cardboard_box.png"
+    },
+    {
+      "type_id": "wooden_crate",
+      "display_name": "木箱",
+      "size_class": "medium",
+      "asset_min_px": 192,
+      "asset_max_px": 256,
+      "icon_px": 128,
+      "visual_color_hex": "#3A8DFF",
+      "signal_profile": "blue",
+      "loot_context": "container_wooden",
+      "asset_path": "res://assets/map/interactables/containers/wooden_crate.png",
+      "icon_path": "res://assets/ui/containericon/wooden_crate.png",
+      "source_raw_path": "res://assets/map/interactables/containers_raw_gpt2/wooden_crate.png"
+    },
+    {
+      "type_id": "tool_cabinet",
+      "display_name": "工具柜",
+      "size_class": "medium",
+      "asset_min_px": 256,
+      "asset_max_px": 384,
+      "icon_px": 128,
+      "visual_color_hex": "#3A8DFF",
+      "signal_profile": "blue",
+      "loot_context": "container_tool",
+      "asset_path": "res://assets/map/interactables/containers/tool_cabinet.png",
+      "icon_path": "res://assets/ui/containericon/tool_cabinet.png",
+      "source_raw_path": "res://assets/map/interactables/containers_raw_gpt2/tool_cabinet.png"
+    },
+    {
+      "type_id": "medical_cabinet",
+      "display_name": "医疗柜",
+      "size_class": "medium",
+      "asset_min_px": 256,
+      "asset_max_px": 384,
+      "icon_px": 128,
+      "visual_color_hex": "#3A8DFF",
+      "signal_profile": "blue",
+      "loot_context": "container_medical",
+      "asset_path": "res://assets/map/interactables/containers/medical_cabinet.png",
+      "icon_path": "res://assets/ui/containericon/medical_cabinet.png",
+      "source_raw_path": "res://assets/map/interactables/containers_raw_gpt2/medical_cabinet.png"
+    },
+    {
+      "type_id": "small_safe",
+      "display_name": "小保险箱",
+      "size_class": "medium",
+      "asset_min_px": 192,
+      "asset_max_px": 256,
+      "icon_px": 128,
+      "visual_color_hex": "#3A8DFF",
+      "signal_profile": "strong_blue",
+      "loot_context": "container_small_safe",
+      "asset_path": "res://assets/map/interactables/containers/small_safe.png",
+      "icon_path": "res://assets/ui/containericon/small_safe.png",
+      "source_raw_path": "res://assets/map/interactables/containers_raw_gpt2/small_safe.png"
+    },
+    {
+      "type_id": "large_safe",
+      "display_name": "大保险柜",
+      "size_class": "large",
+      "asset_min_px": 384,
+      "asset_max_px": 512,
+      "icon_px": 128,
+      "visual_color_hex": "#3A8DFF",
+      "signal_profile": "strong_blue",
+      "loot_context": "container_large_safe",
+      "asset_path": "res://assets/map/interactables/containers/large_safe.png",
+      "icon_path": "res://assets/ui/containericon/large_safe.png",
+      "source_raw_path": "res://assets/map/interactables/containers_raw_gpt2/large_safe.png"
+    },
+    {
+      "type_id": "anomaly_case",
+      "display_name": "异常箱",
+      "size_class": "large",
+      "asset_min_px": 256,
+      "asset_max_px": 512,
+      "icon_px": 128,
+      "visual_color_hex": "#3A8DFF",
+      "signal_profile": "pulse_blue",
+      "loot_context": "container_anomaly",
+      "asset_path": "res://assets/map/interactables/containers/anomaly_case.png",
+      "icon_path": "res://assets/ui/containericon/anomaly_case.png",
+      "source_raw_path": "res://assets/map/interactables/containers_raw_gpt2/anomaly_case.png"
+    }
+  ]
+}

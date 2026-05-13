@@ -7,6 +7,8 @@ const INTRO_CINEMATIC_FALLBACK_PATH := "res://assets/cinematics/opening_intro_ci
 const MAIN_MENU_BACKGROUND_VIDEO_PATH := "res://assets/cinematics/main_menu/main_menu_background_loop_1080p.mp4"
 const MAIN_MENU_BACKGROUND_FALLBACK_VIDEO_PATH := "res://assets/cinematics/main_menu/main_menu_background_loop_1080p.ogv"
 const MAIN_MENU_LOGO_PATH := "res://assets/ui/logos/black_tide_project/processed/black_tide_project_logo_handpainted_alpha_bgfit_01.png"
+const WEB_MAIN_MENU_VIDEO_ID := "project-escape-main-menu-video"
+const WEB_OPENING_VIDEO_ID := "project-escape-opening-video"
 const MAIN_MENU_CONTENT_POSITION := Vector2(34.0, 128.0)
 const MAIN_MENU_CONTENT_SIZE := Vector2(780.0, 742.0)
 const MAIN_MENU_LOGO_BOX_POSITION := Vector2(0.0, 0.0)
@@ -18,6 +20,9 @@ const MAIN_MENU_BUTTON_SIZE := Vector2(360.0, 72.0)
 
 var _game_state: Node
 var _main_menu_background_video_player: VideoStreamPlayer
+var _main_menu_background_dim: ColorRect
+var _main_menu_content: Control
+var _version_label: Label
 var _username_overlay: Control
 var _username_panel: Panel
 var _username_edit: LineEdit
@@ -26,11 +31,23 @@ var _username_confirm_button: Panel
 var _intro_cinematic_overlay: Control
 var _intro_cinematic_video_player: VideoStreamPlayer
 var _intro_cinematic_finishing := false
+var _intro_cinematic_web_video_active := false
 
 func _ready() -> void:
 	_game_state = get_node_or_null("/root/GameState")
 	_play_base_safe_house_bgm()
 	_build()
+
+func _process(_delta: float) -> void:
+	if not _intro_cinematic_web_video_active or _intro_cinematic_finishing:
+		return
+	if _is_web_video_ended(WEB_OPENING_VIDEO_ID):
+		_finish_intro_cinematic(false)
+
+func _exit_tree() -> void:
+	_remove_web_video(WEB_MAIN_MENU_VIDEO_ID)
+	_remove_web_video(WEB_OPENING_VIDEO_ID)
+	_set_web_canvas_transparent(false)
 
 func _build() -> void:
 	anchors_preset = PRESET_FULL_RECT
@@ -49,7 +66,8 @@ func _build_main_menu_background() -> void:
 	bg.anchor_bottom = 1.0
 	add_child(bg)
 
-	_add_main_menu_background_video()
+	if _add_main_menu_background_video():
+		bg.color = Color(0.0, 0.0, 0.0, 0.0)
 
 	var dim := ColorRect.new()
 	dim.name = "MainMenuBackgroundDim"
@@ -58,14 +76,17 @@ func _build_main_menu_background() -> void:
 	dim.anchor_bottom = 1.0
 	dim.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(dim)
+	_main_menu_background_dim = dim
 
-func _add_main_menu_background_video() -> void:
+func _add_main_menu_background_video() -> bool:
+	if OS.has_feature("web"):
+		return _play_web_video(WEB_MAIN_MENU_VIDEO_ID, _res_path_to_web_url(MAIN_MENU_BACKGROUND_VIDEO_PATH), true, true)
 	var stream := _load_first_video_stream([
 		MAIN_MENU_BACKGROUND_VIDEO_PATH,
 		MAIN_MENU_BACKGROUND_FALLBACK_VIDEO_PATH,
 	])
 	if stream == null:
-		return
+		return false
 	var video_player := VideoStreamPlayer.new()
 	video_player.name = "MainMenuBackgroundVideo"
 	video_player.stream = stream
@@ -80,6 +101,7 @@ func _add_main_menu_background_video() -> void:
 	_main_menu_background_video_player = video_player
 	_fit_control_to_16x9_cover(video_player)
 	video_player.play()
+	return true
 
 func _build_main_menu_content() -> void:
 	var content := Control.new()
@@ -92,6 +114,7 @@ func _build_main_menu_content() -> void:
 	content.size = MAIN_MENU_CONTENT_SIZE
 	content.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(content)
+	_main_menu_content = content
 
 	_build_main_menu_logo(content)
 
@@ -127,6 +150,7 @@ func _build_main_menu_content() -> void:
 	version_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	version_label.add_theme_color_override("font_color", Color("#928B7B"))
 	add_child(version_label)
+	_version_label = version_label
 
 func _build_main_menu_logo(parent: Control) -> void:
 	var logo_box := Control.new()
@@ -325,6 +349,7 @@ func _show_intro_cinematic() -> void:
 	if is_instance_valid(_intro_cinematic_overlay):
 		return
 	_intro_cinematic_finishing = false
+	_hide_main_menu_for_intro_cinematic()
 	_pause_bgm_for_intro_cinematic()
 	_intro_cinematic_overlay = Control.new()
 	_intro_cinematic_overlay.name = "OpeningCinematicOverlay"
@@ -363,7 +388,7 @@ func _show_intro_cinematic() -> void:
 	placeholder_label.add_theme_font_size_override("font_size", 18)
 	placeholder_label.add_theme_color_override("font_color", Color(0.82, 0.80, 0.76, 0.45))
 	_intro_cinematic_overlay.add_child(placeholder_label)
-	var video_loaded := _add_intro_cinematic_video(cinematic_config, frame, placeholder_label)
+	var video_loaded := _add_intro_cinematic_video(cinematic_config, bg, frame, placeholder_label)
 
 	var skip_button := Button.new()
 	skip_button.name = "SkipOpeningCinematicButton"
@@ -392,6 +417,8 @@ func _finish_intro_cinematic(_skipped: bool) -> void:
 	if _intro_cinematic_finishing:
 		return
 	_intro_cinematic_finishing = true
+	_intro_cinematic_web_video_active = false
+	_remove_web_video(WEB_OPENING_VIDEO_ID)
 	if is_instance_valid(_intro_cinematic_video_player):
 		_intro_cinematic_video_player.stop()
 	_intro_cinematic_video_player = null
@@ -402,6 +429,21 @@ func _finish_intro_cinematic(_skipped: bool) -> void:
 		_intro_cinematic_overlay.queue_free()
 	_intro_cinematic_overlay = null
 	_enter_base_scene()
+
+func _hide_main_menu_for_intro_cinematic() -> void:
+	if is_instance_valid(_main_menu_content):
+		_main_menu_content.visible = false
+	if is_instance_valid(_main_menu_background_dim):
+		_main_menu_background_dim.visible = false
+	if is_instance_valid(_version_label):
+		_version_label.visible = false
+	if is_instance_valid(_username_overlay):
+		_username_overlay.visible = false
+	if is_instance_valid(_main_menu_background_video_player):
+		_main_menu_background_video_player.stop()
+		_main_menu_background_video_player.visible = false
+	if OS.has_feature("web"):
+		_remove_web_video(WEB_MAIN_MENU_VIDEO_ID)
 
 func _enter_base_scene() -> void:
 	get_tree().change_scene_to_file("res://scenes/base/BaseScene.tscn")
@@ -443,7 +485,18 @@ func _load_intro_cinematic_config() -> Dictionary:
 		return parsed
 	return fallback
 
-func _add_intro_cinematic_video(config: Dictionary, frame: ColorRect, placeholder_label: Label) -> bool:
+func _add_intro_cinematic_video(config: Dictionary, bg: ColorRect, frame: ColorRect, placeholder_label: Label) -> bool:
+	if OS.has_feature("web"):
+		var web_url := _first_web_video_url(_intro_cinematic_video_paths(config))
+		if web_url.is_empty():
+			return false
+		if not _play_web_video(WEB_OPENING_VIDEO_ID, web_url, false, false):
+			return false
+		_intro_cinematic_web_video_active = true
+		bg.visible = false
+		frame.visible = false
+		placeholder_label.visible = false
+		return true
 	var stream := _load_first_video_stream(_intro_cinematic_video_paths(config))
 	if stream == null:
 		return false
@@ -458,6 +511,7 @@ func _add_intro_cinematic_video(config: Dictionary, frame: ColorRect, placeholde
 	_intro_cinematic_overlay.add_child(video_player)
 	_intro_cinematic_video_player = video_player
 	_fit_control_to_16x9_cover(video_player)
+	bg.visible = false
 	frame.visible = false
 	placeholder_label.visible = false
 	video_player.play()
@@ -480,6 +534,18 @@ func _append_unique_video_path(paths: Array, path: String) -> void:
 		return
 	paths.append(path)
 
+func _first_web_video_url(paths: Array) -> String:
+	for path in paths:
+		var video_path := String(path)
+		if video_path.get_extension().to_lower() == "mp4":
+			return _res_path_to_web_url(video_path)
+	return ""
+
+func _res_path_to_web_url(path: String) -> String:
+	if path.begins_with("res://"):
+		return path.trim_prefix("res://")
+	return path
+
 func _load_first_video_stream(paths: Array) -> VideoStream:
 	for path in paths:
 		var stream := _load_video_stream(String(path))
@@ -488,6 +554,8 @@ func _load_first_video_stream(paths: Array) -> VideoStream:
 	return null
 
 func _load_video_stream(path: String) -> VideoStream:
+	if OS.has_feature("web") and path.get_extension().to_lower() == "mp4":
+		return null
 	if path.is_empty() or not FileAccess.file_exists(path):
 		return null
 	if path.get_extension().to_lower() == "ogv" and not _is_ogg_theora_video(path):
@@ -520,6 +588,124 @@ func _refresh_video_cover_rects() -> void:
 		_fit_control_to_16x9_cover(_main_menu_background_video_player)
 	if is_instance_valid(_intro_cinematic_video_player):
 		_fit_control_to_16x9_cover(_intro_cinematic_video_player)
+
+func _play_web_video(element_id: String, url: String, loop: bool, muted: bool) -> bool:
+	if not OS.has_feature("web") or url.is_empty():
+		return false
+	_set_web_canvas_transparent(true)
+	_ensure_web_video_bridge()
+	var script := "window.ProjectEscapeWebVideo.play(%s, %s, { loop: %s, muted: %s });" % [
+		JSON.stringify(element_id),
+		JSON.stringify(url),
+		_bool_to_js(loop),
+		_bool_to_js(muted),
+	]
+	var result = JavaScriptBridge.eval(script, true)
+	return result == null or bool(result)
+
+func _remove_web_video(element_id: String) -> void:
+	if not OS.has_feature("web") or element_id.is_empty():
+		return
+	_ensure_web_video_bridge()
+	JavaScriptBridge.eval("window.ProjectEscapeWebVideo.remove(%s);" % JSON.stringify(element_id), false)
+
+func _is_web_video_ended(element_id: String) -> bool:
+	if not OS.has_feature("web") or element_id.is_empty():
+		return false
+	_ensure_web_video_bridge()
+	return bool(JavaScriptBridge.eval("window.ProjectEscapeWebVideo.ended(%s);" % JSON.stringify(element_id), true))
+
+func _set_web_canvas_transparent(enabled: bool) -> void:
+	if not OS.has_feature("web"):
+		return
+	get_viewport().transparent_bg = enabled
+	RenderingServer.set_default_clear_color(Color(0.0, 0.0, 0.0, 0.0) if enabled else Color.BLACK)
+	var alpha := "0" if enabled else "1"
+	JavaScriptBridge.eval("""
+(function() {
+	var canvas = document.getElementById('canvas');
+	if (!canvas) {
+		return;
+	}
+	canvas.style.background = 'rgba(0,0,0,%s)';
+	canvas.style.position = 'relative';
+	canvas.style.zIndex = '1';
+	document.body.style.backgroundColor = 'black';
+	document.documentElement.style.backgroundColor = 'black';
+})();
+""" % alpha, false)
+
+func _ensure_web_video_bridge() -> void:
+	if not OS.has_feature("web"):
+		return
+	JavaScriptBridge.eval("""
+(function() {
+	if (window.ProjectEscapeWebVideo) {
+		return;
+	}
+	window.ProjectEscapeWebVideo = {
+		play: function(id, src, options) {
+			options = options || {};
+			var video = document.getElementById(id);
+			if (!video) {
+				video = document.createElement('video');
+				video.id = id;
+				document.body.insertBefore(video, document.getElementById('canvas'));
+			}
+			video.dataset.projectEscapeEnded = 'false';
+			video.src = src;
+			video.loop = !!options.loop;
+			video.muted = !!options.muted;
+			video.autoplay = true;
+			video.playsInline = true;
+			video.preload = 'auto';
+			video.controls = false;
+			video.style.position = 'fixed';
+			video.style.left = '0';
+			video.style.top = '0';
+			video.style.width = '100vw';
+			video.style.height = '100vh';
+			video.style.objectFit = 'cover';
+			video.style.zIndex = '0';
+			video.style.pointerEvents = 'none';
+			video.style.backgroundColor = '#050505';
+			video.onended = function() {
+				video.dataset.projectEscapeEnded = 'true';
+			};
+			video.onerror = function() {
+				video.dataset.projectEscapeEnded = 'true';
+				console.warn('ProjectEscape video failed: ' + src);
+			};
+			var promise = video.play();
+			if (promise && promise.catch) {
+				promise.catch(function(error) {
+					console.warn('ProjectEscape video play rejected: ' + error);
+					if (!options.loop) {
+						video.dataset.projectEscapeEnded = 'true';
+					}
+				});
+			}
+			return true;
+		},
+		remove: function(id) {
+			var video = document.getElementById(id);
+			if (video) {
+				video.pause();
+				video.removeAttribute('src');
+				video.load();
+				video.remove();
+			}
+		},
+		ended: function(id) {
+			var video = document.getElementById(id);
+			return !video || video.dataset.projectEscapeEnded === 'true' || video.ended;
+		}
+	};
+})();
+""", false)
+
+func _bool_to_js(value: bool) -> String:
+	return "true" if value else "false"
 
 func _fit_control_to_16x9_cover(control: Control) -> void:
 	var viewport_size := get_viewport_rect().size

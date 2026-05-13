@@ -20,6 +20,8 @@ func _verify_research_material_sources() -> bool:
 
 	if not _verify_research_requirements_are_obtainable(registry):
 		return false
+	if not _verify_outpost_materials_are_run_only(registry):
+		return false
 	if not _verify_shop_stock_level_pools(registry):
 		return false
 	if not _verify_actual_shop_buy_marks_source(game_state):
@@ -59,16 +61,11 @@ func _verify_shop_stock_level_pools(registry) -> bool:
 		if not level_two_ids.has(item_id):
 			printerr("Merchant level 2 stock pool is missing expected resource: %s" % item_id)
 			return false
-	for item_id in ["outpost_fuse", "outpost_filter", "outpost_servo_pack"]:
-		if not level_three_ids.has(item_id):
-			printerr("Merchant level 3 stock pool is missing expected outpost resource: %s" % item_id)
-			return false
-
 	var research_resource_ids := {}
 	for item_id in _research_requirement_item_ids(registry).keys():
 		var item: Dictionary = registry.get_item(item_id)
 		var item_type := String(item.get("item_type", ""))
-		if item_type == "material" or item_type == "outpost_material":
+		if item_type == "material":
 			research_resource_ids[item_id] = true
 	for item_id in research_resource_ids.keys():
 		if not level_three_ids.has(item_id):
@@ -78,10 +75,33 @@ func _verify_shop_stock_level_pools(registry) -> bool:
 		var item_id := String(row.get("item_id", ""))
 		var item: Dictionary = registry.get_item(item_id)
 		var item_type := String(item.get("item_type", ""))
-		if item_type != "material" and item_type != "outpost_material":
-			printerr("Merchant shop must only sell material/outpost_material resources: %s" % item_id)
+		if item_type != "material":
+			printerr("Merchant shop must only sell normal materials: %s" % item_id)
 			return false
 	return true
+
+func _verify_outpost_materials_are_run_only(registry) -> bool:
+	var ok := true
+	var research_item_ids := _research_requirement_item_ids(registry)
+	for item_id in research_item_ids.keys():
+		var item: Dictionary = registry.get_item(item_id)
+		if String(item.get("item_type", "")) == "outpost_material":
+			printerr("Research must not consume outpost-only repair material: %s" % item_id)
+			ok = false
+	for row in registry.shop_stock_rows:
+		var item_id := String(row.get("item_id", ""))
+		var item: Dictionary = registry.get_item(item_id)
+		if String(item.get("item_type", "")) == "outpost_material":
+			printerr("Merchant shop must not sell outpost-only repair material: %s" % item_id)
+			ok = false
+	for context in registry.drop_rows_by_context.keys():
+		for row in registry.drop_rows_by_context[context]:
+			var item_id := String(row.get("item_id", ""))
+			var item: Dictionary = registry.get_item(item_id)
+			if String(item.get("item_type", "")) == "outpost_material":
+				printerr("Container drops must not include outpost-only repair material: %s" % item_id)
+				ok = false
+	return ok
 
 func _verify_actual_shop_buy_marks_source(game_state: Node) -> bool:
 	game_state.clear_warehouse()

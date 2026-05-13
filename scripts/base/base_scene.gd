@@ -123,15 +123,19 @@ func _ready() -> void:
 	buy_button.pressed.connect(_on_buy_pressed)
 	research_button.pressed.connect(_on_research_pressed)
 	research_confirm_dialog.confirmed.connect(_on_research_confirmed)
-	debug_add_currency_button.pressed.connect(_on_debug_add_currency_pressed)
-	debug_add_sell_items_button.pressed.connect(_on_debug_add_sell_items_pressed)
-	debug_add_research_costs_button.pressed.connect(_on_debug_add_research_costs_pressed)
-	debug_refresh_shop_button.pressed.connect(_on_debug_refresh_shop_pressed)
-	debug_max_shop_button.pressed.connect(_on_debug_max_shop_pressed)
-	debug_complete_research_button.pressed.connect(_on_debug_complete_research_pressed)
-	debug_reset_research_button.pressed.connect(_on_debug_reset_research_pressed)
+	if _is_debug_panel_enabled():
+		debug_add_currency_button.pressed.connect(_on_debug_add_currency_pressed)
+		debug_add_sell_items_button.pressed.connect(_on_debug_add_sell_items_pressed)
+		debug_add_research_costs_button.pressed.connect(_on_debug_add_research_costs_pressed)
+		debug_refresh_shop_button.pressed.connect(_on_debug_refresh_shop_pressed)
+		debug_max_shop_button.pressed.connect(_on_debug_max_shop_pressed)
+		debug_complete_research_button.pressed.connect(_on_debug_complete_research_pressed)
+		debug_reset_research_button.pressed.connect(_on_debug_reset_research_pressed)
+	elif debug_panel != null:
+		debug_panel.visible = false
 	_build_visual_surfaces()
-	_build_debug_story_tools()
+	if _is_debug_panel_enabled():
+		_build_debug_story_tools()
 	_build_esc_settings_button()
 	_refresh()
 	call_deferred("_maybe_show_base_story_dialogue")
@@ -276,6 +280,9 @@ func _play_base_safe_house_bgm() -> void:
 	var audio_manager := get_node_or_null("/root/AudioManager")
 	if audio_manager != null and audio_manager.has_method("play_base_safe_house_bgm"):
 		audio_manager.play_base_safe_house_bgm()
+
+func _is_debug_panel_enabled() -> bool:
+	return OS.is_debug_build() and not OS.has_feature("web")
 
 func _show_chapter_goal_popup() -> void:
 	var popup := _make_overlay_popup("第一章目标", "解锁制造所\n\n出售可售物资，积攒 5000 矿币。\n制造所解锁后，才有机会推进救出妹妹的计划。")

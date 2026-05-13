@@ -52,8 +52,8 @@ func _verify_registry() -> bool:
 			ok = false
 			continue
 		var item_type := String(item.get("item_type", ""))
-		if item_type != "material" and item_type != "outpost_material":
-			printerr("Shop stock row must sell only resources: %s" % row.get("item_id", ""))
+		if item_type != "material":
+			printerr("Shop stock row must sell only normal materials: %s" % row.get("item_id", ""))
 			ok = false
 		if int(row.get("buy_price", 0)) <= 0:
 			printerr("Shop stock row must have positive buy_price: %s" % row.get("item_id", ""))
@@ -70,8 +70,13 @@ func _verify_registry() -> bool:
 			ok = false
 	for context in registry.drop_rows_by_context.keys():
 		for row in registry.drop_rows_by_context[context]:
-			if registry.get_item(String(row.get("item_id", ""))).is_empty():
+			var item: Dictionary = registry.get_item(String(row.get("item_id", "")))
+			if item.is_empty():
 				printerr("Drop row references missing item: %s" % row.get("item_id", ""))
+				ok = false
+				continue
+			if String(item.get("item_type", "")) == "outpost_material":
+				printerr("Container drop rows must not include outpost-only repair materials: %s" % row.get("item_id", ""))
 				ok = false
 	var rng := RandomNumberGenerator.new()
 	rng.seed = 12345

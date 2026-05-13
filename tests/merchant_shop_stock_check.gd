@@ -133,4 +133,4 @@ func _is_resource_offer(offer: Variant) -> bool:
 	if not (offer is Dictionary):
 		return false
 	var item_type := String(offer.get("item_type", ""))
-	return item_type == "material" or item_type == "outpost_material"
+	return item_type == "material"

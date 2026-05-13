@@ -38,6 +38,24 @@ func _verify() -> bool:
 		menu.queue_free()
 		_restore_profile(game_state, original_profile)
 		return false
+	var menu_content := menu.get_node_or_null("MainMenuContent") as Control
+	var menu_dim := menu.get_node_or_null("MainMenuBackgroundDim") as ColorRect
+	var version_label := menu.get_node_or_null("VersionLabel") as Label
+	var background_video := menu.get_node_or_null("MainMenuBackgroundVideo") as VideoStreamPlayer
+	if (
+		menu_content == null
+		or menu_content.visible
+		or menu_dim == null
+		or menu_dim.visible
+		or version_label == null
+		or version_label.visible
+		or background_video == null
+		or background_video.visible
+	):
+		printerr("Expected main menu UI and background loop to be hidden while the opening cinematic is playing.")
+		menu.queue_free()
+		_restore_profile(game_state, original_profile)
+		return false
 	var video_player := opening.get_node_or_null("OpeningCinematicVideoPlayer") as VideoStreamPlayer
 	if video_player == null or video_player.stream == null:
 		printerr("Expected opening cinematic video player to load the configured video stream.")
