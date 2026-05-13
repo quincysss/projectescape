@@ -45,6 +45,7 @@ const SECOND_DAY_BLACK_TIDE_DIALOGUE_PATH := "res://setting/dialogues.tab#second
 const SECOND_DAY_BLACK_TIDE_CINEMATIC_PATH := "res://assets/cinematics/source/second_day_black_tide_reveal_720p.mp4"
 const SECOND_DAY_BLACK_TIDE_CINEMATIC_FALLBACK_PATH := "res://assets/cinematics/second_day_black_tide_reveal_720p.ogv"
 const SECOND_DAY_BLACK_TIDE_PLACEHOLDER_SECONDS := 1.2
+const WEB_SECOND_DAY_BLACK_TIDE_VIDEO_ID := "project-escape-second-day-black-tide-video"
 
 @onready var run_director: RunDirector = $RunDirector
 @onready var world_root: Node2D = $WorldRoot
@@ -168,6 +169,7 @@ var _story_video_overlay: Control
 var _story_video_player: VideoStreamPlayer
 var _story_video_finish_timer: Timer
 var _story_video_bgm_paused: bool = false
+var _story_web_video_active := false
 var _active_story_dialogue_panel: Control
 
 func _notification(what: int) -> void:
@@ -197,6 +199,9 @@ func _ready() -> void:
 	call_deferred("_maybe_start_run_story_gate")
 
 func _exit_tree() -> void:
+	_story_web_video_active = false
+	_remove_web_video(WEB_SECOND_DAY_BLACK_TIDE_VIDEO_ID)
+	_set_web_canvas_transparent(false)
 	_resume_bgm_after_story_video()
 	_audio_manager_call("stop_container_open_loop")
 	_audio_manager_call("set_stability_critical_loop_active", [false])
@@ -278,6 +283,7 @@ func _add_key_action(action_name: String, keycode: Key) -> void:
 
 func _process(delta: float) -> void:
 	_update_status_prompt_timeout()
+	_update_story_web_video()
 	if _is_settlement_flow_active():
 		return
 	if _is_story_paused():
@@ -567,6 +573,8 @@ func _show_second_day_black_tide_cinematic() -> void:
 	skip_button.offset_bottom = -34.0
 	skip_button.pressed.connect(func(): _finish_second_day_black_tide_cinematic(true))
 	overlay.add_child(skip_button)
+	if video_loaded and OS.has_feature("web"):
+		skip_button.visible = false
 
 	if not video_loaded:
 		push_warning("Second day black tide cinematic is missing or unsupported; continuing with placeholder.")
@@ -578,6 +586,17 @@ func _show_second_day_black_tide_cinematic() -> void:
 		_story_video_finish_timer.start()
 
 func _add_second_day_black_tide_video(background: ColorRect, frame: ColorRect, placeholder_label: Label) -> bool:
+	if OS.has_feature("web"):
+		var web_url := _res_path_to_web_url(SECOND_DAY_BLACK_TIDE_CINEMATIC_PATH)
+		if not _play_web_video(WEB_SECOND_DAY_BLACK_TIDE_VIDEO_ID, web_url, false, false, true):
+			return false
+		_story_web_video_active = true
+		background.visible = false
+		frame.visible = false
+		placeholder_label.visible = false
+		_pause_bgm_for_story_video()
+		return true
+
 	var stream := _load_first_story_video_stream([
 		SECOND_DAY_BLACK_TIDE_CINEMATIC_PATH,
 		SECOND_DAY_BLACK_TIDE_CINEMATIC_FALLBACK_PATH,
@@ -601,6 +620,9 @@ func _add_second_day_black_tide_video(background: ColorRect, frame: ColorRect, p
 	return true
 
 func _finish_second_day_black_tide_cinematic(_skipped: bool = false) -> void:
+	_story_web_video_active = false
+	_remove_web_video(WEB_SECOND_DAY_BLACK_TIDE_VIDEO_ID)
+	_set_web_canvas_transparent(false)
 	if is_instance_valid(_story_video_finish_timer):
 		_story_video_finish_timer.stop()
 	if is_instance_valid(_story_video_player):
@@ -628,6 +650,203 @@ func _resume_bgm_after_story_video() -> void:
 	if audio_manager != null and audio_manager.has_method("resume_bgm"):
 		audio_manager.resume_bgm()
 
+func _update_story_web_video() -> void:
+	if not _story_web_video_active:
+		return
+	if _is_web_video_ended(WEB_SECOND_DAY_BLACK_TIDE_VIDEO_ID):
+		_finish_second_day_black_tide_cinematic(false)
+
+func _play_web_video(element_id: String, url: String, loop: bool, muted: bool, foreground: bool = false) -> bool:
+	if not OS.has_feature("web") or element_id.is_empty() or url.is_empty():
+		return false
+	_set_web_canvas_transparent(not foreground)
+	_ensure_web_video_bridge()
+	var script := "window.ProjectEscapeStoryVideo.play(%s, %s, { loop: %s, muted: %s, foreground: %s, skipButton: %s });" % [
+		JSON.stringify(element_id),
+		JSON.stringify(url),
+		_bool_to_js(loop),
+		_bool_to_js(muted),
+		_bool_to_js(foreground),
+		_bool_to_js(foreground),
+	]
+	var result = JavaScriptBridge.eval(script, true)
+	return result == null or bool(result)
+
+func _remove_web_video(element_id: String) -> void:
+	if not OS.has_feature("web") or element_id.is_empty():
+		return
+	_ensure_web_video_bridge()
+	JavaScriptBridge.eval("window.ProjectEscapeStoryVideo.remove(%s);" % JSON.stringify(element_id), false)
+
+func _is_web_video_ended(element_id: String) -> bool:
+	if not OS.has_feature("web") or element_id.is_empty():
+		return false
+	_ensure_web_video_bridge()
+	return bool(JavaScriptBridge.eval("window.ProjectEscapeStoryVideo.ended(%s);" % JSON.stringify(element_id), true))
+
+func _set_web_canvas_transparent(enabled: bool) -> void:
+	if not OS.has_feature("web"):
+		return
+	get_viewport().transparent_bg = enabled
+	RenderingServer.set_default_clear_color(Color(0.0, 0.0, 0.0, 0.0) if enabled else Color.BLACK)
+	var alpha := "0" if enabled else "1"
+	JavaScriptBridge.eval("""
+(function() {
+	var canvas = document.getElementById('canvas');
+	if (!canvas) {
+		return;
+	}
+	canvas.style.background = 'rgba(0,0,0,%s)';
+	canvas.style.position = 'relative';
+	canvas.style.zIndex = '1';
+	document.body.style.backgroundColor = 'black';
+	document.documentElement.style.backgroundColor = 'black';
+})();
+""" % alpha, false)
+
+func _ensure_web_video_bridge() -> void:
+	if not OS.has_feature("web"):
+		return
+	JavaScriptBridge.eval("""
+(function() {
+	if (window.ProjectEscapeStoryVideo) {
+		return;
+	}
+	window.ProjectEscapeStoryVideo = {
+		play: function(id, src, options) {
+			options = options || {};
+			var canvas = document.getElementById('canvas');
+			var rootId = id + '-root';
+			var root = document.getElementById(rootId);
+			if (!root) {
+				root = document.createElement('div');
+				root.id = rootId;
+				document.body.appendChild(root);
+			}
+			root.style.position = 'fixed';
+			root.style.left = '0';
+			root.style.top = '0';
+			root.style.width = '100vw';
+			root.style.height = '100vh';
+			root.style.zIndex = options.foreground ? '2147483646' : '0';
+			root.style.pointerEvents = 'none';
+			root.style.backgroundColor = options.foreground ? '#050505' : 'transparent';
+			root.style.visibility = 'visible';
+			root.style.opacity = '1';
+			root.style.display = 'block';
+			root.style.transform = 'translateZ(0)';
+
+			var video = document.getElementById(id);
+			if (!video) {
+				video = document.createElement('video');
+				video.id = id;
+			}
+			if (options.foreground) {
+				root.appendChild(video);
+			} else if (canvas) {
+				document.body.insertBefore(video, canvas);
+			} else {
+				document.body.appendChild(video);
+			}
+			video.dataset.projectEscapeEnded = 'false';
+			video.src = src;
+			video.loop = !!options.loop;
+			video.muted = !!options.muted;
+			video.autoplay = true;
+			video.playsInline = true;
+			video.preload = 'auto';
+			video.controls = false;
+			video.style.position = 'fixed';
+			video.style.left = '0';
+			video.style.top = '0';
+			video.style.width = '100vw';
+			video.style.height = '100vh';
+			video.style.objectFit = 'cover';
+			video.style.zIndex = options.foreground ? '0' : '0';
+			video.style.pointerEvents = 'none';
+			video.style.backgroundColor = '#050505';
+			video.style.visibility = 'visible';
+			video.style.opacity = '1';
+			video.style.display = 'block';
+			video.onended = function() {
+				video.dataset.projectEscapeEnded = 'true';
+			};
+			video.onerror = function() {
+				video.dataset.projectEscapeEnded = 'true';
+				console.warn('ProjectEscape video failed: ' + src);
+			};
+			var promise = video.play();
+			if (promise && promise.catch) {
+				promise.catch(function(error) {
+					console.warn('ProjectEscape video play rejected: ' + error);
+					if (!options.loop) {
+						video.dataset.projectEscapeEnded = 'true';
+					}
+				});
+			}
+			var skipId = id + '-skip';
+			var skipButton = document.getElementById(skipId);
+			if (skipButton) {
+				skipButton.remove();
+			}
+			if (options.skipButton) {
+				skipButton = document.createElement('button');
+				skipButton.id = skipId;
+				skipButton.type = 'button';
+				skipButton.textContent = '\u8df3\u8fc7\u5f71\u50cf';
+				skipButton.style.position = 'fixed';
+				skipButton.style.right = '36px';
+				skipButton.style.bottom = '34px';
+				skipButton.style.zIndex = '2147483647';
+				skipButton.style.pointerEvents = 'auto';
+				skipButton.style.padding = '9px 18px';
+				skipButton.style.border = '1px solid rgba(233, 216, 158, 0.78)';
+				skipButton.style.borderRadius = '2px';
+				skipButton.style.background = 'rgba(8, 8, 8, 0.72)';
+				skipButton.style.color = '#f1e7bd';
+				skipButton.style.font = '16px sans-serif';
+				skipButton.style.cursor = 'pointer';
+				skipButton.onclick = function() {
+					video.dataset.projectEscapeEnded = 'true';
+					video.pause();
+				};
+				document.body.appendChild(skipButton);
+			}
+			return true;
+		},
+		remove: function(id) {
+			var skipButton = document.getElementById(id + '-skip');
+			if (skipButton) {
+				skipButton.remove();
+			}
+			var video = document.getElementById(id);
+			if (video) {
+				video.pause();
+				video.removeAttribute('src');
+				video.load();
+				video.remove();
+			}
+			var root = document.getElementById(id + '-root');
+			if (root) {
+				root.remove();
+			}
+		},
+		ended: function(id) {
+			var video = document.getElementById(id);
+			return !video || video.dataset.projectEscapeEnded === 'true' || video.ended;
+		}
+	};
+})();
+""", false)
+
+func _bool_to_js(value: bool) -> String:
+	return "true" if value else "false"
+
+func _res_path_to_web_url(path: String) -> String:
+	if path.begins_with("res://"):
+		return path.trim_prefix("res://")
+	return path
+
 func _load_first_story_video_stream(paths: Array) -> VideoStream:
 	for path in paths:
 		var stream := _load_story_video_stream(String(path))
@@ -636,6 +855,8 @@ func _load_first_story_video_stream(paths: Array) -> VideoStream:
 	return null
 
 func _load_story_video_stream(path: String) -> VideoStream:
+	if OS.has_feature("web") and path.get_extension().to_lower() == "mp4":
+		return null
 	if path.is_empty() or not FileAccess.file_exists(path):
 		return null
 	if path.get_extension().to_lower() == "ogv" and not _is_ogg_theora_video(path):

@@ -21,9 +21,12 @@ func _verify_merchant_shop_stock() -> bool:
 	if registry.get_shop_stock_rows_for_level(1).is_empty() or registry.get_shop_stock_rows_for_level(3).size() <= registry.get_shop_stock_rows_for_level(1).size():
 		printerr("Expected higher merchant levels to expose a wider shop stock pool.")
 		return false
+	if not _verify_shop_quality_gates(registry):
+		return false
 
 	game_state.clear_warehouse()
 	game_state.clear_currencies()
+	game_state.reset_research()
 	game_state.set_merchant_shop_level(1)
 	game_state.add_currency("mine_coin", 100, "test_shop_buy")
 	var level_one_offers: Array = game_state.refresh_shop_stock(12345)
@@ -31,17 +34,22 @@ func _verify_merchant_shop_stock() -> bool:
 		printerr("Expected level 1 merchant to generate 3 offers, got %d." % level_one_offers.size())
 		return false
 	for offer in level_one_offers:
-		if not _is_resource_offer(offer):
-			printerr("Expected shop offers to be material resources only: %s" % offer)
+		if not _is_valid_offer(offer):
+			printerr("Expected shop offers to be sellable item offers: %s" % offer)
 			return false
 		if int(offer.get("min_shop_level", 1)) > 1:
 			printerr("Expected level 1 stock to exclude higher-level rows.")
+			return false
+		if not _offer_price_matches_item(registry, offer):
 			return false
 
 	var first_offer: Dictionary = level_one_offers[0]
 	var quote: Dictionary = game_state.get_buy_quote(String(first_offer.get("shop_offer_id", "")), 1)
 	if not bool(quote.get("ok", false)):
 		printerr("Expected buy quote to succeed: %s" % quote)
+		return false
+	if int(quote.get("unit_price", 0)) != int(first_offer.get("buy_price", -1)):
+		printerr("Expected buy quote unit price to match offer price: %s" % quote)
 		return false
 	var before_currency: int = game_state.get_currency_amount("mine_coin")
 	var before_warehouse_count: int = game_state.get_warehouse_items_snapshot().size()
@@ -71,6 +79,9 @@ func _verify_merchant_shop_stock() -> bool:
 	if level_three_offers.size() != 5:
 		printerr("Expected level 3 merchant to generate 5 offers, got %d." % level_three_offers.size())
 		return false
+	for offer in level_three_offers:
+		if not _offer_price_matches_item(registry, offer):
+			return false
 	if not await _verify_base_shop_buy(game_state):
 		return false
 	return true
@@ -78,6 +89,7 @@ func _verify_merchant_shop_stock() -> bool:
 func _verify_base_shop_buy(game_state: Node) -> bool:
 	game_state.clear_warehouse()
 	game_state.clear_currencies()
+	game_state.reset_research()
 	game_state.set_merchant_shop_level(1)
 	game_state.add_currency("mine_coin", 100, "test_base_shop_ui")
 	var offers: Array = game_state.refresh_shop_stock(2468)
@@ -130,8 +142,43 @@ func _verify_base_shop_buy(game_state: Node) -> bool:
 	await process_frame
 	return true
 
-func _is_resource_offer(offer: Variant) -> bool:
+func _verify_shop_quality_gates(registry) -> bool:
+	var level_one_qualities := _shop_quality_set(registry, 1)
+	var level_two_qualities := _shop_quality_set(registry, 2)
+	var level_three_qualities := _shop_quality_set(registry, 3)
+	if level_one_qualities.has("A") or level_one_qualities.has("S"):
+		printerr("Merchant level 1 must not expose A/S stock rows.")
+		return false
+	if not level_two_qualities.has("A") or level_two_qualities.has("S"):
+		printerr("Merchant level 2 must expose A stock rows and exclude S stock rows: %s" % level_two_qualities)
+		return false
+	if not level_three_qualities.has("A") or not level_three_qualities.has("S"):
+		printerr("Merchant level 3 must expose both A and S stock rows: %s" % level_three_qualities)
+		return false
+	return true
+
+func _shop_quality_set(registry, level: int) -> Dictionary:
+	var result := {}
+	for row in registry.get_shop_stock_rows_for_level(level):
+		var item: Dictionary = registry.get_item(String(row.get("item_id", "")))
+		result[String(item.get("quality", ""))] = true
+	return result
+
+func _offer_price_matches_item(registry, offer: Dictionary) -> bool:
+	var item: Dictionary = registry.get_item(String(offer.get("item_id", "")))
+	if item.is_empty():
+		printerr("Expected offer to reference an item: %s" % offer)
+		return false
+	if int(offer.get("buy_price", 0)) != int(item.get("sell_value", 0)):
+		printerr("Expected shop offer price to match item sell_value: %s" % offer)
+		return false
+	if String(offer.get("buy_currency_id", "")) != String(item.get("sell_currency_id", "")):
+		printerr("Expected shop offer currency to match item sell_currency_id: %s" % offer)
+		return false
+	return true
+
+func _is_valid_offer(offer: Variant) -> bool:
 	if not (offer is Dictionary):
 		return false
 	var item_type := String(offer.get("item_type", ""))
-	return item_type == "material"
+	return not item_type.is_empty() and int(offer.get("buy_price", 0)) > 0

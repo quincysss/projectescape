@@ -91,11 +91,16 @@ func _verify_research_manager_and_base_ui() -> bool:
 		printerr("Expected max-level research quote to stop further upgrades.")
 		return false
 
+	if not _verify_merchant_shop_research(registry, game_state):
+		return false
+
 	return true
 
 func _verify_base_research_tab(registry, game_state: Node) -> bool:
 	game_state.clear_warehouse()
 	game_state.clear_currencies()
+	if game_state.has_method("mark_first_return_dialogue_seen_and_activate_chapter"):
+		game_state.mark_first_return_dialogue_seen_and_activate_chapter()
 	_add_items(registry, game_state, "battery_old", 2)
 	_add_items(registry, game_state, "tool_parts", 4)
 	_add_items(registry, game_state, "wire_coil", 3)
@@ -144,6 +149,52 @@ func _verify_base_research_tab(registry, game_state: Node) -> bool:
 		return false
 	base_root.queue_free()
 	await process_frame
+	return true
+
+func _verify_merchant_shop_research(registry, game_state: Node) -> bool:
+	game_state.clear_warehouse()
+	game_state.clear_currencies()
+	game_state.reset_research()
+	if game_state.get_merchant_shop_level() != 1:
+		printerr("Expected merchant shop research to start at Lv.1.")
+		return false
+
+	_add_items(registry, game_state, "rusted_bolts", 4)
+	_add_items(registry, game_state, "cracked_lens", 2)
+	_add_items(registry, game_state, "cloth_dirty", 3)
+	game_state.add_currency("mine_coin", 80, "test_merchant_research")
+	var level_one: Dictionary = game_state.complete_research("merchant_shop_level")
+	if not bool(level_one.get("ok", false)) or game_state.get_research_level("merchant_shop_level") != 1:
+		printerr("Expected merchant shop level 1 research to complete: %s" % level_one)
+		return false
+	if game_state.get_merchant_shop_level() != 2:
+		printerr("Expected merchant shop research level 1 to unlock shop Lv.2.")
+		return false
+	var level_two_offers: Array = game_state.refresh_shop_stock(12345)
+	if level_two_offers.size() != 4:
+		printerr("Expected merchant shop Lv.2 to generate 4 offers, got %d." % level_two_offers.size())
+		return false
+
+	_add_items(registry, game_state, "tool_parts", 3)
+	_add_items(registry, game_state, "wire_coil", 3)
+	_add_items(registry, game_state, "battery_old", 2)
+	_add_items(registry, game_state, "street_map_fragment", 1)
+	game_state.add_currency("mine_coin", 180, "test_merchant_research")
+	var level_two: Dictionary = game_state.complete_research("merchant_shop_level")
+	if not bool(level_two.get("ok", false)) or game_state.get_research_level("merchant_shop_level") != 2:
+		printerr("Expected merchant shop level 2 research to complete: %s" % level_two)
+		return false
+	if game_state.get_merchant_shop_level() != 3:
+		printerr("Expected merchant shop research level 2 to unlock shop Lv.3.")
+		return false
+	var level_three_offers: Array = game_state.refresh_shop_stock(12345)
+	if level_three_offers.size() != 5:
+		printerr("Expected merchant shop Lv.3 to generate 5 offers, got %d." % level_three_offers.size())
+		return false
+	var max_quote: Dictionary = game_state.get_research_quote("merchant_shop_level")
+	if bool(max_quote.get("ok", false)) or String(max_quote.get("error", "")) != "max_level":
+		printerr("Expected merchant shop research to stop at max level.")
+		return false
 	return true
 
 func _add_items(registry, game_state: Node, item_id: String, count: int) -> void:

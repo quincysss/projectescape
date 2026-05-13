@@ -20,3 +20,5 @@ warehouse_capacity	仓库整理 II	warehouse	2	5	tool_parts:6;duct_tape_roll:4;r
 warehouse_capacity	仓库整理 III	warehouse	3	5	battery_old:4;pulse_battery:2;signal_resonator_coil:2;street_map_fragment:1	mine_coin	230	warehouse_capacity	100	true	v0.2	永久提高局外仓库容量至 100 格。
 warehouse_capacity	仓库整理 IV	warehouse	4	5	survey_drone_core:2;thermal_scope_module:1;gold_data_chip:1;signal_resonator_coil:4	mine_coin	480	warehouse_capacity	110	true	v0.2	永久提高局外仓库容量至 110 格。
 warehouse_capacity	仓库整理 V	warehouse	5	5	sanctuary_nav_chip:1;blackbox_memory_core:2;prefall_access_key:1;anomaly_heart_shard:1	mine_coin	820	warehouse_capacity	120	true	v0.2	永久提高局外仓库容量至 120 格。
+merchant_shop_level	商店渠道 I	commerce	1	2	rusted_bolts:4;cracked_lens:2;cloth_dirty:3	mine_coin	80	merchant_shop_level	2	true	v0.3	永久提高商人库存等级至 Lv.2，增加每日商品槽位和中阶资源池。
+merchant_shop_level	商店渠道 II	commerce	2	2	tool_parts:3;wire_coil:3;battery_old:2;street_map_fragment:1	mine_coin	180	merchant_shop_level	3	true	v0.3	永久提高商人库存等级至 Lv.3，开放完整资源池。

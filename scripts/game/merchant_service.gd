@@ -262,7 +262,10 @@ func _make_shop_offer(row: Dictionary, rng: RandomNumberGenerator, offer_index: 
 	var min_count: int = maxi(1, int(row.get("min_count", 1)))
 	var max_count: int = maxi(min_count, int(row.get("max_count", min_count)))
 	var count := rng.randi_range(min_count, max_count)
-	var buy_price := maxi(0, int(row.get("buy_price", 0)))
+	var buy_price := maxi(0, int(item_def.get("sell_value", 0)))
+	var buy_currency_id := String(item_def.get("sell_currency_id", row.get("buy_currency_id", DEFAULT_CURRENCY_ID)))
+	if buy_currency_id.is_empty():
+		buy_currency_id = DEFAULT_CURRENCY_ID
 	if count <= 0 or buy_price <= 0:
 		return {}
 	return {
@@ -276,7 +279,7 @@ func _make_shop_offer(row: Dictionary, rng: RandomNumberGenerator, offer_index: 
 		"item_type": String(item_def.get("item_type", "")),
 		"quality": String(item_def.get("quality", "C")),
 		"count": count,
-		"buy_currency_id": String(row.get("buy_currency_id", DEFAULT_CURRENCY_ID)),
+		"buy_currency_id": buy_currency_id,
 		"buy_price": buy_price,
 	}
 

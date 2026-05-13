@@ -430,7 +430,8 @@ func sell_warehouse_item(warehouse_item_id: String, count: int) -> Dictionary:
 	return result
 
 func get_merchant_shop_level() -> int:
-	return merchant_shop_level
+	var researched_level := int(round(_get_research_effect_value("merchant_shop_level", 1.0)))
+	return clampi(maxi(merchant_shop_level, researched_level), 1, 3)
 
 func set_merchant_shop_level(level: int) -> void:
 	var normalized := clampi(level, 1, 3)
@@ -475,6 +476,8 @@ func complete_research(research_id: String) -> Dictionary:
 	var result: Dictionary = research_manager.complete_research(research_id)
 	if bool(result.get("ok", false)):
 		_apply_warehouse_capacity()
+		if String(result.get("effect_type", "")) == "merchant_shop_level":
+			_apply_merchant_shop_level_from_research()
 		save_profile()
 	return result
 
@@ -511,6 +514,9 @@ func reset_research() -> void:
 	_bind_research_manager()
 	research_manager.reset_research()
 	_apply_warehouse_capacity()
+	merchant_shop_level = 1
+	merchant_shop_offers.clear()
+	_bind_merchant_service()
 	save_profile()
 
 func get_currency_amount(currency_id: String = "mine_coin") -> int:
@@ -656,7 +662,7 @@ func _bind_merchant_service() -> void:
 	_bind_currency_wallet()
 	if merchant_service == null:
 		merchant_service = MerchantServiceScript.new()
-	merchant_service.bind_dependencies(warehouse_manager, currency_wallet, merchant_shop_offers, merchant_shop_level)
+	merchant_service.bind_dependencies(warehouse_manager, currency_wallet, merchant_shop_offers, get_merchant_shop_level())
 
 func _bind_research_manager() -> void:
 	_bind_warehouse_manager()
@@ -675,3 +681,11 @@ func _apply_warehouse_capacity() -> void:
 	if warehouse_manager == null:
 		return
 	warehouse_manager.set_capacity(get_warehouse_capacity(BASE_WAREHOUSE_CAPACITY))
+
+func _apply_merchant_shop_level_from_research() -> void:
+	var researched_level := int(round(_get_research_effect_value("merchant_shop_level", 1.0)))
+	var normalized := clampi(maxi(merchant_shop_level, researched_level), 1, 3)
+	if merchant_shop_level != normalized:
+		merchant_shop_level = normalized
+		merchant_shop_offers.clear()
+	_bind_merchant_service()

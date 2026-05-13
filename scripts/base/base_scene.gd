@@ -1910,6 +1910,8 @@ func _format_research_effect(effect_type: String, effect_value: float) -> String
 			return "稳定值 %.0f" % effect_value
 		"warehouse_capacity":
 			return "仓库 %d 格" % int(round(effect_value))
+		"merchant_shop_level":
+			return "商店 Lv.%d" % int(round(effect_value))
 		_:
 			return "%s %.2f" % [effect_type, effect_value]
 

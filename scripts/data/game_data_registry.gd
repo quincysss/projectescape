@@ -237,11 +237,19 @@ func get_shop_stock_rows_for_level(shop_level: int, shop_id: String = "base_merc
 		var item := get_item(item_id)
 		if item.is_empty():
 			continue
-		var item_type := String(item.get("item_type", ""))
-		if item_type != "material":
+		if not _is_shop_stock_item(item):
 			continue
 		result.append(row)
 	return result
+
+func _is_shop_stock_item(item: Dictionary) -> bool:
+	if String(item.get("item_type", "")).is_empty():
+		return false
+	if not TabDataLoader.parse_bool(String(item.get("sellable", "false")), false):
+		return false
+	if int(item.get("sell_value", 0)) <= 0:
+		return false
+	return QUALITY_ORDER.has(String(item.get("quality", "")))
 
 func generate_container_loot(container_def: Dictionary, ring: String, rng: RandomNumberGenerator) -> Array[Dictionary]:
 	var context := String(container_def.get("loot_context", ""))

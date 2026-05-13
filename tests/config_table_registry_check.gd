@@ -1,6 +1,7 @@
 extends SceneTree
 
 const GameDataRegistryScript := preload("res://scripts/data/game_data_registry.gd")
+const TabDataLoader := preload("res://scripts/data/tab_data_loader.gd")
 
 func _initialize() -> void:
 	var ok := _verify_registry()
@@ -72,12 +73,17 @@ func _verify_registry() -> bool:
 			printerr("Shop stock row references missing item: %s" % row.get("item_id", ""))
 			ok = false
 			continue
-		var item_type := String(item.get("item_type", ""))
-		if item_type != "material":
-			printerr("Shop stock row must sell only normal materials: %s" % row.get("item_id", ""))
+		if not TabDataLoader.parse_bool(String(item.get("sellable", "false")), false):
+			printerr("Shop stock row must reference a sellable item: %s" % row.get("item_id", ""))
 			ok = false
 		if int(row.get("buy_price", 0)) <= 0:
 			printerr("Shop stock row must have positive buy_price: %s" % row.get("item_id", ""))
+			ok = false
+		if int(row.get("buy_price", 0)) != int(item.get("sell_value", 0)):
+			printerr("Shop stock buy_price must match item sell_value: %s" % row.get("item_id", ""))
+			ok = false
+		if String(row.get("buy_currency_id", "")) != String(item.get("sell_currency_id", "")):
+			printerr("Shop stock buy_currency_id must match item sell_currency_id: %s" % row.get("item_id", ""))
 			ok = false
 	for container in registry.containers_by_id.values():
 		if container.has("quality") or container.has("grade") or container.has("rarity"):

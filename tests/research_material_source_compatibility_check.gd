@@ -61,6 +61,18 @@ func _verify_shop_stock_level_pools(registry) -> bool:
 		if not level_two_ids.has(item_id):
 			printerr("Merchant level 2 stock pool is missing expected resource: %s" % item_id)
 			return false
+	var level_one_qualities := _shop_quality_set(registry.get_shop_stock_rows_for_level(1), registry)
+	var level_two_qualities := _shop_quality_set(registry.get_shop_stock_rows_for_level(2), registry)
+	var level_three_qualities := _shop_quality_set(registry.get_shop_stock_rows_for_level(3), registry)
+	if level_one_qualities.has("A") or level_one_qualities.has("S"):
+		printerr("Merchant level 1 must not include A/S stock rows.")
+		return false
+	if not level_two_qualities.has("A") or level_two_qualities.has("S"):
+		printerr("Merchant level 2 must include A stock rows and exclude S stock rows.")
+		return false
+	if not level_three_qualities.has("S"):
+		printerr("Merchant level 3 must include S stock rows.")
+		return false
 	var research_resource_ids := {}
 	for item_id in _research_requirement_item_ids(registry).keys():
 		var item: Dictionary = registry.get_item(item_id)
@@ -74,9 +86,8 @@ func _verify_shop_stock_level_pools(registry) -> bool:
 	for row in registry.shop_stock_rows:
 		var item_id := String(row.get("item_id", ""))
 		var item: Dictionary = registry.get_item(item_id)
-		var item_type := String(item.get("item_type", ""))
-		if item_type != "material":
-			printerr("Merchant shop must only sell normal materials: %s" % item_id)
+		if not _is_sellable_shop_item(item):
+			printerr("Merchant shop must only sell sellable warehouse items: %s" % item_id)
 			return false
 	return true
 
@@ -106,6 +117,7 @@ func _verify_outpost_materials_are_run_only(registry) -> bool:
 func _verify_actual_shop_buy_marks_source(game_state: Node) -> bool:
 	game_state.clear_warehouse()
 	game_state.clear_currencies()
+	game_state.reset_research()
 	game_state.set_merchant_shop_level(1)
 	game_state.add_currency("mine_coin", 100, "test_merchant_source")
 	var offers: Array = game_state.refresh_shop_stock(13579)
@@ -164,6 +176,16 @@ func _shop_item_id_set(rows: Array) -> Dictionary:
 	for row in rows:
 		result[String(row.get("item_id", ""))] = true
 	return result
+
+func _shop_quality_set(rows: Array, registry) -> Dictionary:
+	var result := {}
+	for row in rows:
+		var item: Dictionary = registry.get_item(String(row.get("item_id", "")))
+		result[String(item.get("quality", ""))] = true
+	return result
+
+func _is_sellable_shop_item(item: Dictionary) -> bool:
+	return not item.is_empty() and String(item.get("item_type", "")).length() > 0 and String(item.get("sellable", "")) == "true" and int(item.get("sell_value", 0)) > 0
 
 func _add_items_with_source(registry, game_state: Node, item_id: String, count: int, source: String) -> void:
 	var items: Array[Dictionary] = []
