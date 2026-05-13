@@ -64,11 +64,9 @@ large_safe_wire	container_large_safe	wire_coil	1	2	28	material;electronic	v0.3
 large_safe_map_fragment	container_large_safe	street_map_fragment	1	1	18	rare;map	v0.3
 large_safe_photo	container_large_safe	keepsake_photo	1	2	35	rare;settlement	v0.1
 large_safe_chip	container_large_safe	gold_data_chip	1	1	12	rare;electronic	v0.1
-large_safe_filter	container_large_safe	outpost_filter	1	1	10	outpost_material;rare	v0.1
 large_safe_injector	container_large_safe	signal_injector	1	1	18	consumable;rare	v0.1
 large_safe_medkit	container_large_safe	sealed_medkit	1	1	18	consumable;medical;rare	v0.2
 large_safe_drone_core	container_large_safe	survey_drone_core	1	1	14	rare;electronic;signal	v0.2
-large_safe_servo_pack	container_large_safe	outpost_servo_pack	1	1	12	outpost_material;repair;rare	v0.2
 large_safe_blackbox	container_large_safe	blackbox_memory_core	1	1	4	rare;electronic;legendary	v0.2
 large_safe_nav_chip	container_large_safe	sanctuary_nav_chip	1	1	3	rare;map;legendary	v0.2
 anomaly_compass	container_anomaly	cracked_compass	1	1	10	rare;collectible;common	v0.3
@@ -78,7 +76,6 @@ anomaly_street_map	container_anomaly	street_map_fragment	1	1	25	rare;map	v0.3
 anomaly_pulse_battery	container_anomaly	pulse_battery	1	1	20	material;power	v0.3
 anomaly_chip	container_anomaly	gold_data_chip	1	1	18	rare;electronic	v0.1
 anomaly_photo	container_anomaly	keepsake_photo	1	1	28	rare;settlement	v0.1
-anomaly_filter	container_anomaly	outpost_filter	1	1	20	outpost_material;rare	v0.1
 anomaly_signal	container_anomaly	signal_injector	1	1	25	consumable;rare	v0.1
 anomaly_heart_shard	container_anomaly	anomaly_heart_shard	1	1	10	rare;anomaly;legendary	v0.2
 anomaly_blackbox	container_anomaly	blackbox_memory_core	1	1	8	rare;electronic;legendary	v0.2
