@@ -15,8 +15,8 @@ max_stability	稳定训练 II	survival	2	5	stability_candy:2;sterile_patch:2;med
 max_stability	稳定训练 III	survival	3	5	signal_injector:1;sealed_medkit:1;stability_candy:3;street_map_fragment:1	mine_coin	210	max_stability	160	true	v0.2	永久提高玩家稳定值上限至 160。
 max_stability	稳定训练 IV	survival	4	5	anomaly_heart_shard:1;signal_injector:3;blackbox_memory_core:1;sealed_medkit:2	mine_coin	420	max_stability	180	true	v0.2	永久提高玩家稳定值上限至 180。
 max_stability	稳定训练 V	survival	5	5	anomaly_heart_shard:2;sanctuary_nav_chip:1;prefall_access_key:1;blackbox_memory_core:2	mine_coin	760	max_stability	200	true	v0.2	永久提高玩家稳定值上限至 200。
-warehouse_capacity	仓库整理 I	warehouse	1	5	scrap_metal:8;cloth_dirty:4;rusted_bolts:4	mine_coin	40	warehouse_capacity	130	true	v0.2	永久提高局外仓库容量至 130 格。
-warehouse_capacity	仓库整理 II	warehouse	2	5	tool_parts:6;duct_tape_roll:4;reinforced_strap:2	mine_coin	110	warehouse_capacity	140	true	v0.2	永久提高局外仓库容量至 140 格。
-warehouse_capacity	仓库整理 III	warehouse	3	5	battery_old:4;pulse_battery:2;signal_resonator_coil:2;street_map_fragment:1	mine_coin	230	warehouse_capacity	150	true	v0.2	永久提高局外仓库容量至 150 格。
-warehouse_capacity	仓库整理 IV	warehouse	4	5	survey_drone_core:2;thermal_scope_module:1;gold_data_chip:1;signal_resonator_coil:4	mine_coin	480	warehouse_capacity	160	true	v0.2	永久提高局外仓库容量至 160 格。
-warehouse_capacity	仓库整理 V	warehouse	5	5	sanctuary_nav_chip:1;blackbox_memory_core:2;prefall_access_key:1;anomaly_heart_shard:1	mine_coin	820	warehouse_capacity	170	true	v0.2	永久提高局外仓库容量至 170 格。
+warehouse_capacity	仓库整理 I	warehouse	1	5	scrap_metal:8;cloth_dirty:4;rusted_bolts:4	mine_coin	40	warehouse_capacity	80	true	v0.2	永久提高局外仓库容量至 80 格。
+warehouse_capacity	仓库整理 II	warehouse	2	5	tool_parts:6;duct_tape_roll:4;reinforced_strap:2	mine_coin	110	warehouse_capacity	90	true	v0.2	永久提高局外仓库容量至 90 格。
+warehouse_capacity	仓库整理 III	warehouse	3	5	battery_old:4;pulse_battery:2;signal_resonator_coil:2;street_map_fragment:1	mine_coin	230	warehouse_capacity	100	true	v0.2	永久提高局外仓库容量至 100 格。
+warehouse_capacity	仓库整理 IV	warehouse	4	5	survey_drone_core:2;thermal_scope_module:1;gold_data_chip:1;signal_resonator_coil:4	mine_coin	480	warehouse_capacity	110	true	v0.2	永久提高局外仓库容量至 110 格。
+warehouse_capacity	仓库整理 V	warehouse	5	5	sanctuary_nav_chip:1;blackbox_memory_core:2;prefall_access_key:1;anomaly_heart_shard:1	mine_coin	820	warehouse_capacity	120	true	v0.2	永久提高局外仓库容量至 120 格。

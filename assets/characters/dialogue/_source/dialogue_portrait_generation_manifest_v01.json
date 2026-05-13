@@ -1,0 +1,42 @@
+{
+  "asset_set": "dialogue_character_portraits_v01",
+  "prompt_target_model": "gpt-image-2",
+  "final_size": [1024, 1536],
+  "source_background": "#00ff00 chroma key",
+  "postprocess": "remove chroma key to alpha PNG before copying to runtime paths",
+  "runtime_assets": [
+    {
+      "speaker_id": "player",
+      "display_name": "玩家",
+      "side": "right",
+      "source_chroma": "assets/characters/dialogue/_source/player_dialogue_bust_01_chroma.png",
+      "source_alpha_raw": "assets/characters/dialogue/_source/player_dialogue_bust_01_alpha_raw.png",
+      "final": "assets/characters/dialogue/player/player_dialogue_bust_01.png",
+      "reference_image": "C:/Users/KSG/AppData/Roaming/xiezuo/ImageTempCache/xiezuo20260429-175605.png",
+      "generated_image": "C:/Users/KSG/.codex/generated_images/019e20bf-503a-7333-95fd-af4a07a76415/ig_010334e0e43e74cb016a044d783ed88190b2f5ea6d8714d79e.png",
+      "generation_mode": "codex_builtin_image_generation_chroma_key",
+      "status": "final_generated_ready",
+      "is_placeholder": false
+    },
+    {
+      "speaker_id": "operator_404",
+      "display_name": "404 哨所管理员",
+      "side": "left",
+      "source_chroma": "assets/characters/dialogue/_source/operator_404_dialogue_bust_01_chroma.png",
+      "source_alpha_raw": "assets/characters/dialogue/_source/operator_404_dialogue_bust_01_alpha_raw.png",
+      "final": "assets/characters/dialogue/operator_404/operator_404_dialogue_bust_01.png",
+      "generated_image": "C:/Users/KSG/.codex/generated_images/019e20bf-503a-7333-95fd-af4a07a76415/ig_010334e0e43e74cb016a0450544be0819098fd99b537ba84fb.png",
+      "generation_mode": "codex_builtin_image_generation_chroma_key",
+      "status": "final_generated_ready",
+      "is_placeholder": false
+    },
+    {
+      "speaker_id": "unknown",
+      "display_name": "占位剪影",
+      "side": "fallback",
+      "final": "assets/characters/dialogue/common/dialogue_portrait_placeholder.png",
+      "status": "local_fallback_ready",
+      "is_placeholder": true
+    }
+  ]
+}

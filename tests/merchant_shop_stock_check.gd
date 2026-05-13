@@ -12,6 +12,7 @@ func _verify_merchant_shop_stock() -> bool:
 	if game_state == null:
 		printerr("Expected GameState autoload.")
 		return false
+	await process_frame
 
 	var registry = GameDataRegistryScript.new()
 	if not registry.load_all():

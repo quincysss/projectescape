@@ -275,6 +275,7 @@ P2：
 | 前哨站 | 768x768 / 1024x1024 | 需要修复前与修复后两版 |
 | UI 图标 | 128x128 | 背包、装备、消耗品、货币 |
 | 角色立绘参考 | 1024x1024 | 用于角色风格定义 |
+| 剧情对白半身原画 | 1024x1024 / 1024x1536 | 用于 DialoguePanel 中的说话角色原画 |
 | 角色局内 sprite | 128x128 / 256x256 | 需后续拆动画 |
 
 场景拆件要求：
@@ -447,6 +448,31 @@ res://assets/map/outposts/outpost_repaired_01.png
 白色或透明背景。
 ```
 
+剧情对白半身原画：
+
+```text
+半身或大半身。
+正面或 3/4 正面。
+透明背景 PNG。
+角色主体完整，不裁头、不裁肩。
+腰部以下可以自然淡出或被对白框遮挡。
+灰黑废土手绘漫画风。
+小面积蓝紫、暖黄或红色点缀。
+边缘干净，适合 Godot UI 叠放。
+```
+
+主角对白原画提示词：
+
+```text
+2D hand-drawn manga style half-body character portrait, transparent background, wasteland underground outpost survivor and surface scavenger, worn protective coat, patched fabric, light backpack straps, simple respirator scarf or chest filter device, tired but alert expression, muted charcoal and dirty grey palette, small blue-purple electronic module accents, rough black ink outlines, gritty texture, no weapon focus, no text, clean cutout edges.
+```
+
+404 哨所管理员对白原画提示词：
+
+```text
+2D hand-drawn manga style half-body character portrait, transparent background, underground outpost administrator and radio operator, calm reliable expression with fatigue, old utility uniform or maintenance vest, headset and small communication device, subtle 404 patch on shoulder, warm yellow work-light reflection, muted charcoal grey palette, rough black ink outlines, gritty wasteland texture, no readable text, clean cutout edges.
+```
+
 局内角色 sprite：
 
 ```text
@@ -461,6 +487,7 @@ res://assets/map/outposts/outpost_repaired_01.png
 
 ```text
 参考图中的角色是立绘/设定图方向。
+剧情对白半身原画可以直接用于 DialoguePanel，但不能替代局内 HUD 头像和局内 sprite。
 真正局内 sprite 需要再转成俯视可动版本。
 不要直接把立绘当局内角色。
 ```

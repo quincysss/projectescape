@@ -107,6 +107,11 @@ func _verify_outpost_safe_zone_and_extract_ui() -> bool:
 	if not root.extraction_progress_bar.visible or root.extraction_progress_bar.value != 0.0:
 		printerr("Expected extraction progress bar ready at zero.")
 		return false
+	var progress_rect := Rect2(root.extraction_progress_bar.position, root.extraction_progress_bar.size)
+	var status_rect := Rect2(Vector2.ZERO, root.extraction_status_panel.size)
+	if not status_rect.encloses(progress_rect) or progress_rect.end.y > 46.0:
+		printerr("Expected extraction progress bar inside the signal frame, got %s in %s." % [progress_rect, status_rect])
+		return false
 	Input.action_press("extract")
 	root._try_extract()
 	root._update_active_interaction(root.EXTRACTION_HOLD_SECONDS * 0.5)

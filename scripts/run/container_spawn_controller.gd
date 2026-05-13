@@ -92,7 +92,8 @@ func spawn_container(pos: Vector2, container_type_id: String = "", ring: String 
 		display_name,
 		pos,
 		visual_color,
-		visual_size_units
+		visual_size_units,
+		container_def
 	)
 	container.payload = {
 		"state": "available",

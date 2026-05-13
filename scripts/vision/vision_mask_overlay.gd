@@ -19,12 +19,14 @@ func _ready() -> void:
 shader_type canvas_item;
 
 uniform vec2 center = vec2(0.0, 0.0);
+uniform vec2 rect_size = vec2(1.0, 1.0);
 uniform float radius = 1280.0;
 uniform float softness = 18.0;
 uniform float darkness = 1.0;
 
 void fragment() {
-	float dist = distance(FRAGCOORD.xy, center);
+	vec2 pixel = UV * rect_size;
+	float dist = distance(pixel, center);
 	float alpha = smoothstep(radius - softness, radius + softness, dist) * darkness;
 	COLOR = vec4(0.0, 0.0, 0.0, alpha);
 }
@@ -51,15 +53,20 @@ func _update_shader() -> void:
 	if _shader_material == null or not is_inside_tree():
 		return
 	_resize_to_viewport()
-	var center := get_viewport_rect().size * 0.5
-	if target:
-		center = target.get_global_transform_with_canvas().origin
+	var center := _get_mask_center()
+	_shader_material.set_shader_parameter("rect_size", size)
 	_shader_material.set_shader_parameter("center", center)
 	_shader_material.set_shader_parameter("radius", _get_screen_radius())
 
 func _resize_to_viewport() -> void:
 	position = Vector2.ZERO
 	size = get_viewport_rect().size
+
+func _get_mask_center() -> Vector2:
+	if target == null:
+		return size * 0.5
+	var target_screen_position := target.get_global_transform_with_canvas().origin
+	return get_global_transform_with_canvas().affine_inverse() * target_screen_position
 
 func _get_screen_radius() -> float:
 	if target == null:

@@ -109,6 +109,14 @@ func get_effect_value(effect_type: String, default_value: float = 1.0) -> float:
 			value = maxf(value, float(row.get("effect_value", default_value)))
 	return value
 
+func get_max_effect_value(effect_type: String, default_value: float = 1.0) -> float:
+	_ensure_data_loaded()
+	var value := default_value
+	for row in data_registry.get_research_rows():
+		if String(row.get("effect_type", "")) == effect_type:
+			value = maxf(value, float(row.get("effect_value", default_value)))
+	return value
+
 func reset_research() -> void:
 	research_levels.clear()
 

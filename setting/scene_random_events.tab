@@ -1,2 +1,2 @@
 event_id	slot	min_day	guaranteed_day	daily_chance	payload	enabled
-monster_presence	threat	3	3	0.5	monster_count=4;spawn_group=MonsterSpawnPoints;monster_type=black_tide_boundary_essence	true
+monster_presence	threat	2	2	0.8	monster_count=4;spawn_group=MonsterSpawnPoints;monster_type=black_tide_boundary_essence	true

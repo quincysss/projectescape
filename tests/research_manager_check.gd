@@ -12,6 +12,7 @@ func _verify_research_manager_and_base_ui() -> bool:
 	if game_state == null:
 		printerr("Expected GameState autoload.")
 		return false
+	await process_frame
 
 	var registry = GameDataRegistryScript.new()
 	if not registry.load_all():
@@ -33,7 +34,7 @@ func _verify_research_manager_and_base_ui() -> bool:
 	if game_state.get_inventory_slot_count() != 8 or game_state.get_home_storage_slot_count() != 1 or game_state.get_outpost_storage_slot_count() != 0:
 		printerr("Expected default researched storage capacities to match base rules.")
 		return false
-	if absf(game_state.get_player_max_stability() - 100.0) > 0.001 or game_state.get_warehouse_capacity() != 120:
+	if absf(game_state.get_player_max_stability() - 100.0) > 0.001 or game_state.get_warehouse_capacity() != 80:
 		printerr("Expected default stability and warehouse capacity before research.")
 		return false
 

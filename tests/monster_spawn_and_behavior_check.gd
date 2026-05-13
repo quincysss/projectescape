@@ -17,7 +17,7 @@ func _verify_monster_spawn_and_behavior() -> bool:
 		printerr("Expected GameState autoload.")
 		return false
 	var original_profile: Dictionary = game_state.load_profile() if game_state.has_profile() else {}
-	game_state.reset_day(3)
+	game_state.reset_day(2)
 
 	var run_root = RUN_SCENE.instantiate()
 	root.add_child(run_root)
@@ -27,7 +27,7 @@ func _verify_monster_spawn_and_behavior() -> bool:
 	if run_root.run_director.context == null:
 		return _fail_with_restore("Run context missing.", game_state, original_profile, run_root)
 	if not run_root.run_director.context.monster_event_active:
-		return _fail_with_restore("Day 3 run should activate monster event.", game_state, original_profile, run_root)
+		return _fail_with_restore("Day 2 run should activate monster event.", game_state, original_profile, run_root)
 	if run_root.monster_spawn_controller == null:
 		return _fail_with_restore("MonsterSpawnController missing.", game_state, original_profile, run_root)
 	if run_root.monster_spawn_controller.active_count() != 4:

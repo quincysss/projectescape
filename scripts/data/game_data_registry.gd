@@ -4,6 +4,8 @@ extends RefCounted
 const TabDataLoaderScript := preload("res://scripts/data/tab_data_loader.gd")
 
 const ITEMS_PATH := "res://setting/items.tab"
+const REPAIR_MATERIALS_PATH := "res://setting/repairmaterial.tab"
+const CURRENCIES_PATH := "res://data/currencies.tab"
 const ITEM_QUALITY_COLORS_PATH := "res://setting/item_quality_colors.tab"
 const CONTAINER_TYPES_PATH := "res://setting/container_types.tab"
 const DROP_TABLES_PATH := "res://setting/drop_tables.tab"
@@ -58,6 +60,8 @@ const CONTAINER_QUALITY_MODIFIERS := {
 }
 
 var items_by_id: Dictionary = {}
+var repair_materials_by_id: Dictionary = {}
+var currencies_by_id: Dictionary = {}
 var quality_colors_by_id: Dictionary = {}
 var containers_by_id: Dictionary = {}
 var drop_rows_by_context: Dictionary = {}
@@ -71,6 +75,8 @@ var load_errors: Array[String] = []
 func load_all() -> bool:
 	load_errors.clear()
 	items_by_id = _index_rows(_load_rows(ITEMS_PATH), "id")
+	repair_materials_by_id = _index_rows(_load_rows(REPAIR_MATERIALS_PATH), "id")
+	currencies_by_id = _index_rows(_load_rows(CURRENCIES_PATH), "id")
 	quality_colors_by_id = _index_rows(_load_rows(ITEM_QUALITY_COLORS_PATH), "quality")
 	containers_by_id = _index_rows(_load_rows(CONTAINER_TYPES_PATH), "type_id")
 	shop_stock_rows = _load_rows(SHOP_STOCK_PATH)
@@ -90,6 +96,21 @@ func load_all() -> bool:
 
 func get_item(item_id: String) -> Dictionary:
 	return items_by_id.get(item_id, {})
+
+func get_repair_material(material_id: String) -> Dictionary:
+	return repair_materials_by_id.get(material_id, {})
+
+func get_currency(currency_id: String) -> Dictionary:
+	return currencies_by_id.get(currency_id, {})
+
+func get_repair_material_rows() -> Array[Dictionary]:
+	var result: Array[Dictionary] = []
+	for row in repair_materials_by_id.values():
+		if not TabDataLoader.parse_bool(String(row.get("enabled", "true")), true):
+			continue
+		result.append(row.duplicate(true))
+	result.sort_custom(func(a, b): return String(a.get("id", "")) < String(b.get("id", "")))
+	return result
 
 func get_item_quality_color(quality: String) -> Color:
 	var row: Dictionary = quality_colors_by_id.get(quality, {})
@@ -269,6 +290,23 @@ func make_item_stack(item_id: String, amount: int = 1) -> Dictionary:
 		"sellable": TabDataLoader.parse_bool(String(item.get("sellable", "false")), false),
 		"sell_currency_id": String(item.get("sell_currency_id", "mine_coin")),
 		"sell_value": int(item.get("sell_value", 0)),
+	}
+
+func make_repair_material_stack(material_id: String, amount: int = 1, outpost_id: String = "") -> Dictionary:
+	var material := get_repair_material(material_id)
+	if material.is_empty():
+		return {}
+	return {
+		"repair_material_id": StringName(material_id),
+		"item_id": StringName(material_id),
+		"display_name": String(material.get("display_name", material_id)),
+		"amount": maxi(1, amount),
+		"weight_per_unit": float(material.get("weight", 0.0)),
+		"stack_limit": 1,
+		"icon": String(material.get("icon", "")),
+		"description": String(material.get("description", "")),
+		"source": "repair_material_spawn",
+		"outpost_id": outpost_id,
 	}
 
 func _load_rows(path: String) -> Array[Dictionary]:

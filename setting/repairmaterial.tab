@@ -1,0 +1,7 @@
+id	display_name	weight	icon	description	color_hex	enabled	enabled_version
+outpost_fuse	前哨保险丝	0.15	res://assets/ui/itemicon/outpost_fuse.png	前哨站基础供电修复材料。	#F2B838	true	v0.4
+outpost_filter	净化滤芯	0.35	res://assets/ui/itemicon/outpost_filter.png	用于恢复前哨站空气与饮水循环的关键滤芯。	#59D1F2	true	v0.4
+outpost_servo_pack	前哨伺服包	0.45	res://assets/ui/itemicon/outpost_servo_pack.png	用于恢复前哨站机械结构的伺服组件包。	#BD8CF2	true	v0.4
+outpost_relay_core	前哨继电核心	0.25	res://assets/ui/itemicon/outpost_relay_core.png	用于重接前哨站控制回路的继电核心。	#FF8A4B	true	v0.4
+outpost_coolant_cell	冷却芯体	0.30	res://assets/ui/itemicon/outpost_coolant_cell.png	用于恢复前哨站设备散热循环的冷却芯体。	#35C9D7	true	v0.4
+outpost_sealant_kit	密封胶包	0.20	res://assets/ui/itemicon/outpost_sealant_kit.png	用于封闭前哨站破损管线与舱门缝隙的密封材料。	#8FD16A	true	v0.4

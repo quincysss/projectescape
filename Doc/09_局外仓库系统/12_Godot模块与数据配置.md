@@ -53,6 +53,7 @@ WarehouseQueryService：
 
 MerchantService：
 
+- 只允许在 `PlayerProfile.merchant_unlocked == true` 后被 MerchantPanel 调用出售流程。
 - 查询仓库中可出售物品。
 - 根据 items.tab 的 sell_currency_id 和 sell_value 计算售价。
 - 调用 WarehouseManager 扣除售卖数量。
@@ -87,7 +88,7 @@ HoverableItemIcon：
 1. 创建 WarehouseManager、WarehouseData、WarehouseItem、SettlementTransferService、WarehouseQueryService、MerchantService、CurrencyWallet、WarehouseUI、MerchantUI、WarehouseSaveService。
 2. 08 入库通过 SettlementTransferService。
 3. 10 研究所、制作所、出发准备通过 WarehouseQueryService。
-4. 商人出售通过 MerchantService，货币通过 CurrencyWallet 按 currency_id 保存。
+4. 商人出售通过 MerchantService，货币通过 CurrencyWallet 按 currency_id 保存；MerchantPanel 进入前必须检查 merchant_unlocked。
 5. 仓库或货币变更后保存并 revision +1。
 6. 不要让外部系统直接修改 WarehouseData.items 或 currencies。
 7. 建立局外通用 ItemTooltipService / HoverableItemIcon / ItemTooltipPanel，仓库、商人、研究所、制作所中的道具图标 hover 时显示详情，数据来自 items.tab 和 currencies.tab。
@@ -97,7 +98,7 @@ HoverableItemIcon：
 
 - 模块职责清楚。
 - 08/10/出发准备可通过接口接入。
-- 商人可通过接口出售物品并获得 mine_coin。
+- 首次成功返回剧情结束前商人不可进入；解锁后商人可通过接口出售物品并获得 mine_coin。
 - 保存服务独立。
 - 局外道具详情 Tooltip 模块职责独立，且不接入局内界面。
 

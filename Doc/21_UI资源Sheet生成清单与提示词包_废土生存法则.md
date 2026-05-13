@@ -67,6 +67,7 @@ UI 资源分两层生成：
 | UI-07 | 撤离与结算拆分 sheet | 撤离按钮状态、结算面板、警告弹窗 | 2048x2048 |
 | UI-08 | 局外基地整体框架设计稿 | 顶部页签、主内容、右侧详情、底部操作 | 1920x1080 |
 | UI-09 | 局外导航与通用面板 sheet | 页签、按钮、筛选、滚动条、标题牌 | 2048x2048 |
+| UI-09A | 剧情对白界面与控件 sheet | 底部对白框、说话人名牌、跳过、继续提示、原画阴影底 | 2048x2048 |
 | UI-10 | 仓库系统整体稿 | 仓库格、分类筛选、物品详情、整理操作 | 1920x1080 |
 | UI-11 | 仓库系统拆分 sheet | 仓库专用格子、分类 chip、排序按钮、容量条 | 2048x2048 |
 | UI-12 | 商人与货币整体稿 | 可出售列表、数量选择、单价、总价、矿币栏 | 1920x1080 |
@@ -247,6 +248,22 @@ Elements: top navigation tab normal, top navigation tab selected, top navigation
 Requirements: transparent background, clean cutout edges, consistent line width, suitable for slicing and nine-slice usage in Godot, no readable text.
 Avoid: full menu screenshot, labels, watermark, modern flat UI, glossy 3D, overlapping elements.
 ```
+
+---
+
+## 13.5 UI-09A 剧情对白界面与控件 Sheet
+
+```text
+Create a transparent PNG UI sprite sheet for story dialogue interface elements in a 2D wasteland extraction game.
+Canvas: 2048x2048.
+Grid: 4x4, evenly spaced cells, one UI element per cell, no labels.
+Style: dark hand-drawn manga UI, thick black ink outlines, dirty worn metal and paper, grayscale base, muted blue-purple and warm yellow accents.
+Elements: wide bottom dialogue box frame, speaker nameplate active, speaker nameplate inactive, next indicator, skip button frame, portrait shadow plate left, portrait shadow plate right, active speaker glow edge, inactive speaker dim overlay, important keyword highlight strip, dialogue choice button normal, dialogue choice button selected, small warning note frame, black background dim overlay sample.
+Requirements: transparent background, clean cutout edges, reusable in Godot UI, no readable text, no character portraits inside the sheet.
+Avoid: full dialogue screenshot, baked character art, visual novel glossy UI, labels, watermark.
+```
+
+角色原画不放在 UI-09A 中，主角和 404 哨所管理员半身原画按角色资源规格单独生成。
 
 ---
 
@@ -529,22 +546,23 @@ ui_[system]_[element]_[state].png
 7. UI-06 撤离与结算整体设计稿。
 8. UI-07 撤离与结算拆分 Sheet。
 9. UI-09 局外导航与通用面板 Sheet。
-10. UI-18 通用系统图标 Sheet。
+10. UI-09A 剧情对白界面与控件 Sheet。
+11. UI-18 通用系统图标 Sheet。
 ```
 
 第三轮做局外系统深化：
 
 ```text
-11. UI-10 仓库系统整体稿。
-12. UI-11 仓库系统拆分 Sheet。
-13. UI-12 商人与货币整体稿。
-14. UI-13 商人与货币拆分 Sheet。
-15. UI-14 研究所整体稿。
-16. UI-15 研究所拆分 Sheet。
-17. UI-16 制作所整体稿。
-18. UI-17 制作所拆分 Sheet。
-19. UI-18 出发准备整体稿。
-20. UI-19 出发准备拆分 Sheet。
+12. UI-10 仓库系统整体稿。
+13. UI-11 仓库系统拆分 Sheet。
+14. UI-12 商人与货币整体稿。
+15. UI-13 商人与货币拆分 Sheet。
+16. UI-14 研究所整体稿。
+17. UI-15 研究所拆分 Sheet。
+18. UI-16 制作所整体稿。
+19. UI-17 制作所拆分 Sheet。
+20. UI-18 出发准备整体稿。
+21. UI-19 出发准备拆分 Sheet。
 ```
 
 ---

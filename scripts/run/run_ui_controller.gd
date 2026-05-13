@@ -11,6 +11,7 @@ const EXTRACTION_STATUS_FRAME_CENTER := preload("res://assets/ui/run_timer_extra
 const EXTRACTION_STATUS_FRAME_RIGHT := preload("res://assets/ui/run_timer_extraction_hud/components/ui_run_extraction_status_frame_right_01.png")
 const EXTRACTION_STATUS_DOT_UNAVAILABLE := preload("res://assets/ui/run_timer_extraction_hud/components/ui_run_extraction_status_dot_unavailable_01.png")
 const EXTRACTION_STATUS_DOT_AVAILABLE := preload("res://assets/ui/run_timer_extraction_hud/components/ui_run_extraction_status_dot_available_01.png")
+const BACKPACK_STATUS_ICON := preload("res://assets/ui/itemicon/backpack_small_reinforced.png")
 const STABILITY_FILL_OFFSET := Vector2(22, 19)
 const STABILITY_FILL_SIZE := Vector2(361, 35)
 const EXTRACTION_STATUS_WIDTH := 298.0
@@ -18,13 +19,20 @@ const INVENTORY_GRID_COLUMNS := 5
 const INVENTORY_GRID_SLOT_SIZE := 62.0
 const INVENTORY_GRID_SLOT_GAP := 10.0
 const INVENTORY_BACKPACK_DISPLAY_SLOTS := 30
-const INVENTORY_PANEL_TOP := 292.0
-const INVENTORY_LOOT_PANEL_TOP := 374.0
+const MATERIAL_BACKPACK_DISPLAY_SLOTS := 5
+const INVENTORY_PANEL_TOP := 128.0
+const INVENTORY_PANEL_RIGHT_MARGIN := 20.0
+const INVENTORY_PANEL_SIZE := Vector2(460.0, 760.0)
+const INVENTORY_SECONDARY_PANEL_RIGHT_MARGIN := 498.0
+const INVENTORY_STORAGE_PANEL_SIZE := Vector2(430.0, 360.0)
+const INVENTORY_LOOT_PANEL_SIZE := Vector2(430.0, 336.0)
+const INVENTORY_LOOT_PANEL_TOP := 252.0
 const PORTRAIT_SIZE := Vector2(168.0, 184.0)
 const OBJECTIVE_HUD_POSITION := Vector2(2.0, 242.0)
 const OBJECTIVE_HUD_SIZE := Vector2(356.0, 136.0)
 const OBJECTIVE_HUD_HOME_ALPHA := 1.0
 const OBJECTIVE_HUD_FIELD_ALPHA := 0.58
+const INVENTORY_PANEL_OPEN_SECONDS := 0.18
 
 func build(scene) -> void:
 	_build_character_status_hud(scene)
@@ -59,6 +67,7 @@ func refresh(scene) -> void:
 	_layout_inventory_surfaces(scene, is_storage_zone, scene.loot_panel.visible)
 	_refresh_inventory_actions(scene)
 	_set_items_grid(scene, scene.inventory_label, scene.run_director.inventory_component.get_items_snapshot(), "inventory", scene.run_director.inventory_component.max_slots)
+	_set_items_grid(scene, scene.material_inventory_label, _material_items_snapshot(scene), "inventory_material", _material_capacity(scene))
 	_set_items_grid(scene, scene.home_storage_label, scene.get_active_storage_items_snapshot(), scene.get_active_storage_source_id(), _active_storage_capacity(scene))
 	_set_items_grid(scene, scene.loot_label, scene.opened_loot, "loot", maxi(scene.opened_loot.size(), 8))
 
@@ -245,6 +254,7 @@ func _build_center_status_hud(scene) -> void:
 	scene.extraction_status_dot.size = Vector2(30, 30)
 	scene.extraction_status_dot.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	scene.extraction_status_dot.stretch_mode = TextureRect.STRETCH_SCALE
+	scene.extraction_status_dot.z_index = 3
 	scene.extraction_status_panel.add_child(scene.extraction_status_dot)
 
 	scene.extraction_status_label = Label.new()
@@ -252,19 +262,21 @@ func _build_center_status_hud(scene) -> void:
 	scene.extraction_status_label.position = Vector2(64, 8)
 	scene.extraction_status_label.size = Vector2(EXTRACTION_STATUS_WIDTH - 88.0, 34)
 	scene.extraction_status_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	scene.extraction_status_label.z_index = 3
 	scene.extraction_status_label.add_theme_font_size_override("font_size", 18)
 	scene.extraction_status_label.add_theme_color_override("font_color", Color("#D7D0C3"))
 	scene.extraction_status_panel.add_child(scene.extraction_status_label)
 
 	scene.extraction_progress_bar = ProgressBar.new()
 	scene.extraction_progress_bar.name = "ExtractionHoldProgress"
-	scene.extraction_progress_bar.position = Vector2(64, 38)
-	scene.extraction_progress_bar.size = Vector2(EXTRACTION_STATUS_WIDTH - 96.0, 7)
+	scene.extraction_progress_bar.position = Vector2(64, 17)
+	scene.extraction_progress_bar.size = Vector2(EXTRACTION_STATUS_WIDTH - 96.0, 9)
 	scene.extraction_progress_bar.min_value = 0.0
 	scene.extraction_progress_bar.max_value = 1.0
 	scene.extraction_progress_bar.value = 0.0
 	scene.extraction_progress_bar.show_percentage = false
 	scene.extraction_progress_bar.visible = false
+	scene.extraction_progress_bar.z_index = 1
 	scene.extraction_progress_bar.add_theme_stylebox_override("background", _progress_style(Color(0.02, 0.02, 0.018, 0.92), Color(0.28, 0.27, 0.24), 1))
 	scene.extraction_progress_bar.add_theme_stylebox_override("fill", _progress_style(Color(0.18, 0.66, 0.34, 0.96), Color(0.18, 0.66, 0.34), 0))
 	scene.extraction_status_panel.add_child(scene.extraction_progress_bar)
@@ -326,53 +338,82 @@ func _build_backpack_status_hud(scene) -> void:
 	scene.backpack_hud_root.anchor_top = 1.0
 	scene.backpack_hud_root.anchor_bottom = 1.0
 	scene.backpack_hud_root.offset_left = -362.0
-	scene.backpack_hud_root.offset_top = -128.0
+	scene.backpack_hud_root.offset_top = -146.0
 	scene.backpack_hud_root.offset_right = -18.0
 	scene.backpack_hud_root.offset_bottom = -18.0
 	scene.backpack_hud_root.add_theme_stylebox_override("panel", _panel_style(Color(0.055, 0.055, 0.055, 0.9), Color(0.07, 0.42, 0.72, 0.92), 2))
+	scene.backpack_hud_root.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+	scene.backpack_hud_root.gui_input.connect(func(event): _on_backpack_status_hud_gui_input(scene, event))
 	scene.ui_root.add_child(scene.backpack_hud_root)
 
 	scene.backpack_icon_placeholder = Panel.new()
 	scene.backpack_icon_placeholder.name = "BackpackIcon"
 	scene.backpack_icon_placeholder.position = Vector2(16, 18)
 	scene.backpack_icon_placeholder.size = Vector2(70, 70)
-	scene.backpack_icon_placeholder.add_theme_stylebox_override("panel", _panel_style(Color(0.10, 0.095, 0.09, 0.94), Color(0.38, 0.38, 0.36, 0.9), 1))
+	scene.backpack_icon_placeholder.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	scene.backpack_icon_placeholder.add_theme_stylebox_override("panel", _panel_style(Color(0.04, 0.04, 0.038, 0.55), Color(0.20, 0.20, 0.18, 0.0), 0))
 	scene.backpack_hud_root.add_child(scene.backpack_icon_placeholder)
 
-	var icon_label := Label.new()
-	icon_label.text = "包"
-	icon_label.position = Vector2(0, 0)
-	icon_label.size = Vector2(70, 70)
-	icon_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	icon_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	icon_label.add_theme_font_size_override("font_size", 22)
-	icon_label.add_theme_color_override("font_color", Color(0.62, 0.60, 0.56))
-	scene.backpack_icon_placeholder.add_child(icon_label)
+	var icon_image := TextureRect.new()
+	icon_image.name = "BackpackIconImage"
+	icon_image.position = Vector2(4, 4)
+	icon_image.size = Vector2(62, 62)
+	icon_image.texture = BACKPACK_STATUS_ICON
+	icon_image.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	icon_image.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	icon_image.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	scene.backpack_icon_placeholder.add_child(icon_image)
+
+	var supply_panel := Control.new()
+	supply_panel.name = "SupplySlotsBox"
+	supply_panel.position = Vector2(106, 14)
+	supply_panel.size = Vector2(210, 28)
+	supply_panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	scene.backpack_hud_root.add_child(supply_panel)
 
 	scene.backpack_slot_label = Label.new()
 	scene.backpack_slot_label.name = "BackpackSlots"
-	scene.backpack_slot_label.position = Vector2(106, 16)
-	scene.backpack_slot_label.size = Vector2(210, 28)
+	scene.backpack_slot_label.position = Vector2(8, 1)
+	scene.backpack_slot_label.size = Vector2(194, 24)
+	scene.backpack_slot_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	scene.backpack_slot_label.add_theme_font_size_override("font_size", 20)
 	scene.backpack_slot_label.add_theme_color_override("font_color", Color(0.82, 0.80, 0.76))
-	scene.backpack_hud_root.add_child(scene.backpack_slot_label)
+	supply_panel.add_child(scene.backpack_slot_label)
+
+	var material_panel := Control.new()
+	material_panel.name = "MaterialSlotsBox"
+	material_panel.position = Vector2(106, 46)
+	material_panel.size = Vector2(210, 28)
+	material_panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	scene.backpack_hud_root.add_child(material_panel)
+
+	scene.backpack_material_slot_label = Label.new()
+	scene.backpack_material_slot_label.name = "MaterialSlots"
+	scene.backpack_material_slot_label.position = Vector2(8, 1)
+	scene.backpack_material_slot_label.size = Vector2(194, 24)
+	scene.backpack_material_slot_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	scene.backpack_material_slot_label.add_theme_font_size_override("font_size", 20)
+	scene.backpack_material_slot_label.add_theme_color_override("font_color", Color(0.82, 0.86, 0.78))
+	material_panel.add_child(scene.backpack_material_slot_label)
 
 	scene.weight_bar = ProgressBar.new()
 	scene.weight_bar.name = "WeightBar"
-	scene.weight_bar.position = Vector2(106, 58)
+	scene.weight_bar.position = Vector2(106, 86)
 	scene.weight_bar.size = Vector2(210, 20)
 	scene.weight_bar.min_value = 0.0
 	scene.weight_bar.max_value = 20.0
 	scene.weight_bar.value = 0.0
 	scene.weight_bar.show_percentage = false
+	scene.weight_bar.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	scene.weight_bar.add_theme_stylebox_override("background", _progress_style(Color(0.02, 0.02, 0.018, 0.92), Color(0.28, 0.28, 0.27), 1))
 	scene.weight_bar.add_theme_stylebox_override("fill", _progress_style(Color(0.42, 0.28, 0.72, 0.95), Color(0.42, 0.28, 0.72), 0))
 	scene.backpack_hud_root.add_child(scene.weight_bar)
 
 	scene.weight_value_label = Label.new()
 	scene.weight_value_label.name = "WeightValue"
-	scene.weight_value_label.position = Vector2(106, 78)
+	scene.weight_value_label.position = Vector2(106, 106)
 	scene.weight_value_label.size = Vector2(210, 22)
+	scene.weight_value_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	scene.weight_value_label.add_theme_font_size_override("font_size", 15)
 	scene.weight_value_label.add_theme_color_override("font_color", Color(0.82, 0.80, 0.76))
 	scene.backpack_hud_root.add_child(scene.weight_value_label)
@@ -415,10 +456,34 @@ func _build_hidden_action_buttons(scene) -> void:
 	scene.extract_hud_button.button_up.connect(scene._release_extraction_hold_button)
 	scene.ui_root.add_child(scene.extract_hud_button)
 
+func _on_backpack_status_hud_gui_input(scene, event: InputEvent) -> void:
+	if event is InputEventMouseButton:
+		var mouse_event := event as InputEventMouseButton
+		if mouse_event.button_index == MOUSE_BUTTON_LEFT and mouse_event.pressed:
+			scene._toggle_inventory_panel()
+
 func _build_inventory_panels(scene) -> void:
 	scene.inventory_panel = _make_panel(Vector2(16, 154), Vector2(390, 360), "背包")
 	scene.inventory_label = _make_grid_area(Vector2(16, 86), Vector2(358, 196))
 	scene.inventory_panel.add_child(scene.inventory_label)
+	scene.material_inventory_label = _make_grid_area(Vector2(16, 524), Vector2(358, 86))
+	scene.inventory_panel.add_child(scene.material_inventory_label)
+	var supply_title := Label.new()
+	supply_title.name = "SupplyBackpackTitle"
+	supply_title.text = "物资背包"
+	supply_title.position = Vector2(28, 72)
+	supply_title.size = Vector2(160, 24)
+	supply_title.add_theme_font_size_override("font_size", 15)
+	supply_title.add_theme_color_override("font_color", Color("#D7D0C3"))
+	scene.inventory_panel.add_child(supply_title)
+	var material_title := Label.new()
+	material_title.name = "MaterialBackpackTitle"
+	material_title.text = "材料背包"
+	material_title.position = Vector2(28, 504)
+	material_title.size = Vector2(160, 24)
+	material_title.add_theme_font_size_override("font_size", 15)
+	material_title.add_theme_color_override("font_color", Color("#88D8A8"))
+	scene.inventory_panel.add_child(material_title)
 	scene.inventory_selection_label = Label.new()
 	scene.inventory_selection_label.name = "InventorySelectionLabel"
 	scene.inventory_selection_label.add_theme_font_size_override("font_size", 15)
@@ -643,7 +708,7 @@ func _objective_inventory_count(scene, item_id: String) -> int:
 	if scene.run_director == null or scene.run_director.inventory_component == null:
 		return 0
 	var count := 0
-	for stack in scene.run_director.inventory_component.items:
+	for stack in _material_items_snapshot(scene):
 		if str(stack.get("item_id", "")) == item_id:
 			count += int(stack.get("amount", 1))
 	return count
@@ -725,15 +790,26 @@ func _find_outpost_station(scene, outpost_id: String):
 func _refresh_backpack_status(scene) -> void:
 	var used_slots := 0
 	var max_slots := 0
+	var material_used_slots := 0
+	var material_max_slots := 0
 	if scene.run_director.inventory_component != null:
 		used_slots = scene.run_director.inventory_component.items.size()
 		max_slots = scene.run_director.inventory_component.max_slots
+		if scene.run_director.inventory_component.has_method("get_repair_material_items_snapshot"):
+			material_used_slots = scene.run_director.inventory_component.get_repair_material_items_snapshot().size()
+		else:
+			material_used_slots = scene.run_director.inventory_component.repair_material_items.size()
+		material_max_slots = scene.run_director.inventory_component.max_repair_material_slots
 	else:
 		used_slots = scene.run_director.context.player_inventory.size()
 		max_slots = scene.run_director.config.inventory_slots
+		material_used_slots = scene.run_director.context.material_inventory.size()
+		material_max_slots = MATERIAL_BACKPACK_DISPLAY_SLOTS
 	var current_weight: float = maxf(0.0, float(scene.run_director.context.current_weight))
 	var max_weight: float = maxf(1.0, float(scene.run_director.context.weight_limit))
 	scene.backpack_slot_label.text = "背包格  %d/%d" % [used_slots, max_slots]
+	scene.backpack_slot_label.text = "物资：%d/%d" % [used_slots, max_slots]
+	scene.backpack_material_slot_label.text = "材料：%d/%d" % [material_used_slots, material_max_slots]
 	scene.weight_bar.max_value = max_weight
 	scene.weight_bar.value = minf(current_weight, max_weight)
 	scene.weight_value_label.text = "负重: %.1f/%.1f" % [current_weight, max_weight]
@@ -773,6 +849,8 @@ func _format_countdown(seconds: float) -> String:
 
 func toggle_inventory(scene) -> void:
 	var is_storage_zone: bool = scene.run_director.context != null and scene.is_storage_zone_active()
+	var inventory_was_visible: bool = scene.inventory_panel.visible
+	var storage_was_visible: bool = scene.home_storage_panel.visible
 	if is_storage_zone:
 		if scene.inventory_panel.visible or scene.home_storage_panel.visible:
 			scene.home_storage_user_closed = true
@@ -785,6 +863,10 @@ func toggle_inventory(scene) -> void:
 	else:
 		scene.inventory_panel.visible = not scene.inventory_panel.visible
 	refresh(scene)
+	if scene.inventory_panel.visible and not inventory_was_visible:
+		_play_panel_open_from_bottom(scene.inventory_panel, scene)
+	if scene.home_storage_panel.visible and not storage_was_visible:
+		_play_panel_open_from_bottom(scene.home_storage_panel, scene)
 
 func _make_panel(pos: Vector2, panel_size: Vector2, title: String) -> Panel:
 	var panel := Panel.new()
@@ -840,27 +922,37 @@ func _sync_storage_ui(scene, is_storage_zone: bool) -> void:
 	scene.home_storage_panel.visible = scene.inventory_panel.visible
 
 func _layout_inventory_surfaces(scene, is_storage_zone: bool, loot_open: bool) -> void:
-	_configure_panel_anchor_right(scene.inventory_panel, Vector2(390, 650), 20.0, INVENTORY_PANEL_TOP)
-	scene.inventory_label.position = Vector2(28, 136)
-	scene.inventory_label.size = Vector2(334, 426)
-	scene.inventory_selection_label.position = Vector2(28, 586)
-	scene.inventory_selection_label.size = Vector2(210, 28)
-	scene.discard_button.position = Vector2(256, 582)
+	_configure_panel_anchor_right(scene.inventory_panel, INVENTORY_PANEL_SIZE, INVENTORY_PANEL_RIGHT_MARGIN, INVENTORY_PANEL_TOP)
+	var supply_title := scene.inventory_panel.get_node_or_null("SupplyBackpackTitle") as Label
+	if supply_title != null:
+		supply_title.position = Vector2(28, 72)
+		supply_title.size = Vector2(220, 24)
+	var material_title := scene.inventory_panel.get_node_or_null("MaterialBackpackTitle") as Label
+	if material_title != null:
+		material_title.position = Vector2(28, 566)
+		material_title.size = Vector2(220, 24)
+	scene.inventory_label.position = Vector2(28, 108)
+	scene.inventory_label.size = Vector2(404, 438)
+	scene.material_inventory_label.position = Vector2(28, 596)
+	scene.material_inventory_label.size = Vector2(404, 88)
+	scene.inventory_selection_label.position = Vector2(28, 708)
+	scene.inventory_selection_label.size = Vector2(280, 28)
+	scene.discard_button.position = Vector2(326, 704)
 	scene.discard_button.size = Vector2(106, 36)
 	if is_storage_zone:
-		_configure_panel_anchor_right(scene.home_storage_panel, Vector2(390, 316), 432.0, INVENTORY_PANEL_TOP)
+		_configure_panel_anchor_right(scene.home_storage_panel, INVENTORY_STORAGE_PANEL_SIZE, INVENTORY_SECONDARY_PANEL_RIGHT_MARGIN, INVENTORY_PANEL_TOP)
 		scene.home_storage_label.position = Vector2(24, 68)
-		scene.home_storage_label.size = Vector2(342, 144)
-		scene.deposit_button.position = Vector2(130, 246)
-		scene.deposit_button.size = Vector2(130, 36)
-		scene.extract_button.position = Vector2(268, 246)
-		scene.extract_button.size = Vector2(106, 36)
+		scene.home_storage_label.size = Vector2(382, 190)
+		scene.deposit_button.position = Vector2(140, 300)
+		scene.deposit_button.size = Vector2(140, 36)
+		scene.extract_button.position = Vector2(292, 300)
+		scene.extract_button.size = Vector2(114, 36)
 	if loot_open:
-		_configure_panel_anchor_right(scene.loot_panel, Vector2(390, 316), 432.0, INVENTORY_LOOT_PANEL_TOP)
+		_configure_panel_anchor_right(scene.loot_panel, INVENTORY_LOOT_PANEL_SIZE, INVENTORY_SECONDARY_PANEL_RIGHT_MARGIN, INVENTORY_LOOT_PANEL_TOP)
 		scene.loot_label.position = Vector2(24, 68)
-		scene.loot_label.size = Vector2(342, 134)
-		scene.take_all_button.position = Vector2(130, 240)
-		scene.take_all_button.size = Vector2(130, 36)
+		scene.loot_label.size = Vector2(382, 170)
+		scene.take_all_button.position = Vector2(140, 272)
+		scene.take_all_button.size = Vector2(140, 36)
 
 func _configure_panel_rect(panel: Panel, pos: Vector2, panel_size: Vector2, anchor_right: bool) -> void:
 	if anchor_right:
@@ -882,6 +974,17 @@ func _configure_panel_anchor_right(panel: Panel, panel_size: Vector2, right_marg
 	panel.offset_top = top_margin
 	panel.offset_right = -right_margin
 	panel.offset_bottom = top_margin + panel_size.y
+
+func _play_panel_open_from_bottom(panel: Control, scene) -> void:
+	if panel == null:
+		return
+	panel.pivot_offset = Vector2(panel.size.x * 0.5, panel.size.y)
+	panel.scale = Vector2(1.0, 0.08)
+	panel.modulate.a = 0.0
+	var tween: Tween = scene.create_tween()
+	tween.set_parallel(true)
+	tween.tween_property(panel, "scale", Vector2.ONE, INVENTORY_PANEL_OPEN_SECONDS).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+	tween.tween_property(panel, "modulate:a", 1.0, INVENTORY_PANEL_OPEN_SECONDS * 0.75).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
 
 func _set_panel_title(panel: Panel, title: String) -> void:
 	if panel == null:
@@ -921,6 +1024,8 @@ func _set_items_grid(scene, grid_root: Control, items: Array, source_id: String,
 func _display_slot_count(source_id: String, capacity: int) -> int:
 	if source_id == "inventory":
 		return maxi(INVENTORY_BACKPACK_DISPLAY_SLOTS, capacity)
+	if source_id == "inventory_material":
+		return maxi(MATERIAL_BACKPACK_DISPLAY_SLOTS, capacity)
 	return maxi(capacity, 1)
 
 func _make_item_slot(scene, pos: Vector2, slot_size: Vector2, item: Dictionary, index: int, source_id: String) -> Button:
@@ -934,6 +1039,8 @@ func _make_item_slot(scene, pos: Vector2, slot_size: Vector2, item: Dictionary, 
 	button.add_theme_color_override("font_color", _quality_color(item))
 	var selected := source_id == "inventory" and index == int(scene.selected_inventory_index)
 	var border_color := Color("#D1B850") if selected else Color("#35C9D7")
+	if source_id == "inventory_material" and not selected:
+		border_color = Color("#20B86B")
 	var border_width := 3 if selected else 2
 	button.add_theme_stylebox_override("normal", _slot_style(Color("#071116"), border_color, border_width))
 	button.add_theme_stylebox_override("hover", _slot_style(Color("#0B151A"), Color("#D1B850"), 2))
@@ -963,6 +1070,8 @@ func _make_empty_slot(scene, pos: Vector2, slot_size: Vector2, locked: bool = fa
 	panel.position = pos
 	panel.size = slot_size
 	var border := Color("#4D575B") if locked else Color("#35C9D7")
+	if source_id == "inventory_material" and not locked:
+		border = Color("#20B86B")
 	panel.add_theme_stylebox_override("panel", _slot_style(Color("#071116"), border, 1))
 	if locked:
 		var label := Label.new()
@@ -989,6 +1098,12 @@ func _add_grid_footer(scene, grid_root: Control, items: Array, capacity: int, so
 		footer.text = "容量: %d/%d    负重: %.1f/%.1f" % [used, capacity, current_weight, max_weight]
 	else:
 		footer.text = "容量: %d/%d" % [used, capacity]
+	if source_id == "inventory":
+		var current_weight_override: float = maxf(0.0, float(scene.run_director.context.current_weight))
+		var max_weight_override: float = maxf(1.0, float(scene.run_director.context.weight_limit))
+		footer.text = "物资: %d/%d    负重: %.1f/%.1f" % [used, capacity, current_weight_override, max_weight_override]
+	elif source_id == "inventory_material":
+		footer.text = "材料: %d/%d" % [used, capacity]
 	grid_root.add_child(footer)
 
 func _empty_slot_accepts_click(source_id: String) -> bool:
@@ -1007,6 +1122,8 @@ func _dispatch_grid_slot(scene, source_id: String, index: int) -> void:
 			scene._on_inventory_item_meta_clicked("inventory:%d" % index)
 		"loot":
 			scene._on_loot_item_meta_clicked("loot:%d" % index)
+		"inventory_material":
+			pass
 		_:
 			scene._on_home_storage_item_meta_clicked("storage:%d" % index)
 
@@ -1033,7 +1150,7 @@ func _add_item_slot_content(button: Button, slot_size: Vector2, item: Dictionary
 		var fallback := Label.new()
 		fallback.position = icon_pos
 		fallback.size = Vector2(icon_size, icon_size)
-		fallback.text = String(item.get("quality", "C"))
+		fallback.text = "材" if _is_repair_material_item(item) else String(item.get("quality", "C"))
 		fallback.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		fallback.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 		fallback.add_theme_font_size_override("font_size", 18)
@@ -1091,6 +1208,18 @@ func _slot_display_name(name: String) -> String:
 		return name
 	return name.substr(0, 6)
 
+func _material_items_snapshot(scene) -> Array:
+	var inventory = scene.run_director.inventory_component
+	if inventory != null and inventory.has_method("get_repair_material_items_snapshot"):
+		return inventory.get_repair_material_items_snapshot()
+	return []
+
+func _material_capacity(scene) -> int:
+	var inventory = scene.run_director.inventory_component
+	if inventory != null:
+		return int(inventory.max_repair_material_slots)
+	return MATERIAL_BACKPACK_DISPLAY_SLOTS
+
 func _active_storage_capacity(scene) -> int:
 	if scene._is_active_outpost_storage():
 		return scene.run_director.get_outpost_storage_capacity(scene.active_outpost_storage_id)
@@ -1111,23 +1240,29 @@ func _set_items_text(label: RichTextLabel, items: Array, source_id: String = "")
 	label.append_text("\n".join(lines))
 
 func _item_line(item: Dictionary, index: int = -1, source_id: String = "") -> String:
-	var quality := String(item.get("quality", "C"))
 	var color := _quality_color_hex(item)
 	var name := String(item.get("display_name", item.get("item_id", "")))
 	var amount := int(item.get("amount", 0))
 	var weight := float(item.get("weight_per_unit", 0.0))
-	var text := "[color=#%s][%s] %s[/color]  x%s  单重 %.2f" % [color, quality, name, amount, weight]
+	var text := "[color=#%s]%s[/color]  x%s  单重 %.2f" % [color, name, amount, weight]
+	if not _is_repair_material_item(item):
+		var quality := String(item.get("quality", "C"))
+		text = "[color=#%s][%s] %s[/color]  x%s  单重 %.2f" % [color, quality, name, amount, weight]
 	if source_id.is_empty() or index < 0:
 		return text
 	return "[url=%s:%d]%s[/url]" % [source_id, index, text]
 
 func _quality_color_hex(item: Dictionary) -> String:
+	if _is_repair_material_item(item) and not item.has("quality_color"):
+		return "20B86B"
 	var value = item.get("quality_color", Color.WHITE)
 	if value is Color:
 		return value.to_html(false)
 	return "FFFFFF"
 
 func _quality_color(item: Dictionary) -> Color:
+	if _is_repair_material_item(item) and not item.has("quality_color"):
+		return Color("#20B86B")
 	var value = item.get("quality_color", Color.WHITE)
 	if value is Color:
 		return value
@@ -1140,6 +1275,9 @@ func _quality_color(item: Dictionary) -> Color:
 			return Color("#6FA8DC")
 		_:
 			return Color("#D8D6CE")
+
+func _is_repair_material_item(item: Dictionary) -> bool:
+	return not String(item.get("repair_material_id", "")).is_empty()
 
 func _interaction_progress_text(interaction_id: String) -> String:
 	match interaction_id:

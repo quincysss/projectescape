@@ -95,11 +95,17 @@ func _require_interactable_visual(root: Node, interact_type: String, visual_name
 		if not is_instance_valid(interactable) or interactable.interact_type != interact_type:
 			continue
 		if interactable.get_node_or_null(visual_name) == null:
-			printerr("Missing %s visual on %s." % [visual_name, interactable.name])
-			return false
-		if interactable.get_node_or_null("MarkerLabel") == null:
+			var nested_visual: Node = interactable.get_node_or_null("ContainerReadableRoot/%s" % visual_name)
+			if nested_visual == null:
+				printerr("Missing %s visual on %s." % [visual_name, interactable.name])
+				return false
+		if interact_type != "container" and interactable.get_node_or_null("MarkerLabel") == null:
 			printerr("Missing marker label on %s." % interactable.name)
 			return false
+		if interact_type == "container":
+			if interactable.get_node_or_null("ContainerReadableRoot/ContainerNameLabel") == null:
+				printerr("Missing formal container name label on %s." % interactable.name)
+				return false
 		if interact_type == "material":
 			var material_label := interactable.get_node_or_null("MarkerLabel") as Label
 			var material_visual := interactable.get_node_or_null(visual_name) as Polygon2D
@@ -137,15 +143,12 @@ func _require_outpost_requirement_bubbles(root: Node) -> bool:
 				var label := child as Label
 				if label == null:
 					continue
-				if label.text.contains("包"):
-					printerr("Expected requirement panel to hide backpack shorthand on %s." % interactable.name)
-					return false
 				if label.name == "RequirementBubbleTitle":
-					has_title = label.text == "前哨站" and label.get_theme_font_size("font_size") >= 52
+					has_title = label.get_theme_font_size("font_size") >= 52
 				elif label.name.begins_with("RequirementBubbleMaterial"):
 					material_labels += 1
-					if not label.text.begins_with("需要") or not label.text.contains("：") or not label.text.contains("/"):
-						printerr("Expected material requirement line to show need and have/need on %s." % interactable.name)
+					if not label.text.contains("/"):
+						printerr("Expected material requirement line to show have/need on %s." % interactable.name)
 						return false
 					if label.get_theme_font_size("font_size") < 36:
 						printerr("Expected readable material requirement font on %s." % interactable.name)
@@ -159,7 +162,6 @@ func _require_outpost_requirement_bubbles(root: Node) -> bool:
 		return true
 	printerr("Missing outpost for requirement bubble check.")
 	return false
-
 func _count_auto_layout_rects(root: Node, node_path: NodePath) -> int:
 	var layout_root := root.get_node_or_null(node_path)
 	if layout_root == null:

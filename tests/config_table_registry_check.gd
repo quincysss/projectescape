@@ -16,9 +16,30 @@ func _verify_registry() -> bool:
 	if registry.items_by_id.size() < 10:
 		printerr("Expected item table content.")
 		ok = false
+	if registry.repair_materials_by_id.size() != 6:
+		printerr("Expected exactly six repair material rows.")
+		ok = false
 	for item in registry.items_by_id.values():
 		if String(item.get("stackable", "")) != "false" or int(item.get("stack_limit", 0)) != 1:
 			printerr("Item %s must be single-slot and non-stackable." % item.get("id", ""))
+			ok = false
+		if String(item.get("item_type", "")) == "outpost_material":
+			printerr("Outpost repair materials must not live in items.tab: %s" % item.get("id", ""))
+			ok = false
+	for material in registry.repair_materials_by_id.values():
+		var material_id := String(material.get("id", ""))
+		if material_id.is_empty() or not registry.get_item(material_id).is_empty():
+			printerr("Repair material id must be unique from items.tab: %s" % material_id)
+			ok = false
+		if material.has("quality") or material.has("first_outpost_amount") or material.has("second_outpost_amount"):
+			printerr("Repair material table must not carry quality or fixed outpost amount fields: %s" % material_id)
+			ok = false
+		if float(material.get("weight", -1.0)) < 0.0:
+			printerr("Repair material must declare non-negative weight: %s" % material_id)
+			ok = false
+		var stack: Dictionary = registry.make_repair_material_stack(material_id)
+		if stack.has("quality") or stack.has("quality_color") or stack.has("item_type"):
+			printerr("Repair material stack must stay quality-free and item-table-free: %s" % material_id)
 			ok = false
 	if registry.containers_by_id.size() < 7:
 		printerr("Expected seven configured container types.")
@@ -75,8 +96,8 @@ func _verify_registry() -> bool:
 				printerr("Drop row references missing item: %s" % row.get("item_id", ""))
 				ok = false
 				continue
-			if String(item.get("item_type", "")) == "outpost_material":
-				printerr("Container drop rows must not include outpost-only repair materials: %s" % row.get("item_id", ""))
+			if registry.repair_materials_by_id.has(String(row.get("item_id", ""))):
+				printerr("Container drop rows must not include run-only repair materials: %s" % row.get("item_id", ""))
 				ok = false
 	var rng := RandomNumberGenerator.new()
 	rng.seed = 12345

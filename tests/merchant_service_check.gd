@@ -23,6 +23,7 @@ func _verify_merchant_service_and_base_tabs() -> bool:
 	game_state.clear_currencies()
 	game_state.add_to_warehouse([
 		registry.make_item_stack("gold_data_chip"),
+		registry.make_item_stack("ss_old_world_gold_bar"),
 		registry.make_item_stack("field_bandage"),
 		registry.make_item_stack("field_bandage"),
 		registry.make_item_stack("scrap_metal"),
@@ -30,13 +31,11 @@ func _verify_merchant_service_and_base_tabs() -> bool:
 
 	var sellable_items: Array = game_state.query_sellable_items()
 	var chip_group := _find_group_by_item_id(sellable_items, "gold_data_chip")
+	var ss_group := _find_group_by_item_id(sellable_items, "ss_old_world_gold_bar")
 	var bandage_group := _find_group_by_item_id(sellable_items, "field_bandage")
 	var material_group := _find_group_by_item_id(sellable_items, "scrap_metal")
-	if chip_group.is_empty() or bandage_group.is_empty():
-		printerr("Expected rare item and medical consumable to be sellable.")
-		return false
-	if not material_group.is_empty():
-		printerr("Expected material to be hidden from merchant sell list.")
+	if chip_group.is_empty() or ss_group.is_empty() or bandage_group.is_empty() or material_group.is_empty():
+		printerr("Expected rare, SS rare, medical consumable, and normal material items to be sellable.")
 		return false
 	if int(bandage_group.get("count", 0)) != 2:
 		printerr("Expected merchant to group two warehouse bandages.")
@@ -45,6 +44,14 @@ func _verify_merchant_service_and_base_tabs() -> bool:
 	var quote: Dictionary = game_state.get_sell_quote(String(chip_group.get("warehouse_item_id", "")), 1)
 	if not bool(quote.get("ok", false)) or int(quote.get("total_value", 0)) != 120:
 		printerr("Expected gold_data_chip quote to pay 120 mine_coin.")
+		return false
+	var ss_quote: Dictionary = game_state.get_sell_quote(String(ss_group.get("warehouse_item_id", "")), 1)
+	if not bool(ss_quote.get("ok", false)) or int(ss_quote.get("total_value", 0)) <= 0:
+		printerr("Expected SS item quote to pay mine_coin.")
+		return false
+	var material_quote: Dictionary = game_state.get_sell_quote(String(material_group.get("warehouse_item_id", "")), 1)
+	if not bool(material_quote.get("ok", false)) or int(material_quote.get("total_value", 0)) <= 0:
+		printerr("Expected normal material quote to pay mine_coin.")
 		return false
 
 	var before_currency: int = game_state.get_currency_amount("mine_coin")

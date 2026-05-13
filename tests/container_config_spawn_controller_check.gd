@@ -59,9 +59,9 @@ func _verify_config_driven_container_spawn() -> bool:
 		if int(item.get("amount", 0)) != 1 or int(item.get("stack_limit", 0)) != 1:
 			printerr("Expected generated loot to be single and non-stackable.")
 			ok = false
-	var visual := container.get_node_or_null("ContainerVisual") as ColorRect
-	if visual == null or visual.size.x < 380.0:
-		printerr("Expected large configured visual size.")
+	var visual := container.get_node_or_null("ContainerReadableRoot/ContainerVisual") as Sprite2D
+	if visual == null or visual.texture == null or visual.scale.x <= 0.0:
+		printerr("Expected configured container sprite visual.")
 		ok = false
 	container_root.queue_free()
 	await process_frame
@@ -70,7 +70,7 @@ func _verify_config_driven_container_spawn() -> bool:
 func _spawn_points() -> Array:
 	return []
 
-func _make_interactable(id: String, type: String, label_text: String, pos: Vector2, color: Color, size_units: Vector2 = Vector2.ZERO):
+func _make_interactable(id: String, type: String, label_text: String, pos: Vector2, color: Color, size_units: Vector2 = Vector2.ZERO, container_def: Dictionary = {}):
 	var area := Area2D.new()
 	area.name = id
 	area.script = InteractableScript
@@ -78,7 +78,7 @@ func _make_interactable(id: String, type: String, label_text: String, pos: Vecto
 	area.interact_type = type
 	area.display_name = label_text
 	area.position = pos
-	var visual_size: Vector2 = visual_builder.add_interactable_visual(area, type, label_text, color, size_units)
+	var visual_size: Vector2 = visual_builder.add_interactable_visual(area, type, label_text, color, size_units, container_def)
 	var label: Label = visual_builder.make_world_label(label_text, Vector2(-visual_size.x * 0.5, -visual_size.y * 0.5 - 42.0), area)
 	label.z_index = 20
 	interactables.append(area)

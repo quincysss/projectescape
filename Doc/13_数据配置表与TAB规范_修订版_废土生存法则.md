@@ -129,11 +129,20 @@ data/drop_tables.tab
 data/outpost_requirements.tab
 ```
 
+剧情和对白配置使用：
+
+```text
+setting/dialogues.tab
+setting/dialogue_speakers.tab
+```
+
 V0.1 局外商人开工时必须先有 `data/currencies.tab`。
 
 V0.3 初期可以先做 `items.tab`、`currencies.tab`、`materials.tab`、`equipment.tab`、`consumables.tab`、`effects.tab`、`research.tab`、`recipes.tab`。
 
 `drop_tables.tab` 和 `outpost_requirements.tab` 可以在局内刷新和前哨配置复杂后再拆。
+
+`dialogue_speakers.tab` 用于按 `speaker_id` 配置剧情对白角色原画、默认站位和名牌颜色；对白正文仍由 `dialogues.tab` 管理。
 
 ---
 

@@ -33,8 +33,7 @@ func _verify_outpost_requirement_bubble_uses_carried_materials() -> bool:
 			"amount": 1,
 			"weight_per_unit": float(data.get("weight", 1.0)),
 			"stack_limit": 99,
-			"item_type": "outpost_material",
-			"quality": "C",
+			"repair_material_id": item_id,
 		})
 	root._update_outpost_requirement_bubbles()
 	await process_frame

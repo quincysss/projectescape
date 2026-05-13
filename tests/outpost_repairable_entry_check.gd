@@ -65,8 +65,7 @@ func _fill_outpost_requirements(root: Node, outpost) -> void:
 			root.run_director.inventory_component.add_item({
 				"item_id": StringName(str(item_id)),
 				"amount": 1,
-				"quality": "C",
-				"type": "outpost_material",
+				"repair_material_id": StringName(str(item_id)),
 			})
 
 func _collect_reachable_points(root: Node, start: Vector2) -> Dictionary:

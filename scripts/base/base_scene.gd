@@ -26,6 +26,8 @@ const RESEARCH_MATERIAL_SLOT_WIDTH := 64.0
 const RESEARCH_MATERIAL_SLOT_HEIGHT := 58.0
 const RESEARCH_MATERIAL_SLOT_GAP := 14.0
 const RESEARCH_MATERIAL_ROW_GAP := 14.0
+const ITEM_TOOLTIP_DELAY_SECONDS := 0.15
+const ITEM_TOOLTIP_MARGIN := 16.0
 
 @onready var warehouse_tab_button: Button = %WarehouseTabButton
 @onready var merchant_tab_button: Button = %MerchantTabButton
@@ -102,6 +104,19 @@ var esc_settings_button: Button
 var _esc_settings_popup: Control
 var _debug_slow_next_loading := false
 var _debug_fail_next_loading := false
+var tooltip_layer: Control
+var item_tooltip_panel: Panel
+var item_tooltip_icon: TextureRect
+var item_tooltip_quality_marker: ColorRect
+var item_tooltip_name_label: Label
+var item_tooltip_price_label: Label
+var item_tooltip_description_label: Label
+var item_tooltip_timer: Timer
+var _tooltip_pending_item: Dictionary = {}
+var _tooltip_pending_context: Dictionary = {}
+var _tooltip_pending_anchor: Control
+var _tooltip_current_anchor: Control
+var _tooltip_current_item_id := ""
 
 func _ready() -> void:
 	_game_state = get_node_or_null("/root/GameState")
@@ -452,6 +467,7 @@ func _is_left_mouse_pressed(event: InputEvent) -> bool:
 func _show_tab(tab_id: String) -> void:
 	if tab_id == TAB_CRAFTING and not _is_crafting_tab_available():
 		tab_id = TAB_WAREHOUSE
+	_hide_item_tooltip("switch_tab")
 	_active_tab = tab_id
 	_refresh()
 
@@ -491,6 +507,7 @@ func _refresh() -> void:
 	_update_selected_research_state()
 
 func _refresh_tabs() -> void:
+	_hide_item_tooltip("refresh_tabs")
 	var crafting_available := _is_crafting_tab_available()
 	if _active_tab == TAB_CRAFTING and not crafting_available:
 		_active_tab = TAB_WAREHOUSE
@@ -525,6 +542,7 @@ func _is_crafting_tab_available() -> bool:
 func _build_visual_surfaces() -> void:
 	var ui_root := get_node("BaseUIRoot") as Control
 	_style_top_navigation()
+	_build_item_tooltip_layer(ui_root)
 	warehouse_label.visible = false
 	warehouse_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	merchant_list.visible = false
@@ -560,6 +578,76 @@ func _build_visual_surfaces() -> void:
 	_build_merchant_surface()
 	_build_research_surface()
 	_build_crafting_surface()
+
+func _build_item_tooltip_layer(ui_root: Control) -> void:
+	if tooltip_layer != null:
+		return
+	tooltip_layer = Control.new()
+	tooltip_layer.name = "TooltipLayer"
+	tooltip_layer.anchor_left = 0.0
+	tooltip_layer.anchor_top = 0.0
+	tooltip_layer.anchor_right = 1.0
+	tooltip_layer.anchor_bottom = 1.0
+	tooltip_layer.offset_left = 0.0
+	tooltip_layer.offset_top = 0.0
+	tooltip_layer.offset_right = 0.0
+	tooltip_layer.offset_bottom = 0.0
+	tooltip_layer.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	tooltip_layer.z_index = 100
+	ui_root.add_child(tooltip_layer)
+
+	item_tooltip_panel = Panel.new()
+	item_tooltip_panel.name = "ItemTooltipPanel"
+	item_tooltip_panel.visible = false
+	item_tooltip_panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	item_tooltip_panel.add_theme_stylebox_override("panel", _panel_style(Color(0.035, 0.033, 0.032, 0.95), Color("#2B8F99"), 1))
+	tooltip_layer.add_child(item_tooltip_panel)
+
+	item_tooltip_icon = TextureRect.new()
+	item_tooltip_icon.name = "ItemTooltipIcon"
+	item_tooltip_icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	item_tooltip_icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	item_tooltip_icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	item_tooltip_panel.add_child(item_tooltip_icon)
+
+	item_tooltip_quality_marker = ColorRect.new()
+	item_tooltip_quality_marker.name = "QualityMarker"
+	item_tooltip_quality_marker.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	item_tooltip_panel.add_child(item_tooltip_quality_marker)
+
+	item_tooltip_name_label = _make_section_label("", Vector2.ZERO, Vector2(120, 30), 18)
+	item_tooltip_name_label.name = "ItemTooltipName"
+	item_tooltip_name_label.clip_text = true
+	item_tooltip_name_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	item_tooltip_panel.add_child(item_tooltip_name_label)
+
+	item_tooltip_price_label = _make_section_label("", Vector2.ZERO, Vector2(92, 30), 15)
+	item_tooltip_price_label.name = "ItemTooltipPrice"
+	item_tooltip_price_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	item_tooltip_price_label.clip_text = true
+	item_tooltip_price_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	item_tooltip_panel.add_child(item_tooltip_price_label)
+
+	var divider := ColorRect.new()
+	divider.name = "ItemTooltipDivider"
+	var divider_color := Color("#2B8F99")
+	divider_color.a = 0.72
+	divider.color = divider_color
+	divider.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	item_tooltip_panel.add_child(divider)
+
+	item_tooltip_description_label = _make_section_label("", Vector2.ZERO, Vector2(190, 120), 14)
+	item_tooltip_description_label.name = "ItemTooltipDescription"
+	item_tooltip_description_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	item_tooltip_description_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	item_tooltip_panel.add_child(item_tooltip_description_label)
+
+	item_tooltip_timer = Timer.new()
+	item_tooltip_timer.name = "ItemTooltipDelayTimer"
+	item_tooltip_timer.one_shot = true
+	item_tooltip_timer.wait_time = ITEM_TOOLTIP_DELAY_SECONDS
+	item_tooltip_timer.timeout.connect(_on_item_tooltip_delay_timeout)
+	tooltip_layer.add_child(item_tooltip_timer)
 
 func _style_top_navigation() -> void:
 	var tabs: Array[Button] = [warehouse_tab_button, merchant_tab_button, research_tab_button, crafting_tab_button]
@@ -755,7 +843,10 @@ func _style_button(button: Button, important: bool) -> void:
 func _set_warehouse_items_text(items: Array) -> void:
 	warehouse_label.clear()
 	var capacity: int = _game_state.get_warehouse_capacity() if _game_state != null and _game_state.has_method("get_warehouse_capacity") else items.size()
-	_set_item_grid(warehouse_grid_root, items, capacity, TAB_WAREHOUSE)
+	var max_capacity := capacity
+	if _game_state != null and _game_state.has_method("get_warehouse_max_capacity"):
+		max_capacity = int(_game_state.get_warehouse_max_capacity())
+	_set_item_grid(warehouse_grid_root, items, max_capacity, TAB_WAREHOUSE, capacity)
 	if warehouse_status_label != null:
 		warehouse_status_label.text = "仓库容量：%d/%d\n格子规则：每格 1 个道具，不堆叠。" % [items.size(), capacity]
 	if items.is_empty():
@@ -865,13 +956,17 @@ func _expand_shop_offers_to_slots(offers: Array) -> Array[Dictionary]:
 			result.append(slot)
 	return result
 
-func _set_item_grid(grid_root: Control, items: Array, capacity: int, source_id: String) -> void:
+func _set_item_grid(grid_root: Control, items: Array, capacity: int, source_id: String, unlocked_slots: int = -1) -> void:
 	if grid_root == null:
 		return
+	_hide_item_tooltip("grid_refresh")
 	for child in grid_root.get_children():
 		grid_root.remove_child(child)
 		child.queue_free()
 	capacity = maxi(capacity, items.size())
+	if unlocked_slots < 0:
+		unlocked_slots = capacity
+	unlocked_slots = clampi(unlocked_slots, 0, capacity)
 	var columns := BASE_GRID_COLUMNS
 	var slot_size := BASE_GRID_SLOT_SIZE
 	var gap := BASE_GRID_SLOT_GAP
@@ -886,13 +981,14 @@ func _set_item_grid(grid_root: Control, items: Array, capacity: int, source_id: 
 		var row := int(index / columns)
 		var slot_pos := Vector2(float(col) * (slot_size + gap), float(row) * (slot_size + gap))
 		var item: Variant = items[index] if index < items.size() else null
+		var locked := index >= unlocked_slots
 		if item is Dictionary:
-			grid_root.add_child(_make_base_item_slot(slot_pos, Vector2(slot_size, slot_size), item, index, source_id))
+			grid_root.add_child(_make_base_item_slot(slot_pos, Vector2(slot_size, slot_size), item, index, source_id, locked))
 		else:
-			grid_root.add_child(_make_base_empty_slot(slot_pos, Vector2(slot_size, slot_size)))
-	grid_root.add_child(_make_grid_footer(Vector2(0, grid_height - BASE_GRID_FOOTER_HEIGHT + 4.0), Vector2(grid_width, 22), items.size(), capacity))
+			grid_root.add_child(_make_base_empty_slot(slot_pos, Vector2(slot_size, slot_size), locked))
+	grid_root.add_child(_make_grid_footer(Vector2(0, grid_height - BASE_GRID_FOOTER_HEIGHT + 4.0), Vector2(grid_width, 22), items.size(), unlocked_slots))
 
-func _make_base_item_slot(pos: Vector2, slot_size: Vector2, item: Dictionary, index: int, source_id: String) -> Button:
+func _make_base_item_slot(pos: Vector2, slot_size: Vector2, item: Dictionary, index: int, source_id: String, locked: bool = false) -> Button:
 	var button := Button.new()
 	button.position = pos
 	button.size = slot_size
@@ -914,18 +1010,28 @@ func _make_base_item_slot(pos: Vector2, slot_size: Vector2, item: Dictionary, in
 	)
 	var border_color := Color("#D1B850") if selected else Color("#35C9D7")
 	var border_width := 3 if selected else 2
-	button.add_theme_stylebox_override("normal", _slot_style(Color("#071116"), border_color, border_width))
+	var normal_bg := Color("#151819") if locked else Color("#071116")
+	var normal_border := Color("#4D575B") if locked else border_color
+	button.disabled = locked
+	button.set_meta("warehouse_slot_locked", locked)
+	button.add_theme_stylebox_override("normal", _slot_style(normal_bg, normal_border, border_width))
 	button.add_theme_stylebox_override("hover", _slot_style(Color("#0B151A"), Color("#D1B850"), 2))
 	button.add_theme_stylebox_override("pressed", _slot_style(Color("#121817"), Color("#D1B850"), 3))
+	button.add_theme_stylebox_override("disabled", _slot_style(Color("#151819"), Color("#4D575B"), 1))
 	_add_base_item_slot_content(button, slot_size, item, source_id)
-	button.button_up.connect(func(): _dispatch_grid_slot(source_id, meta_id, index))
+	_bind_base_item_tooltip(button, item, source_id)
+	if not locked:
+		button.button_up.connect(func(): _dispatch_grid_slot(source_id, meta_id, index))
 	return button
 
-func _make_base_empty_slot(pos: Vector2, slot_size: Vector2) -> Panel:
+func _make_base_empty_slot(pos: Vector2, slot_size: Vector2, locked: bool = false) -> Panel:
 	var panel := Panel.new()
 	panel.position = pos
 	panel.size = slot_size
-	panel.add_theme_stylebox_override("panel", _slot_style(Color("#071116"), Color("#354145"), 1))
+	panel.set_meta("warehouse_slot_locked", locked)
+	var bg_color := Color("#151819") if locked else Color("#071116")
+	var border_color := Color("#4D575B") if locked else Color("#354145")
+	panel.add_theme_stylebox_override("panel", _slot_style(bg_color, border_color, 1))
 	return panel
 
 func _make_grid_footer(pos: Vector2, footer_size: Vector2, used: int, capacity: int) -> Label:
@@ -1043,6 +1149,182 @@ func _slot_tooltip(item: Dictionary, source_id: String) -> String:
 			]
 		_:
 			return "%s\n品质：%s\n单格道具" % [name, quality]
+
+func _bind_base_item_tooltip(anchor: Control, item: Dictionary, source_id: String, context: Dictionary = {}) -> void:
+	if anchor == null:
+		return
+	anchor.tooltip_text = ""
+	anchor.mouse_filter = Control.MOUSE_FILTER_STOP
+	var tooltip_context := context.duplicate(true)
+	if not tooltip_context.has("context"):
+		tooltip_context["context"] = source_id
+	anchor.mouse_entered.connect(func(): _queue_item_tooltip(item, anchor, tooltip_context))
+	anchor.mouse_exited.connect(func(): _hide_item_tooltip_for_anchor(anchor, "mouse_exited"))
+
+func _queue_item_tooltip(item: Dictionary, anchor: Control, context: Dictionary = {}) -> void:
+	if anchor == null or not is_instance_valid(anchor):
+		return
+	_tooltip_pending_item = item.duplicate(true)
+	_tooltip_pending_context = context.duplicate(true)
+	_tooltip_pending_anchor = anchor
+	if item_tooltip_timer != null:
+		item_tooltip_timer.start(ITEM_TOOLTIP_DELAY_SECONDS)
+
+func _on_item_tooltip_delay_timeout() -> void:
+	if _tooltip_pending_anchor == null or not is_instance_valid(_tooltip_pending_anchor):
+		_hide_item_tooltip("anchor_gone")
+		return
+	_show_item_tooltip(_tooltip_pending_item, _tooltip_pending_anchor, _tooltip_pending_context)
+
+func _show_item_tooltip(item: Dictionary, anchor: Control, context: Dictionary = {}) -> void:
+	if item_tooltip_panel == null or anchor == null or not is_instance_valid(anchor):
+		return
+	var data := _build_item_tooltip_data(item, context)
+	if data.is_empty():
+		_hide_item_tooltip("empty_data")
+		return
+	_tooltip_current_anchor = anchor
+	_tooltip_current_item_id = String(data.get("item_id", ""))
+	_apply_item_tooltip_data(data)
+	_position_item_tooltip(anchor)
+	item_tooltip_panel.visible = true
+
+func _hide_item_tooltip_for_anchor(anchor: Control, reason: String = "") -> void:
+	if anchor == _tooltip_pending_anchor or anchor == _tooltip_current_anchor:
+		_hide_item_tooltip(reason)
+
+func _hide_item_tooltip(_reason: String = "") -> void:
+	if item_tooltip_timer != null:
+		item_tooltip_timer.stop()
+	_tooltip_pending_item = {}
+	_tooltip_pending_context = {}
+	_tooltip_pending_anchor = null
+	_tooltip_current_anchor = null
+	_tooltip_current_item_id = ""
+	if item_tooltip_panel != null:
+		item_tooltip_panel.visible = false
+
+func _build_item_tooltip_data(item: Dictionary, context: Dictionary = {}) -> Dictionary:
+	var item_id := String(item.get("item_id", ""))
+	if item_id.is_empty() and item.has("warehouse_item_id"):
+		item_id = String(item.get("warehouse_item_id", ""))
+	if item_id.is_empty():
+		if OS.is_debug_build():
+			push_warning("Item tooltip missing item_id for context %s." % String(context.get("context", "")))
+			return {
+				"item_id": "missing_item",
+				"display_name": "未知道具",
+				"quality": "C",
+				"icon": "",
+				"price_text": "不可出售",
+				"sellable": false,
+				"description": "Tooltip 缺少 item_id。",
+			}
+		return {}
+	if not _ensure_debug_data_loaded():
+		return {}
+	var definition := _debug_registry.get_item(item_id)
+	if definition.is_empty():
+		if OS.is_debug_build():
+			push_warning("Item tooltip cannot find item_id: %s." % item_id)
+			return {
+				"item_id": item_id,
+				"display_name": item_id,
+				"quality": "C",
+				"icon": String(item.get("icon", "")),
+				"price_text": "不可出售",
+				"sellable": false,
+				"description": "items.tab 中没有这个道具定义。",
+			}
+		return {}
+	var sellable := _parse_bool(definition.get("sellable", item.get("sellable", false)))
+	var sell_value := int(definition.get("sell_value", item.get("sell_value", 0)))
+	var currency_id := String(definition.get("sell_currency_id", item.get("sell_currency_id", "mine_coin")))
+	var description := String(definition.get("description", item.get("description", "")))
+	if description.strip_edges().is_empty():
+		description = "暂无记录。"
+	return {
+		"item_id": item_id,
+		"display_name": String(definition.get("name", item.get("display_name", item_id))),
+		"quality": String(definition.get("quality", item.get("quality", "C"))),
+		"icon": String(definition.get("icon", item.get("icon", ""))),
+		"price_text": "%d%s" % [sell_value, _currency_name(currency_id)] if sellable and sell_value > 0 else "不可出售",
+		"sellable": sellable and sell_value > 0,
+		"description": description,
+	}
+
+func _apply_item_tooltip_data(data: Dictionary) -> void:
+	var tooltip_size := _item_tooltip_size()
+	var icon_size := _item_tooltip_icon_size()
+	item_tooltip_panel.size = tooltip_size
+	item_tooltip_icon.position = Vector2((tooltip_size.x - icon_size) * 0.5, 24.0)
+	item_tooltip_icon.size = Vector2(icon_size, icon_size)
+	item_tooltip_icon.texture = _tooltip_icon_texture(String(data.get("icon", "")))
+	item_tooltip_quality_marker.position = Vector2(18.0, icon_size + 54.0)
+	item_tooltip_quality_marker.size = Vector2(5.0, 18.0)
+	item_tooltip_quality_marker.color = _quality_name_color(String(data.get("quality", "C")))
+	item_tooltip_name_label.position = Vector2(28.0, icon_size + 48.0)
+	item_tooltip_name_label.size = Vector2(tooltip_size.x - 128.0, 30.0)
+	item_tooltip_name_label.text = String(data.get("display_name", ""))
+	item_tooltip_name_label.add_theme_color_override("font_color", _quality_name_color(String(data.get("quality", "C"))))
+	item_tooltip_price_label.position = Vector2(tooltip_size.x - 96.0, icon_size + 50.0)
+	item_tooltip_price_label.size = Vector2(78.0, 26.0)
+	item_tooltip_price_label.text = String(data.get("price_text", ""))
+	item_tooltip_price_label.add_theme_color_override("font_color", Color("#D8D6CE") if bool(data.get("sellable", false)) else Color("#7D8586"))
+	var divider := item_tooltip_panel.get_node_or_null("ItemTooltipDivider") as ColorRect
+	if divider != null:
+		divider.position = Vector2(18.0, icon_size + 83.0)
+		divider.size = Vector2(tooltip_size.x - 36.0, 1.0)
+	item_tooltip_description_label.position = Vector2(18.0, icon_size + 118.0)
+	item_tooltip_description_label.size = Vector2(tooltip_size.x - 36.0, tooltip_size.y - icon_size - 138.0)
+	item_tooltip_description_label.text = String(data.get("description", ""))
+
+func _position_item_tooltip(anchor: Control) -> void:
+	var viewport_size := get_viewport_rect().size
+	var panel_size := _item_tooltip_size()
+	var anchor_rect := anchor.get_global_rect()
+	var x := anchor_rect.position.x + anchor_rect.size.x + ITEM_TOOLTIP_MARGIN
+	if x + panel_size.x + ITEM_TOOLTIP_MARGIN > viewport_size.x:
+		x = anchor_rect.position.x - panel_size.x - ITEM_TOOLTIP_MARGIN
+	var y := anchor_rect.position.y
+	x = clampf(x, ITEM_TOOLTIP_MARGIN, maxf(ITEM_TOOLTIP_MARGIN, viewport_size.x - panel_size.x - ITEM_TOOLTIP_MARGIN))
+	y = clampf(y, ITEM_TOOLTIP_MARGIN, maxf(ITEM_TOOLTIP_MARGIN, viewport_size.y - panel_size.y - ITEM_TOOLTIP_MARGIN))
+	var local_position := tooltip_layer.get_global_transform().affine_inverse() * Vector2(x, y)
+	item_tooltip_panel.position = local_position
+
+func _item_tooltip_size() -> Vector2:
+	var width := get_viewport_rect().size.x
+	if width >= 1800.0:
+		return Vector2(260.0, 300.0)
+	if width >= 1500.0:
+		return Vector2(240.0, 280.0)
+	return Vector2(224.0, 260.0)
+
+func _item_tooltip_icon_size() -> float:
+	var width := get_viewport_rect().size.x
+	if width >= 1800.0:
+		return 88.0
+	if width >= 1500.0:
+		return 80.0
+	return 72.0
+
+func _tooltip_icon_texture(icon_path: String) -> Texture2D:
+	if icon_path.is_empty() or not ResourceLoader.exists(icon_path):
+		return null
+	return load(icon_path) as Texture2D
+
+func _quality_name_color(quality: String) -> Color:
+	match quality:
+		"SS":
+			return Color("#D84B55")
+		"S":
+			return Color("#D1B850")
+		"A":
+			return Color("#B9A9FF")
+		"B":
+			return Color("#6FA8DC")
+		_:
+			return Color("#D8D6CE")
 
 func _dispatch_grid_slot(source_id: String, meta_id: String, index: int) -> void:
 	match source_id:
@@ -1216,11 +1498,21 @@ func _roman_level(level: int) -> String:
 			return str(level)
 
 func _currency_name(currency_id: String) -> String:
+	if _ensure_debug_data_loaded():
+		var definition := _debug_registry.get_currency(currency_id)
+		if not definition.is_empty():
+			return String(definition.get("name", currency_id))
 	match currency_id:
 		"mine_coin":
 			return "矿币"
 		_:
 			return currency_id
+
+func _parse_bool(value: Variant) -> bool:
+	if value is bool:
+		return value
+	var normalized := String(value).strip_edges().to_lower()
+	return normalized == "true" or normalized == "1" or normalized == "yes"
 
 
 func _update_selected_sell_state() -> void:
@@ -1418,32 +1710,56 @@ func _make_research_material_slot(detail: Dictionary, pos: Vector2) -> Panel:
 	var panel := Panel.new()
 	panel.position = pos
 	panel.size = Vector2(RESEARCH_MATERIAL_SLOT_WIDTH, RESEARCH_MATERIAL_SLOT_HEIGHT)
+	panel.mouse_filter = Control.MOUSE_FILTER_STOP
 	var enough := bool(detail.get("enough", false))
 	panel.add_theme_stylebox_override("panel", _slot_style(Color("#071116"), Color("#35C9D7") if enough else Color("#8B4F4F"), 1))
 	var material_name := String(detail.get("display_name", detail.get("item_id", "")))
-	panel.tooltip_text = "%s：%d/%d" % [
-		material_name,
-		int(detail.get("owned", 0)),
-		int(detail.get("required", 0)),
-	]
-	var name_label := Label.new()
-	name_label.position = Vector2(4, 6)
-	name_label.size = Vector2(panel.size.x - 8.0, 22)
-	name_label.text = material_name
-	name_label.clip_text = true
-	name_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	name_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	_style_label(name_label, 10, Color("#D8D6CE"))
-	panel.add_child(name_label)
+	panel.tooltip_text = ""
+	var item_id := String(detail.get("item_id", ""))
+	var item_def := _debug_registry.get_item(item_id) if _ensure_debug_data_loaded() else {}
+	var icon_path := String(item_def.get("icon", ""))
+	var texture := _tooltip_icon_texture(icon_path)
+	if texture != null:
+		var icon := TextureRect.new()
+		icon.name = "ResearchMaterialIcon"
+		icon.position = Vector2((panel.size.x - 28.0) * 0.5, 4.0)
+		icon.size = Vector2(28.0, 28.0)
+		icon.texture = texture
+		icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		panel.add_child(icon)
+	else:
+		var name_label := Label.new()
+		name_label.position = Vector2(4, 6)
+		name_label.size = Vector2(panel.size.x - 8.0, 22)
+		name_label.text = material_name
+		name_label.clip_text = true
+		name_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		name_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+		name_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		_style_label(name_label, 10, Color("#D8D6CE"))
+		panel.add_child(name_label)
 
 	var count_label := Label.new()
-	count_label.position = Vector2(4, 30)
+	count_label.position = Vector2(4, 34)
 	count_label.size = Vector2(panel.size.x - 8.0, 20)
 	count_label.text = "%d/%d" % [int(detail.get("owned", 0)), int(detail.get("required", 0))]
 	count_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	count_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	count_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_style_label(count_label, 13, Color("#D8D6CE") if enough else Color("#D7A0A0"))
 	panel.add_child(count_label)
+	var tooltip_item := {
+		"item_id": item_id,
+		"display_name": material_name,
+	}
+	_bind_base_item_tooltip(panel, tooltip_item, "research", {
+		"context": "research",
+		"owned_count": int(detail.get("owned", 0)),
+		"required_count": int(detail.get("required", 0)),
+		"show_requirement_state": true,
+	})
 	return panel
 
 func _selected_research_detail_row() -> Dictionary:
@@ -1880,6 +2196,6 @@ func _ensure_debug_data_loaded() -> bool:
 	if _debug_data_loaded:
 		return true
 	_debug_data_loaded = _debug_registry.load_all()
-	if not _debug_data_loaded:
+	if not _debug_data_loaded and debug_result_label != null:
 		debug_result_label.text = "Debug 配置表加载失败：%s" % str(_debug_registry.load_errors)
 	return _debug_data_loaded

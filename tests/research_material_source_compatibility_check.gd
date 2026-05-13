@@ -83,23 +83,23 @@ func _verify_shop_stock_level_pools(registry) -> bool:
 func _verify_outpost_materials_are_run_only(registry) -> bool:
 	var ok := true
 	var research_item_ids := _research_requirement_item_ids(registry)
-	for item_id in research_item_ids.keys():
-		var item: Dictionary = registry.get_item(item_id)
-		if String(item.get("item_type", "")) == "outpost_material":
-			printerr("Research must not consume outpost-only repair material: %s" % item_id)
+	for material_id in registry.repair_materials_by_id.keys():
+		if not registry.get_item(String(material_id)).is_empty():
+			printerr("Repair material must not be defined in items.tab: %s" % material_id)
+			ok = false
+		if research_item_ids.has(String(material_id)):
+			printerr("Research must not consume run-only repair material: %s" % material_id)
 			ok = false
 	for row in registry.shop_stock_rows:
 		var item_id := String(row.get("item_id", ""))
-		var item: Dictionary = registry.get_item(item_id)
-		if String(item.get("item_type", "")) == "outpost_material":
-			printerr("Merchant shop must not sell outpost-only repair material: %s" % item_id)
+		if registry.repair_materials_by_id.has(item_id):
+			printerr("Merchant shop must not sell run-only repair material: %s" % item_id)
 			ok = false
 	for context in registry.drop_rows_by_context.keys():
 		for row in registry.drop_rows_by_context[context]:
 			var item_id := String(row.get("item_id", ""))
-			var item: Dictionary = registry.get_item(item_id)
-			if String(item.get("item_type", "")) == "outpost_material":
-				printerr("Container drops must not include outpost-only repair material: %s" % item_id)
+			if registry.repair_materials_by_id.has(item_id):
+				printerr("Container drops must not include run-only repair material: %s" % item_id)
 				ok = false
 	return ok
 

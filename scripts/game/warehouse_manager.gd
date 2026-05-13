@@ -1,7 +1,7 @@
 class_name WarehouseManager
 extends RefCounted
 
-const DEFAULT_MAX_SLOTS := 120
+const DEFAULT_MAX_SLOTS := 80
 
 var items: Array[Dictionary] = []
 var max_slots: int = DEFAULT_MAX_SLOTS

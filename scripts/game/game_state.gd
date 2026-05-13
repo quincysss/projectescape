@@ -10,7 +10,7 @@ const BASE_INVENTORY_SLOTS := 8
 const BASE_HOME_STORAGE_SLOTS := 1
 const BASE_OUTPOST_STORAGE_SLOTS := 0
 const BASE_MAX_STABILITY := 100.0
-const BASE_WAREHOUSE_CAPACITY := 120
+const BASE_WAREHOUSE_CAPACITY := 80
 const MANUFACTURING_UNLOCK_COST := 5000
 const DEFAULT_CHARACTER_ID := "male_01"
 const DEFAULT_CHARACTER_HUD_ASSETS := {
@@ -469,6 +469,12 @@ func get_player_max_stability(default_value: float = BASE_MAX_STABILITY) -> floa
 
 func get_warehouse_capacity(default_capacity: int = BASE_WAREHOUSE_CAPACITY) -> int:
 	return maxi(default_capacity, int(round(_get_research_effect_value("warehouse_capacity", float(default_capacity)))))
+
+func get_warehouse_max_capacity(default_capacity: int = BASE_WAREHOUSE_CAPACITY) -> int:
+	if research_manager == null:
+		research_manager = ResearchManagerScript.new()
+	research_manager.research_levels = research_levels
+	return maxi(default_capacity, int(round(research_manager.get_max_effect_value("warehouse_capacity", float(default_capacity)))))
 
 func reset_research() -> void:
 	_bind_research_manager()

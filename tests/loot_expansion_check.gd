@@ -37,15 +37,10 @@ func _verify_loot_expansion() -> bool:
 			if not dropped_ids.has(String(item_id)):
 				printerr("Expanded loot item %s is not attached to any drop table." % item_id)
 				ok = false
-			var item_type := String(item.get("item_type", ""))
 			var sellable := TabDataLoaderScript.parse_bool(String(item.get("sellable", "")), false)
 			var sell_value := int(item.get("sell_value", 0))
-			if item_type == "material" or item_type == "outpost_material":
-				if sellable or sell_value != 0:
-					printerr("Expanded material %s should not have merchant value." % item_id)
-					ok = false
-			elif not sellable or sell_value <= 0:
-				printerr("Expanded non-material %s should have merchant value." % item_id)
+			if not sellable or sell_value <= 0:
+				printerr("Expanded loot item %s should have merchant value." % item_id)
 				ok = false
 	if not _verify_context_contents(registry):
 		ok = false

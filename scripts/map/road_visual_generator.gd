@@ -3,15 +3,11 @@ class_name RoadVisualGenerator
 extends Node2D
 
 const UNIT := 64.0
-const RoadMainTexture := preload("res://assets/map/roads/tiles/road_straight_main_01.png")
-const AlleyPathTexture := preload("res://assets/map/roads/tiles/alley_path_01.png")
-const CrossIntersectionTexture := preload("res://assets/map/roads/tiles/road_cross_intersection_01.png")
-const TIntersectionTexture := preload("res://assets/map/roads/tiles/road_t_junction_01.png")
-const CornerTexture := preload("res://assets/map/roads/tiles/road_corner_01.png")
-const PlazaTexture := preload("res://assets/map/roads/tiles/plaza_concrete_01.png")
-const SidewalkTexture := preload("res://assets/map/roads/tiles/sidewalk_tile_01.png")
-const CrosswalkTexture := preload("res://assets/map/roads/tiles/crosswalk_tile_01.png")
-const ManholeTexture := preload("res://assets/map/roads/tiles/manhole_tile_01.png")
+
+const CrosswalkTexture := preload("res://assets/map/roads/overlays/road_overlay_crosswalk_remnant_01.png")
+const ManholeTexture := preload("res://assets/map/roads/overlays/road_overlay_manhole_01.png")
+const SidewalkTexture := preload("res://assets/map/roads/overlays/road_overlay_curb_chip_strip_01.png")
+
 const GroundTileTextures := [
 	preload("res://assets/map/roads/ground/road_ground_base_tile_1024_01.png"),
 	preload("res://assets/map/roads/ground/road_ground_base_tile_1024_02.png"),
@@ -176,7 +172,7 @@ func _add_straight_segments(cells: Dictionary, consumed: Dictionary, horizontal:
 			continue
 		var segment_rect := _rect_for_keys(cells, segment_keys)
 		var sprite_name := "RoadStraight%s_%03d_%03d_%02d" % ["H" if horizontal else "V", start_key.x, start_key.y, segment_keys.size()]
-		var sprite := _make_tile_sprite(sprite_name, CrossIntersectionTexture, segment_rect, -88)
+		var sprite := _make_tile_sprite(sprite_name, _texture_for_kind("StraightDetail"), segment_rect, -88)
 		sprite.rotation_degrees = 90.0 if horizontal else 0.0
 		add_child(sprite)
 		for key in segment_keys:
@@ -302,17 +298,17 @@ func _tile_kind_for_mask(mask: int, key: Vector2i) -> String:
 func _texture_for_kind(tile_kind: String) -> Texture2D:
 	match tile_kind:
 		"Cross":
-			return RoadMainTexture
+			return GroundTileTextures[0]
 		"T":
-			return TIntersectionTexture
+			return GroundTileTextures[1]
 		"Corner":
-			return CornerTexture
+			return GroundTileTextures[2]
 		"StraightDetail":
-			return CrossIntersectionTexture
+			return GroundTileTextures[0]
 		"Plaza":
-			return PlazaTexture
+			return GroundTileTextures[1]
 		_:
-			return AlleyPathTexture
+			return GroundTileTextures[2]
 
 func _rotation_for_mask(mask: int) -> float:
 	if mask == 3 or mask == 7:

@@ -2,12 +2,15 @@ class_name OutpostMaterialSpawnController
 extends RefCounted
 
 const MATERIAL_LIFETIME_SECONDS := 120.0
+const REQUIREMENTS_PER_OUTPOST := 2
+const REQUIREMENT_AMOUNT := 1
 
 var outpost_root: Node
 var get_spawn_points: Callable
 var make_interactable: Callable
 var make_item: Callable
 var remove_interactable: Callable
+var data_registry
 var unit: float = 64.0
 
 func setup(
@@ -16,7 +19,8 @@ func setup(
 	p_make_interactable: Callable,
 	p_make_item: Callable,
 	p_remove_interactable: Callable,
-	p_unit: float
+	p_unit: float,
+	p_data_registry = null
 ) -> void:
 	outpost_root = p_outpost_root
 	get_spawn_points = p_get_spawn_points
@@ -24,17 +28,18 @@ func setup(
 	make_item = p_make_item
 	remove_interactable = p_remove_interactable
 	unit = p_unit
+	data_registry = p_data_registry
 
-func build_requirements(first_outpost_id: String, second_outpost_id: String) -> Dictionary:
+func build_requirements(first_outpost_id: String, second_outpost_id: String, seed: int = 0) -> Dictionary:
 	var requirements := {}
-	requirements[first_outpost_id] = {
-		"scrap_metal": {"display_name": "废金属", "amount": 2, "weight": 2.0},
-		"old_battery": {"display_name": "旧电池", "amount": 1, "weight": 4.0},
-	}
-	requirements[second_outpost_id] = {
-		"copper_wire": {"display_name": "铜线", "amount": 2, "weight": 1.5},
-		"signal_core": {"display_name": "信号核心", "amount": 1, "weight": 3.0},
-	}
+	var rng := RandomNumberGenerator.new()
+	if seed == 0:
+		rng.randomize()
+	else:
+		rng.seed = _requirements_seed(seed, first_outpost_id, second_outpost_id)
+	var rows := _repair_material_rows()
+	requirements[first_outpost_id] = _random_requirements(rows, rng)
+	requirements[second_outpost_id] = _random_requirements(rows, rng)
 	return requirements
 
 func spawn_for_outposts(requirements_by_outpost: Dictionary, outpost_positions: Dictionary) -> Array:
@@ -48,14 +53,14 @@ func spawn_for_outposts(requirements_by_outpost: Dictionary, outpost_positions: 
 			var data: Dictionary = requirements[item_id]
 			var pos: Vector2 = _next_material_position(base_pos, used_positions, offset)
 			var pickup = make_interactable.call(
-				"pickup_%s" % item_id,
+				"pickup_%s_%s" % [outpost_id, item_id],
 				"material",
 				data.display_name,
 				pos,
 				material_color(String(item_id))
 			)
 			pickup.payload = {
-				"item": make_item.call(item_id, data.display_name, data.amount, data.weight, 1),
+				"item": _make_repair_material_item(String(item_id), data, String(outpost_id)),
 				"outpost_id": outpost_id,
 				"item_id": String(item_id),
 				"lifetime": MATERIAL_LIFETIME_SECONDS,
@@ -95,14 +100,14 @@ func _respawn_material(outpost_id: String, item_id: String, item: Dictionary, ol
 	var pos := _next_material_position(base_pos, used_positions, 0)
 	var display_name := String(item.get("display_name", item_id))
 	var pickup = make_interactable.call(
-		"pickup_%s" % item_id,
+		"pickup_%s_%s" % [outpost_id, item_id],
 		"material",
 		display_name,
 		pos,
 		material_color(item_id)
 	)
 	pickup.payload = {
-		"item": item.duplicate(true),
+		"item": _normalize_repair_material_item(item, outpost_id),
 		"outpost_id": outpost_id,
 		"item_id": item_id,
 		"lifetime": MATERIAL_LIFETIME_SECONDS,
@@ -170,14 +175,77 @@ func _is_position_used(pos: Vector2, used_positions: Array[Vector2]) -> bool:
 	return false
 
 func material_color(item_id: String) -> Color:
-	match item_id:
-		"scrap_metal":
-			return Color(0.72, 0.72, 0.68)
-		"old_battery":
-			return Color(0.95, 0.34, 0.30)
-		"copper_wire":
-			return Color(0.95, 0.55, 0.22)
-		"signal_core":
-			return Color(0.30, 0.95, 0.92)
-		_:
-			return Color(0.30, 0.85, 0.38)
+	var material := _repair_material_row(item_id)
+	var color_text := String(material.get("color_hex", ""))
+	if not color_text.is_empty():
+		return Color(color_text)
+	return Color(0.30, 0.85, 0.38)
+
+func _make_repair_material_item(item_id: String, data: Dictionary, outpost_id: String) -> Dictionary:
+	var item: Dictionary = {}
+	if data_registry != null and data_registry.has_method("make_repair_material_stack"):
+		item = data_registry.make_repair_material_stack(item_id, int(data.get("amount", 1)), outpost_id)
+	if item.is_empty():
+		item = make_item.call(item_id, data.display_name, data.amount, data.weight, 1)
+	return _normalize_repair_material_item(item, outpost_id)
+
+func _normalize_repair_material_item(item: Dictionary, outpost_id: String) -> Dictionary:
+	var normalized := item.duplicate(true)
+	var material_id := String(normalized.get("repair_material_id", normalized.get("item_id", "")))
+	normalized["repair_material_id"] = StringName(material_id)
+	normalized["item_id"] = StringName(material_id)
+	normalized["source"] = "repair_material_spawn"
+	normalized["outpost_id"] = outpost_id
+	normalized.erase("item_type")
+	normalized.erase("tags")
+	normalized.erase("quality")
+	normalized.erase("quality_color")
+	normalized.erase("sellable")
+	normalized.erase("sell_currency_id")
+	normalized.erase("sell_value")
+	return normalized
+
+func _random_requirements(rows: Array[Dictionary], rng: RandomNumberGenerator) -> Dictionary:
+	var result := {}
+	var candidates: Array[Dictionary] = []
+	for row in rows:
+		candidates.append(row)
+	var pick_count: int = mini(REQUIREMENTS_PER_OUTPOST, candidates.size())
+	for _index in range(pick_count):
+		var candidate_index := rng.randi_range(0, candidates.size() - 1)
+		var row: Dictionary = candidates[candidate_index]
+		candidates.remove_at(candidate_index)
+		var material_id := String(row.get("id", ""))
+		if material_id.is_empty():
+			continue
+		result[material_id] = {
+			"display_name": String(row.get("display_name", material_id)),
+			"amount": REQUIREMENT_AMOUNT,
+			"weight": float(row.get("weight", 0.0)),
+		}
+	return result
+
+func _requirements_seed(seed: int, first_outpost_id: String, second_outpost_id: String) -> int:
+	var text := "%s|%s|%s|repair_materials" % [seed, first_outpost_id, second_outpost_id]
+	var hashed := int(text.hash())
+	if hashed < 0:
+		hashed = -hashed
+	return maxi(1, hashed)
+
+func _repair_material_rows() -> Array[Dictionary]:
+	if data_registry != null and data_registry.has_method("get_repair_material_rows"):
+		var rows: Array[Dictionary] = data_registry.get_repair_material_rows()
+		if rows.is_empty() and data_registry.has_method("load_all"):
+			data_registry.load_all()
+			rows = data_registry.get_repair_material_rows()
+		return rows
+	return []
+
+func _repair_material_row(item_id: String) -> Dictionary:
+	if data_registry != null and data_registry.has_method("get_repair_material"):
+		var row: Dictionary = data_registry.get_repair_material(item_id)
+		if row.is_empty() and data_registry.has_method("load_all"):
+			data_registry.load_all()
+			row = data_registry.get_repair_material(item_id)
+		return row
+	return {}

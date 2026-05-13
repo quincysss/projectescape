@@ -68,9 +68,9 @@ func _event_row(event_id: String) -> Dictionary:
 		return {
 			"event_id": MONSTER_EVENT_ID,
 			"slot": "threat",
-			"min_day": "3",
-			"guaranteed_day": "3",
-			"daily_chance": "0.5",
+			"min_day": "2",
+			"guaranteed_day": "2",
+			"daily_chance": "0.8",
 			"payload": "monster_count=4;spawn_group=MonsterSpawnPoints;monster_type=black_tide_boundary_essence",
 			"enabled": "true",
 		}

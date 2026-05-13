@@ -27,21 +27,40 @@ func _verify_overview_readable_overlay_scale() -> bool:
 		printerr("Expected a spawned container.")
 		ok = false
 	else:
-		var visual := container.get_node_or_null("ContainerVisual") as ColorRect
-		var lifetime_label := container.get_node_or_null("ContainerLifetimeLabel") as Label
-		var lifetime_background := container.get_node_or_null("ContainerLifetimeLabelBackground") as ColorRect
+		var readable_root := container.get_node_or_null("ContainerReadableRoot") as Node2D
+		var visual := container.get_node_or_null("ContainerReadableRoot/ContainerVisual") as Sprite2D
+		var lifetime_label := container.get_node_or_null("ContainerReadableRoot/ContainerLifetimeLabel") as Label
+		var lifetime_background := container.get_node_or_null("ContainerReadableRoot/ContainerLifetimeBarBackground") as ColorRect
+		var name_label := container.get_node_or_null("ContainerReadableRoot/ContainerNameLabel") as Label
 		var marker_label := container.get_node_or_null("MarkerLabel") as Label
-		if lifetime_label == null or absf(lifetime_label.scale.x - 3.0) > 0.01:
-			printerr("Expected overview container lifetime label to cap at 3x scale.")
+		if readable_root == null or absf(readable_root.scale.x - 3.0) > 0.01:
+			printerr("Expected overview formal container root to cap at 3.0x scale.")
 			ok = false
-		if visual != null and lifetime_label != null and absf(lifetime_label.position.y - (visual.size.y * 0.5 + 8.0)) > 0.01:
-			printerr("Expected scaled lifetime label to keep normal offset from container.")
+		if visual == null or visual.texture == null:
+			printerr("Expected overview container formal icon.")
 			ok = false
-		if lifetime_background != null and lifetime_label != null and lifetime_background.position != lifetime_label.position:
-			printerr("Expected lifetime label and background to stay grouped.")
+		if lifetime_label == null or lifetime_background == null:
+			printerr("Expected overview container lifetime bar and label.")
 			ok = false
-		if marker_label == null or absf(marker_label.scale.x - 3.0) > 0.01:
-			printerr("Expected overview container marker label to cap at 3x scale.")
+		if name_label == null:
+			printerr("Expected overview container name label.")
+			ok = false
+		if marker_label != null:
+			printerr("Expected formal container to omit the old marker label.")
+			ok = false
+
+	var material: Node = _first_interactable(root.outpost_root, "material")
+	if material == null:
+		printerr("Expected a spawned material.")
+		ok = false
+	else:
+		var material_visual := material.get_node_or_null("BuildMaterialVisual") as Polygon2D
+		var material_label := material.get_node_or_null("MarkerLabel") as Label
+		if material_visual == null or absf(material_visual.scale.x - 3.0) > 0.01:
+			printerr("Expected overview material visual to cap at 3.0x scale.")
+			ok = false
+		if material_label == null or absf(material_label.scale.x - 3.0) > 0.01:
+			printerr("Expected overview material marker label to cap at 3.0x scale.")
 			ok = false
 
 	var outpost: Node = _first_interactable(root.outpost_root, "outpost")
@@ -51,7 +70,7 @@ func _verify_overview_readable_overlay_scale() -> bool:
 	else:
 		var outpost_label := outpost.get_node_or_null("WorldLabel") as Label
 		if outpost_label == null or absf(outpost_label.scale.x - 3.0) > 0.01:
-			printerr("Expected overview outpost label to cap at 3x scale.")
+			printerr("Expected overview outpost label to cap at 3.0x scale.")
 			ok = false
 		ok = _check_outpost_requirement_bubble_spacing(outpost) and ok
 
@@ -60,9 +79,9 @@ func _verify_overview_readable_overlay_scale() -> bool:
 	await process_frame
 	root._update_readable_world_ui_scale()
 	if container != null:
-		var follow_label := container.get_node_or_null("ContainerLifetimeLabel") as Label
-		if follow_label != null and absf(follow_label.scale.x - 1.0) > 0.01:
-			printerr("Expected follow mode container label to return to normal scale.")
+		var follow_root := container.get_node_or_null("ContainerReadableRoot") as Node2D
+		if follow_root != null and absf(follow_root.scale.x - 1.0) > 0.01:
+			printerr("Expected follow mode formal container root to return to normal scale.")
 			ok = false
 
 	root.queue_free()
@@ -87,6 +106,13 @@ func _check_outpost_requirement_bubble_spacing(outpost: Node) -> bool:
 	if background == null:
 		printerr("Expected outpost requirement panel background.")
 		return false
+	if background.color.a < 0.5 or background.color.a > 0.8:
+		printerr("Expected outpost requirement panel background to use a compact translucent black fill.")
+		return false
+	var border := bubbles.get_node_or_null("RequirementBubbleBorder") as Line2D
+	if border == null or border.default_color != Color("#D1B850"):
+		printerr("Expected outpost requirement panel to use the project gold border.")
+		return false
 	var panel_center := background.position + background.size * 0.5
 	if panel_center.length() > 0.01:
 		printerr("Expected outpost requirement panel center to match outpost center. center=%s" % panel_center)
@@ -100,10 +126,7 @@ func _check_outpost_requirement_bubble_spacing(outpost: Node) -> bool:
 				title = label
 			elif label.name.begins_with("RequirementBubbleMaterial"):
 				labels.append(label)
-			if label.text.contains("包"):
-				printerr("Expected requirement panel not to show backpack shorthand.")
-				return false
-	if title == null or title.text != "前哨站":
+	if title == null:
 		printerr("Expected outpost requirement panel title.")
 		return false
 	if title.get_theme_font_size("font_size") < 52:
@@ -112,9 +135,9 @@ func _check_outpost_requirement_bubble_spacing(outpost: Node) -> bool:
 	if labels.size() < 2:
 		printerr("Expected at least two material requirement labels.")
 		return false
-	labels.sort_custom(func(a, b): return a.position.x < b.position.x)
+	labels.sort_custom(func(a, b): return a.position.y < b.position.y)
 	for label in labels:
-		if not label.text.begins_with("需要") or not label.text.contains("：") or not label.text.contains("/"):
+		if not label.text.contains("/"):
 			printerr("Expected material requirement label format.")
 			return false
 		if label.get_theme_font_size("font_size") < 36:
@@ -123,10 +146,10 @@ func _check_outpost_requirement_bubble_spacing(outpost: Node) -> bool:
 	for index in range(labels.size() - 1):
 		var current := labels[index]
 		var next := labels[index + 1]
-		var current_width := current.size.x * current.scale.x
-		var gap := next.position.x - current.position.x - current_width
-		if gap < 20.0:
-			printerr("Expected scaled requirement bubbles not to overlap.")
+		var current_height := current.size.y * current.scale.y
+		var gap := next.position.y - current.position.y - current_height
+		if gap < 12.0:
+			printerr("Expected vertical requirement rows not to overlap.")
 			return false
 	var title_bottom := title.position.y + title.size.y * title.scale.y
 	var first_material_top := labels[0].position.y

@@ -118,6 +118,5 @@ func _item(item_id: String, display_name: String, amount: int, weight: float) ->
 		"amount": amount,
 		"weight_per_unit": weight,
 		"stack_limit": 99,
-		"item_type": "material",
-		"quality": "C",
+		"repair_material_id": item_id,
 	}

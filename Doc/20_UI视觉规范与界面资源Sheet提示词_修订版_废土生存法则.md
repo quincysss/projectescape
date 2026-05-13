@@ -674,6 +674,30 @@ SPECIAL
 按钮：确认 / 返回
 ```
 
+剧情对白界面 V0.1：
+
+```text
+背景：当前流程背景暗化，或黑色/局外背景暗化。
+左侧：404 哨所管理员半身原画。
+右侧：主角半身原画。
+底部：对白框、说话人名、对白正文、继续提示。
+右上或对白框角落：跳过按钮。
+```
+
+对白原画规则：
+
+```text
+operator_404 默认显示 404 哨所管理员原画，位于左侧。
+player 默认显示主角原画，位于右侧。
+当前说话者 alpha 1.0，轻微提亮或描边。
+未说话者 alpha 0.35-0.5，降低饱和度。
+首次返回玩家独白只显示主角原画，不显示管理员。
+窄屏只显示当前说话者，优先保证对白文本完整可读。
+角色原画不烘焙进对白框背景，必须作为独立 PNG 叠放。
+```
+
+详细规则见 `Doc/25_主菜单玩家档案与剧情章节目标系统/08_剧情对白角色原画显示规则.md`。
+
 章节目标卡：
 
 ```text
@@ -1136,6 +1160,21 @@ Elements: empty item slot, selected item slot, occupied item slot frame, locked 
 Requirements: transparent background, consistent padding, clean cutout edges, reusable in Godot UI.
 Avoid: full inventory screen, text labels, item illustrations mixed into slots, watermark.
 ```
+
+---
+
+## 15.5.1 剧情对白 UI Sheet
+
+```text
+Create a transparent PNG UI sprite sheet for story dialogue interface elements in a 2D wasteland extraction game.
+Grid: 4x4, one element per cell, no labels.
+Style: dark hand-drawn manga UI, thick black ink outlines, dirty worn metal and paper, grayscale base, muted blue-purple and warm yellow accents.
+Elements: wide bottom dialogue box frame, speaker nameplate active, speaker nameplate inactive, next indicator, skip button frame, portrait shadow plate left, portrait shadow plate right, active speaker glow edge, inactive speaker dim overlay, important keyword highlight strip, dialogue choice button normal, dialogue choice button selected, small warning note frame, black background dim overlay sample.
+Requirements: transparent background, clean cutout edges, reusable in Godot UI, no readable text, no character portraits inside the sheet.
+Avoid: full dialogue screenshot, baked character art, visual novel glossy UI, readable labels, watermark.
+```
+
+角色原画本身不放入 UI Sheet，按 `Doc/17_美术资源规格与GPT生图提示词规范_修订版_废土生存法则.md` 的角色原画规格单独生成。
 
 ---
 

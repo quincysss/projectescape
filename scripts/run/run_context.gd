@@ -11,6 +11,7 @@ var is_time_expired: bool = false
 var player_spawn_position: Vector2 = Vector2.ZERO
 var player_stability: float = 100.0
 var player_inventory: Array = []
+var material_inventory: Array = []
 var current_weight: float = 0.0
 var weight_limit: float = 20.0
 var weight_stage: String = "LIGHT"
@@ -72,6 +73,7 @@ func to_debug_dictionary() -> Dictionary:
 		"player_spawn_position": player_spawn_position,
 		"player_stability": player_stability,
 		"inventory_slots_used": player_inventory.size(),
+		"material_slots_used": material_inventory.size(),
 		"current_weight": current_weight,
 		"weight_limit": weight_limit,
 		"weight_stage": weight_stage,

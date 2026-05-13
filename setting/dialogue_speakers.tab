@@ -1,0 +1,3 @@
+speaker_id	display_name	portrait_path	portrait_side	nameplate_color	enabled_version	notes
+player	玩家	res://assets/characters/dialogue/player/player_dialogue_bust_01.png	right	#c8d4dc	v0.1	主角默认对白半身原画；已按参考图生成正式透明立绘
+operator_404	404 哨所管理员	res://assets/characters/dialogue/operator_404/operator_404_dialogue_bust_01.png	left	#d6c07a	v0.1	兼容 dialogues.tab 中的 operator_404；已生成破旧兜帽管理员正式透明立绘

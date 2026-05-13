@@ -58,33 +58,36 @@ func _verify_container_spawn_and_visuals() -> bool:
 	return ok
 
 func _check_container_visual(root: Node, container: Node) -> bool:
-	var visual := container.get_node_or_null("ContainerVisual") as ColorRect
-	var fill := container.get_node_or_null("ContainerLifetimeFill") as ColorRect
-	var lifetime_label := container.get_node_or_null("ContainerLifetimeLabel") as Label
-	var lifetime_background := container.get_node_or_null("ContainerLifetimeLabelBackground") as ColorRect
-	var nameplate_label := container.get_node_or_null("ContainerNameplateLabel") as Label
-	var nameplate_background := container.get_node_or_null("ContainerNameplateBackground") as ColorRect
+	var readable_root := container.get_node_or_null("ContainerReadableRoot") as Node2D
+	var visual := container.get_node_or_null("ContainerReadableRoot/ContainerVisual") as Sprite2D
+	var fill := container.get_node_or_null("ContainerReadableRoot/ContainerLifetimeFill") as ColorRect
+	var lifetime_label := container.get_node_or_null("ContainerReadableRoot/ContainerLifetimeLabel") as Label
+	var lifetime_bar := container.get_node_or_null("ContainerReadableRoot/ContainerLifetimeBarBackground") as ColorRect
+	var name_label := container.get_node_or_null("ContainerReadableRoot/ContainerNameLabel") as Label
 	var marker_label := container.get_node_or_null("MarkerLabel") as Label
 	var ok := true
-	if visual == null or fill == null:
-		printerr("Expected container visual and lifetime fill nodes.")
+	if readable_root == null:
+		printerr("Expected formal readable container root.")
+		ok = false
+	if visual == null or visual.texture == null or fill == null:
+		printerr("Expected formal container icon and lifetime fill nodes.")
 		ok = false
 	if lifetime_label == null:
 		printerr("Expected container lifetime seconds label.")
 		ok = false
-	if lifetime_background == null:
-		printerr("Expected readable lifetime label background.")
+	if lifetime_bar == null:
+		printerr("Expected readable lifetime progress bar background.")
 		ok = false
-	if nameplate_label != null or nameplate_background != null:
-		printerr("Expected container to omit the extra nameplate.")
+	if name_label == null:
+		printerr("Expected formal container name label.")
 		ok = false
-	if marker_label == null or ["S", "A", "B", "C"].has(marker_label.text):
-		printerr("Expected container type marker instead of S/A/B/C grade marker.")
+	if container.get_node_or_null("ContainerReadableRoot/ContainerNameUnderline") != null:
+		printerr("Expected formal container name underline to be removed.")
 		ok = false
-	elif marker_label.get_theme_font_size("font_size") < 40:
-		printerr("Expected container marker font to stay readable in home overview.")
+	if marker_label != null:
+		printerr("Expected formal container visual to omit the old center marker label.")
 		ok = false
-	if visual != null and visual.size.x < 120.0:
+	if visual != null and visual.texture != null and visual.scale.x * visual.texture.get_width() < 120.0:
 		printerr("Expected configured container visual size.")
 		ok = false
 	if not container.payload.has("type_id") or not container.payload.has("open_time"):
@@ -93,17 +96,22 @@ func _check_container_visual(root: Node, container: Node) -> bool:
 	if not container.payload.has("container_color") or container.payload.container_color != Color("#3A8DFF"):
 		printerr("Expected configured unified blue container color.")
 		ok = false
-	if visual != null and fill != null:
+	if lifetime_bar != null and fill != null:
 		container.payload.lifetime = float(container.payload.lifetime_max) * 0.5
 		root._refresh_container_lifetime_visual(container)
-		if absf(fill.size.x - visual.size.x * 0.5) > 0.5:
+		if absf(fill.size.x - lifetime_bar.size.x * 0.5) > 0.5:
 			printerr("Expected lifetime fill width to track remaining lifetime.")
 			ok = false
-		if lifetime_label != null and (not lifetime_label.text.begins_with("剩 ") or not lifetime_label.text.ends_with("s")):
-			printerr("Expected lifetime label to show seconds.")
-			ok = false
+	if lifetime_label != null and not lifetime_label.text.ends_with("s"):
+		printerr("Expected lifetime label to show seconds.")
+		ok = false
+	if name_label != null and name_label.get_theme_color("font_color") != Color("#FFC547"):
+		printerr("Expected container name label color #FFC547.")
+		ok = false
+	if lifetime_label != null and lifetime_label.get_theme_color("font_color") != Color("#FEDC54"):
+		printerr("Expected container lifetime label color #FEDC54.")
+		ok = false
 	return ok
-
 func _check_no_duplicate_container_positions(root: Node) -> bool:
 	var seen := {}
 	for container in root.container_root.get_children():

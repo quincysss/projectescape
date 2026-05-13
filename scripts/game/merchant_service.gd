@@ -315,8 +315,7 @@ func _can_sell_item(item: Dictionary) -> bool:
 		return false
 	if int(item.get("sell_value", 0)) <= 0:
 		return false
-	var item_type := String(item.get("item_type", ""))
-	if item_type == "material" or item_type == "outpost_material":
+	if not String(item.get("repair_material_id", "")).is_empty():
 		return false
 	for tag in _get_tags(item):
 		var normalized := String(tag)

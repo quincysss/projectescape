@@ -1,0 +1,2189 @@
+[gd_scene format=3 uid="uid://bbxao5r4lyx1d"]
+
+[ext_resource type="Script" uid="uid://dafpycg0ad5iu" path="res://scripts/run/run_scene.gd" id="0_run_scene"]
+[ext_resource type="Script" uid="uid://b8pmhv7r3q7yw" path="res://scripts/run/run_director.gd" id="1_run_director"]
+[ext_resource type="Script" uid="uid://b6x1qaptybfy0" path="res://scripts/run/run_state_machine.gd" id="2_state_machine"]
+[ext_resource type="Script" uid="uid://diq20cvnrpqvm" path="res://scripts/run/spawn_point.gd" id="3_spawn_point"]
+[ext_resource type="Script" uid="uid://cokewsl0yxcdg" path="res://scripts/outpost/outpost_candidate_point.gd" id="4_outpost_candidate"]
+[ext_resource type="Script" uid="uid://c88nr3qmv1tt3" path="res://scripts/run/home_safe_zone.gd" id="5_home_safe_zone"]
+[ext_resource type="Script" uid="uid://bpabgosaxqljl" path="res://scripts/player/stability_component.gd" id="6_stability"]
+[ext_resource type="Script" uid="uid://bnsjxisb7pl3v" path="res://scripts/vision/vision_controller.gd" id="7_vision"]
+[ext_resource type="Script" uid="uid://cbyio7dyjynp4" path="res://scripts/camera/run_camera_controller.gd" id="8_camera"]
+[ext_resource type="Texture2D" uid="uid://dtxv5yy360sxn" path="res://assets/map/details/rooftop/water_tank_01.png" id="8_jqsji"]
+[ext_resource type="Texture2D" uid="uid://cbpvoghosagbv" path="res://assets/map/interactables/props/oil_drum_01.png" id="8_k3vyy"]
+[ext_resource type="Texture2D" uid="uid://dnfnia7nekou5" path="res://assets/map/props/placement/utility_pole_01.png" id="9_7tdpv"]
+[ext_resource type="Script" uid="uid://cbymcmii4cal7" path="res://scripts/inventory/inventory_component.gd" id="9_inventory"]
+[ext_resource type="Texture2D" uid="uid://b4nqly5rqxd2v" path="res://assets/map/safe/safe_house_active_01.png" id="9_w0nex"]
+[ext_resource type="Script" uid="uid://cxkt7ynvfc2xq" path="res://scripts/inventory/weight_component.gd" id="10_weight"]
+[ext_resource type="Script" uid="uid://lyioyvael0ho" path="res://scripts/inventory/home_storage_component.gd" id="11_home_storage"]
+[ext_resource type="Script" path="res://scripts/map/map_layout_rect.gd" id="12_map_rect"]
+[ext_resource type="Script" uid="uid://ddmr5koxxcwn5" path="res://scripts/map/map_layout_point.gd" id="13_map_point"]
+[ext_resource type="Script" uid="uid://bvmyoqvhbgjca" path="res://scripts/map/road_visual_generator.gd" id="14_road_visual_generator"]
+[ext_resource type="Texture2D" uid="uid://chfdfnhx6xwxx" path="res://assets/map/roads/ground/road_ground_base_tile_1024_01.png" id="15_road_ground"]
+[ext_resource type="Texture2D" uid="uid://dne75flxuo3es" path="res://assets/map/blocks/fill/block_fill_dirty_02.png" id="16_block_dirty"]
+[ext_resource type="Texture2D" uid="uid://ddjnho8qkrxwn" path="res://assets/map/blocks/fill/block_fill_cracked_02.png" id="17_block_cracked"]
+[ext_resource type="Texture2D" uid="uid://cg3tafu0gr12m" path="res://assets/map/blocks/fill/block_fill_clean_02.png" id="18_block_clean"]
+[ext_resource type="Texture2D" uid="uid://woqrowyp14cq" path="res://assets/map/buildings/building_medium_apartment_rooftop_01.png" id="20_building_apartment"]
+[ext_resource type="Texture2D" uid="uid://bniwry40hwmws" path="res://assets/map/buildings/building_small_corner_shop_01.png" id="21_building_corner_shop"]
+[ext_resource type="Texture2D" uid="uid://clv2para4ltt5" path="res://assets/map/buildings/building_small_residential_block_01.png" id="22_building_residential"]
+[ext_resource type="Texture2D" uid="uid://7f45nhb3e2d4" path="res://assets/map/buildings/building_medium_shop_blank_neon_01.png" id="23_building_medium_shop"]
+[ext_resource type="Texture2D" uid="uid://11cq54v5nu25" path="res://assets/map/buildings/building_narrow_alley_01.png" id="24_building_narrow_alley"]
+[ext_resource type="Script" uid="uid://dgfi53xkhsuuo" path="res://scripts/outpost/outpost_visual_anchor.gd" id="25_outpost_visual_anchor"]
+[ext_resource type="Texture2D" uid="uid://bjgeesjdav4jt" path="res://assets/map/outposts/outpost_broken_01.png" id="26_outpost_broken"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_home_safe_zone"]
+size = Vector2(1600, 1352)
+
+[node name="RunScene" type="Node2D" unique_id=282431199]
+script = ExtResource("0_run_scene")
+
+[node name="WorldRoot" type="Node2D" parent="." unique_id=176377243]
+
+[node name="YSortRoot" type="Node2D" parent="WorldRoot" unique_id=1602200452]
+y_sort_enabled = true
+metadata/_manual_building_art_layer = true
+
+[node name="Block_Ref_01_14x44_Buildings" type="Node2D" parent="WorldRoot/YSortRoot" unique_id=963710911]
+position = Vector2(-8400, -2680)
+metadata/host_block_id = "Block_Ref_01_14x44"
+metadata/_manual_building_art = true
+
+[node name="Block_Ref_01_14x44_Building_SmallShop_01" type="Node2D" parent="WorldRoot/YSortRoot" unique_id=704931451]
+position = Vector2(-8304, -1886.0001)
+scale = Vector2(0.908722, 1.767956)
+metadata/building_id = "building_corner_shop_01"
+metadata/building_type = "shop"
+metadata/host_block_id = "Block_Ref_01_14x44"
+metadata/is_enterable = false
+metadata/has_collision = false
+metadata/blocks_signal_visibility = false
+metadata/occludes_player = true
+metadata/placement_group = "Block_Ref_01_14x44_Buildings"
+
+[node name="ArtSprite" type="Sprite2D" parent="WorldRoot/YSortRoot/Block_Ref_01_14x44_Building_SmallShop_01" unique_id=797739523]
+position = Vector2(-0.00015258789, -619.9248)
+scale = Vector2(6.645006, 2.734207)
+texture = ExtResource("24_building_narrow_alley")
+
+[node name="Block_Ref_01_14x44_Building_SmallShop_02" type="Node2D" parent="WorldRoot/YSortRoot" unique_id=594892868]
+position = Vector2(-8416, -2877.0002)
+scale = Vector2(0.908722, 1.767956)
+metadata/building_id = "building_corner_shop_01"
+metadata/building_type = "shop"
+metadata/host_block_id = "Block_Ref_01_14x44"
+metadata/is_enterable = false
+metadata/has_collision = false
+metadata/blocks_signal_visibility = false
+metadata/occludes_player = true
+metadata/placement_group = "Block_Ref_01_14x44_Buildings"
+
+[node name="ArtSprite" type="Sprite2D" parent="WorldRoot/YSortRoot/Block_Ref_01_14x44_Building_SmallShop_02" unique_id=1621979825]
+position = Vector2(-0.00015258789, -619.9248)
+scale = Vector2(6.645006, 2.734207)
+texture = ExtResource("24_building_narrow_alley")
+
+[node name="Block_Ref_02_80x21_Buildings" type="Node2D" parent="WorldRoot/YSortRoot" unique_id=1125907547]
+position = Vector2(-4992, -3968)
+metadata/host_block_id = "Block_Ref_02_80x21"
+metadata/_manual_building_art = true
+
+[node name="Block_Ref_02_80x21_Building_StreetEdge_04" type="Node2D" parent="WorldRoot/YSortRoot" unique_id=716620957]
+position = Vector2(-4176, -3328.0002)
+scale = Vector2(0.908722, 1.767956)
+metadata/building_id = "building_narrow_alley_01"
+metadata/building_type = "alley"
+metadata/host_block_id = "Block_Ref_02_80x21"
+metadata/is_enterable = false
+metadata/has_collision = false
+metadata/blocks_signal_visibility = false
+metadata/occludes_player = true
+metadata/placement_group = "Block_Ref_02_80x21_Buildings"
+
+[node name="ArtSprite" type="Sprite2D" parent="WorldRoot/YSortRoot/Block_Ref_02_80x21_Building_StreetEdge_04" unique_id=1568114476]
+position = Vector2(-44.017868, -651.6)
+scale = Vector2(7.5602794, 2.855251)
+texture = ExtResource("24_building_narrow_alley")
+
+[node name="Block_Ref_02_80x21_Building_StreetEdge_05" type="Node2D" parent="WorldRoot/YSortRoot" unique_id=408060896]
+position = Vector2(-2992, -3376)
+scale = Vector2(0.908722, 1.767956)
+metadata/building_id = "building_narrow_alley_01"
+metadata/building_type = "alley"
+metadata/host_block_id = "Block_Ref_02_80x21"
+metadata/is_enterable = false
+metadata/has_collision = false
+metadata/blocks_signal_visibility = false
+metadata/occludes_player = true
+metadata/placement_group = "Block_Ref_02_80x21_Buildings"
+
+[node name="ArtSprite" type="Sprite2D" parent="WorldRoot/YSortRoot/Block_Ref_02_80x21_Building_StreetEdge_05" unique_id=1087720041]
+position = Vector2(-44.017868, -651.6)
+scale = Vector2(7.5602794, 2.855251)
+texture = ExtResource("24_building_narrow_alley")
+
+[node name="Block_Ref_03_54x34_Buildings" type="Node2D" parent="WorldRoot/YSortRoot" unique_id=1101727489]
+position = Vector2(-640, -3520)
+metadata/host_block_id = "Block_Ref_03_54x34"
+metadata/_manual_building_art = true
+
+[node name="Block_Ref_03_54x34_Building_BlockFill_01" type="Node2D" parent="WorldRoot/YSortRoot" unique_id=712796972]
+position = Vector2(-584, -2648)
+scale = Vector2(1.557809, 1.798595)
+metadata/building_id = "building_apartment_01"
+metadata/building_type = "apartment"
+metadata/host_block_id = "Block_Ref_03_54x34"
+metadata/is_enterable = false
+metadata/has_collision = false
+metadata/blocks_signal_visibility = false
+metadata/occludes_player = true
+metadata/placement_group = "Block_Ref_03_54x34_Buildings"
+
+[node name="ArtSprite" type="Sprite2D" parent="WorldRoot/YSortRoot/Block_Ref_03_54x34_Building_BlockFill_01" unique_id=1897559581]
+position = Vector2(-25.677086, -467.03128)
+scale = Vector2(3.5995998, 2.1285324)
+texture = ExtResource("21_building_corner_shop")
+
+[node name="Block_Ref_04_42x35_Buildings" type="Node2D" parent="WorldRoot/YSortRoot" unique_id=1843590452]
+position = Vector2(2944, -3968)
+metadata/host_block_id = "Block_Ref_04_42x35"
+metadata/_manual_building_art = true
+
+[node name="Block_Ref_04_42x35_Building_Cluster_01" type="Node2D" parent="WorldRoot/YSortRoot" unique_id=1029298993]
+position = Vector2(2168.0002, -4112.0005)
+scale = Vector2(1.166287, 1.051643)
+metadata/building_id = "building_corner_shop_01"
+metadata/building_type = "shop"
+metadata/host_block_id = "Block_Ref_04_42x35"
+metadata/is_enterable = false
+metadata/has_collision = false
+metadata/blocks_signal_visibility = false
+metadata/occludes_player = true
+metadata/placement_group = "Block_Ref_04_42x35_Buildings"
+
+[node name="ArtSprite" type="Sprite2D" parent="WorldRoot/YSortRoot/Block_Ref_04_42x35_Building_Cluster_01" unique_id=138967932]
+position = Vector2(19.802094, -591.58826)
+scale = Vector2(3.6874998, 2.7815623)
+texture = ExtResource("21_building_corner_shop")
+
+[node name="Block_Ref_05_60x46_Buildings" type="Node2D" parent="WorldRoot/YSortRoot" unique_id=789254906]
+position = Vector2(7104, -3136)
+metadata/host_block_id = "Block_Ref_05_60x46"
+metadata/_manual_building_art = true
+
+[node name="Block_Ref_05_60x46_Building_Cluster_01" type="Node2D" parent="WorldRoot/YSortRoot" unique_id=1034264366]
+position = Vector2(5904, -2424)
+scale = Vector2(0.908722, 1.767956)
+metadata/building_id = "building_narrow_alley_01"
+metadata/building_type = "alley"
+metadata/host_block_id = "Block_Ref_05_60x46"
+metadata/is_enterable = false
+metadata/has_collision = false
+metadata/blocks_signal_visibility = false
+metadata/occludes_player = true
+metadata/placement_group = "Block_Ref_05_60x46_Buildings"
+
+[node name="ArtSprite" type="Sprite2D" parent="WorldRoot/YSortRoot/Block_Ref_05_60x46_Building_Cluster_01" unique_id=1403695144]
+position = Vector2(-79.23237, -656.12494)
+scale = Vector2(7.5602794, 2.855251)
+texture = ExtResource("24_building_narrow_alley")
+
+[node name="Block_Ref_05_60x46_Building_Cluster_03" type="Node2D" parent="WorldRoot/YSortRoot" unique_id=725604972]
+position = Vector2(7000, -2707)
+scale = Vector2(0.908722, 1.767956)
+metadata/building_id = "building_narrow_alley_01"
+metadata/building_type = "alley"
+metadata/host_block_id = "Block_Ref_05_60x46"
+metadata/is_enterable = false
+metadata/has_collision = false
+metadata/blocks_signal_visibility = false
+metadata/occludes_player = true
+metadata/placement_group = "Block_Ref_05_60x46_Buildings"
+
+[node name="ArtSprite" type="Sprite2D" parent="WorldRoot/YSortRoot/Block_Ref_05_60x46_Building_Cluster_03" unique_id=1406551610]
+position = Vector2(-73.73013, -649.33746)
+scale = Vector2(7.5602794, 2.855251)
+texture = ExtResource("24_building_narrow_alley")
+
+[node name="Block_Ref_05_60x46_Building_Cluster_04" type="Node2D" parent="WorldRoot/YSortRoot" unique_id=344042754]
+position = Vector2(8480, -2760)
+scale = Vector2(0.908722, 1.767956)
+metadata/building_id = "building_narrow_alley_01"
+metadata/building_type = "alley"
+metadata/host_block_id = "Block_Ref_05_60x46"
+metadata/is_enterable = false
+metadata/has_collision = false
+metadata/blocks_signal_visibility = false
+metadata/occludes_player = true
+metadata/placement_group = "Block_Ref_05_60x46_Buildings"
+
+[node name="ArtSprite" type="Sprite2D" parent="WorldRoot/YSortRoot/Block_Ref_05_60x46_Building_Cluster_04" unique_id=338625688]
+position = Vector2(-22.066101, -454.59)
+scale = Vector2(7.5602794, 2.855251)
+texture = ExtResource("24_building_narrow_alley")
+
+[node name="Block_Ref_06_65x23_Buildings" type="Node2D" parent="WorldRoot/YSortRoot" unique_id=1378231207]
+position = Vector2(-6080, -2240)
+metadata/host_block_id = "Block_Ref_06_65x23"
+metadata/_manual_building_art = true
+
+[node name="Block_Ref_06_65x23_Building_StreetEdge_01" type="Node2D" parent="WorldRoot/YSortRoot" unique_id=113219752]
+position = Vector2(-6408, -1616)
+scale = Vector2(1.419968, 1.316195)
+metadata/building_id = "building_medium_shop_01"
+metadata/building_type = "shop"
+metadata/host_block_id = "Block_Ref_06_65x23"
+metadata/is_enterable = false
+metadata/has_collision = false
+metadata/blocks_signal_visibility = false
+metadata/occludes_player = true
+metadata/placement_group = "Block_Ref_06_65x23_Buildings"
+
+[node name="ArtSprite" type="Sprite2D" parent="WorldRoot/YSortRoot/Block_Ref_06_65x23_Building_StreetEdge_01" unique_id=1659389974]
+position = Vector2(-5.6338806, -498.40643)
+scale = Vector2(2.3299112, 2.573438)
+texture = ExtResource("23_building_medium_shop")
+
+[node name="Block_Ref_06_65x23_Building_StreetEdge_02" type="Node2D" parent="WorldRoot/YSortRoot" unique_id=813863561]
+position = Vector2(-5032, -2224.0002)
+scale = Vector2(0.908722, 1.767956)
+metadata/building_id = "building_corner_shop_01"
+metadata/building_type = "shop"
+metadata/host_block_id = "Block_Ref_06_65x23"
+metadata/is_enterable = false
+metadata/has_collision = false
+metadata/blocks_signal_visibility = false
+metadata/occludes_player = true
+metadata/placement_group = "Block_Ref_06_65x23_Buildings"
+
+[node name="ArtSprite" type="Sprite2D" parent="WorldRoot/YSortRoot/Block_Ref_06_65x23_Building_StreetEdge_02" unique_id=311413503]
+position = Vector2(-52.821487, -158.37495)
+scale = Vector2(3.578406, 1.6351147)
+texture = ExtResource("8_jqsji")
+
+[node name="Block_Ref_07_25x34_Buildings" type="Node2D" parent="WorldRoot/YSortRoot" unique_id=1840993621]
+position = Vector2(-3136, 64)
+metadata/host_block_id = "Block_Ref_07_25x34"
+metadata/_manual_building_art = true
+
+[node name="Block_Ref_07_25x34_Building_Home" type="Node2D" parent="WorldRoot/YSortRoot" unique_id=722053620]
+position = Vector2(-3136, 792)
+scale = Vector2(1.166, 1.052)
+metadata/building_id = "safe_house_active_01"
+metadata/building_type = "home"
+metadata/host_block_id = "Block_Ref_07_25x34"
+metadata/is_enterable = true
+metadata/has_collision = false
+metadata/blocks_signal_visibility = false
+metadata/occludes_player = false
+metadata/player_always_in_front = true
+metadata/placement_group = "Block_Ref_07_25x34_Buildings"
+
+[node name="ArtSprite" type="Sprite2D" parent="WorldRoot/YSortRoot/Block_Ref_07_25x34_Building_Home" unique_id=89531129]
+position = Vector2(-6.860755, -608.365)
+scale = Vector2(3.4534717, 3.6826699)
+texture = ExtResource("9_w0nex")
+
+[node name="Block_Ref_08_30x59_Buildings" type="Node2D" parent="WorldRoot/YSortRoot" unique_id=1763372892]
+position = Vector2(-8192, 480)
+metadata/host_block_id = "Block_Ref_08_30x59"
+metadata/_manual_building_art = true
+
+[node name="Block_Ref_08_30x59_Building_Alley_01" type="Node2D" parent="WorldRoot/YSortRoot" unique_id=462181654]
+position = Vector2(-8392, 584)
+scale = Vector2(0.909, 1.768)
+metadata/building_id = "building_narrow_alley_01"
+metadata/building_type = "alley"
+metadata/host_block_id = "Block_Ref_08_30x59"
+metadata/is_enterable = false
+metadata/has_collision = false
+metadata/blocks_signal_visibility = false
+metadata/occludes_player = true
+metadata/placement_group = "Block_Ref_08_30x59_Buildings"
+
+[node name="ArtSprite" type="Sprite2D" parent="WorldRoot/YSortRoot/Block_Ref_08_30x59_Building_Alley_01" unique_id=1214442449]
+position = Vector2(-22.066, -454.59)
+scale = Vector2(6.645006, 2.734207)
+texture = ExtResource("24_building_narrow_alley")
+
+[node name="Block_Ref_08_30x59_Building_Alley_03" type="Node2D" parent="WorldRoot/YSortRoot" unique_id=1602673393]
+position = Vector2(-8032, 2176)
+scale = Vector2(0.909, 1.768)
+metadata/building_id = "building_narrow_alley_01"
+metadata/building_type = "alley"
+metadata/host_block_id = "Block_Ref_08_30x59"
+metadata/is_enterable = false
+metadata/has_collision = false
+metadata/blocks_signal_visibility = false
+metadata/occludes_player = true
+metadata/placement_group = "Block_Ref_08_30x59_Buildings"
+
+[node name="ArtSprite" type="Sprite2D" parent="WorldRoot/YSortRoot/Block_Ref_08_30x59_Building_Alley_03" unique_id=317384659]
+position = Vector2(-22.002615, -642.8733)
+scale = Vector2(6.645006, 2.734207)
+texture = ExtResource("24_building_narrow_alley")
+
+[node name="Block_Ref_09_36x21_Buildings" type="Node2D" parent="WorldRoot/YSortRoot" unique_id=820412865]
+position = Vector2(-5760, -448)
+metadata/host_block_id = "Block_Ref_09_36x21"
+metadata/_manual_building_art = true
+
+[node name="Block_Ref_10_49x54_Buildings" type="Node2D" parent="WorldRoot/YSortRoot" unique_id=350502021]
+position = Vector2(-64, -192)
+metadata/host_block_id = "Block_Ref_10_49x54"
+metadata/_manual_building_art = true
+
+[node name="Block_Ref_10_49x54_Building_Apartment_04" type="Node2D" parent="WorldRoot/YSortRoot" unique_id=1591878522]
+position = Vector2(-65, 1072.0001)
+scale = Vector2(1.558, 1.799)
+metadata/building_id = "building_apartment_01"
+metadata/building_type = "apartment"
+metadata/host_block_id = "Block_Ref_10_49x54"
+metadata/is_enterable = false
+metadata/has_collision = false
+metadata/blocks_signal_visibility = false
+metadata/occludes_player = true
+metadata/placement_group = "Block_Ref_10_49x54_Buildings"
+
+[node name="ArtSprite" type="Sprite2D" parent="WorldRoot/YSortRoot/Block_Ref_10_49x54_Building_Apartment_04" unique_id=1181293558]
+position = Vector2(1.5258789e-05, -778.2101)
+scale = Vector2(4.270311, 3.7531567)
+texture = ExtResource("20_building_apartment")
+
+[node name="Block_Ref_11_41x33_Buildings" type="Node2D" parent="WorldRoot/YSortRoot" unique_id=683071835]
+position = Vector2(3392, -1280)
+metadata/host_block_id = "Block_Ref_11_41x33"
+metadata/_manual_building_art = true
+
+[node name="Block_Ref_11_41x33_Building_CornerShop_01" type="Node2D" parent="WorldRoot/YSortRoot" unique_id=2034372871]
+position = Vector2(3135.0002, -704)
+scale = Vector2(1.166, 1.052)
+metadata/building_id = "building_corner_shop_01"
+metadata/building_type = "shop"
+metadata/host_block_id = "Block_Ref_11_41x33"
+metadata/is_enterable = false
+metadata/has_collision = false
+metadata/blocks_signal_visibility = false
+metadata/occludes_player = true
+metadata/placement_group = "Block_Ref_11_41x33_Buildings"
+
+[node name="ArtSprite" type="Sprite2D" parent="WorldRoot/YSortRoot/Block_Ref_11_41x33_Building_CornerShop_01" unique_id=1762359570]
+position = Vector2(-20.583069, -646.3877)
+scale = Vector2(4.335182, 3.0366843)
+texture = ExtResource("21_building_corner_shop")
+
+[node name="Block_Ref_11_41x33_Building_Alley_03" type="Node2D" parent="WorldRoot/YSortRoot" unique_id=1886765847]
+position = Vector2(4040.0002, -232)
+scale = Vector2(0.909, 1.768)
+metadata/building_id = "building_narrow_alley_01"
+metadata/building_type = "alley"
+metadata/host_block_id = "Block_Ref_11_41x33"
+metadata/is_enterable = false
+metadata/has_collision = false
+metadata/blocks_signal_visibility = false
+metadata/occludes_player = true
+metadata/placement_group = "Block_Ref_11_41x33_Buildings"
+
+[node name="ArtSprite" type="Sprite2D" parent="WorldRoot/YSortRoot/Block_Ref_11_41x33_Building_Alley_03" unique_id=410785735]
+position = Vector2(-52.80516, -674.2082)
+scale = Vector2(7.5602794, 2.855251)
+texture = ExtResource("24_building_narrow_alley")
+
+[node name="Block_Ref_12_61x26_Buildings" type="Node2D" parent="WorldRoot/YSortRoot" unique_id=1272342328]
+position = Vector2(7104, -320)
+metadata/host_block_id = "Block_Ref_12_61x26"
+metadata/_manual_building_art = true
+
+[node name="Block_Ref_12_61x26_Building_MediumShop_01" type="Node2D" parent="WorldRoot/YSortRoot" unique_id=2115084101]
+position = Vector2(6688, 496)
+scale = Vector2(1.42, 1.316)
+metadata/building_id = "building_medium_shop_01"
+metadata/building_type = "shop"
+metadata/host_block_id = "Block_Ref_12_61x26"
+metadata/is_enterable = false
+metadata/has_collision = false
+metadata/blocks_signal_visibility = false
+metadata/occludes_player = true
+metadata/placement_group = "Block_Ref_12_61x26_Buildings"
+
+[node name="ArtSprite" type="Sprite2D" parent="WorldRoot/YSortRoot/Block_Ref_12_61x26_Building_MediumShop_01" unique_id=586665656]
+position = Vector2(28.169464, -626.13983)
+scale = Vector2(3.0207644, 3.4534388)
+texture = ExtResource("23_building_medium_shop")
+
+[node name="Block_Ref_13_33x35_Buildings" type="Node2D" parent="WorldRoot/YSortRoot" unique_id=1967055824]
+position = Vector2(-5760, 1792)
+metadata/host_block_id = "Block_Ref_13_33x35"
+metadata/_manual_building_art = true
+
+[node name="Block_Ref_13_33x35_Building_CornerShop_01" type="Node2D" parent="WorldRoot/YSortRoot" unique_id=1690666343]
+position = Vector2(-5784.0005, 2648)
+scale = Vector2(1.166, 1.052)
+metadata/building_id = "building_corner_shop_01"
+metadata/building_type = "shop"
+metadata/host_block_id = "Block_Ref_13_33x35"
+metadata/is_enterable = false
+metadata/has_collision = false
+metadata/blocks_signal_visibility = false
+metadata/occludes_player = true
+metadata/placement_group = "Block_Ref_13_33x35_Buildings"
+
+[node name="ArtSprite" type="Sprite2D" parent="WorldRoot/YSortRoot/Block_Ref_13_33x35_Building_CornerShop_01" unique_id=417157569]
+position = Vector2(-6.8607197, -722.4334)
+scale = Vector2(4.14736, 3.5750313)
+texture = ExtResource("21_building_corner_shop")
+
+[node name="Block_Ref_14_30x25_Buildings" type="Node2D" parent="WorldRoot/YSortRoot" unique_id=1301068470]
+position = Vector2(-3200, 1952)
+metadata/host_block_id = "Block_Ref_14_30x25"
+metadata/_manual_building_art = true
+
+[node name="Block_Ref_14_30x25_Building_CornerShop_02" type="Node2D" parent="WorldRoot/YSortRoot" unique_id=1066231754]
+position = Vector2(-3152, 2616)
+scale = Vector2(1.166, 1.052)
+metadata/building_id = "building_corner_shop_01"
+metadata/building_type = "shop"
+metadata/host_block_id = "Block_Ref_14_30x25"
+metadata/is_enterable = false
+metadata/has_collision = false
+metadata/blocks_signal_visibility = false
+metadata/occludes_player = true
+metadata/placement_group = "Block_Ref_14_30x25_Buildings"
+
+[node name="ArtSprite" type="Sprite2D" parent="WorldRoot/YSortRoot/Block_Ref_14_30x25_Building_CornerShop_02" unique_id=1592918140]
+position = Vector2(-14.858185, -674.20416)
+scale = Vector2(3.9436462, 3.1941726)
+texture = ExtResource("21_building_corner_shop")
+
+[node name="Block_Ref_15_44x34_Buildings" type="Node2D" parent="WorldRoot/YSortRoot" unique_id=1425483047]
+position = Vector2(3328, 1408)
+metadata/host_block_id = "Block_Ref_15_44x34"
+metadata/_manual_building_art = true
+
+[node name="Block_Ref_16_18x23_Buildings" type="Node2D" parent="WorldRoot/YSortRoot" unique_id=263838254]
+position = Vector2(5824, 1792)
+metadata/host_block_id = "Block_Ref_16_18x23"
+metadata/_manual_building_art = true
+
+[node name="Block_Ref_16_18x23_Building_CornerShop_01" type="Node2D" parent="WorldRoot/YSortRoot" unique_id=1344555482]
+position = Vector2(5832, 2640)
+metadata/building_id = "building_corner_shop_01"
+metadata/building_type = "shop"
+metadata/host_block_id = "Block_Ref_16_18x23"
+metadata/is_enterable = false
+metadata/has_collision = false
+metadata/blocks_signal_visibility = false
+metadata/occludes_player = true
+metadata/placement_group = "Block_Ref_16_18x23_Buildings"
+
+[node name="ArtSprite" type="Sprite2D" parent="WorldRoot/YSortRoot/Block_Ref_16_18x23_Building_CornerShop_01" unique_id=166931037]
+position = Vector2(-24.000168, -936.0001)
+scale = Vector2(6.296169, 4.144475)
+texture = ExtResource("24_building_narrow_alley")
+
+[node name="Block_Ref_17_38x25_Buildings" type="Node2D" parent="WorldRoot/YSortRoot" unique_id=962948264]
+position = Vector2(7936, 1792)
+metadata/host_block_id = "Block_Ref_17_38x25"
+metadata/_manual_building_art = true
+
+[node name="Block_Ref_18_29x25_Buildings" type="Node2D" parent="WorldRoot/YSortRoot" unique_id=1633828283]
+position = Vector2(-8200, 3552)
+metadata/host_block_id = "Block_Ref_18_29x25"
+metadata/_manual_building_art = true
+
+[node name="Block_Ref_19_32x24_Buildings" type="Node2D" parent="WorldRoot/YSortRoot" unique_id=49041358]
+position = Vector2(-5760, 4064)
+metadata/host_block_id = "Block_Ref_19_32x24"
+metadata/_manual_building_art = true
+
+[node name="Block_Ref_19_32x24_Building_MediumShop_01" type="Node2D" parent="WorldRoot/YSortRoot" unique_id=459095475]
+position = Vector2(-8208, 4224)
+scale = Vector2(1.42, 1.316)
+metadata/building_id = "building_medium_shop_01"
+metadata/building_type = "shop"
+metadata/host_block_id = "Block_Ref_19_32x24"
+metadata/is_enterable = false
+metadata/has_collision = false
+metadata/blocks_signal_visibility = false
+metadata/occludes_player = true
+metadata/placement_group = "Block_Ref_19_32x24_Buildings"
+
+[node name="ArtSprite" type="Sprite2D" parent="WorldRoot/YSortRoot/Block_Ref_19_32x24_Building_MediumShop_01" unique_id=386802532]
+position = Vector2(-11.267273, -537.994)
+scale = Vector2(1.7242091, 2.9429653)
+texture = ExtResource("23_building_medium_shop")
+
+[node name="Block_Ref_20_37x23_Buildings" type="Node2D" parent="WorldRoot/YSortRoot" unique_id=343830786]
+position = Vector2(-2944, 4032)
+metadata/host_block_id = "Block_Ref_20_37x23"
+metadata/_manual_building_art = true
+
+[node name="Block_Ref_20_37x23_Building_CornerShop_02" type="Node2D" parent="WorldRoot/YSortRoot" unique_id=109197397]
+position = Vector2(-3080.0002, 4736.0005)
+scale = Vector2(1.166, 1.052)
+metadata/building_id = "building_corner_shop_01"
+metadata/building_type = "shop"
+metadata/host_block_id = "Block_Ref_20_37x23"
+metadata/is_enterable = false
+metadata/has_collision = false
+metadata/blocks_signal_visibility = false
+metadata/occludes_player = true
+metadata/placement_group = "Block_Ref_20_37x23_Buildings"
+
+[node name="ArtSprite" type="Sprite2D" parent="WorldRoot/YSortRoot/Block_Ref_20_37x23_Building_CornerShop_02" unique_id=1709567871]
+position = Vector2(-50.223022, -508.89728)
+scale = Vector2(3.3653786, 2.8193004)
+texture = ExtResource("21_building_corner_shop")
+
+[node name="Block_Ref_21_53x44_Buildings" type="Node2D" parent="WorldRoot/YSortRoot" unique_id=916376199]
+position = Vector2(64, 3456)
+metadata/host_block_id = "Block_Ref_21_53x44"
+metadata/_manual_building_art = true
+
+[node name="Block_Ref_21_53x44_Building_Alley_04" type="Node2D" parent="WorldRoot/YSortRoot" unique_id=937440580]
+position = Vector2(784.00024, 3936)
+scale = Vector2(0.909, 1.768)
+metadata/building_id = "building_narrow_alley_01"
+metadata/building_type = "alley"
+metadata/host_block_id = "Block_Ref_21_53x44"
+metadata/is_enterable = false
+metadata/has_collision = false
+metadata/blocks_signal_visibility = false
+metadata/occludes_player = true
+metadata/placement_group = "Block_Ref_21_53x44_Buildings"
+
+[node name="ArtSprite" type="Sprite2D" parent="WorldRoot/YSortRoot/Block_Ref_21_53x44_Building_Alley_04" unique_id=413436952]
+position = Vector2(-1.1444092e-05, -588.2356)
+scale = Vector2(7.5602794, 2.855251)
+texture = ExtResource("24_building_narrow_alley")
+
+[node name="Block_Ref_21_53x44_Building_CornerShop_02" type="Node2D" parent="WorldRoot/YSortRoot" unique_id=127268524]
+position = Vector2(448, 4839.9995)
+scale = Vector2(1.166, 1.052)
+metadata/building_id = "building_corner_shop_01"
+metadata/building_type = "shop"
+metadata/host_block_id = "Block_Ref_21_53x44"
+metadata/is_enterable = false
+metadata/has_collision = false
+metadata/blocks_signal_visibility = false
+metadata/occludes_player = true
+metadata/placement_group = "Block_Ref_21_53x44_Buildings"
+
+[node name="ArtSprite" type="Sprite2D" parent="WorldRoot/YSortRoot/Block_Ref_21_53x44_Building_CornerShop_02" unique_id=579309654]
+position = Vector2(-24.974365, -758.93524)
+scale = Vector2(4.669015, 3.729306)
+texture = ExtResource("21_building_corner_shop")
+
+[node name="Block_Ref_21_53x44_Building_Alley_03" type="Node2D" parent="WorldRoot/YSortRoot" unique_id=1800419206]
+position = Vector2(-848, 4064.0005)
+scale = Vector2(0.909, 1.768)
+metadata/building_id = "building_narrow_alley_01"
+metadata/building_type = "alley"
+metadata/host_block_id = "Block_Ref_21_53x44"
+metadata/is_enterable = false
+metadata/has_collision = false
+metadata/blocks_signal_visibility = false
+metadata/occludes_player = true
+metadata/placement_group = "Block_Ref_21_53x44_Buildings"
+
+[node name="ArtSprite" type="Sprite2D" parent="WorldRoot/YSortRoot/Block_Ref_21_53x44_Building_Alley_03" unique_id=1548349815]
+position = Vector2(-1.1444092e-05, -588.2356)
+scale = Vector2(7.5602794, 2.855251)
+texture = ExtResource("24_building_narrow_alley")
+
+[node name="Block_Ref_22_44x23_Buildings" type="Node2D" parent="WorldRoot/YSortRoot" unique_id=229354728]
+position = Vector2(3136, 3776)
+metadata/host_block_id = "Block_Ref_22_44x23"
+metadata/_manual_building_art = true
+
+[node name="Block_Ref_22_44x23_Building_MediumShop_01" type="Node2D" parent="WorldRoot/YSortRoot" unique_id=1029640571]
+position = Vector2(3104, 4520)
+scale = Vector2(1.42, 1.316)
+metadata/building_id = "building_medium_shop_01"
+metadata/building_type = "shop"
+metadata/host_block_id = "Block_Ref_22_44x23"
+metadata/is_enterable = false
+metadata/has_collision = false
+metadata/blocks_signal_visibility = false
+metadata/occludes_player = true
+metadata/placement_group = "Block_Ref_22_44x23_Buildings"
+
+[node name="ArtSprite" type="Sprite2D" parent="WorldRoot/YSortRoot/Block_Ref_22_44x23_Building_MediumShop_01" unique_id=684106480]
+position = Vector2(16.901413, -541.79333)
+scale = Vector2(2.14114, 3.1097739)
+texture = ExtResource("23_building_medium_shop")
+
+[node name="Block_Ref_23_61x32_Buildings" type="Node2D" parent="WorldRoot/YSortRoot" unique_id=2038027462]
+position = Vector2(6848, 4064)
+metadata/host_block_id = "Block_Ref_23_61x32"
+metadata/_manual_building_art = true
+
+[node name="Block_Ref_23_61x32_Building_MediumShop_03" type="Node2D" parent="WorldRoot/YSortRoot" unique_id=201640241]
+position = Vector2(3920, 792.00006)
+scale = Vector2(2.0163999, 1.731856)
+metadata/building_id = "building_medium_shop_01"
+metadata/building_type = "shop"
+metadata/host_block_id = "Block_Ref_23_61x32"
+metadata/is_enterable = false
+metadata/has_collision = false
+metadata/blocks_signal_visibility = false
+metadata/occludes_player = true
+metadata/placement_group = "Block_Ref_23_61x32_Buildings"
+
+[node name="ArtSprite" type="Sprite2D" parent="WorldRoot/YSortRoot/Block_Ref_23_61x32_Building_MediumShop_03" unique_id=208597606]
+position = Vector2(3.9674492, -138.57973)
+scale = Vector2(0.7878276, 0.8291679)
+texture = ExtResource("8_k3vyy")
+
+[node name="Block_Ref_23_61x32_Building_MediumShop_02" type="Node2D" parent="WorldRoot/YSortRoot" unique_id=1162606809]
+position = Vector2(4352, 1072)
+scale = Vector2(2.0163999, 1.731856)
+metadata/building_id = "building_medium_shop_01"
+metadata/building_type = "shop"
+metadata/host_block_id = "Block_Ref_23_61x32"
+metadata/is_enterable = false
+metadata/has_collision = false
+metadata/blocks_signal_visibility = false
+metadata/occludes_player = true
+metadata/placement_group = "Block_Ref_23_61x32_Buildings"
+
+[node name="ArtSprite" type="Sprite2D" parent="WorldRoot/YSortRoot/Block_Ref_23_61x32_Building_MediumShop_02" unique_id=135670252]
+position = Vector2(3.9674492, -138.57973)
+scale = Vector2(0.7878276, 0.8291679)
+texture = ExtResource("8_k3vyy")
+
+[node name="Block_Ref_23_61x32_Building_MediumShop_01" type="Node2D" parent="WorldRoot/YSortRoot" unique_id=2051674750]
+position = Vector2(2136, 856)
+scale = Vector2(1.42, 1.316)
+metadata/building_id = "building_medium_shop_01"
+metadata/building_type = "shop"
+metadata/host_block_id = "Block_Ref_23_61x32"
+metadata/is_enterable = false
+metadata/has_collision = false
+metadata/blocks_signal_visibility = false
+metadata/occludes_player = true
+metadata/placement_group = "Block_Ref_23_61x32_Buildings"
+
+[node name="ArtSprite" type="Sprite2D" parent="WorldRoot/YSortRoot/Block_Ref_23_61x32_Building_MediumShop_01" unique_id=361765551]
+position = Vector2(5.633728, -273.55646)
+scale = Vector2(1.7490697, 1.5928198)
+texture = ExtResource("9_7tdpv")
+
+[node name="Block_Ref_23_61x32_Building_Residential_03" type="Node2D" parent="WorldRoot/YSortRoot" unique_id=174615833]
+position = Vector2(6128, 4864.0005)
+scale = Vector2(1.114, 1.161)
+metadata/building_id = "building_residential_01"
+metadata/building_type = "residential"
+metadata/host_block_id = "Block_Ref_23_61x32"
+metadata/is_enterable = false
+metadata/has_collision = false
+metadata/blocks_signal_visibility = false
+metadata/occludes_player = true
+metadata/placement_group = "Block_Ref_23_61x32_Buildings"
+
+[node name="ArtSprite" type="Sprite2D" parent="WorldRoot/YSortRoot/Block_Ref_23_61x32_Building_Residential_03" unique_id=565569758]
+position = Vector2(107.71982, -730.40497)
+scale = Vector2(4.8949842, 4.0529823)
+texture = ExtResource("22_building_residential")
+
+[node name="Block_Ref_23_61x32_Building_Alley_04" type="Node2D" parent="WorldRoot/YSortRoot" unique_id=690223783]
+position = Vector2(8392, 5096.0005)
+scale = Vector2(0.909, 1.768)
+metadata/building_id = "building_narrow_alley_01"
+metadata/building_type = "alley"
+metadata/host_block_id = "Block_Ref_23_61x32"
+metadata/is_enterable = false
+metadata/has_collision = false
+metadata/blocks_signal_visibility = false
+metadata/occludes_player = true
+metadata/placement_group = "Block_Ref_23_61x32_Buildings"
+
+[node name="ArtSprite" type="Sprite2D" parent="WorldRoot/YSortRoot/Block_Ref_23_61x32_Building_Alley_04" unique_id=1539946906]
+position = Vector2(-106.31467, -612.8507)
+scale = Vector2(7.5602794, 2.855251)
+texture = ExtResource("24_building_narrow_alley")
+
+[node name="Block_Ref_06_65x24_Buildings" type="Node2D" parent="WorldRoot/YSortRoot" unique_id=95591949]
+position = Vector2(-3136, -1920)
+metadata/host_block_id = "Block_Ref_06_65x24"
+metadata/_manual_building_art = true
+
+[node name="Block_Ref_06_65x24_Building_CornerShop_02" type="Node2D" parent="WorldRoot/YSortRoot" unique_id=508970167]
+position = Vector2(-3024.0002, -1032)
+scale = Vector2(1.166, 1.052)
+metadata/building_id = "building_corner_shop_01"
+metadata/building_type = "shop"
+metadata/host_block_id = "Block_Ref_06_65x24"
+metadata/is_enterable = false
+metadata/has_collision = false
+metadata/blocks_signal_visibility = false
+metadata/occludes_player = true
+metadata/placement_group = "Block_Ref_06_65x24_Buildings"
+
+[node name="ArtSprite" type="Sprite2D" parent="WorldRoot/YSortRoot/Block_Ref_06_65x24_Building_CornerShop_02" unique_id=362371684]
+position = Vector2(-85.76309, -773.3916)
+scale = Vector2(4.0166135, 3.6165946)
+texture = ExtResource("21_building_corner_shop")
+
+[node name="OutpostA_01_Visual" type="Node2D" parent="WorldRoot/YSortRoot" unique_id=123746572]
+z_index = -1
+position = Vector2(3272, -2896)
+script = ExtResource("25_outpost_visual_anchor")
+candidate_id = "OutpostA_01"
+metadata/player_always_in_front = true
+metadata/outpost_uses_normal_ysort = true
+metadata/occludes_player = false
+metadata/placement_group = "OutpostVisuals"
+
+[node name="ArtSprite" type="Sprite2D" parent="WorldRoot/YSortRoot/OutpostA_01_Visual" unique_id=1274221096]
+position = Vector2(-47.999985, -623.99994)
+scale = Vector2(4.7380958, 3.5025454)
+texture = ExtResource("26_outpost_broken")
+
+[node name="OutpostA_02_Visual" type="Node2D" parent="WorldRoot/YSortRoot" unique_id=1913528776]
+z_index = -1
+position = Vector2(-5744, 120)
+script = ExtResource("25_outpost_visual_anchor")
+candidate_id = "OutpostA_02"
+metadata/player_always_in_front = true
+metadata/outpost_uses_normal_ysort = true
+metadata/occludes_player = false
+metadata/placement_group = "OutpostVisuals"
+
+[node name="ArtSprite" type="Sprite2D" parent="WorldRoot/YSortRoot/OutpostA_02_Visual" unique_id=619158881]
+position = Vector2(-28, -507.99997)
+scale = Vector2(4.7380958, 3.5025454)
+texture = ExtResource("26_outpost_broken")
+
+[node name="OutpostA_03_Visual" type="Node2D" parent="WorldRoot/YSortRoot" unique_id=1774384877]
+z_index = -1
+position = Vector2(3358, 2520)
+script = ExtResource("25_outpost_visual_anchor")
+candidate_id = "OutpostA_03"
+metadata/player_always_in_front = true
+metadata/outpost_uses_normal_ysort = true
+metadata/occludes_player = false
+metadata/placement_group = "OutpostVisuals"
+
+[node name="ArtSprite" type="Sprite2D" parent="WorldRoot/YSortRoot/OutpostA_03_Visual" unique_id=69055186]
+position = Vector2(-30, -688.00006)
+scale = Vector2(4.7380958, 3.5025454)
+texture = ExtResource("26_outpost_broken")
+
+[node name="OutpostB_01_Visual" type="Node2D" parent="WorldRoot/YSortRoot" unique_id=1427028778]
+z_index = -1
+position = Vector2(7096, -1664)
+script = ExtResource("25_outpost_visual_anchor")
+candidate_id = "OutpostB_01"
+metadata/player_always_in_front = true
+metadata/outpost_uses_normal_ysort = true
+metadata/occludes_player = false
+metadata/placement_group = "OutpostVisuals"
+
+[node name="ArtSprite" type="Sprite2D" parent="WorldRoot/YSortRoot/OutpostB_01_Visual" unique_id=818146592]
+position = Vector2(0, -584.99994)
+scale = Vector2(4.7380958, 3.5025454)
+texture = ExtResource("26_outpost_broken")
+
+[node name="OutpostB_02_Visual" type="Node2D" parent="WorldRoot/YSortRoot" unique_id=734855814]
+z_index = -1
+position = Vector2(7944, 2480)
+script = ExtResource("25_outpost_visual_anchor")
+candidate_id = "OutpostB_02"
+metadata/player_always_in_front = true
+metadata/outpost_uses_normal_ysort = true
+metadata/occludes_player = false
+metadata/placement_group = "OutpostVisuals"
+
+[node name="ArtSprite" type="Sprite2D" parent="WorldRoot/YSortRoot/OutpostB_02_Visual" unique_id=1540946272]
+position = Vector2(-12.999769, -483.87482)
+scale = Vector2(4.305555, 3.1558526)
+texture = ExtResource("26_outpost_broken")
+
+[node name="OutpostB_03_Visual" type="Node2D" parent="WorldRoot/YSortRoot" unique_id=943622112]
+z_index = -1
+position = Vector2(-5752, 4824)
+script = ExtResource("25_outpost_visual_anchor")
+candidate_id = "OutpostB_03"
+metadata/player_always_in_front = true
+metadata/outpost_uses_normal_ysort = true
+metadata/occludes_player = false
+metadata/placement_group = "OutpostVisuals"
+
+[node name="ArtSprite" type="Sprite2D" parent="WorldRoot/YSortRoot/OutpostB_03_Visual" unique_id=1462692947]
+position = Vector2(-11, -607.99994)
+scale = Vector2(4.7380958, 3.5025454)
+texture = ExtResource("26_outpost_broken")
+
+[node name="OutpostB_04_Visual" type="Node2D" parent="WorldRoot/YSortRoot" unique_id=1951851785]
+z_index = -1
+position = Vector2(-6208, -3320)
+script = ExtResource("25_outpost_visual_anchor")
+candidate_id = "OutpostB_04"
+metadata/player_always_in_front = true
+metadata/outpost_uses_normal_ysort = true
+metadata/occludes_player = false
+metadata/placement_group = "OutpostVisuals"
+
+[node name="ArtSprite" type="Sprite2D" parent="WorldRoot/YSortRoot/OutpostB_04_Visual" unique_id=1129940029]
+position = Vector2(0, -639.99994)
+scale = Vector2(4.7380958, 3.5025454)
+texture = ExtResource("26_outpost_broken")
+
+[node name="PlayerRoot" type="Node2D" parent="WorldRoot" unique_id=502134850]
+position = Vector2(-3152, 616)
+
+[node name="PlayerSpawn" type="Marker2D" parent="WorldRoot/PlayerRoot" unique_id=1156965986]
+position = Vector2(16, 200)
+script = ExtResource("3_spawn_point")
+
+[node name="HomeSafeZone" type="Area2D" parent="WorldRoot/PlayerRoot" unique_id=1836207874]
+position = Vector2(-24, -152)
+script = ExtResource("5_home_safe_zone")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="WorldRoot/PlayerRoot/HomeSafeZone" unique_id=2138604763]
+position = Vector2(48, -344)
+shape = SubResource("RectangleShape2D_home_safe_zone")
+debug_color = Color(0, 0.6, 0.69803923, 0)
+
+[node name="TileMapRoot" type="Node2D" parent="WorldRoot" unique_id=1942119462]
+
+[node name="MapLayout" type="Node2D" parent="WorldRoot" unique_id=1744224353]
+
+[node name="StreetWalkable" type="Node2D" parent="WorldRoot/MapLayout" unique_id=573380467]
+
+[node name="Street_RoadField_280x158" type="Node2D" parent="WorldRoot/MapLayout/StreetWalkable" unique_id=125738936]
+script = ExtResource("12_map_rect")
+rect_id = "Street_RoadField_280x158"
+size_units = Vector2(280, 158)
+walkable = true
+art_mode = "tile"
+art_texture = ExtResource("15_road_ground")
+art_tile_size_units = Vector2(16, 16)
+
+[node name="BlockSolid" type="Node2D" parent="WorldRoot/MapLayout" unique_id=409377983]
+
+[node name="Block_Ref_01_14x44" type="Node2D" parent="WorldRoot/MapLayout/BlockSolid" unique_id=1383261755]
+position = Vector2(-8400, -3384)
+scale = Vector2(1.1652095, 1)
+script = ExtResource("12_map_rect")
+rect_kind = "block"
+rect_id = "Block_Ref_01_14x44"
+size_units = Vector2(15, 44)
+subtype = "edge_block"
+ring = "reference_image"
+has_collision = true
+art_texture = ExtResource("16_block_dirty")
+
+[node name="ArtRoot" type="Node2D" parent="WorldRoot/MapLayout/BlockSolid/Block_Ref_01_14x44" unique_id=1475601188]
+
+[node name="FoundationSprite" type="Sprite2D" parent="WorldRoot/MapLayout/BlockSolid/Block_Ref_01_14x44/ArtRoot" unique_id=2073899184]
+z_index = -68
+position = Vector2(-1.4551915e-10, -1058)
+scale = Vector2(2.064516, 1.5981737)
+texture = ExtResource("16_block_dirty")
+
+[node name="FoundationSprite2" type="Sprite2D" parent="WorldRoot/MapLayout/BlockSolid/Block_Ref_01_14x44/ArtRoot" unique_id=1480800716]
+z_index = -68
+position = Vector2(0, -370)
+scale = Vector2(2.064516, 1.5981737)
+texture = ExtResource("16_block_dirty")
+
+[node name="FoundationSprite3" type="Sprite2D" parent="WorldRoot/MapLayout/BlockSolid/Block_Ref_01_14x44/ArtRoot" unique_id=1158200374]
+z_index = -68
+position = Vector2(0, 327)
+scale = Vector2(2.064516, 1.5981737)
+texture = ExtResource("16_block_dirty")
+
+[node name="FoundationSprite4" type="Sprite2D" parent="WorldRoot/MapLayout/BlockSolid/Block_Ref_01_14x44/ArtRoot" unique_id=478829094]
+z_index = -68
+position = Vector2(0, 1037.5)
+scale = Vector2(2.080645, 1.691781)
+texture = ExtResource("16_block_dirty")
+
+[node name="Block_Ref_02_80x21" type="Node2D" parent="WorldRoot/MapLayout/BlockSolid" unique_id=438946253]
+position = Vector2(-4992, -3968)
+script = ExtResource("12_map_rect")
+rect_kind = "block"
+rect_id = "Block_Ref_02_80x21"
+size_units = Vector2(80, 20)
+subtype = "large_block"
+ring = "reference_image"
+has_collision = true
+art_texture = ExtResource("17_block_cracked")
+
+[node name="ArtRoot" type="Node2D" parent="WorldRoot/MapLayout/BlockSolid/Block_Ref_02_80x21" unique_id=1635024712]
+
+[node name="FoundationSprite" type="Sprite2D" parent="WorldRoot/MapLayout/BlockSolid/Block_Ref_02_80x21/ArtRoot" unique_id=1426435827]
+z_index = -68
+position = Vector2(-1711.5, 0)
+scale = Vector2(3.9649537, 2.9269402)
+texture = ExtResource("17_block_cracked")
+
+[node name="FoundationSprite2" type="Sprite2D" parent="WorldRoot/MapLayout/BlockSolid/Block_Ref_02_80x21/ArtRoot" unique_id=690787740]
+z_index = -68
+position = Vector2(-26, 0)
+scale = Vector2(3.9649537, 2.9269402)
+texture = ExtResource("17_block_cracked")
+
+[node name="FoundationSprite3" type="Sprite2D" parent="WorldRoot/MapLayout/BlockSolid/Block_Ref_02_80x21/ArtRoot" unique_id=1422476517]
+z_index = -68
+position = Vector2(1668.75, 0)
+scale = Vector2(4.1413555, 2.9497716)
+texture = ExtResource("17_block_cracked")
+
+[node name="Block_Ref_03_54x34" type="Node2D" parent="WorldRoot/MapLayout/BlockSolid" unique_id=1564353197]
+position = Vector2(-640, -3520)
+script = ExtResource("12_map_rect")
+rect_kind = "block"
+rect_id = "Block_Ref_03_54x34"
+size_units = Vector2(40, 34)
+subtype = "large_block"
+ring = "reference_image"
+has_collision = true
+art_texture = ExtResource("18_block_clean")
+
+[node name="ArtRoot" type="Node2D" parent="WorldRoot/MapLayout/BlockSolid/Block_Ref_03_54x34" unique_id=233597035]
+
+[node name="FoundationSprite" type="Sprite2D" parent="WorldRoot/MapLayout/BlockSolid/Block_Ref_03_54x34/ArtRoot" unique_id=1924455080]
+z_index = -68
+position = Vector2(-637, -537.0001)
+scale = Vector2(2.857778, 2.515982)
+texture = ExtResource("18_block_clean")
+
+[node name="FoundationSprite2" type="Sprite2D" parent="WorldRoot/MapLayout/BlockSolid/Block_Ref_03_54x34/ArtRoot" unique_id=247786659]
+z_index = -68
+position = Vector2(628, -537.0001)
+scale = Vector2(2.857778, 2.515982)
+texture = ExtResource("18_block_clean")
+
+[node name="FoundationSprite3" type="Sprite2D" parent="WorldRoot/MapLayout/BlockSolid/Block_Ref_03_54x34/ArtRoot" unique_id=786703750]
+z_index = -68
+position = Vector2(-637, 542.9999)
+scale = Vector2(2.857778, 2.515982)
+texture = ExtResource("18_block_clean")
+
+[node name="FoundationSprite4" type="Sprite2D" parent="WorldRoot/MapLayout/BlockSolid/Block_Ref_03_54x34/ArtRoot" unique_id=1976004575]
+z_index = -68
+position = Vector2(628, 542.9999)
+scale = Vector2(2.857778, 2.515982)
+texture = ExtResource("18_block_clean")
+
+[node name="Block_Ref_04_42x35" type="Node2D" parent="WorldRoot/MapLayout/BlockSolid" unique_id=486611705]
+position = Vector2(2944, -3968)
+script = ExtResource("12_map_rect")
+rect_kind = "block"
+rect_id = "Block_Ref_04_42x35"
+size_units = Vector2(56, 34)
+subtype = "large_block"
+ring = "reference_image"
+has_collision = true
+art_texture = ExtResource("16_block_dirty")
+
+[node name="ArtRoot" type="Node2D" parent="WorldRoot/MapLayout/BlockSolid/Block_Ref_04_42x35" unique_id=921038942]
+
+[node name="FoundationSprite" type="Sprite2D" parent="WorldRoot/MapLayout/BlockSolid/Block_Ref_04_42x35/ArtRoot" unique_id=1942005260]
+z_index = -68
+position = Vector2(-941.50006, -362.5111)
+scale = Vector2(3.9746544, 3.3584974)
+texture = ExtResource("16_block_dirty")
+
+[node name="FoundationSprite2" type="Sprite2D" parent="WorldRoot/MapLayout/BlockSolid/Block_Ref_04_42x35/ArtRoot" unique_id=1516448876]
+z_index = -68
+position = Vector2(837.25006, -361.99994)
+scale = Vector2(4.3928576, 3.3287666)
+texture = ExtResource("16_block_dirty")
+
+[node name="FoundationSprite3" type="Sprite2D" parent="WorldRoot/MapLayout/BlockSolid/Block_Ref_04_42x35/ArtRoot" unique_id=526413707]
+z_index = -68
+position = Vector2(-936.75006, 717.0002)
+scale = Vector2(3.9297237, 1.7077632)
+texture = ExtResource("16_block_dirty")
+
+[node name="FoundationSprite4" type="Sprite2D" parent="WorldRoot/MapLayout/BlockSolid/Block_Ref_04_42x35/ArtRoot" unique_id=1640825689]
+z_index = -68
+position = Vector2(842.49994, 716.7501)
+scale = Vector2(4.3986177, 1.6655259)
+texture = ExtResource("16_block_dirty")
+
+[node name="Block_Ref_05_60x46" type="Node2D" parent="WorldRoot/MapLayout/BlockSolid" unique_id=782592447]
+position = Vector2(7104, -3136)
+script = ExtResource("12_map_rect")
+rect_kind = "block"
+rect_id = "Block_Ref_05_60x46"
+size_units = Vector2(58, 46)
+subtype = "large_block"
+ring = "reference_image"
+has_collision = true
+art_texture = ExtResource("17_block_cracked")
+
+[node name="ArtRoot" type="Node2D" parent="WorldRoot/MapLayout/BlockSolid/Block_Ref_05_60x46" unique_id=1829361204]
+
+[node name="FoundationSprite" type="Sprite2D" parent="WorldRoot/MapLayout/BlockSolid/Block_Ref_05_60x46/ArtRoot" unique_id=408745189]
+z_index = -68
+position = Vector2(-928.50024, -731)
+scale = Vector2(4.334111, 3.3835611)
+texture = ExtResource("17_block_cracked")
+
+[node name="FoundationSprite2" type="Sprite2D" parent="WorldRoot/MapLayout/BlockSolid/Block_Ref_05_60x46/ArtRoot" unique_id=1643716913]
+z_index = -68
+position = Vector2(883.99976, -731)
+scale = Vector2(4.334111, 3.3835611)
+texture = ExtResource("17_block_cracked")
+
+[node name="FoundationSprite3" type="Sprite2D" parent="WorldRoot/MapLayout/BlockSolid/Block_Ref_05_60x46/ArtRoot" unique_id=296656399]
+z_index = -68
+position = Vector2(-928.50024, 741.9999)
+scale = Vector2(4.334111, 3.3835611)
+texture = ExtResource("17_block_cracked")
+
+[node name="FoundationSprite4" type="Sprite2D" parent="WorldRoot/MapLayout/BlockSolid/Block_Ref_05_60x46/ArtRoot" unique_id=511794755]
+z_index = -68
+position = Vector2(883.99976, 741.9999)
+scale = Vector2(4.334111, 3.3835611)
+texture = ExtResource("17_block_cracked")
+
+[node name="Block_Ref_06_65x23" type="Node2D" parent="WorldRoot/MapLayout/BlockSolid" unique_id=510045993]
+position = Vector2(-6080, -2240)
+script = ExtResource("12_map_rect")
+rect_kind = "block"
+rect_id = "Block_Ref_06_65x23"
+size_units = Vector2(46, 22)
+subtype = "large_block"
+ring = "reference_image"
+has_collision = true
+art_texture = ExtResource("18_block_clean")
+
+[node name="ArtRoot" type="Node2D" parent="WorldRoot/MapLayout/BlockSolid/Block_Ref_06_65x23" unique_id=311076598]
+
+[node name="FoundationSprite" type="Sprite2D" parent="WorldRoot/MapLayout/BlockSolid/Block_Ref_06_65x23/ArtRoot" unique_id=2136893606]
+z_index = -68
+position = Vector2(-736.4999, -3.0000136)
+scale = Vector2(3.2688892, 3.2009134)
+texture = ExtResource("18_block_clean")
+
+[node name="FoundationSprite2" type="Sprite2D" parent="WorldRoot/MapLayout/BlockSolid/Block_Ref_06_65x23/ArtRoot" unique_id=1044003853]
+z_index = -68
+position = Vector2(726.0001, -3.0000136)
+scale = Vector2(3.2688892, 3.2009134)
+texture = ExtResource("18_block_clean")
+
+[node name="Block_Ref_07_25x34" type="Node2D" parent="WorldRoot/MapLayout/BlockSolid" unique_id=1624107445]
+position = Vector2(-3136, 64)
+script = ExtResource("12_map_rect")
+rect_kind = "block"
+rect_id = "Block_Ref_07_25x34"
+size_units = Vector2(30, 26)
+subtype = "long_block"
+ring = "reference_image"
+has_collision = true
+art_texture = ExtResource("16_block_dirty")
+
+[node name="ArtRoot" type="Node2D" parent="WorldRoot/MapLayout/BlockSolid/Block_Ref_07_25x34" unique_id=580179545]
+
+[node name="FoundationSprite" type="Sprite2D" parent="WorldRoot/MapLayout/BlockSolid/Block_Ref_07_25x34/ArtRoot" unique_id=514744810]
+z_index = -68
+scale = Vector2(4.423963, 3.799087)
+texture = ExtResource("16_block_dirty")
+
+[node name="Block_Ref_08_30x59" type="Node2D" parent="WorldRoot/MapLayout/BlockSolid" unique_id=2058530168]
+position = Vector2(-8192, 480)
+script = ExtResource("12_map_rect")
+rect_kind = "block"
+rect_id = "Block_Ref_08_30x59"
+size_units = Vector2(24, 55)
+subtype = "long_block"
+ring = "reference_image"
+has_collision = true
+art_texture = ExtResource("17_block_cracked")
+
+[node name="ArtRoot" type="Node2D" parent="WorldRoot/MapLayout/BlockSolid/Block_Ref_08_30x59" unique_id=1934525740]
+
+[node name="FoundationSprite" type="Sprite2D" parent="WorldRoot/MapLayout/BlockSolid/Block_Ref_08_30x59/ArtRoot" unique_id=1733708750]
+z_index = -68
+position = Vector2(-0.50027657, 1101.5)
+scale = Vector2(3.5864475, 3.0068493)
+texture = ExtResource("17_block_cracked")
+
+[node name="FoundationSprite2" type="Sprite2D" parent="WorldRoot/MapLayout/BlockSolid/Block_Ref_08_30x59/ArtRoot" unique_id=1134616352]
+z_index = -68
+position = Vector2(-0.7500806, -151.74998)
+scale = Vector2(3.5829437, 2.989726)
+texture = ExtResource("17_block_cracked")
+
+[node name="FoundationSprite3" type="Sprite2D" parent="WorldRoot/MapLayout/BlockSolid/Block_Ref_08_30x59/ArtRoot" unique_id=1547048404]
+z_index = -68
+position = Vector2(0.7500193, -1117.25)
+scale = Vector2(3.5899532, 2.941781)
+texture = ExtResource("17_block_cracked")
+
+[node name="Block_Ref_09_36x21" type="Node2D" parent="WorldRoot/MapLayout/BlockSolid" unique_id=167678122]
+position = Vector2(-5760, -448)
+script = ExtResource("12_map_rect")
+rect_kind = "block"
+rect_id = "Block_Ref_09_36x21"
+size_units = Vector2(36, 22)
+subtype = "medium_block"
+ring = "reference_image"
+has_collision = true
+art_texture = ExtResource("18_block_clean")
+
+[node name="ArtRoot" type="Node2D" parent="WorldRoot/MapLayout/BlockSolid/Block_Ref_09_36x21" unique_id=1644393419]
+
+[node name="FoundationSprite" type="Sprite2D" parent="WorldRoot/MapLayout/BlockSolid/Block_Ref_09_36x21/ArtRoot" unique_id=37497637]
+z_index = -68
+position = Vector2(-566.9999, -268.50003)
+scale = Vector2(2.6000004, 1.9885846)
+texture = ExtResource("18_block_clean")
+
+[node name="FoundationSprite2" type="Sprite2D" parent="WorldRoot/MapLayout/BlockSolid/Block_Ref_09_36x21/ArtRoot" unique_id=745637581]
+z_index = -68
+position = Vector2(577.00024, -269.00003)
+scale = Vector2(2.543332, 1.9828768)
+texture = ExtResource("18_block_clean")
+
+[node name="FoundationSprite3" type="Sprite2D" parent="WorldRoot/MapLayout/BlockSolid/Block_Ref_09_36x21/ArtRoot" unique_id=1630158360]
+z_index = -68
+position = Vector2(-566.9999, 273.9999)
+scale = Vector2(2.6000004, 1.9885846)
+texture = ExtResource("18_block_clean")
+
+[node name="FoundationSprite4" type="Sprite2D" parent="WorldRoot/MapLayout/BlockSolid/Block_Ref_09_36x21/ArtRoot" unique_id=1321074535]
+z_index = -68
+position = Vector2(583, 274.00003)
+scale = Vector2(2.6000004, 1.9885846)
+texture = ExtResource("18_block_clean")
+
+[node name="Block_Ref_10_49x54" type="Node2D" parent="WorldRoot/MapLayout/BlockSolid" unique_id=688176237]
+position = Vector2(-64, -192)
+script = ExtResource("12_map_rect")
+rect_kind = "block"
+rect_id = "Block_Ref_10_49x54"
+size_units = Vector2(50, 54)
+subtype = "large_block"
+ring = "reference_image"
+has_collision = true
+art_texture = ExtResource("16_block_dirty")
+
+[node name="ArtRoot" type="Node2D" parent="WorldRoot/MapLayout/BlockSolid/Block_Ref_10_49x54" unique_id=1190200681]
+
+[node name="FoundationSprite" type="Sprite2D" parent="WorldRoot/MapLayout/BlockSolid/Block_Ref_10_49x54/ArtRoot" unique_id=1813935417]
+z_index = -68
+position = Vector2(-800.5001, -858.5)
+scale = Vector2(3.6843317, 3.9703197)
+texture = ExtResource("16_block_dirty")
+
+[node name="FoundationSprite2" type="Sprite2D" parent="WorldRoot/MapLayout/BlockSolid/Block_Ref_10_49x54/ArtRoot" unique_id=2079115759]
+z_index = -68
+position = Vector2(780.25, -855.75006)
+scale = Vector2(3.7361748, 3.9805937)
+texture = ExtResource("16_block_dirty")
+
+[node name="FoundationSprite3" type="Sprite2D" parent="WorldRoot/MapLayout/BlockSolid/Block_Ref_10_49x54/ArtRoot" unique_id=24658171]
+z_index = -68
+position = Vector2(-794.5001, 858.5)
+scale = Vector2(3.6843317, 3.9703197)
+texture = ExtResource("16_block_dirty")
+
+[node name="FoundationSprite4" type="Sprite2D" parent="WorldRoot/MapLayout/BlockSolid/Block_Ref_10_49x54/ArtRoot" unique_id=843767466]
+z_index = -68
+position = Vector2(786.25, 861.24994)
+scale = Vector2(3.7361748, 3.9805937)
+texture = ExtResource("16_block_dirty")
+
+[node name="Block_Ref_11_41x33" type="Node2D" parent="WorldRoot/MapLayout/BlockSolid" unique_id=1478259471]
+position = Vector2(3392, -1280)
+script = ExtResource("12_map_rect")
+rect_kind = "block"
+rect_id = "Block_Ref_11_41x33"
+size_units = Vector2(42, 34)
+subtype = "large_block"
+ring = "reference_image"
+has_collision = true
+art_texture = ExtResource("17_block_cracked")
+
+[node name="ArtRoot" type="Node2D" parent="WorldRoot/MapLayout/BlockSolid/Block_Ref_11_41x33" unique_id=856306708]
+
+[node name="FoundationSprite" type="Sprite2D" parent="WorldRoot/MapLayout/BlockSolid/Block_Ref_11_41x33/ArtRoot" unique_id=76193035]
+z_index = -68
+scale = Vector2(6.280374, 4.968037)
+texture = ExtResource("17_block_cracked")
+
+[node name="Block_Ref_12_61x26" type="Node2D" parent="WorldRoot/MapLayout/BlockSolid" unique_id=2125659147]
+position = Vector2(7104, -320)
+script = ExtResource("12_map_rect")
+rect_kind = "block"
+rect_id = "Block_Ref_12_61x26"
+size_units = Vector2(58, 26)
+subtype = "large_block"
+ring = "reference_image"
+has_collision = true
+art_texture = ExtResource("18_block_clean")
+
+[node name="ArtRoot" type="Node2D" parent="WorldRoot/MapLayout/BlockSolid/Block_Ref_12_61x26" unique_id=1468635921]
+
+[node name="FoundationSprite" type="Sprite2D" parent="WorldRoot/MapLayout/BlockSolid/Block_Ref_12_61x26/ArtRoot" unique_id=1188161812]
+z_index = -68
+position = Vector2(-928.49994, 5.499969)
+scale = Vector2(4.1222224, 3.8242009)
+texture = ExtResource("18_block_clean")
+
+[node name="FoundationSprite2" type="Sprite2D" parent="WorldRoot/MapLayout/BlockSolid/Block_Ref_12_61x26/ArtRoot" unique_id=231672423]
+z_index = -68
+position = Vector2(912.00006, 4.9999995)
+scale = Vector2(4.1222224, 3.8242009)
+texture = ExtResource("18_block_clean")
+
+[node name="Block_Ref_13_33x35" type="Node2D" parent="WorldRoot/MapLayout/BlockSolid" unique_id=1367324460]
+position = Vector2(-5760, 1792)
+script = ExtResource("12_map_rect")
+rect_kind = "block"
+rect_id = "Block_Ref_13_33x35"
+size_units = Vector2(36, 32)
+subtype = "medium_block"
+ring = "reference_image"
+has_collision = true
+art_texture = ExtResource("16_block_dirty")
+
+[node name="ArtRoot" type="Node2D" parent="WorldRoot/MapLayout/BlockSolid/Block_Ref_13_33x35" unique_id=314592498]
+
+[node name="FoundationSprite" type="Sprite2D" parent="WorldRoot/MapLayout/BlockSolid/Block_Ref_13_33x35/ArtRoot" unique_id=866957291]
+z_index = -68
+position = Vector2(-573.4999, -505.49997)
+scale = Vector2(2.6658993, 2.3675797)
+texture = ExtResource("16_block_dirty")
+
+[node name="FoundationSprite2" type="Sprite2D" parent="WorldRoot/MapLayout/BlockSolid/Block_Ref_13_33x35/ArtRoot" unique_id=216175754]
+z_index = -68
+position = Vector2(569.0001, -504.99997)
+scale = Vector2(2.6658993, 2.3675797)
+texture = ExtResource("16_block_dirty")
+
+[node name="FoundationSprite3" type="Sprite2D" parent="WorldRoot/MapLayout/BlockSolid/Block_Ref_13_33x35/ArtRoot" unique_id=1472791388]
+z_index = -68
+position = Vector2(-573.4999, 500.49997)
+scale = Vector2(2.6658993, 2.3675797)
+texture = ExtResource("16_block_dirty")
+
+[node name="FoundationSprite4" type="Sprite2D" parent="WorldRoot/MapLayout/BlockSolid/Block_Ref_13_33x35/ArtRoot" unique_id=14206252]
+z_index = -68
+position = Vector2(569.0001, 500.99997)
+scale = Vector2(2.6658993, 2.3675797)
+texture = ExtResource("16_block_dirty")
+
+[node name="Block_Ref_14_30x25" type="Node2D" parent="WorldRoot/MapLayout/BlockSolid" unique_id=1562959509]
+position = Vector2(-3200, 1952)
+script = ExtResource("12_map_rect")
+rect_kind = "block"
+rect_id = "Block_Ref_14_30x25"
+size_units = Vector2(32, 25)
+subtype = "medium_block"
+ring = "reference_image"
+has_collision = true
+art_texture = ExtResource("17_block_cracked")
+
+[node name="ArtRoot" type="Node2D" parent="WorldRoot/MapLayout/BlockSolid/Block_Ref_14_30x25" unique_id=1662135241]
+
+[node name="FoundationSprite" type="Sprite2D" parent="WorldRoot/MapLayout/BlockSolid/Block_Ref_14_30x25/ArtRoot" unique_id=1527900999]
+z_index = -68
+scale = Vector2(4.785047, 3.652968)
+texture = ExtResource("17_block_cracked")
+
+[node name="Block_Ref_15_44x34" type="Node2D" parent="WorldRoot/MapLayout/BlockSolid" unique_id=262802716]
+position = Vector2(3328, 1408)
+script = ExtResource("12_map_rect")
+rect_kind = "block"
+rect_id = "Block_Ref_15_44x34"
+size_units = Vector2(44, 34)
+subtype = "large_block"
+ring = "reference_image"
+has_collision = true
+art_texture = ExtResource("18_block_clean")
+
+[node name="ArtRoot" type="Node2D" parent="WorldRoot/MapLayout/BlockSolid/Block_Ref_15_44x34" unique_id=961547441]
+
+[node name="FoundationSprite" type="Sprite2D" parent="WorldRoot/MapLayout/BlockSolid/Block_Ref_15_44x34/ArtRoot" unique_id=607481312]
+z_index = -68
+scale = Vector2(6.257778, 4.968037)
+texture = ExtResource("18_block_clean")
+
+[node name="Block_Ref_16_18x23" type="Node2D" parent="WorldRoot/MapLayout/BlockSolid" unique_id=2108955367]
+position = Vector2(5824, 1792)
+script = ExtResource("12_map_rect")
+rect_kind = "block"
+rect_id = "Block_Ref_16_18x23"
+size_units = Vector2(18, 24)
+subtype = "small_block"
+ring = "reference_image"
+has_collision = true
+art_texture = ExtResource("16_block_dirty")
+
+[node name="ArtRoot" type="Node2D" parent="WorldRoot/MapLayout/BlockSolid/Block_Ref_16_18x23" unique_id=1881609467]
+
+[node name="FoundationSprite" type="Sprite2D" parent="WorldRoot/MapLayout/BlockSolid/Block_Ref_16_18x23/ArtRoot" unique_id=1443118075]
+z_index = -68
+position = Vector2(-5.0000925, -379.49997)
+scale = Vector2(2.631336, 1.7739724)
+texture = ExtResource("16_block_dirty")
+
+[node name="FoundationSprite2" type="Sprite2D" parent="WorldRoot/MapLayout/BlockSolid/Block_Ref_16_18x23/ArtRoot" unique_id=2057010871]
+z_index = -68
+position = Vector2(-5.0000925, 390.00003)
+scale = Vector2(2.631336, 1.7739724)
+texture = ExtResource("16_block_dirty")
+
+[node name="Block_Ref_17_38x25" type="Node2D" parent="WorldRoot/MapLayout/BlockSolid" unique_id=867510420]
+position = Vector2(7936, 1792)
+script = ExtResource("12_map_rect")
+rect_kind = "block"
+rect_id = "Block_Ref_17_38x25"
+size_units = Vector2(32, 24)
+subtype = "medium_block"
+ring = "reference_image"
+has_collision = true
+art_texture = ExtResource("17_block_cracked")
+
+[node name="ArtRoot" type="Node2D" parent="WorldRoot/MapLayout/BlockSolid/Block_Ref_17_38x25" unique_id=2405931]
+
+[node name="FoundationSprite" type="Sprite2D" parent="WorldRoot/MapLayout/BlockSolid/Block_Ref_17_38x25/ArtRoot" unique_id=1875147315]
+z_index = -68
+position = Vector2(-509.00003, -331.49997)
+scale = Vector2(2.4065423, 1.9931506)
+texture = ExtResource("17_block_cracked")
+
+[node name="FoundationSprite2" type="Sprite2D" parent="WorldRoot/MapLayout/BlockSolid/Block_Ref_17_38x25/ArtRoot" unique_id=2116073337]
+z_index = -68
+position = Vector2(497.5001, -329.74994)
+scale = Vector2(2.4556084, 1.9988585)
+texture = ExtResource("17_block_cracked")
+
+[node name="FoundationSprite3" type="Sprite2D" parent="WorldRoot/MapLayout/BlockSolid/Block_Ref_17_38x25/ArtRoot" unique_id=1445850890]
+z_index = -68
+position = Vector2(-509.00003, 335.50003)
+scale = Vector2(2.4065423, 1.9931506)
+texture = ExtResource("17_block_cracked")
+
+[node name="FoundationSprite4" type="Sprite2D" parent="WorldRoot/MapLayout/BlockSolid/Block_Ref_17_38x25/ArtRoot" unique_id=1307649643]
+z_index = -68
+position = Vector2(497.5001, 337.25006)
+scale = Vector2(2.4556084, 1.9988585)
+texture = ExtResource("17_block_cracked")
+
+[node name="Block_Ref_18_29x25" type="Node2D" parent="WorldRoot/MapLayout/BlockSolid" unique_id=381859250]
+position = Vector2(-8200, 3552)
+script = ExtResource("12_map_rect")
+rect_kind = "block"
+rect_id = "Block_Ref_18_29x25"
+size_units = Vector2(24, 25)
+subtype = "medium_block"
+ring = "reference_image"
+has_collision = true
+art_texture = ExtResource("18_block_clean")
+
+[node name="ArtRoot" type="Node2D" parent="WorldRoot/MapLayout/BlockSolid/Block_Ref_18_29x25" unique_id=1186242162]
+
+[node name="FoundationSprite" type="Sprite2D" parent="WorldRoot/MapLayout/BlockSolid/Block_Ref_18_29x25/ArtRoot" unique_id=1323773921]
+z_index = -68
+position = Vector2(-377.99997, -397.00006)
+scale = Vector2(1.7333331, 1.8401823)
+texture = ExtResource("18_block_clean")
+
+[node name="FoundationSprite2" type="Sprite2D" parent="WorldRoot/MapLayout/BlockSolid/Block_Ref_18_29x25/ArtRoot" unique_id=1255266369]
+z_index = -68
+position = Vector2(382.0001, -397.00006)
+scale = Vector2(1.7333331, 1.8401823)
+texture = ExtResource("18_block_clean")
+
+[node name="FoundationSprite3" type="Sprite2D" parent="WorldRoot/MapLayout/BlockSolid/Block_Ref_18_29x25/ArtRoot" unique_id=1837181008]
+z_index = -68
+position = Vector2(-381.99997, 400.99994)
+scale = Vector2(1.7333331, 1.8401823)
+texture = ExtResource("18_block_clean")
+
+[node name="FoundationSprite4" type="Sprite2D" parent="WorldRoot/MapLayout/BlockSolid/Block_Ref_18_29x25/ArtRoot" unique_id=376506260]
+z_index = -68
+position = Vector2(378.0001, 400.99994)
+scale = Vector2(1.7333331, 1.8401823)
+texture = ExtResource("18_block_clean")
+
+[node name="Block_Ref_19_32x24" type="Node2D" parent="WorldRoot/MapLayout/BlockSolid" unique_id=594013683]
+position = Vector2(-5760, 4064)
+script = ExtResource("12_map_rect")
+rect_kind = "block"
+rect_id = "Block_Ref_19_32x24"
+size_units = Vector2(36, 24)
+subtype = "medium_block"
+ring = "reference_image"
+has_collision = true
+art_texture = ExtResource("16_block_dirty")
+
+[node name="ArtRoot" type="Node2D" parent="WorldRoot/MapLayout/BlockSolid/Block_Ref_19_32x24" unique_id=768766518]
+
+[node name="FoundationSprite" type="Sprite2D" parent="WorldRoot/MapLayout/BlockSolid/Block_Ref_19_32x24/ArtRoot" unique_id=2003202136]
+z_index = -68
+position = Vector2(-567.99994, -371.99997)
+scale = Vector2(2.6912444, 1.8082191)
+texture = ExtResource("16_block_dirty")
+
+[node name="FoundationSprite2" type="Sprite2D" parent="WorldRoot/MapLayout/BlockSolid/Block_Ref_19_32x24/ArtRoot" unique_id=1172565813]
+z_index = -68
+position = Vector2(568.0002, -371.99997)
+scale = Vector2(2.6912444, 1.8082191)
+texture = ExtResource("16_block_dirty")
+
+[node name="FoundationSprite3" type="Sprite2D" parent="WorldRoot/MapLayout/BlockSolid/Block_Ref_19_32x24/ArtRoot" unique_id=745315959]
+z_index = -68
+position = Vector2(-567.99994, 363.0001)
+scale = Vector2(2.6912444, 1.8082191)
+texture = ExtResource("16_block_dirty")
+
+[node name="FoundationSprite4" type="Sprite2D" parent="WorldRoot/MapLayout/BlockSolid/Block_Ref_19_32x24/ArtRoot" unique_id=1035706398]
+z_index = -68
+position = Vector2(568.0002, 363.0001)
+scale = Vector2(2.6912444, 1.8082191)
+texture = ExtResource("16_block_dirty")
+
+[node name="Block_Ref_20_37x23" type="Node2D" parent="WorldRoot/MapLayout/BlockSolid" unique_id=1809853367]
+position = Vector2(-2944, 4032)
+script = ExtResource("12_map_rect")
+rect_kind = "block"
+rect_id = "Block_Ref_20_37x23"
+size_units = Vector2(32, 24)
+subtype = "medium_block"
+ring = "reference_image"
+has_collision = true
+art_texture = ExtResource("17_block_cracked")
+
+[node name="ArtRoot" type="Node2D" parent="WorldRoot/MapLayout/BlockSolid/Block_Ref_20_37x23" unique_id=748306063]
+
+[node name="FoundationSprite" type="Sprite2D" parent="WorldRoot/MapLayout/BlockSolid/Block_Ref_20_37x23/ArtRoot" unique_id=830428017]
+z_index = -68
+position = Vector2(-511.00003, -369.49997)
+scale = Vector2(2.3971965, 1.8196344)
+texture = ExtResource("17_block_cracked")
+
+[node name="FoundationSprite2" type="Sprite2D" parent="WorldRoot/MapLayout/BlockSolid/Block_Ref_20_37x23/ArtRoot" unique_id=696888878]
+z_index = -68
+position = Vector2(505.49982, -370.24997)
+scale = Vector2(2.4369156, 1.8276253)
+texture = ExtResource("17_block_cracked")
+
+[node name="FoundationSprite3" type="Sprite2D" parent="WorldRoot/MapLayout/BlockSolid/Block_Ref_20_37x23/ArtRoot" unique_id=1421343557]
+z_index = -68
+position = Vector2(-511.00003, 369.99997)
+scale = Vector2(2.3971965, 1.8196344)
+texture = ExtResource("17_block_cracked")
+
+[node name="FoundationSprite4" type="Sprite2D" parent="WorldRoot/MapLayout/BlockSolid/Block_Ref_20_37x23/ArtRoot" unique_id=996479120]
+z_index = -68
+position = Vector2(505.49982, 369.25003)
+scale = Vector2(2.4369156, 1.8276253)
+texture = ExtResource("17_block_cracked")
+
+[node name="Block_Ref_21_53x44" type="Node2D" parent="WorldRoot/MapLayout/BlockSolid" unique_id=491979361]
+position = Vector2(64, 3456)
+script = ExtResource("12_map_rect")
+rect_kind = "block"
+rect_id = "Block_Ref_21_53x44"
+size_units = Vector2(46, 44)
+subtype = "large_block"
+ring = "reference_image"
+has_collision = true
+art_texture = ExtResource("18_block_clean")
+
+[node name="ArtRoot" type="Node2D" parent="WorldRoot/MapLayout/BlockSolid/Block_Ref_21_53x44" unique_id=797294620]
+
+[node name="FoundationSprite" type="Sprite2D" parent="WorldRoot/MapLayout/BlockSolid/Block_Ref_21_53x44/ArtRoot" unique_id=877422406]
+z_index = -68
+position = Vector2(-744.49994, -708)
+scale = Vector2(3.2333333, 3.1963472)
+texture = ExtResource("18_block_clean")
+
+[node name="FoundationSprite2" type="Sprite2D" parent="WorldRoot/MapLayout/BlockSolid/Block_Ref_21_53x44/ArtRoot" unique_id=2036052357]
+z_index = -68
+position = Vector2(717.75, -708.0001)
+scale = Vector2(3.3300002, 3.1963468)
+texture = ExtResource("18_block_clean")
+
+[node name="FoundationSprite3" type="Sprite2D" parent="WorldRoot/MapLayout/BlockSolid/Block_Ref_21_53x44/ArtRoot" unique_id=1748193764]
+z_index = -68
+position = Vector2(-744.49994, 696.49994)
+scale = Vector2(3.2333333, 3.2488585)
+texture = ExtResource("18_block_clean")
+
+[node name="FoundationSprite4" type="Sprite2D" parent="WorldRoot/MapLayout/BlockSolid/Block_Ref_21_53x44/ArtRoot" unique_id=255631799]
+z_index = -68
+position = Vector2(717.75, 698.5)
+scale = Vector2(3.3300002, 3.257991)
+texture = ExtResource("18_block_clean")
+
+[node name="Block_Ref_22_44x23" type="Node2D" parent="WorldRoot/MapLayout/BlockSolid" unique_id=422200176]
+position = Vector2(3136, 3776)
+script = ExtResource("12_map_rect")
+rect_kind = "block"
+rect_id = "Block_Ref_22_44x23"
+size_units = Vector2(34, 24)
+subtype = "medium_block"
+ring = "reference_image"
+has_collision = true
+art_texture = ExtResource("16_block_dirty")
+
+[node name="ArtRoot" type="Node2D" parent="WorldRoot/MapLayout/BlockSolid/Block_Ref_22_44x23" unique_id=1802584712]
+
+[node name="FoundationSprite" type="Sprite2D" parent="WorldRoot/MapLayout/BlockSolid/Block_Ref_22_44x23/ArtRoot" unique_id=106206045]
+z_index = -68
+position = Vector2(-537.9999, -368.49997)
+scale = Vector2(2.5345626, 1.8242007)
+texture = ExtResource("16_block_dirty")
+
+[node name="FoundationSprite2" type="Sprite2D" parent="WorldRoot/MapLayout/BlockSolid/Block_Ref_22_44x23/ArtRoot" unique_id=1661507644]
+z_index = -68
+position = Vector2(542.0001, -367.99997)
+scale = Vector2(2.5345626, 1.8242007)
+texture = ExtResource("16_block_dirty")
+
+[node name="FoundationSprite3" type="Sprite2D" parent="WorldRoot/MapLayout/BlockSolid/Block_Ref_22_44x23/ArtRoot" unique_id=1758486025]
+z_index = -68
+position = Vector2(-537.9999, 375.50003)
+scale = Vector2(2.5345626, 1.8242007)
+texture = ExtResource("16_block_dirty")
+
+[node name="FoundationSprite4" type="Sprite2D" parent="WorldRoot/MapLayout/BlockSolid/Block_Ref_22_44x23/ArtRoot" unique_id=1265115128]
+z_index = -68
+position = Vector2(542.0001, 376.00003)
+scale = Vector2(2.5345626, 1.8242007)
+texture = ExtResource("16_block_dirty")
+
+[node name="Block_Ref_23_61x32" type="Node2D" parent="WorldRoot/MapLayout/BlockSolid" unique_id=960497349]
+position = Vector2(6848, 4064)
+script = ExtResource("12_map_rect")
+rect_kind = "block"
+rect_id = "Block_Ref_23_61x32"
+size_units = Vector2(66, 31)
+subtype = "large_block"
+ring = "reference_image"
+has_collision = true
+art_texture = ExtResource("17_block_cracked")
+
+[node name="ArtRoot" type="Node2D" parent="WorldRoot/MapLayout/BlockSolid/Block_Ref_23_61x32" unique_id=1081708269]
+
+[node name="FoundationSprite" type="Sprite2D" parent="WorldRoot/MapLayout/BlockSolid/Block_Ref_23_61x32/ArtRoot" unique_id=1639096736]
+z_index = -68
+position = Vector2(-1056.9999, -1.9998437)
+scale = Vector2(4.929907, 4.5205483)
+texture = ExtResource("17_block_cracked")
+
+[node name="FoundationSprite2" type="Sprite2D" parent="WorldRoot/MapLayout/BlockSolid/Block_Ref_23_61x32/ArtRoot" unique_id=573651782]
+z_index = -68
+position = Vector2(1033.5001, 3.9999123)
+scale = Vector2(5.0070095, 4.5205483)
+texture = ExtResource("17_block_cracked")
+
+[node name="Block_Ref_06_65x24" type="Node2D" parent="WorldRoot/MapLayout/BlockSolid" unique_id=878776665]
+position = Vector2(-3136, -1920)
+script = ExtResource("12_map_rect")
+rect_kind = "block"
+rect_id = "Block_Ref_06_65x24"
+size_units = Vector2(30, 28)
+subtype = "large_block"
+ring = "reference_image"
+has_collision = true
+art_texture = ExtResource("18_block_clean")
+
+[node name="ArtRoot" type="Node2D" parent="WorldRoot/MapLayout/BlockSolid/Block_Ref_06_65x24" unique_id=1362728724]
+
+[node name="FoundationSprite" type="Sprite2D" parent="WorldRoot/MapLayout/BlockSolid/Block_Ref_06_65x24/ArtRoot" unique_id=1287209554]
+z_index = -68
+position = Vector2(-468.00003, -439.49994)
+scale = Vector2(2.1866667, 2.084475)
+texture = ExtResource("18_block_clean")
+
+[node name="FoundationSprite2" type="Sprite2D" parent="WorldRoot/MapLayout/BlockSolid/Block_Ref_06_65x24/ArtRoot" unique_id=441067855]
+z_index = -68
+position = Vector2(467.99997, -438.99994)
+scale = Vector2(2.1866667, 2.084475)
+texture = ExtResource("18_block_clean")
+
+[node name="FoundationSprite3" type="Sprite2D" parent="WorldRoot/MapLayout/BlockSolid/Block_Ref_06_65x24/ArtRoot" unique_id=1801484790]
+z_index = -68
+position = Vector2(-468.00003, 454.49994)
+scale = Vector2(2.1866667, 2.084475)
+texture = ExtResource("18_block_clean")
+
+[node name="FoundationSprite4" type="Sprite2D" parent="WorldRoot/MapLayout/BlockSolid/Block_Ref_06_65x24/ArtRoot" unique_id=1420130187]
+z_index = -68
+position = Vector2(467.99997, 454.99994)
+scale = Vector2(2.1866667, 2.084475)
+texture = ExtResource("18_block_clean")
+
+[node name="Buildings" type="Node2D" parent="WorldRoot/MapLayout" unique_id=935141383]
+
+[node name="Points" type="Node2D" parent="WorldRoot/MapLayout" unique_id=1627908728]
+
+[node name="ContainerSpawnPoints" type="Node2D" parent="WorldRoot/MapLayout/Points" unique_id=43474632]
+
+[node name="Container_IN_01" type="Marker2D" parent="WorldRoot/MapLayout/Points/ContainerSpawnPoints" unique_id=1574783589]
+position = Vector2(-1904, -856)
+script = ExtResource("13_map_point")
+point_id = "Container_IN_01"
+map_side = "left"
+tags = Array[StringName]([&"street_edge"])
+
+[node name="Container_IN_02" type="Marker2D" parent="WorldRoot/MapLayout/Points/ContainerSpawnPoints" unique_id=1865192353]
+position = Vector2(-1840, 1864)
+script = ExtResource("13_map_point")
+point_id = "Container_IN_02"
+tags = Array[StringName]([&"street_edge"])
+
+[node name="Container_IN_03" type="Marker2D" parent="WorldRoot/MapLayout/Points/ContainerSpawnPoints" unique_id=2011587746]
+position = Vector2(-224, 1864)
+script = ExtResource("13_map_point")
+point_id = "Container_IN_03"
+tags = Array[StringName]([&"street_edge"])
+
+[node name="Container_IN_04" type="Marker2D" parent="WorldRoot/MapLayout/Points/ContainerSpawnPoints" unique_id=1625369626]
+position = Vector2(-3136, 3016)
+script = ExtResource("13_map_point")
+point_id = "Container_IN_04"
+tags = Array[StringName]([&"street_edge"])
+
+[node name="Container_IN_05" type="Marker2D" parent="WorldRoot/MapLayout/Points/ContainerSpawnPoints" unique_id=1825659899]
+position = Vector2(-4320, -936)
+script = ExtResource("13_map_point")
+point_id = "Container_IN_05"
+map_side = "left"
+tags = Array[StringName]([&"street_edge"])
+
+[node name="Container_MID_01" type="Marker2D" parent="WorldRoot/MapLayout/Points/ContainerSpawnPoints" unique_id=1462820956]
+position = Vector2(-2192, -4376)
+script = ExtResource("13_map_point")
+point_id = "Container_MID_01"
+ring = "middle"
+map_side = "left"
+tags = Array[StringName]([&"street_edge"])
+
+[node name="Container_MID_02" type="Marker2D" parent="WorldRoot/MapLayout/Points/ContainerSpawnPoints" unique_id=1134518147]
+position = Vector2(1920, -2552)
+script = ExtResource("13_map_point")
+point_id = "Container_MID_02"
+ring = "middle"
+map_side = "left"
+tags = Array[StringName]([&"street_edge"])
+
+[node name="Container_MID_03" type="Marker2D" parent="WorldRoot/MapLayout/Points/ContainerSpawnPoints" unique_id=502460065]
+position = Vector2(936, -4528)
+script = ExtResource("13_map_point")
+point_id = "Container_MID_03"
+ring = "middle"
+tags = Array[StringName]([&"street_edge"])
+
+[node name="Container_MID_04" type="Marker2D" parent="WorldRoot/MapLayout/Points/ContainerSpawnPoints" unique_id=433968295]
+position = Vector2(3512, 8)
+script = ExtResource("13_map_point")
+point_id = "Container_MID_04"
+ring = "middle"
+tags = Array[StringName]([&"street_edge"])
+
+[node name="Container_MID_05" type="Marker2D" parent="WorldRoot/MapLayout/Points/ContainerSpawnPoints" unique_id=943925643]
+position = Vector2(2976, 2792)
+script = ExtResource("13_map_point")
+point_id = "Container_MID_05"
+ring = "middle"
+tags = Array[StringName]([&"street_edge"])
+
+[node name="Container_MID_06" type="Marker2D" parent="WorldRoot/MapLayout/Points/ContainerSpawnPoints" unique_id=1086589771]
+position = Vector2(1872, 4704)
+script = ExtResource("13_map_point")
+point_id = "Container_MID_06"
+ring = "middle"
+tags = Array[StringName]([&"street_edge"])
+
+[node name="Container_MID_07" type="Marker2D" parent="WorldRoot/MapLayout/Points/ContainerSpawnPoints" unique_id=997907537]
+position = Vector2(-7424, -3072)
+script = ExtResource("13_map_point")
+point_id = "Container_MID_07"
+ring = "middle"
+map_side = "left"
+tags = Array[StringName]([&"street_edge"])
+
+[node name="Container_OUT_01" type="Marker2D" parent="WorldRoot/MapLayout/Points/ContainerSpawnPoints" unique_id=1431139158]
+position = Vector2(4992, -4536)
+script = ExtResource("13_map_point")
+point_id = "Container_OUT_01"
+ring = "outer"
+map_side = "right"
+tags = Array[StringName]([&"street_edge"])
+
+[node name="Container_OUT_02" type="Marker2D" parent="WorldRoot/MapLayout/Points/ContainerSpawnPoints" unique_id=674436176]
+position = Vector2(4992, -256)
+script = ExtResource("13_map_point")
+point_id = "Container_OUT_02"
+ring = "outer"
+map_side = "right"
+tags = Array[StringName]([&"street_edge"])
+
+[node name="Container_OUT_03" type="Marker2D" parent="WorldRoot/MapLayout/Points/ContainerSpawnPoints" unique_id=730106010]
+position = Vector2(5480, 2816)
+script = ExtResource("13_map_point")
+point_id = "Container_OUT_03"
+ring = "outer"
+map_side = "right"
+tags = Array[StringName]([&"street_edge"])
+
+[node name="Container_OUT_04" type="Marker2D" parent="WorldRoot/MapLayout/Points/ContainerSpawnPoints" unique_id=399736949]
+position = Vector2(7920, -4816)
+script = ExtResource("13_map_point")
+point_id = "Container_OUT_04"
+ring = "outer"
+map_side = "right"
+tags = Array[StringName]([&"street_edge"])
+
+[node name="Container_OUT_05" type="Marker2D" parent="WorldRoot/MapLayout/Points/ContainerSpawnPoints" unique_id=1657650584]
+position = Vector2(8672, 2792)
+script = ExtResource("13_map_point")
+point_id = "Container_OUT_05"
+ring = "outer"
+map_side = "right"
+tags = Array[StringName]([&"street_edge"])
+
+[node name="Container_OUT_06" type="Marker2D" parent="WorldRoot/MapLayout/Points/ContainerSpawnPoints" unique_id=1618630882]
+position = Vector2(-4272, 4000)
+script = ExtResource("13_map_point")
+point_id = "Container_OUT_06"
+ring = "outer"
+tags = Array[StringName]([&"street_edge"])
+
+[node name="Container_FAR_01" type="Marker2D" parent="WorldRoot/MapLayout/Points/ContainerSpawnPoints" unique_id=1679235396]
+position = Vector2(8448, 792)
+script = ExtResource("13_map_point")
+point_id = "Container_FAR_01"
+ring = "far_outer"
+map_side = "left"
+tags = Array[StringName]([&"street_edge"])
+
+[node name="Container_FAR_02" type="Marker2D" parent="WorldRoot/MapLayout/Points/ContainerSpawnPoints" unique_id=956863891]
+position = Vector2(-7768, 4704)
+script = ExtResource("13_map_point")
+point_id = "Container_FAR_02"
+ring = "far_outer"
+map_side = "left"
+tags = Array[StringName]([&"street_edge"])
+
+[node name="Container_FAR_03" type="Marker2D" parent="WorldRoot/MapLayout/Points/ContainerSpawnPoints" unique_id=820682066]
+position = Vector2(-7696, -4392)
+script = ExtResource("13_map_point")
+point_id = "Container_FAR_03"
+ring = "far_outer"
+map_side = "right"
+tags = Array[StringName]([&"street_edge"])
+
+[node name="Container_FAR_04" type="Marker2D" parent="WorldRoot/MapLayout/Points/ContainerSpawnPoints" unique_id=1929563622]
+position = Vector2(6624, 1216)
+script = ExtResource("13_map_point")
+point_id = "Container_FAR_04"
+ring = "far_outer"
+map_side = "right"
+tags = Array[StringName]([&"street_edge"])
+
+[node name="MaterialSpawnPoints" type="Node2D" parent="WorldRoot/MapLayout/Points" unique_id=358665458]
+
+[node name="Material_A_01" type="Marker2D" parent="WorldRoot/MapLayout/Points/MaterialSpawnPoints" unique_id=1629043153]
+position = Vector2(1776, -648)
+script = ExtResource("13_map_point")
+point_type = "material"
+point_id = "Material_A_01"
+ring = "middle"
+tags = Array[StringName]([&"street_edge"])
+
+[node name="Material_A_02" type="Marker2D" parent="WorldRoot/MapLayout/Points/MaterialSpawnPoints" unique_id=1662083387]
+position = Vector2(-3136, -3040)
+script = ExtResource("13_map_point")
+point_type = "material"
+point_id = "Material_A_02"
+ring = "middle"
+tags = Array[StringName]([&"street_edge"])
+
+[node name="Material_A_03" type="Marker2D" parent="WorldRoot/MapLayout/Points/MaterialSpawnPoints" unique_id=831566731]
+position = Vector2(2736, -16)
+script = ExtResource("13_map_point")
+point_type = "material"
+point_id = "Material_A_03"
+ring = "middle"
+tags = Array[StringName]([&"street_edge"])
+
+[node name="Material_A_04" type="Marker2D" parent="WorldRoot/MapLayout/Points/MaterialSpawnPoints" unique_id=1315430512]
+position = Vector2(4480, 4840)
+script = ExtResource("13_map_point")
+point_type = "material"
+point_id = "Material_A_04"
+ring = "middle"
+tags = Array[StringName]([&"street_edge"])
+
+[node name="Material_A_05" type="Marker2D" parent="WorldRoot/MapLayout/Points/MaterialSpawnPoints" unique_id=622246817]
+position = Vector2(-5440, -3136)
+script = ExtResource("13_map_point")
+point_type = "material"
+point_id = "Material_A_05"
+tags = Array[StringName]([&"street_edge"])
+
+[node name="Material_A_06" type="Marker2D" parent="WorldRoot/MapLayout/Points/MaterialSpawnPoints" unique_id=1619430707]
+position = Vector2(-1880, -2168)
+script = ExtResource("13_map_point")
+point_type = "material"
+point_id = "Material_A_06"
+tags = Array[StringName]([&"street_edge"])
+
+[node name="Material_B_01" type="Marker2D" parent="WorldRoot/MapLayout/Points/MaterialSpawnPoints" unique_id=225053024]
+position = Vector2(8544, -1416)
+script = ExtResource("13_map_point")
+point_type = "material"
+point_id = "Material_B_01"
+ring = "outer"
+map_side = "right"
+tags = Array[StringName]([&"street_edge"])
+
+[node name="Material_B_02" type="Marker2D" parent="WorldRoot/MapLayout/Points/MaterialSpawnPoints" unique_id=156153519]
+position = Vector2(7680, -4800)
+script = ExtResource("13_map_point")
+point_type = "material"
+point_id = "Material_B_02"
+ring = "far_outer"
+map_side = "right"
+tags = Array[StringName]([&"street_edge"])
+
+[node name="Material_B_03" type="Marker2D" parent="WorldRoot/MapLayout/Points/MaterialSpawnPoints" unique_id=1170551920]
+position = Vector2(4992, 256)
+script = ExtResource("13_map_point")
+point_type = "material"
+point_id = "Material_B_03"
+ring = "outer"
+map_side = "right"
+tags = Array[StringName]([&"street_edge"])
+
+[node name="Material_B_04" type="Marker2D" parent="WorldRoot/MapLayout/Points/MaterialSpawnPoints" unique_id=1767185774]
+position = Vector2(5024, -2144)
+script = ExtResource("13_map_point")
+point_type = "material"
+point_id = "Material_B_04"
+ring = "outer"
+map_side = "right"
+tags = Array[StringName]([&"street_edge"])
+
+[node name="Material_B_05" type="Marker2D" parent="WorldRoot/MapLayout/Points/MaterialSpawnPoints" unique_id=1990388354]
+position = Vector2(-7152, 1328)
+script = ExtResource("13_map_point")
+point_type = "material"
+point_id = "Material_B_05"
+ring = "far_outer"
+map_side = "right"
+tags = Array[StringName]([&"street_edge"])
+
+[node name="Material_B_06" type="Marker2D" parent="WorldRoot/MapLayout/Points/MaterialSpawnPoints" unique_id=1924894088]
+position = Vector2(48, -4824)
+script = ExtResource("13_map_point")
+point_type = "material"
+point_id = "Material_B_06"
+ring = "far_outer"
+map_side = "right"
+tags = Array[StringName]([&"street_edge"])
+
+[node name="MonsterSpawnPoints" type="Node2D" parent="WorldRoot/MapLayout/Points" unique_id=1120447227]
+
+[node name="monster_spawn_street_001" type="Marker2D" parent="WorldRoot/MapLayout/Points/MonsterSpawnPoints" unique_id=1418136712]
+position = Vector2(-1904, -856)
+script = ExtResource("13_map_point")
+point_type = "monster"
+point_id = "monster_spawn_street_001"
+map_side = "left"
+tags = Array[StringName]([&"street", &"monster_spawn_street"])
+
+[node name="PatrolPath" type="Node2D" parent="WorldRoot/MapLayout/Points/MonsterSpawnPoints/monster_spawn_street_001" unique_id=1218898502]
+
+[node name="Patrol_01" type="Marker2D" parent="WorldRoot/MapLayout/Points/MonsterSpawnPoints/monster_spawn_street_001/PatrolPath" unique_id=460722838]
+position = Vector2(-176, -2664)
+
+[node name="Patrol_02" type="Marker2D" parent="WorldRoot/MapLayout/Points/MonsterSpawnPoints/monster_spawn_street_001/PatrolPath" unique_id=457571857]
+position = Vector2(-48, 536)
+
+[node name="monster_spawn_street_002" type="Marker2D" parent="WorldRoot/MapLayout/Points/MonsterSpawnPoints" unique_id=155029763]
+position = Vector2(-1840, 1864)
+script = ExtResource("13_map_point")
+point_type = "monster"
+point_id = "monster_spawn_street_002"
+map_side = "left"
+tags = Array[StringName]([&"street", &"monster_spawn_street"])
+
+[node name="PatrolPath" type="Node2D" parent="WorldRoot/MapLayout/Points/MonsterSpawnPoints/monster_spawn_street_002" unique_id=1970933719]
+
+[node name="Patrol_01" type="Marker2D" parent="WorldRoot/MapLayout/Points/MonsterSpawnPoints/monster_spawn_street_002/PatrolPath" unique_id=929407627]
+position = Vector2(0, -704)
+
+[node name="Patrol_02" type="Marker2D" parent="WorldRoot/MapLayout/Points/MonsterSpawnPoints/monster_spawn_street_002/PatrolPath" unique_id=1546870144]
+position = Vector2(144, 1968)
+
+[node name="monster_spawn_street_003" type="Marker2D" parent="WorldRoot/MapLayout/Points/MonsterSpawnPoints" unique_id=980535024]
+position = Vector2(-5855, 3064)
+script = ExtResource("13_map_point")
+point_type = "monster"
+point_id = "monster_spawn_street_003"
+tags = Array[StringName]([&"street", &"monster_spawn_street"])
+
+[node name="PatrolPath" type="Node2D" parent="WorldRoot/MapLayout/Points/MonsterSpawnPoints/monster_spawn_street_003" unique_id=1396784291]
+
+[node name="Patrol_01" type="Marker2D" parent="WorldRoot/MapLayout/Points/MonsterSpawnPoints/monster_spawn_street_003/PatrolPath" unique_id=842156007]
+position = Vector2(-1313, -16)
+
+[node name="Patrol_02" type="Marker2D" parent="WorldRoot/MapLayout/Points/MonsterSpawnPoints/monster_spawn_street_003/PatrolPath" unique_id=1405442806]
+position = Vector2(3495, 0)
+
+[node name="monster_spawn_street_004" type="Marker2D" parent="WorldRoot/MapLayout/Points/MonsterSpawnPoints" unique_id=1837901477]
+position = Vector2(-7424, -3072)
+script = ExtResource("13_map_point")
+point_type = "monster"
+point_id = "monster_spawn_street_004"
+ring = "middle"
+map_side = "left"
+tags = Array[StringName]([&"street", &"monster_spawn_street"])
+
+[node name="PatrolPath" type="Node2D" parent="WorldRoot/MapLayout/Points/MonsterSpawnPoints/monster_spawn_street_004" unique_id=1703702275]
+
+[node name="Patrol_01" type="Marker2D" parent="WorldRoot/MapLayout/Points/MonsterSpawnPoints/monster_spawn_street_004/PatrolPath" unique_id=828604765]
+position = Vector2(-384, 0)
+
+[node name="Patrol_02" type="Marker2D" parent="WorldRoot/MapLayout/Points/MonsterSpawnPoints/monster_spawn_street_004/PatrolPath" unique_id=1179064025]
+position = Vector2(4592, -32)
+
+[node name="monster_spawn_street_005" type="Marker2D" parent="WorldRoot/MapLayout/Points/MonsterSpawnPoints" unique_id=1191489779]
+position = Vector2(3512, 8)
+script = ExtResource("13_map_point")
+point_type = "monster"
+point_id = "monster_spawn_street_005"
+ring = "middle"
+tags = Array[StringName]([&"street", &"monster_spawn_street"])
+
+[node name="PatrolPath" type="Node2D" parent="WorldRoot/MapLayout/Points/MonsterSpawnPoints/monster_spawn_street_005" unique_id=994654543]
+
+[node name="Patrol_01" type="Marker2D" parent="WorldRoot/MapLayout/Points/MonsterSpawnPoints/monster_spawn_street_005/PatrolPath" unique_id=132185980]
+position = Vector2(-1736, 32)
+
+[node name="Patrol_02" type="Marker2D" parent="WorldRoot/MapLayout/Points/MonsterSpawnPoints/monster_spawn_street_005/PatrolPath" unique_id=1372609378]
+position = Vector2(1488, 0)
+
+[node name="monster_spawn_street_006" type="Marker2D" parent="WorldRoot/MapLayout/Points/MonsterSpawnPoints" unique_id=1158566698]
+position = Vector2(2976, 2792)
+script = ExtResource("13_map_point")
+point_type = "monster"
+point_id = "monster_spawn_street_006"
+ring = "middle"
+tags = Array[StringName]([&"street", &"monster_spawn_street"])
+
+[node name="PatrolPath" type="Node2D" parent="WorldRoot/MapLayout/Points/MonsterSpawnPoints/monster_spawn_street_006" unique_id=1225968978]
+
+[node name="Patrol_01" type="Marker2D" parent="WorldRoot/MapLayout/Points/MonsterSpawnPoints/monster_spawn_street_006/PatrolPath" unique_id=566761738]
+position = Vector2(-1240, -16)
+
+[node name="Patrol_02" type="Marker2D" parent="WorldRoot/MapLayout/Points/MonsterSpawnPoints/monster_spawn_street_006/PatrolPath" unique_id=1309849162]
+position = Vector2(2032, -24)
+
+[node name="monster_spawn_street_007" type="Marker2D" parent="WorldRoot/MapLayout/Points/MonsterSpawnPoints" unique_id=645023950]
+position = Vector2(1872, 4704)
+script = ExtResource("13_map_point")
+point_type = "monster"
+point_id = "monster_spawn_street_007"
+ring = "middle"
+tags = Array[StringName]([&"street", &"monster_spawn_street"])
+
+[node name="PatrolPath" type="Node2D" parent="WorldRoot/MapLayout/Points/MonsterSpawnPoints/monster_spawn_street_007" unique_id=314349146]
+
+[node name="Patrol_01" type="Marker2D" parent="WorldRoot/MapLayout/Points/MonsterSpawnPoints/monster_spawn_street_007/PatrolPath" unique_id=280297667]
+position = Vector2(-256, 0)
+
+[node name="Patrol_02" type="Marker2D" parent="WorldRoot/MapLayout/Points/MonsterSpawnPoints/monster_spawn_street_007/PatrolPath" unique_id=2138503768]
+position = Vector2(768, 0)
+
+[node name="monster_spawn_street_008" type="Marker2D" parent="WorldRoot/MapLayout/Points/MonsterSpawnPoints" unique_id=360391663]
+position = Vector2(4992, -4536)
+script = ExtResource("13_map_point")
+point_type = "monster"
+point_id = "monster_spawn_street_008"
+ring = "outer"
+map_side = "right"
+tags = Array[StringName]([&"street", &"monster_spawn_street"])
+
+[node name="PatrolPath" type="Node2D" parent="WorldRoot/MapLayout/Points/MonsterSpawnPoints/monster_spawn_street_008" unique_id=573381412]
+
+[node name="Patrol_01" type="Marker2D" parent="WorldRoot/MapLayout/Points/MonsterSpawnPoints/monster_spawn_street_008/PatrolPath" unique_id=588649413]
+position = Vector2(0, -512)
+
+[node name="Patrol_02" type="Marker2D" parent="WorldRoot/MapLayout/Points/MonsterSpawnPoints/monster_spawn_street_008/PatrolPath" unique_id=859981967]
+position = Vector2(0, 6872)
+
+[node name="monster_spawn_street_009" type="Marker2D" parent="WorldRoot/MapLayout/Points/MonsterSpawnPoints" unique_id=1382336026]
+position = Vector2(7896, -1336)
+script = ExtResource("13_map_point")
+point_type = "monster"
+point_id = "monster_spawn_street_009"
+ring = "outer"
+map_side = "right"
+tags = Array[StringName]([&"street", &"monster_spawn_street"])
+
+[node name="PatrolPath" type="Node2D" parent="WorldRoot/MapLayout/Points/MonsterSpawnPoints/monster_spawn_street_009" unique_id=1417094142]
+
+[node name="Patrol_01" type="Marker2D" parent="WorldRoot/MapLayout/Points/MonsterSpawnPoints/monster_spawn_street_009/PatrolPath" unique_id=1638401764]
+position = Vector2(-2912, -40)
+
+[node name="Patrol_02" type="Marker2D" parent="WorldRoot/MapLayout/Points/MonsterSpawnPoints/monster_spawn_street_009/PatrolPath" unique_id=1340384850]
+position = Vector2(704, 0)
+
+[node name="monster_spawn_street_010" type="Marker2D" parent="WorldRoot/MapLayout/Points/MonsterSpawnPoints" unique_id=334021792]
+position = Vector2(8672, 2792)
+script = ExtResource("13_map_point")
+point_type = "monster"
+point_id = "monster_spawn_street_010"
+ring = "outer"
+map_side = "right"
+tags = Array[StringName]([&"street", &"monster_spawn_street"])
+
+[node name="PatrolPath" type="Node2D" parent="WorldRoot/MapLayout/Points/MonsterSpawnPoints/monster_spawn_street_010" unique_id=1694641790]
+
+[node name="Patrol_01" type="Marker2D" parent="WorldRoot/MapLayout/Points/MonsterSpawnPoints/monster_spawn_street_010/PatrolPath" unique_id=1141473929]
+position = Vector2(-4168, 40)
+
+[node name="Block_Ref_23_61x32_Building_MediumShop_02" type="Node2D" parent="WorldRoot/MapLayout/Points/MonsterSpawnPoints/monster_spawn_street_010/PatrolPath/Patrol_01" unique_id=1684282736]
+position = Vector2(4352, 1072)
+scale = Vector2(2.0163999, 1.731856)
+metadata/building_id = "building_medium_shop_01"
+metadata/building_type = "shop"
+metadata/host_block_id = "Block_Ref_23_61x32"
+metadata/is_enterable = false
+metadata/has_collision = false
+metadata/blocks_signal_visibility = false
+metadata/occludes_player = true
+metadata/placement_group = "Block_Ref_23_61x32_Buildings"
+
+[node name="ArtSprite" type="Sprite2D" parent="WorldRoot/MapLayout/Points/MonsterSpawnPoints/monster_spawn_street_010/PatrolPath/Patrol_01/Block_Ref_23_61x32_Building_MediumShop_02" unique_id=1717005492]
+position = Vector2(3.9674492, -138.57973)
+scale = Vector2(0.7878276, 0.8291679)
+texture = ExtResource("8_k3vyy")
+
+[node name="Patrol_02" type="Marker2D" parent="WorldRoot/MapLayout/Points/MonsterSpawnPoints/monster_spawn_street_010/PatrolPath" unique_id=1951422899]
+position = Vector2(256, 0)
+
+[node name="MapVisual" type="Node2D" parent="WorldRoot" unique_id=474766645]
+
+[node name="TerrainGroundBase" type="Node2D" parent="WorldRoot/MapVisual" unique_id=1451601040]
+
+[node name="RoadVisual" type="Node2D" parent="WorldRoot/MapVisual" unique_id=1110864055]
+script = ExtResource("14_road_visual_generator")
+
+[node name="ManualRoadPieces" type="Node2D" parent="WorldRoot/MapVisual/RoadVisual" unique_id=1218365624]
+
+[node name="BlockVisual" type="Node2D" parent="WorldRoot/MapVisual" unique_id=177636704]
+
+[node name="BuildingVisual" type="Node2D" parent="WorldRoot/MapVisual" unique_id=2110107962]
+
+[node name="PropVisual" type="Node2D" parent="WorldRoot/MapVisual" unique_id=448196426]
+
+[node name="DecalVisual" type="Node2D" parent="WorldRoot/MapVisual" unique_id=1502109803]
+
+[node name="MapLights" type="Node2D" parent="WorldRoot" unique_id=271892773]
+
+[node name="StreetLights" type="Node2D" parent="WorldRoot/MapLights" unique_id=309976307]
+
+[node name="BuildingLights" type="Node2D" parent="WorldRoot/MapLights" unique_id=1177958892]
+
+[node name="AmbientLights" type="Node2D" parent="WorldRoot/MapLights" unique_id=436957399]
+
+[node name="ContainerRoot" type="Node2D" parent="WorldRoot" unique_id=505334510]
+
+[node name="OutpostRoot" type="Node2D" parent="WorldRoot" unique_id=1984135266]
+
+[node name="OutpostCandidates" type="Node2D" parent="WorldRoot/OutpostRoot" unique_id=1156794764]
+
+[node name="First" type="Node2D" parent="WorldRoot/OutpostRoot/OutpostCandidates" unique_id=1260202229]
+
+[node name="OutpostA_01" type="Marker2D" parent="WorldRoot/OutpostRoot/OutpostCandidates/First" unique_id=819252724]
+position = Vector2(3224, -3296)
+scale = Vector2(3.4164484, 1.6473631)
+script = ExtResource("4_outpost_candidate")
+candidate_id = "OutpostA_01"
+
+[node name="OutpostA_02" type="Marker2D" parent="WorldRoot/OutpostRoot/OutpostCandidates/First" unique_id=937594871]
+position = Vector2(-5776.0005, -161.00002)
+scale = Vector2(3.4164484, 1.6473631)
+script = ExtResource("4_outpost_candidate")
+candidate_id = "OutpostA_02"
+
+[node name="OutpostA_03" type="Marker2D" parent="WorldRoot/OutpostRoot/OutpostCandidates/First" unique_id=620724659]
+position = Vector2(3336, 2077)
+scale = Vector2(3.4164484, 1.6473631)
+script = ExtResource("4_outpost_candidate")
+candidate_id = "OutpostA_03"
+
+[node name="Second" type="Node2D" parent="WorldRoot/OutpostRoot/OutpostCandidates" unique_id=125344101]
+
+[node name="OutpostB_01" type="Marker2D" parent="WorldRoot/OutpostRoot/OutpostCandidates/Second" unique_id=1428607807]
+position = Vector2(7088, -2080)
+scale = Vector2(3.4164484, 1.6473631)
+script = ExtResource("4_outpost_candidate")
+outpost_tier = "second"
+candidate_id = "OutpostB_01"
+
+[node name="OutpostB_02" type="Marker2D" parent="WorldRoot/OutpostRoot/OutpostCandidates/Second" unique_id=286657084]
+position = Vector2(7952, 2168.0002)
+scale = Vector2(3.1010184, 1.5638655)
+script = ExtResource("4_outpost_candidate")
+outpost_tier = "second"
+candidate_id = "OutpostB_02"
+
+[node name="OutpostB_03" type="Marker2D" parent="WorldRoot/OutpostRoot/OutpostCandidates/Second" unique_id=1501159160]
+position = Vector2(-5776, 4416)
+scale = Vector2(3.4164484, 1.6473631)
+script = ExtResource("4_outpost_candidate")
+outpost_tier = "second"
+candidate_id = "OutpostB_03"
+
+[node name="OutpostB_04" type="Marker2D" parent="WorldRoot/OutpostRoot/OutpostCandidates/Second" unique_id=550445006]
+position = Vector2(-6256, -3736.0002)
+scale = Vector2(3.4164484, 1.6473631)
+script = ExtResource("4_outpost_candidate")
+outpost_tier = "second"
+candidate_id = "OutpostB_04"
+
+[node name="ExtractionRoot" type="Node2D" parent="WorldRoot" unique_id=1988031226]
+
+[node name="EffectRoot" type="Node2D" parent="WorldRoot" unique_id=366365985]
+
+[node name="CameraRoot" type="Node2D" parent="." unique_id=447163172]
+
+[node name="RunCameraController" type="Node" parent="CameraRoot" unique_id=799699287]
+script = ExtResource("8_camera")
+
+[node name="RunUIRoot" type="CanvasLayer" parent="." unique_id=371911869]
+
+[node name="VisionController" type="Node" parent="RunUIRoot" unique_id=373244988]
+script = ExtResource("7_vision")
+
+[node name="StabilityComponent" type="Node" parent="." unique_id=1080227173]
+script = ExtResource("6_stability")
+
+[node name="WeightComponent" type="Node" parent="." unique_id=603999899]
+script = ExtResource("10_weight")
+
+[node name="InventoryComponent" type="Node" parent="." unique_id=838575908]
+script = ExtResource("9_inventory")
+weight_component_path = NodePath("../WeightComponent")
+
+[node name="HomeStorageComponent" type="Node" parent="." unique_id=1481011442]
+script = ExtResource("11_home_storage")
+
+[node name="RunDirector" type="Node" parent="." unique_id=1734912767]
+script = ExtResource("1_run_director")
+stability_component_path = NodePath("../StabilityComponent")
+vision_controller_path = NodePath("../RunUIRoot/VisionController")
+camera_controller_path = NodePath("../CameraRoot/RunCameraController")
+inventory_component_path = NodePath("../InventoryComponent")
+weight_component_path = NodePath("../WeightComponent")
+home_storage_component_path = NodePath("../HomeStorageComponent")
+
+[node name="RunStateMachine" type="Node" parent="RunDirector" unique_id=1282437613]
+script = ExtResource("2_state_machine")

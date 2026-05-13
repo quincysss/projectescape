@@ -30,6 +30,7 @@ const PLAYER_FOLLOW_ZOOM := Vector2(0.28, 0.28)
 const HOME_OVERVIEW_MAX_ZOOM := 0.11
 const HOME_OVERVIEW_MIN_ZOOM := 0.025
 const HOME_OVERVIEW_PADDING_UNITS := Vector2(0.0, 0.0)
+const HOME_OVERVIEW_READABLE_UI_SCALE_MULTIPLIER := 1.0
 const HOME_OVERVIEW_READABLE_UI_MAX_SCALE := 3.0
 const CAMERA_TRANSITION_SECONDS := 0.5
 const CONTAINER_OPEN_HOLD_SECONDS := 0.8
@@ -107,11 +108,13 @@ var objective_extraction_label: Label
 var backpack_hud_root: Panel
 var backpack_icon_placeholder: Panel
 var backpack_slot_label: Label
+var backpack_material_slot_label: Label
 var weight_bar: ProgressBar
 var weight_value_label: Label
 var prompt_label: Label
 var inventory_panel: Panel
 var inventory_label: Control
+var material_inventory_label: Control
 var inventory_selection_label: Label
 var loot_panel: Panel
 var loot_label: Control
@@ -205,7 +208,8 @@ func _create_runtime_controllers() -> void:
 		Callable(self, "_make_interactable"),
 		Callable(self, "_item"),
 		Callable(self, "_remove_interactable"),
-		UNIT
+		UNIT,
+		run_director.data_registry
 	)
 	monster_spawn_controller = MonsterSpawnControllerScript.new()
 
@@ -494,7 +498,7 @@ func _spawn_selected_outposts() -> void:
 	var first_id: String = context.selected_first_outpost_id
 	var second_id: String = context.selected_second_outpost_id
 	if outpost_material_spawn_controller:
-		outpost_requirements = outpost_material_spawn_controller.build_requirements(first_id, second_id)
+		outpost_requirements = outpost_material_spawn_controller.build_requirements(first_id, second_id, int(context.seed))
 	for outpost_id in [first_id, second_id]:
 		var pos: Vector2 = context.selected_outpost_positions.get(outpost_id, Vector2.ZERO)
 		var footprint_units := _get_outpost_footprint_units(outpost_id)
@@ -538,7 +542,7 @@ func _get_material_spawn_points() -> Array:
 func _get_monster_spawn_points() -> Array:
 	return _get_layout_points("MonsterSpawnPoints")
 
-func _make_interactable(id: String, type: String, label_text: String, pos: Vector2, color: Color, size_units: Vector2 = Vector2.ZERO):
+func _make_interactable(id: String, type: String, label_text: String, pos: Vector2, color: Color, size_units: Vector2 = Vector2.ZERO, visual_data: Dictionary = {}):
 	var area := Area2D.new()
 	area.name = id
 	area.script = InteractableScript
@@ -551,7 +555,7 @@ func _make_interactable(id: String, type: String, label_text: String, pos: Vecto
 	circle.radius = ((maxf(size_units.x, size_units.y) * 0.6) if (type == "outpost" or type == "container") and size_units != Vector2.ZERO else (6.0 if type == "outpost" else 2.0)) * UNIT
 	shape.shape = circle
 	area.add_child(shape)
-	var visual_size: Vector2 = interactable_visual_builder.add_interactable_visual(area, type, label_text, color, size_units)
+	var visual_size: Vector2 = interactable_visual_builder.add_interactable_visual(area, type, label_text, color, size_units, visual_data)
 	if type != "container" and type != "material":
 		var label: Label = interactable_visual_builder.make_world_label(label_text, Vector2(-visual_size.x * 0.5, -visual_size.y * 0.5 - 42), area)
 		label.z_index = 20
@@ -1452,7 +1456,7 @@ func _update_readable_world_ui_scale() -> void:
 	var scale_value := 1.0
 	if run_director.context != null and run_director.context.active_safe_zone_id == "home":
 		var zoom_value := maxf(0.001, (absf(camera.zoom.x) + absf(camera.zoom.y)) * 0.5)
-		scale_value = clampf(1.0 / zoom_value, 1.0, HOME_OVERVIEW_READABLE_UI_MAX_SCALE)
+		scale_value = clampf((1.0 / zoom_value) * HOME_OVERVIEW_READABLE_UI_SCALE_MULTIPLIER, 1.0, HOME_OVERVIEW_READABLE_UI_MAX_SCALE)
 	for root in [container_root, outpost_root, player_root]:
 		interactable_visual_builder.apply_readable_overlay_scale(root, scale_value)
 

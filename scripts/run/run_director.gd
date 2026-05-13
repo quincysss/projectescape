@@ -568,6 +568,8 @@ func _on_camera_controller_transition_finished(_mode: int) -> void:
 func _on_inventory_changed(items: Array) -> void:
 	if context:
 		context.player_inventory = _snapshot_to_context(items)
+		if inventory_component and inventory_component.has_method("get_repair_material_items_snapshot"):
+			context.material_inventory = _snapshot_to_context(inventory_component.get_repair_material_items_snapshot())
 		context.current_weight = inventory_component.get_current_weight() if inventory_component else context.current_weight
 	inventory_changed.emit(items)
 	_sync_inventory_context()
@@ -601,6 +603,8 @@ func _sync_inventory_context() -> void:
 		return
 	if inventory_component:
 		context.player_inventory = _snapshot_to_context(inventory_component.get_items_snapshot())
+		if inventory_component.has_method("get_repair_material_items_snapshot"):
+			context.material_inventory = _snapshot_to_context(inventory_component.get_repair_material_items_snapshot())
 		context.current_weight = inventory_component.get_current_weight()
 	if weight_component:
 		context.weight_limit = weight_component.max_weight

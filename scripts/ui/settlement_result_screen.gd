@@ -133,7 +133,7 @@ func _group_items(items: Array) -> Array[Dictionary]:
 		var item: Dictionary = raw_item
 		var item_id := String(item.get("item_id", ""))
 		var display_name := String(item.get("display_name", item_id))
-		var quality := String(item.get("quality", "C"))
+		var quality := "" if _is_repair_material_item(item) else String(item.get("quality", "C"))
 		var source := _source_text(item)
 		var status := _status_text(item)
 		var icon := _icon_path(item)
@@ -204,11 +204,14 @@ func _make_item_row(item: Dictionary) -> Control:
 	text_box.add_child(name_label)
 
 	var meta_label := Label.new()
-	meta_label.text = "品质 %s  |  来源：%s  |  %s" % [
-		String(item.get("quality", "C")),
-		_source_text(item),
-		_status_text(item),
-	]
+	if _is_repair_material_item(item):
+		meta_label.text = "来源：%s  |  %s" % [_source_text(item), _status_text(item)]
+	else:
+		meta_label.text = "品质 %s  |  来源：%s  |  %s" % [
+			String(item.get("quality", "C")),
+			_source_text(item),
+			_status_text(item),
+		]
 	meta_label.clip_text = true
 	meta_label.add_theme_font_size_override("font_size", 13)
 	meta_label.add_theme_color_override("font_color", Color("#AFA99D"))
@@ -230,7 +233,7 @@ func _make_quality_fallback(item: Dictionary) -> Control:
 	panel.add_theme_stylebox_override("panel", _panel_style(Color("#101416"), _quality_color(item), 1))
 
 	var label := Label.new()
-	label.text = String(item.get("quality", "C"))
+	label.text = "材" if _is_repair_material_item(item) else String(item.get("quality", "C"))
 	label.anchor_right = 1.0
 	label.anchor_bottom = 1.0
 	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -255,6 +258,8 @@ func _icon_path(item: Dictionary) -> String:
 	if _registry == null:
 		return ""
 	var definition: Dictionary = _registry.get_item(String(item.get("item_id", "")))
+	if definition.is_empty() and _is_repair_material_item(item):
+		definition = _registry.get_repair_material(String(item.get("repair_material_id", item.get("item_id", ""))))
 	return String(definition.get("icon", ""))
 
 func _ensure_registry() -> void:
@@ -299,6 +304,8 @@ func _quality_rank(quality: String) -> int:
 			return 0
 
 func _quality_color(item: Dictionary) -> Color:
+	if _is_repair_material_item(item) and not item.has("quality_color"):
+		return Color("#20B86B")
 	var value = item.get("quality_color", null)
 	if value is Color:
 		return value
@@ -313,6 +320,9 @@ func _quality_color(item: Dictionary) -> Color:
 			return Color("#4DB4FF")
 		_:
 			return Color("#B8C1C4")
+
+func _is_repair_material_item(item: Dictionary) -> bool:
+	return not String(item.get("repair_material_id", "")).is_empty()
 
 func _panel_style(bg_color: Color, border_color: Color, border_width: int) -> StyleBoxFlat:
 	var style := StyleBoxFlat.new()

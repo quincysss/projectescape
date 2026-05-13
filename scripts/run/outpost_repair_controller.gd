@@ -40,7 +40,7 @@ func repair(station) -> Dictionary:
 	var submitted: Dictionary = {}
 	for item_id in submittable.keys():
 		var requested := int(submittable[item_id])
-		var removed: int = run_director.inventory_component.remove_item(StringName(item_id), requested)
+		var removed: int = _remove_repair_material(String(item_id), requested)
 		if removed <= 0:
 			continue
 		delivered[item_id] = int(delivered.get(item_id, 0)) + removed
@@ -109,8 +109,8 @@ func inventory_count(item_id: String) -> int:
 	if run_director == null or run_director.inventory_component == null:
 		return 0
 	var count := 0
-	for stack in run_director.inventory_component.items:
-		if str(stack.item_id) == item_id:
+	for stack in _repair_material_items():
+		if _repair_material_id(stack) == item_id:
 			count += int(stack.amount)
 	return count
 
@@ -176,6 +176,42 @@ func _requirements_fulfilled(requirements: Dictionary, delivered: Dictionary) ->
 		if int(delivered.get(item_key, 0)) < int(requirements[item_id].get("amount", 0)):
 			return false
 	return true
+
+func _remove_repair_material(item_id: String, amount: int) -> int:
+	if run_director == null or run_director.inventory_component == null:
+		return 0
+	if run_director.inventory_component.has_method("remove_repair_material"):
+		return int(run_director.inventory_component.remove_repair_material(StringName(item_id), amount))
+	var remaining := amount
+	var removed := 0
+	for index in range(run_director.inventory_component.items.size() - 1, -1, -1):
+		if remaining <= 0:
+			break
+		var stack: Dictionary = run_director.inventory_component.items[index]
+		if _repair_material_id(stack) != item_id:
+			continue
+		if not _is_repair_material_stack(stack):
+			continue
+		var removed_stack: Dictionary = run_director.inventory_component.remove_item_at(index, remaining)
+		var moved := int(removed_stack.get("amount", 0))
+		remaining -= moved
+		removed += moved
+	return removed
+
+func _repair_material_items() -> Array:
+	if run_director == null or run_director.inventory_component == null:
+		return []
+	if run_director.inventory_component.has_method("get_repair_material_items_snapshot"):
+		return run_director.inventory_component.get_repair_material_items_snapshot()
+	if run_director.inventory_component.has_method("get_material_items_snapshot"):
+		return run_director.inventory_component.get_material_items_snapshot()
+	return run_director.inventory_component.items
+
+func _is_repair_material_stack(stack: Dictionary) -> bool:
+	return not _repair_material_id(stack).is_empty()
+
+func _repair_material_id(stack: Dictionary) -> String:
+	return String(stack.get("repair_material_id", ""))
 
 func _refresh_pending_state(station) -> void:
 	var progress := repair_progress(station)
