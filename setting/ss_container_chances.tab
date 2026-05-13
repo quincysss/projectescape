@@ -1,8 +1,8 @@
-type_id	roll_chance	pity_eligible	enabled	enabled_version	description
-cardboard_box	0.001	false	true	v0.3	小纸箱极低概率产出 SS。
-wooden_crate	0.01	false	true	v0.3	木箱低概率产出 SS。
-tool_cabinet	0.01	false	true	v0.3	工具柜低概率产出 SS。
-medical_cabinet	0.01	false	true	v0.3	医疗柜低概率产出 SS。
-small_safe	0.05	true	true	v0.3	小保险箱较低概率产出 SS，参与简单保底。
-large_safe	0.10	true	true	v0.3	大保险柜较高概率产出 SS，参与简单保底。
-anomaly_case	0.10	true	true	v0.3	异常箱较高概率产出 SS，参与简单保底。
+﻿type_id	roll_chance	pity_eligible	enabled	enabled_version	description
+cardboard_box	0.05	false	true	v0.3	小纸箱极低概率产出 SS。
+wooden_crate	0.1	false	true	v0.3	木箱低概率产出 SS。
+tool_cabinet	0.15	false	true	v0.3	工具柜低概率产出 SS。
+medical_cabinet	0.15	false	true	v0.3	医疗柜低概率产出 SS。
+small_safe	0.15	true	true	v0.3	小保险箱较低概率产出 SS，参与简单保底。
+large_safe	0.2	true	true	v0.3	大保险柜较高概率产出 SS，参与简单保底。
+anomaly_case	0.2	true	true	v0.3	异常箱较高概率产出 SS，参与简单保底。
