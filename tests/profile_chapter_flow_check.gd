@@ -155,8 +155,13 @@ func _verify() -> bool:
 		base.queue_free()
 		_restore_profile(game_state, original_profile)
 		return false
-	if crafting_unlock.text != "购买制造机" or not crafting_status.text.contains("攒够 5000 矿币") or not crafting_status.text.contains("妹妹还有救"):
-		printerr("Expected manufacturing objective copy to explain the old machine, 5000 mine_coin, and sister stakes.")
+	if (
+		crafting_unlock.text != "解锁制造所"
+		or not crafting_status.text.contains("救出妹妹")
+		or not crafting_status.text.contains("积攒 5000 矿币")
+		or not crafting_status.text.contains("解锁制造所")
+	):
+		printerr("Expected manufacturing objective copy to follow the chapter 1 rescue objective.")
 		base.queue_free()
 		_restore_profile(game_state, original_profile)
 		return false

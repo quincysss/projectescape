@@ -4,14 +4,16 @@ const GameDataRegistryScript := preload("res://scripts/data/game_data_registry.g
 const DialogueServiceScript := preload("res://scripts/dialogue/dialogue_service.gd")
 const DialoguePanelScene := preload("res://scenes/ui/DialoguePanel.tscn")
 const RunLoadingScreenScene := preload("res://scenes/ui/RunLoadingScreen.tscn")
+const FullscreenBackgroundBuilderScript := preload("res://scripts/ui/fullscreen_background_builder.gd")
 
 const TAB_WAREHOUSE := "warehouse"
 const TAB_MERCHANT := "merchant"
 const TAB_RESEARCH := "research"
 const TAB_CRAFTING := "crafting"
-const WORLD_INTRO_DIALOGUE_PATH := "res://data/dialogue/world_intro_dialogue.json"
-const FIRST_DEPARTURE_DIALOGUE_PATH := "res://data/dialogue/first_departure_outpost_dialogue.json"
-const FIRST_RETURN_DIALOGUE_PATH := "res://data/dialogue/first_return_chapter_1_dialogue.json"
+const BASE_BACKGROUND_PATH := "res://assets/originalphoto/basementphoto.png"
+const WORLD_INTRO_DIALOGUE_PATH := "res://setting/dialogues.tab#world_intro_dialogue"
+const FIRST_DEPARTURE_DIALOGUE_PATH := "res://setting/dialogues.tab#first_departure_outpost_dialogue"
+const FIRST_RETURN_DIALOGUE_PATH := "res://setting/dialogues.tab#first_return_chapter_1"
 const MANUFACTURING_UNLOCK_COST := 5000
 const BASE_GRID_COLUMNS := 5
 const BASE_GRID_SLOT_SIZE := 62.0
@@ -96,12 +98,16 @@ var debug_force_chapter_complete_button: Button
 var debug_force_monster_button: Button
 var debug_slow_loading_button: Button
 var debug_fail_loading_button: Button
+var esc_settings_button: Button
+var _esc_settings_popup: Control
 var _debug_slow_next_loading := false
 var _debug_fail_next_loading := false
 
 func _ready() -> void:
 	_game_state = get_node_or_null("/root/GameState")
+	set_process_input(true)
 	_play_base_safe_house_bgm()
+	_build_background()
 	start_button.pressed.connect(_on_start_pressed)
 	warehouse_tab_button.pressed.connect(_on_warehouse_tab_pressed)
 	merchant_tab_button.pressed.connect(_on_merchant_tab_pressed)
@@ -126,8 +132,30 @@ func _ready() -> void:
 	debug_reset_research_button.pressed.connect(_on_debug_reset_research_pressed)
 	_build_visual_surfaces()
 	_build_debug_story_tools()
+	_build_esc_settings_button()
 	_refresh()
 	call_deferred("_maybe_show_base_story_dialogue")
+
+func _input(event: InputEvent) -> void:
+	if not _is_escape_pressed(event):
+		return
+	if _close_esc_settings_popup():
+		get_viewport().set_input_as_handled()
+		return
+	if _can_open_esc_settings_popup():
+		_show_esc_settings_popup()
+		get_viewport().set_input_as_handled()
+
+func _build_background() -> void:
+	if get_node_or_null("BaseBackground") != null:
+		return
+	FullscreenBackgroundBuilderScript.add_image_background(
+		self,
+		BASE_BACKGROUND_PATH,
+		"BaseBackground",
+		Color("#1A1917"),
+		Color(0.0, 0.0, 0.0, 0.34)
+	)
 
 func _on_start_pressed() -> void:
 	_request_start_run()
@@ -250,7 +278,7 @@ func _play_base_safe_house_bgm() -> void:
 		audio_manager.play_base_safe_house_bgm()
 
 func _show_chapter_goal_popup() -> void:
-	var popup := _make_overlay_popup("第一章目标", "买下旧制造机\n\n出售从地面带回的可用物资，攒够 5000 矿币。\n只要制造所恢复运转，哨所就能自制补给和修复零件；也许，妹妹还有救。")
+	var popup := _make_overlay_popup("第一章目标", "解锁制造所\n\n出售可售物资，积攒 5000 矿币。\n制造所解锁后，才有机会推进救出妹妹的计划。")
 	var panel := popup.get_node("PopupPanel") as Panel
 	var ok_button := _make_popup_button("知道了", Vector2(176, 258), func(): popup.queue_free())
 	var merchant_button := _make_popup_button("前往商人", Vector2(332, 258), func():
@@ -262,28 +290,34 @@ func _show_chapter_goal_popup() -> void:
 	add_child(popup)
 
 func _show_chapter_complete_popup(surface_day: int) -> void:
-	var text := "你用了 %d 天，为 404 哨所重新点亮了制造所。\n\n从今天开始，带回来的材料不再只是等待被卖掉的废品。\n它们可以被加工，可以被修复，也可以变成下一次回到地面的希望。" % surface_day
+	var text := "你用了 %d 天，成功购买了旧时代制造机。\n也许，救出妹妹的路终于有了第一盏灯。\n\n第一章节结束，后续章节开发中" % surface_day
 	var popup := _make_overlay_popup("第一章结束", text, Vector2(680, 380))
 	var panel := popup.get_node("PopupPanel") as Panel
-	var enter_button := _make_popup_button("进入制造所", Vector2(200, 300), func():
-		popup.queue_free()
-		_show_tab(TAB_CRAFTING)
+	var continue_button := _make_popup_button("继续游戏", Vector2(200, 300), func(): popup.queue_free())
+	var reset_button := _make_popup_button("重新开始", Vector2(356, 300), func():
+		_reset_progress_and_show_notice(popup)
 	)
-	var continue_button := _make_popup_button("继续整理", Vector2(356, 300), func(): popup.queue_free())
-	panel.add_child(enter_button)
 	panel.add_child(continue_button)
+	panel.add_child(reset_button)
 	add_child(popup)
 
-func _make_overlay_popup(title: String, body: String, panel_size: Vector2 = Vector2(640, 340)) -> Control:
+func _make_overlay_popup(title: String, body: String, panel_size: Vector2 = Vector2(640, 340), close_on_blank: bool = false) -> Control:
 	var overlay := Control.new()
 	overlay.name = "StoryPopupOverlay"
 	overlay.anchor_right = 1.0
 	overlay.anchor_bottom = 1.0
 	overlay.mouse_filter = Control.MOUSE_FILTER_STOP
 	var dim := ColorRect.new()
+	dim.name = "DimLayer"
 	dim.color = Color(0, 0, 0, 0.62)
 	dim.anchor_right = 1.0
 	dim.anchor_bottom = 1.0
+	dim.mouse_filter = Control.MOUSE_FILTER_STOP
+	if close_on_blank:
+		dim.gui_input.connect(func(event: InputEvent):
+			if _is_left_mouse_pressed(event) and is_instance_valid(overlay):
+				overlay.queue_free()
+		)
 	overlay.add_child(dim)
 	var panel := Panel.new()
 	panel.name = "PopupPanel"
@@ -315,6 +349,98 @@ func _make_popup_button(text: String, pos: Vector2, callback: Callable) -> Butto
 	button.pressed.connect(callback)
 	_style_button(button, true)
 	return button
+
+func _build_esc_settings_button() -> void:
+	if esc_settings_button != null or not has_node("BaseUIRoot"):
+		return
+	var ui_root := get_node("BaseUIRoot") as Control
+	esc_settings_button = Button.new()
+	esc_settings_button.name = "EscSettingsButton"
+	esc_settings_button.text = "ESC 设置"
+	esc_settings_button.anchor_left = 1.0
+	esc_settings_button.anchor_right = 1.0
+	esc_settings_button.anchor_top = 1.0
+	esc_settings_button.anchor_bottom = 1.0
+	esc_settings_button.offset_left = -156.0
+	esc_settings_button.offset_right = -24.0
+	esc_settings_button.offset_top = -58.0
+	esc_settings_button.offset_bottom = -20.0
+	esc_settings_button.pressed.connect(_show_esc_settings_popup)
+	_style_button(esc_settings_button, false)
+	ui_root.add_child(esc_settings_button)
+
+func _show_esc_settings_popup() -> void:
+	if is_instance_valid(_esc_settings_popup) or _is_dialogue_playing():
+		return
+	var popup := _make_overlay_popup("设置", "", Vector2(420, 260), true)
+	popup.name = "EscSettingsPopupOverlay"
+	_esc_settings_popup = popup
+	popup.tree_exiting.connect(func():
+		if _esc_settings_popup == popup:
+			_esc_settings_popup = null
+	)
+	var panel := popup.get_node("PopupPanel") as Panel
+	var settings_button := _make_popup_button("设置", Vector2(70, 172), func():
+		popup.queue_free()
+		_show_notice_popup("设置", "设置页将在后续版本开放。")
+	)
+	var reset_button := _make_popup_button("重置进度", Vector2(220, 172), func():
+		_reset_progress_and_show_notice(popup)
+	)
+	panel.add_child(settings_button)
+	panel.add_child(reset_button)
+	add_child(popup)
+
+func _close_esc_settings_popup() -> bool:
+	if not is_instance_valid(_esc_settings_popup):
+		return false
+	_esc_settings_popup.queue_free()
+	_esc_settings_popup = null
+	return true
+
+func _can_open_esc_settings_popup() -> bool:
+	if _is_dialogue_playing():
+		return false
+	if (
+		get_node_or_null("StoryPopupOverlay") != null
+		or get_node_or_null("EscSettingsPopupOverlay") != null
+		or get_node_or_null("BaseNoticePopupOverlay") != null
+	):
+		return false
+	return true
+
+func _show_notice_popup(title: String, body: String) -> void:
+	var popup := _make_overlay_popup(title, body, Vector2(520, 240), true)
+	popup.name = "BaseNoticePopupOverlay"
+	var panel := popup.get_node("PopupPanel") as Panel
+	var ok_button := _make_popup_button("知道了", Vector2(194, 174), func(): popup.queue_free())
+	panel.add_child(ok_button)
+	add_child(popup)
+
+func _reset_progress_and_show_notice(popup_to_close: Control = null) -> void:
+	if is_instance_valid(popup_to_close):
+		popup_to_close.queue_free()
+	var result := _reset_local_progress()
+	if bool(result.get("ok", false)):
+		_refresh()
+		_show_notice_popup("重置进度", "进度已重置。请重新登陆或刷新界面后查看重置后的进度。")
+	else:
+		_show_notice_popup("重置进度", "重置进度失败：%s" % String(result.get("reason", result.get("error", "unknown"))))
+
+func _reset_local_progress() -> Dictionary:
+	if _game_state == null:
+		return {"ok": false, "reason": "GameState 不可用"}
+	if _game_state.has_method("reset_local_data_debug_only"):
+		return _game_state.reset_local_data_debug_only()
+	if _game_state.has_method("delete_profile_debug_only"):
+		return _game_state.delete_profile_debug_only()
+	return {"ok": false, "reason": "GameState 不支持重置本地数据"}
+
+func _is_escape_pressed(event: InputEvent) -> bool:
+	return event is InputEventKey and event.pressed and not event.echo and event.keycode == KEY_ESCAPE
+
+func _is_left_mouse_pressed(event: InputEvent) -> bool:
+	return event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT
 
 func _show_tab(tab_id: String) -> void:
 	if tab_id == TAB_CRAFTING and not _is_crafting_tab_available():
@@ -401,9 +527,17 @@ func _build_visual_surfaces() -> void:
 	research_list.visible = false
 	research_list.mouse_filter = Control.MOUSE_FILTER_IGNORE
 
-	chapter_goal_label = _make_section_label("", Vector2(700, 86), Vector2(280, 58), 15)
+	chapter_goal_label = _make_section_label("", Vector2.ZERO, Vector2(236, 82), 15)
+	chapter_goal_label.name = "ChapterGoalLabel"
+	chapter_goal_label.anchor_left = 1.0
+	chapter_goal_label.anchor_right = 1.0
+	chapter_goal_label.offset_left = -260.0
+	chapter_goal_label.offset_right = -24.0
+	chapter_goal_label.offset_top = 92.0
+	chapter_goal_label.offset_bottom = 174.0
 	chapter_goal_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	chapter_goal_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	chapter_goal_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	ui_root.add_child(chapter_goal_label)
 
 	warehouse_panel = _make_base_panel("WarehouseGridPanel", Vector2(24, 154), Vector2(980, 500), "局外仓库")
@@ -518,7 +652,7 @@ func _build_crafting_surface() -> void:
 	crafting_panel.add_child(crafting_status_label)
 	crafting_unlock_button = Button.new()
 	crafting_unlock_button.name = "CraftingUnlockButton"
-	crafting_unlock_button.text = "购买制造机"
+	crafting_unlock_button.text = "解锁制造所"
 	crafting_unlock_button.position = Vector2(36, 286)
 	crafting_unlock_button.size = Vector2(160, 42)
 	crafting_unlock_button.pressed.connect(_on_crafting_unlock_pressed)
@@ -532,8 +666,8 @@ func _build_crafting_surface() -> void:
 
 	manufacturing_confirm_dialog = ConfirmationDialog.new()
 	manufacturing_confirm_dialog.name = "ManufacturingConfirmDialog"
-	manufacturing_confirm_dialog.title = "确认购买制造机"
-	manufacturing_confirm_dialog.ok_button_text = "确认购买"
+	manufacturing_confirm_dialog.title = "确认解锁制造所"
+	manufacturing_confirm_dialog.ok_button_text = "确认解锁"
 	manufacturing_confirm_dialog.cancel_button_text = "取消"
 	manufacturing_confirm_dialog.confirmed.connect(_on_manufacturing_unlock_confirmed)
 	ui_root.add_child(manufacturing_confirm_dialog)
@@ -541,7 +675,8 @@ func _build_crafting_surface() -> void:
 func _build_debug_story_tools() -> void:
 	if debug_panel == null:
 		return
-	debug_panel.offset_bottom = 766.0
+	debug_panel.offset_top = 190.0
+	debug_panel.offset_bottom = 876.0
 	debug_reset_profile_button = _make_debug_button("重置本地数据", 356.0, _on_debug_reset_profile_pressed)
 	debug_reset_story_button = _make_debug_button("重置剧情与章节", 398.0, _on_debug_reset_story_pressed)
 	debug_add_chapter_currency_button = _make_debug_button("+5000 矿币", 440.0, _on_debug_add_chapter_currency_pressed)
@@ -757,6 +892,7 @@ func _make_base_item_slot(pos: Vector2, slot_size: Vector2, item: Dictionary, in
 	button.text = ""
 	button.clip_text = false
 	button.tooltip_text = _slot_tooltip(item, source_id)
+	button.set_meta("ui_click_sfx", "ui_item_click")
 	button.add_theme_font_size_override("font_size", 12)
 	button.add_theme_color_override("font_color", _quality_color(item))
 	var meta_id := String(item.get("grid_meta_id", str(index)))
@@ -805,8 +941,10 @@ func _slot_text(item: Dictionary, source_id: String) -> String:
 
 func _add_base_item_slot_content(button: Button, slot_size: Vector2, item: Dictionary, source_id: String) -> void:
 	var texture := _item_icon_texture(item)
-	var icon_size := maxf(24.0, minf(slot_size.x - 28.0, slot_size.y * 0.48))
-	var icon_pos := Vector2((slot_size.x - icon_size) * 0.5, 4.0)
+	var label_height := clampf(slot_size.y * 0.28, 12.0, 18.0)
+	var icon_size := maxf(18.0, minf(slot_size.x - 12.0, slot_size.y - label_height - 6.0))
+	var content_height := icon_size + 2.0 + label_height
+	var icon_pos := Vector2((slot_size.x - icon_size) * 0.5, maxf(2.0, (slot_size.y - content_height) * 0.38))
 	if texture != null:
 		var icon := TextureRect.new()
 		icon.position = icon_pos
@@ -831,18 +969,10 @@ func _add_base_item_slot_content(button: Button, slot_size: Vector2, item: Dicti
 	_add_slot_text_box(
 		button,
 		_slot_display_name(String(item.get("display_name", item.get("item_id", "")))),
-		Vector2(3.0, slot_size.y - 25.0),
-		Vector2(slot_size.x - 6.0, 14.0),
+		Vector2(3.0, minf(slot_size.y - label_height - 2.0, icon_pos.y + icon_size + 2.0)),
+		Vector2(slot_size.x - 6.0, label_height),
 		8,
 		_quality_color(item)
-	)
-	_add_slot_text_box(
-		button,
-		"x%d" % _slot_amount(item, source_id),
-		Vector2(3.0, slot_size.y - 12.0),
-		Vector2(slot_size.x - 6.0, 10.0),
-		9,
-		Color("#D8D6CE")
 	)
 
 func _item_icon_texture(item: Dictionary) -> Texture2D:
@@ -862,8 +992,6 @@ func _add_slot_text_box(button: Button, text: String, pos: Vector2, box_size: Ve
 
 	var label := Label.new()
 	label.text = text
-	label.position = Vector2(0.0, -4.0)
-	label.size = Vector2(box_size.x, box_size.y + 8.0)
 	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	label.clip_text = true
@@ -872,15 +1000,11 @@ func _add_slot_text_box(button: Button, text: String, pos: Vector2, box_size: Ve
 	label.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0.85))
 	label.add_theme_constant_override("shadow_offset_x", 1)
 	label.add_theme_constant_override("shadow_offset_y", 1)
+	label.custom_minimum_size = Vector2.ZERO
+	label.position = Vector2(0.0, -4.0)
+	label.size = Vector2(box_size.x, box_size.y + 8.0)
 	label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	box.add_child(label)
-
-func _slot_amount(item: Dictionary, source_id: String) -> int:
-	match source_id:
-		"buy", "sell":
-			return 1
-		_:
-			return maxi(1, int(item.get("amount", 1)))
 
 func _compact_item_name(name: String) -> String:
 	if name.length() <= 4:
@@ -1216,7 +1340,7 @@ func _update_chapter_goal_view() -> void:
 		return
 	var snapshot: Dictionary = _game_state.get_chapter_goal_snapshot()
 	if bool(snapshot.get("active", false)):
-		chapter_goal_label.text = "第一章：买下旧制造机\n矿币 %d / %d" % [
+		chapter_goal_label.text = "第一章：救出妹妹\n目标：解锁制造所\n矿币 %d / %d" % [
 			int(snapshot.get("current_currency", 0)),
 			int(snapshot.get("required_currency", MANUFACTURING_UNLOCK_COST)),
 		]
@@ -1236,15 +1360,15 @@ func _update_crafting_panel() -> void:
 	var unlocked := bool(_game_state.get("manufacturing_station_unlocked"))
 	var goal_active := bool(_game_state.get("chapter_1_goal_active"))
 	if unlocked:
-		crafting_status_label.text = "制造所已恢复运转。\n\n旧制造机已经接入哨所电力。后续可以在这里制作补给、修复零件，并继续推进妹妹的治疗方案。"
+		crafting_status_label.text = "制造所已解锁。\n\n旧时代制造机已经接入哨所电力。也许，救出妹妹的路终于有了第一盏灯。"
 		crafting_unlock_button.visible = false
 		crafting_result_label.text = ""
 		return
 	crafting_unlock_button.visible = true
 	if not goal_active:
-		crafting_status_label.text = "制造所尚未开放。\n\n先完成首次地面探索并返回基地。确认妹妹的状况后，制造所目标会正式开启。"
+		crafting_status_label.text = "制造所尚未开放。\n\n先完成首次地面探索并返回基地。首次返回剧情结束后，第一章目标会正式开启。"
 	else:
-		crafting_status_label.text = "当前目标：买下旧制造机\n\n把地面带回的可出售物资卖给商人，攒够 5000 矿币。制造机一旦运转，哨所就能自制补给和修复零件；也许，妹妹还有救。\n\n矿币：%d / %d" % [
+		crafting_status_label.text = "当前目标：为救出妹妹，解锁制造所\n\n出售可售物资，积攒 5000 矿币。制造所解锁后，才有机会推进救出妹妹的计划。\n\n矿币：%d / %d" % [
 			current_coin,
 			MANUFACTURING_UNLOCK_COST,
 		]
@@ -1255,7 +1379,7 @@ func _update_crafting_panel() -> void:
 	elif current_coin < MANUFACTURING_UNLOCK_COST:
 		crafting_result_label.text = "还差 %d 矿币。去商人页签出售带回的道具。" % (MANUFACTURING_UNLOCK_COST - current_coin)
 	else:
-		crafting_result_label.text = "矿币已足够。确认购买旧制造机，制造所即可恢复运转。"
+		crafting_result_label.text = "矿币已足够。确认解锁制造所，推进救出妹妹的计划。"
 
 func _clear_research_requirement_slots() -> void:
 	if research_requirement_grid_root == null:
@@ -1568,7 +1692,7 @@ func _on_crafting_unlock_pressed() -> void:
 		crafting_result_label.text = "矿币或章节目标条件不足。"
 		_update_crafting_panel()
 		return
-	manufacturing_confirm_dialog.dialog_text = "确认花费 5000 矿币买下旧制造机？\n购买后制造所将恢复运转。"
+	manufacturing_confirm_dialog.dialog_text = "确认解锁制造所？\n将消耗 5000 矿币。"
 	manufacturing_confirm_dialog.popup_centered()
 
 func _on_manufacturing_unlock_confirmed() -> void:

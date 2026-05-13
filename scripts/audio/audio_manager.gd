@@ -18,6 +18,8 @@ const SFX_CONTAINER_OPEN_COMPLETE := "container_open_complete"
 const SFX_OUTPOST_REPAIR_COMPLETE := "outpost_repair_complete"
 const SFX_EXTRACTION_SUCCESS := "cue_extraction_success"
 const SFX_PLAYER_DEATH := "cue_player_death"
+const SFX_UI_BUTTON_CLICK := "ui_button_click"
+const SFX_UI_ITEM_CLICK := "ui_item_click"
 
 const MUSIC_BUS := "Master"
 const SFX_BUS := "Master"
@@ -122,6 +124,12 @@ func play_extraction_success_cue() -> bool:
 
 func play_player_death_cue() -> bool:
 	return play_sfx(SFX_PLAYER_DEATH)
+
+func play_ui_button_click() -> bool:
+	return play_sfx(SFX_UI_BUTTON_CLICK)
+
+func play_ui_item_click() -> bool:
+	return play_sfx(SFX_UI_ITEM_CLICK)
 
 func play_sfx(sfx_id: String) -> bool:
 	_ensure_players()

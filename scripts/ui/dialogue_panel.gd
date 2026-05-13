@@ -5,6 +5,10 @@ signal dialogue_finished(dialogue_id: String, skipped: bool)
 
 const TYPE_CHARS_PER_SECOND := 32.0
 const SPEAKER_NAME_FONT_SIZE := 22
+const DIALOGUE_BORDER_COLOR := Color("#7F6A34")
+const DIALOGUE_BG_LEFT := Color(0.0, 0.0, 0.0, 0.78)
+const DIALOGUE_BG_RIGHT := Color(0.42, 0.41, 0.40, 0.56)
+const DIALOGUE_BOX_SIZE := Vector2(660.0, 256.0)
 
 var dialogue_id := ""
 var entries: Array = []
@@ -79,25 +83,35 @@ func _build() -> void:
 	dialogue_box.anchor_right = 0.5
 	dialogue_box.anchor_top = 0.5
 	dialogue_box.anchor_bottom = 0.5
-	dialogue_box.offset_left = -270.0
-	dialogue_box.offset_top = 54.0
-	dialogue_box.offset_right = 270.0
-	dialogue_box.offset_bottom = 174.0
-	dialogue_box.add_theme_stylebox_override("panel", _panel_style(Color(0.40, 0.37, 0.37, 0.82), Color(0.50, 0.48, 0.48, 0.65), 1))
+	dialogue_box.offset_left = -DIALOGUE_BOX_SIZE.x * 0.5
+	dialogue_box.offset_top = 28.0
+	dialogue_box.offset_right = DIALOGUE_BOX_SIZE.x * 0.5
+	dialogue_box.offset_bottom = 28.0 + DIALOGUE_BOX_SIZE.y
+	dialogue_box.add_theme_stylebox_override("panel", _panel_style(Color(0.0, 0.0, 0.0, 0.0), DIALOGUE_BORDER_COLOR, 2))
 	add_child(dialogue_box)
+
+	var gradient_bg := TextureRect.new()
+	gradient_bg.name = "DialogueGradientBackground"
+	gradient_bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	gradient_bg.anchor_right = 1.0
+	gradient_bg.anchor_bottom = 1.0
+	gradient_bg.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	gradient_bg.stretch_mode = TextureRect.STRETCH_SCALE
+	gradient_bg.texture = _dialogue_gradient_texture()
+	dialogue_box.add_child(gradient_bg)
 
 	speaker_label = Label.new()
 	speaker_label.name = "SpeakerLabel"
-	speaker_label.position = Vector2(10, 8)
-	speaker_label.size = Vector2(500, 28)
+	speaker_label.position = Vector2(28, 22)
+	speaker_label.size = Vector2(604, 30)
 	speaker_label.add_theme_font_size_override("font_size", SPEAKER_NAME_FONT_SIZE)
 	speaker_label.add_theme_color_override("font_color", Color("#EFEDEA"))
 	dialogue_box.add_child(speaker_label)
 
 	body_label = Label.new()
 	body_label.name = "BodyLabel"
-	body_label.position = Vector2(28, 42)
-	body_label.size = Vector2(484, 48)
+	body_label.position = Vector2(54, 68)
+	body_label.size = Vector2(560, 112)
 	body_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	body_label.add_theme_font_size_override("font_size", 17)
 	body_label.add_theme_color_override("font_color", Color("#F0EEEE"))
@@ -105,8 +119,8 @@ func _build() -> void:
 
 	hint_label = Label.new()
 	hint_label.name = "HintLabel"
-	hint_label.position = Vector2(340, 86)
-	hint_label.size = Vector2(186, 22)
+	hint_label.position = Vector2(420, 204)
+	hint_label.size = Vector2(206, 24)
 	hint_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	hint_label.text = "SPACE 继续"
 	hint_label.add_theme_font_size_override("font_size", 13)
@@ -175,3 +189,16 @@ func _panel_style(bg_color: Color, border_color: Color, border_width: int) -> St
 	style.content_margin_right = 8
 	style.content_margin_bottom = 8
 	return style
+
+func _dialogue_gradient_texture() -> GradientTexture2D:
+	var gradient := Gradient.new()
+	gradient.set_color(0, DIALOGUE_BG_LEFT)
+	gradient.set_color(1, DIALOGUE_BG_RIGHT)
+	var texture := GradientTexture2D.new()
+	texture.gradient = gradient
+	texture.width = int(DIALOGUE_BOX_SIZE.x)
+	texture.height = int(DIALOGUE_BOX_SIZE.y)
+	texture.fill = GradientTexture2D.FILL_LINEAR
+	texture.fill_from = Vector2(0.0, 0.0)
+	texture.fill_to = Vector2(1.0, 0.15)
+	return texture

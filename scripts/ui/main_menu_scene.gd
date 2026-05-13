@@ -576,7 +576,13 @@ func _show_username_overlay() -> void:
 
 func _on_username_confirm_button_input(event: InputEvent) -> void:
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
+		_play_ui_button_click()
 		_on_username_confirmed()
+
+func _play_ui_button_click() -> void:
+	var audio_manager := get_node_or_null("/root/AudioManager")
+	if audio_manager != null and audio_manager.has_method("play_ui_button_click"):
+		audio_manager.play_ui_button_click()
 
 func _flat_panel_style(bg_color: Color, border_color: Color, border_width: int) -> StyleBoxFlat:
 	var style := StyleBoxFlat.new()

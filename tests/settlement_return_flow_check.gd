@@ -35,7 +35,12 @@ func _initialize() -> void:
 	quit(0 if ok else 1)
 
 func _verify() -> bool:
-	return await _verify_settlement_screen_success() and await _verify_settlement_screen_failure() and await _verify_return_loading()
+	var ok := await _verify_settlement_screen_success()
+	ok = await _verify_settlement_screen_failure() and ok
+	ok = await _verify_return_loading() and ok
+	_cleanup_audio_manager()
+	await process_frame
+	return ok
 
 func _verify_settlement_screen_success() -> bool:
 	var screen: SettlementResultScreen = SettlementResultScreenScript.new()
@@ -64,6 +69,7 @@ func _verify_settlement_screen_success() -> bool:
 		printerr("Expected identical settlement items to be grouped into two rows, got %d." % screen.item_list.get_child_count())
 		screen.queue_free()
 		return false
+	screen.return_button.set_meta("ui_click_sfx_disabled", true)
 	screen.return_button.emit_signal("pressed")
 	if not bool(requested.get("value", false)):
 		printerr("Expected return button to request return loading.")
@@ -152,8 +158,8 @@ func _verify_return_loading() -> bool:
 		printerr("Expected any key to complete return loading.")
 		_cleanup(fake, loading)
 		return false
-	if is_instance_valid(fake):
-		fake.queue_free()
+	_cleanup(fake, loading)
+	await process_frame
 	return true
 
 func _item(item_id: String, display_name: String, quality: String, source: String, status: String) -> Dictionary:
@@ -180,3 +186,18 @@ func _cleanup(fake, loading) -> void:
 		loading.queue_free()
 	if is_instance_valid(fake):
 		fake.queue_free()
+
+func _cleanup_audio_manager() -> void:
+	var audio_manager := root.get_node_or_null("AudioManager")
+	if audio_manager == null:
+		return
+	if audio_manager.has_method("stop_bgm"):
+		audio_manager.stop_bgm()
+	if audio_manager.has_method("stop_all_loops"):
+		audio_manager.stop_all_loops()
+	for child in audio_manager.get_children():
+		if child is AudioStreamPlayer:
+			child.stop()
+			child.stream = null
+			if String(child.name).begins_with("OneShot_"):
+				child.free()

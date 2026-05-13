@@ -6,6 +6,7 @@ const MonsterBasicScene := preload("res://scenes/entities/monsters/MonsterBasic.
 
 const MONSTER_DEFS_PATH := "res://setting/monster_defs.tab"
 const DEFAULT_MONSTER_ID := "black_tide_boundary_essence"
+const MONSTER_HIT_RESPAWN_DELAY_SECONDS := 30.0
 
 var monster_parent: Node2D
 var point_provider: Callable
@@ -15,6 +16,11 @@ var unit: float = 64.0
 var active_monsters: Array[Node] = []
 var load_errors: Array[String] = []
 var monster_defs_by_id: Dictionary = {}
+var respawn_delay_seconds: float = MONSTER_HIT_RESPAWN_DELAY_SECONDS
+
+var _active_definition: Dictionary = {}
+var _respawn_index: int = 0
+var _pending_respawn_timers: Dictionary = {}
 
 func setup(
 	p_monster_parent: Node2D,
@@ -44,6 +50,8 @@ func spawn_for_context(context) -> Array[Node]:
 	points = _shuffled_points(points, rng)
 	var monster_type_id := String(context.get("monster_type_id"))
 	var definition := _monster_definition(monster_type_id)
+	_active_definition = definition
+	_respawn_index = 0
 	context.monster_spawn_point_ids.clear()
 	context.active_monster_ids.clear()
 	for index in range(spawn_count):
@@ -57,6 +65,7 @@ func spawn_for_context(context) -> Array[Node]:
 	return get_active_monsters()
 
 func clear_all() -> void:
+	_clear_pending_respawns()
 	for monster in active_monsters:
 		if monster != null and is_instance_valid(monster):
 			monster.queue_free()
@@ -85,28 +94,28 @@ func debug_spawn(count: int = 4) -> Array[Node]:
 	}
 	return spawn_for_context(context)
 
-func _spawn_one(point: Node2D, index: int, definition: Dictionary):
+func _spawn_one(point: Node2D, index: int, definition: Dictionary, id_suffix: String = ""):
 	if monster_parent == null or not is_instance_valid(monster_parent):
 		return null
 	var monster = MonsterBasicScene.instantiate()
 	if monster == null:
 		return null
 	var point_id := _point_id(point)
-	var id := "Monster_%s_%02d" % [point_id, index + 1]
+	var id := "Monster_%s_%02d%s" % [point_id, index + 1, id_suffix]
 	monster.name = id
 	var data := {
 		"monster_id": id,
 		"spawn_point_id": point_id,
 		"spawn_position": point.global_position,
-		"patrol_radius": float(definition.get("patrol_radius_px", 220.0)),
-		"patrol_speed": float(definition.get("patrol_speed_px", 48.0)),
-		"charge_speed": float(definition.get("charge_speed_px", 420.0)),
-		"vision_radius": float(definition.get("vision_radius_px", 360.0)),
-		"vision_angle_degrees": float(definition.get("vision_angle_degrees", 70.0)),
-		"warning_seconds": float(definition.get("warning_seconds", 5.0)),
+		"patrol_radius": float(definition.get("patrol_radius_px", 520.0)),
+		"patrol_speed": float(definition.get("patrol_speed_px", 168.0)),
+		"charge_speed": float(definition.get("charge_speed_px", 1680.0)),
+		"vision_radius": float(definition.get("vision_radius_px", 920.0)),
+		"vision_angle_degrees": float(definition.get("vision_angle_degrees", 100.0)),
+		"warning_seconds": float(definition.get("warning_seconds", 1.0)),
 		"stability_damage": float(definition.get("stability_damage", 20.0)),
-		"hit_radius": float(definition.get("hit_radius_px", 72.0)),
-		"patrol_target_reach_distance": float(definition.get("patrol_target_reach_distance_px", 28.0)),
+		"hit_radius": float(definition.get("hit_radius_px", 128.0)),
+		"patrol_target_reach_distance": float(definition.get("patrol_target_reach_distance_px", 40.0)),
 		"patrol_points": _patrol_points_for_spawn(point),
 	}
 	monster_parent.add_child(monster)
@@ -115,10 +124,59 @@ func _spawn_one(point: Node2D, index: int, definition: Dictionary):
 		monster.monster_removed.connect(_on_monster_removed)
 	return monster
 
-func _on_monster_removed(monster_id: String) -> void:
+func _on_monster_removed(monster_id: String, spawn_point_id: String, removal_reason: String) -> void:
 	if run_director != null and run_director.context != null:
 		run_director.context.active_monster_ids.erase(monster_id)
 	get_active_monsters()
+	if removal_reason == "hit_player":
+		_schedule_hit_respawn(spawn_point_id)
+
+func _schedule_hit_respawn(spawn_point_id: String) -> void:
+	if spawn_point_id.is_empty():
+		return
+	if _pending_respawn_timers.has(spawn_point_id):
+		return
+	if monster_parent == null or not is_instance_valid(monster_parent):
+		return
+	var timer := Timer.new()
+	timer.name = "MonsterRespawnTimer_%s" % spawn_point_id
+	timer.one_shot = true
+	timer.wait_time = maxf(0.01, respawn_delay_seconds)
+	_pending_respawn_timers[spawn_point_id] = timer
+	monster_parent.add_child(timer)
+	timer.timeout.connect(_on_respawn_timer_timeout.bind(spawn_point_id, timer))
+	timer.start()
+
+func _on_respawn_timer_timeout(spawn_point_id: String, timer: Timer) -> void:
+	if _pending_respawn_timers.get(spawn_point_id) == timer:
+		_pending_respawn_timers.erase(spawn_point_id)
+	if timer != null and is_instance_valid(timer):
+		timer.queue_free()
+	if monster_parent == null or not is_instance_valid(monster_parent):
+		return
+	var point := _find_point_by_id(spawn_point_id)
+	if point == null:
+		return
+	var definition := _active_definition if not _active_definition.is_empty() else _monster_definition(DEFAULT_MONSTER_ID)
+	_respawn_index += 1
+	var spawned = _spawn_one(point, _respawn_index, definition, "_respawn")
+	if spawned == null:
+		return
+	active_monsters.append(spawned)
+	if run_director != null and run_director.context != null:
+		run_director.context.active_monster_ids.append(String(spawned.get("monster_id")))
+
+func _clear_pending_respawns() -> void:
+	for timer in _pending_respawn_timers.values():
+		if timer != null and is_instance_valid(timer):
+			timer.queue_free()
+	_pending_respawn_timers.clear()
+
+func _find_point_by_id(spawn_point_id: String) -> Node2D:
+	for point in _get_point_pool():
+		if _point_id(point) == spawn_point_id:
+			return point
+	return null
 
 func _get_point_pool() -> Array:
 	if not point_provider.is_valid():
@@ -183,12 +241,12 @@ func _monster_definition(monster_id: String) -> Dictionary:
 		return monster_defs_by_id[normalized_id]
 	return {
 		"monster_id": DEFAULT_MONSTER_ID,
-		"patrol_radius_px": "220",
-		"patrol_speed_px": "84",
-		"charge_speed_px": "840",
-		"vision_radius_px": "720",
+		"patrol_radius_px": "520",
+		"patrol_speed_px": "168",
+		"charge_speed_px": "1680",
+		"vision_radius_px": "920",
 		"vision_angle_degrees": "100",
-		"warning_seconds": "5",
+		"warning_seconds": "1",
 		"stability_damage": "20",
 		"hit_radius_px": "128",
 		"patrol_target_reach_distance_px": "40",

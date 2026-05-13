@@ -17,6 +17,7 @@ const BLOCK_ART_USE_CORNER_PIECES := false
 const BLOCK_ART_USE_TILED_FILL := false
 const BLOCK_FILL_TILE_UNITS := Vector2(4.0, 4.0)
 const OUTPOST_ENTRY_CLEARANCE_UNITS := Vector2(1.5, 1.5)
+const OUTPOST_ENTRY_CORRIDOR_WIDTH_UNITS := 4.0
 
 var scene: Node
 var unit: float
@@ -89,6 +90,7 @@ func create_ground() -> void:
 
 func get_enterable_exception_rects() -> Array[Rect2]:
 	var rects: Array[Rect2] = []
+	var block_layouts := get_layout_rects("BlockSolid")
 	rects.append(Rect2(scene.player_root.global_position - _u(home_safe_size_units) * 0.5, _u(home_safe_size_units)))
 	for point in get_outpost_candidate_points():
 		var footprint_units: Vector2 = point.get_footprint_units() if point.has_method("get_footprint_units") else outpost_size_units
@@ -100,10 +102,75 @@ func get_enterable_exception_rects() -> Array[Rect2]:
 			OUTPOST_ENTRY_CLEARANCE_UNITS.x * unit,
 			OUTPOST_ENTRY_CLEARANCE_UNITS.y * unit
 		))
+		rects.append_array(_get_outpost_entry_corridors(footprint_rect, block_layouts))
 	for layout in get_layout_rects("Buildings"):
 		if layout.rect_kind == "home" or layout.rect_kind == "outpost" or layout.walkable:
 			rects.append(layout.get_rect_px(unit))
 	return rects
+
+
+func _get_outpost_entry_corridors(footprint_rect: Rect2, block_layouts: Array) -> Array[Rect2]:
+	var containing_block := Rect2()
+	var has_block := false
+	for layout in block_layouts:
+		var block_rect: Rect2 = layout.get_rect_px(unit)
+		if block_rect.has_point(footprint_rect.get_center()):
+			containing_block = block_rect
+			has_block = true
+			break
+	if not has_block:
+		for layout in block_layouts:
+			var block_rect: Rect2 = layout.get_rect_px(unit)
+			if block_rect.intersects(footprint_rect):
+				containing_block = block_rect
+				has_block = true
+				break
+	if not has_block:
+		return []
+	var corridor := _make_outpost_entry_corridor(footprint_rect, containing_block)
+	if corridor.size.x <= 0.0 or corridor.size.y <= 0.0:
+		return []
+	return [corridor]
+
+
+func _make_outpost_entry_corridor(footprint_rect: Rect2, block_rect: Rect2) -> Rect2:
+	var center := footprint_rect.get_center()
+	var width := OUTPOST_ENTRY_CORRIDOR_WIDTH_UNITS * unit
+	var half_width := width * 0.5
+	var distances := {
+		"left": footprint_rect.position.x - block_rect.position.x,
+		"right": block_rect.end.x - footprint_rect.end.x,
+		"top": footprint_rect.position.y - block_rect.position.y,
+		"bottom": block_rect.end.y - footprint_rect.end.y,
+	}
+	var direction := "left"
+	var best_distance := INF
+	for key in distances.keys():
+		var distance := maxf(0.0, float(distances[key]))
+		if distance < best_distance:
+			best_distance = distance
+			direction = String(key)
+	match direction:
+		"left":
+			return Rect2(
+				Vector2(block_rect.position.x, center.y - half_width),
+				Vector2(maxf(0.0, footprint_rect.position.x - block_rect.position.x), width)
+			)
+		"right":
+			return Rect2(
+				Vector2(footprint_rect.end.x, center.y - half_width),
+				Vector2(maxf(0.0, block_rect.end.x - footprint_rect.end.x), width)
+			)
+		"top":
+			return Rect2(
+				Vector2(center.x - half_width, block_rect.position.y),
+				Vector2(width, maxf(0.0, footprint_rect.position.y - block_rect.position.y))
+			)
+		_:
+			return Rect2(
+				Vector2(center.x - half_width, footprint_rect.end.y),
+				Vector2(width, maxf(0.0, block_rect.end.y - footprint_rect.end.y))
+			)
 
 
 func get_outpost_candidate_points() -> Array[Node2D]:

@@ -188,7 +188,7 @@ scale = Vector2(7.5602794, 2.855251)
 texture = ExtResource("24_building_narrow_alley")
 
 [node name="Block_Ref_05_60x46_Building_Cluster_03" type="Node2D" parent="WorldRoot/YSortRoot" unique_id=725604972]
-position = Vector2(7136, -2272.0002)
+position = Vector2(7000, -2707)
 scale = Vector2(0.908722, 1.767956)
 metadata/building_id = "building_narrow_alley_01"
 metadata/building_type = "alley"
@@ -205,7 +205,7 @@ scale = Vector2(7.5602794, 2.855251)
 texture = ExtResource("24_building_narrow_alley")
 
 [node name="Block_Ref_05_60x46_Building_Cluster_04" type="Node2D" parent="WorldRoot/YSortRoot" unique_id=344042754]
-position = Vector2(8344, -2720)
+position = Vector2(8480, -2760)
 scale = Vector2(0.908722, 1.767956)
 metadata/building_id = "building_narrow_alley_01"
 metadata/building_type = "alley"
@@ -539,8 +539,25 @@ position = Vector2(64, 3456)
 metadata/host_block_id = "Block_Ref_21_53x44"
 metadata/_manual_building_art = true
 
+[node name="Block_Ref_21_53x44_Building_Alley_04" type="Node2D" parent="WorldRoot/YSortRoot" unique_id=937440580]
+position = Vector2(784.00024, 3936)
+scale = Vector2(0.909, 1.768)
+metadata/building_id = "building_narrow_alley_01"
+metadata/building_type = "alley"
+metadata/host_block_id = "Block_Ref_21_53x44"
+metadata/is_enterable = false
+metadata/has_collision = false
+metadata/blocks_signal_visibility = false
+metadata/occludes_player = true
+metadata/placement_group = "Block_Ref_21_53x44_Buildings"
+
+[node name="ArtSprite" type="Sprite2D" parent="WorldRoot/YSortRoot/Block_Ref_21_53x44_Building_Alley_04" unique_id=413436952]
+position = Vector2(-1.1444092e-05, -588.2356)
+scale = Vector2(7.5602794, 2.855251)
+texture = ExtResource("24_building_narrow_alley")
+
 [node name="Block_Ref_21_53x44_Building_CornerShop_02" type="Node2D" parent="WorldRoot/YSortRoot" unique_id=127268524]
-position = Vector2(416.00003, 3856)
+position = Vector2(448, 4839.9995)
 scale = Vector2(1.166, 1.052)
 metadata/building_id = "building_corner_shop_01"
 metadata/building_type = "shop"
@@ -557,7 +574,7 @@ scale = Vector2(4.669015, 3.729306)
 texture = ExtResource("21_building_corner_shop")
 
 [node name="Block_Ref_21_53x44_Building_Alley_03" type="Node2D" parent="WorldRoot/YSortRoot" unique_id=1800419206]
-position = Vector2(-856.0001, 4896.0005)
+position = Vector2(-848, 4064.0005)
 scale = Vector2(0.909, 1.768)
 metadata/building_id = "building_narrow_alley_01"
 metadata/building_type = "alley"
@@ -652,7 +669,7 @@ scale = Vector2(1.7490697, 1.5928198)
 texture = ExtResource("9_7tdpv")
 
 [node name="Block_Ref_23_61x32_Building_Residential_03" type="Node2D" parent="WorldRoot/YSortRoot" unique_id=174615833]
-position = Vector2(5656, 5040)
+position = Vector2(6128, 4864.0005)
 scale = Vector2(1.114, 1.161)
 metadata/building_id = "building_residential_01"
 metadata/building_type = "residential"
@@ -664,8 +681,8 @@ metadata/occludes_player = true
 metadata/placement_group = "Block_Ref_23_61x32_Buildings"
 
 [node name="ArtSprite" type="Sprite2D" parent="WorldRoot/YSortRoot/Block_Ref_23_61x32_Building_Residential_03" unique_id=565569758]
-position = Vector2(24.416718, -536.91644)
-scale = Vector2(3.4115047, 3.104737)
+position = Vector2(107.71982, -730.40497)
+scale = Vector2(4.8949842, 4.0529823)
 texture = ExtResource("22_building_residential")
 
 [node name="Block_Ref_23_61x32_Building_Alley_04" type="Node2D" parent="WorldRoot/YSortRoot" unique_id=690223783]

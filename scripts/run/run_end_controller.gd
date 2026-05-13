@@ -33,9 +33,13 @@ func validate_extraction() -> Dictionary:
 func handle_player_death(_tree: SceneTree, reason: String = "stability_depleted") -> Dictionary:
 	if run_director != null and run_director.state_machine != null:
 		var state: Dictionary = run_director.state_machine.get_state_snapshot()
-		if state.get("current_phase", "") in ["FAILED", "SETTLEMENT"]:
+		if state.get("current_phase", "") == "SETTLEMENT":
 			return {"accepted": false, "message": "Run already finished."}
-		run_director.on_player_dead(reason)
+		if state.get("current_phase", "") == "FAILED":
+			if state.get("run_result", "") != "DEAD":
+				return {"accepted": false, "message": "Run already finished."}
+		else:
+			run_director.on_player_dead(reason)
 	var result := result_builder.build_death_result(run_director, reason)
 	return {"accepted": true, "result": result, "message": result.get("message", "")}
 
@@ -43,9 +47,13 @@ func handle_player_death(_tree: SceneTree, reason: String = "stability_depleted"
 func handle_timeout(_tree: SceneTree, reason: String = "time_expired") -> Dictionary:
 	if run_director != null and run_director.state_machine != null:
 		var state: Dictionary = run_director.state_machine.get_state_snapshot()
-		if state.get("current_phase", "") in ["FAILED", "SETTLEMENT"]:
+		if state.get("current_phase", "") == "SETTLEMENT":
 			return {"accepted": false, "message": "Run already finished."}
-		run_director.on_run_timeout(reason)
+		if state.get("current_phase", "") == "FAILED":
+			if state.get("run_result", "") != "TIMEOUT_FAILED":
+				return {"accepted": false, "message": "Run already finished."}
+		else:
+			run_director.on_run_timeout(reason)
 	var result := result_builder.build_timeout_result(run_director, reason)
 	return {"accepted": true, "result": result, "message": result.get("message", "")}
 

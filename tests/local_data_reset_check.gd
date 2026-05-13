@@ -17,6 +17,8 @@ func _verify() -> bool:
 	var ok := true
 	ok = _verify_game_state_reset(game_state) and ok
 	ok = await _verify_debug_button_reset(game_state) and ok
+	ok = await _verify_esc_settings_reset(game_state) and ok
+	ok = await _verify_chapter_complete_reset(game_state) and ok
 	_restore_profile(game_state, original_profile)
 	return ok
 
@@ -47,6 +49,64 @@ func _verify_debug_button_reset(game_state: Node) -> bool:
 	var ok := _expect_clean_runtime(game_state, false)
 	if result_label == null or not result_label.text.contains("重置本地数据"):
 		printerr("Expected GM reset button to report local data reset.")
+		ok = false
+	base_root.queue_free()
+	await process_frame
+	return ok
+
+func _verify_esc_settings_reset(game_state: Node) -> bool:
+	if not _make_dirty_local_data(game_state):
+		return false
+	var base_root = BaseScene.instantiate()
+	root.add_child(base_root)
+	await process_frame
+	var settings_button := base_root.get_node_or_null("BaseUIRoot/EscSettingsButton") as Button
+	if settings_button == null:
+		printerr("Expected base surface to include a bottom-right ESC settings button.")
+		base_root.queue_free()
+		await process_frame
+		return false
+	settings_button.emit_signal("pressed")
+	await process_frame
+	var popup := base_root.get_node_or_null("EscSettingsPopupOverlay") as Control
+	var reset_button := _find_button_by_text(base_root, "重置进度")
+	if popup == null or reset_button == null:
+		printerr("Expected ESC settings popup to include reset progress.")
+		base_root.queue_free()
+		await process_frame
+		return false
+	reset_button.emit_signal("pressed")
+	await process_frame
+	var ok := _expect_clean_runtime(game_state, false)
+	var notice := _find_label_containing(base_root, "重新登陆或刷新界面")
+	if notice == null:
+		printerr("Expected reset progress notice to tell the player to relogin or refresh.")
+		ok = false
+	base_root.queue_free()
+	await process_frame
+	return ok
+
+func _verify_chapter_complete_reset(game_state: Node) -> bool:
+	if not _make_dirty_local_data(game_state):
+		return false
+	var base_root = BaseScene.instantiate()
+	root.add_child(base_root)
+	await process_frame
+	base_root._show_chapter_complete_popup(3)
+	await process_frame
+	var continue_button := _find_button_by_text(base_root, "继续游戏")
+	var reset_button := _find_button_by_text(base_root, "重新开始")
+	if continue_button == null or reset_button == null:
+		printerr("Expected chapter complete popup to offer continue game and restart.")
+		base_root.queue_free()
+		await process_frame
+		return false
+	reset_button.emit_signal("pressed")
+	await process_frame
+	var ok := _expect_clean_runtime(game_state, false)
+	var notice := _find_label_containing(base_root, "重新登陆或刷新界面")
+	if notice == null:
+		printerr("Expected chapter reset notice to tell the player to relogin or refresh.")
 		ok = false
 	base_root.queue_free()
 	await process_frame
@@ -150,6 +210,15 @@ func _find_button_by_text(node: Node, text: String) -> Button:
 		return node
 	for child in node.get_children():
 		var found := _find_button_by_text(child, text)
+		if found != null:
+			return found
+	return null
+
+func _find_label_containing(node: Node, text: String) -> Label:
+	if node is Label and String(node.text).contains(text):
+		return node
+	for child in node.get_children():
+		var found := _find_label_containing(child, text)
 		if found != null:
 			return found
 	return null

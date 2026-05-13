@@ -19,6 +19,10 @@ config/icon="res://icon.svg"
 
 GameState="*res://scripts/game/game_state.gd"
 AudioManager="*res://scripts/audio/audio_manager.gd"
+UIAudioRouter="*res://scripts/audio/ui_audio_router.gd"
+MCPScreenshot="*res://addons/godot_mcp/mcp_screenshot_service.gd"
+MCPInputService="*res://addons/godot_mcp/mcp_input_service.gd"
+MCPGameInspector="*res://addons/godot_mcp/mcp_game_inspector_service.gd"
 
 [display]
 

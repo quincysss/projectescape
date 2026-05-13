@@ -4,7 +4,9 @@ extends Control
 signal return_completed
 signal return_failed(reason: String)
 
+const FullscreenBackgroundBuilderScript := preload("res://scripts/ui/fullscreen_background_builder.gd")
 const BASE_SCENE_PATH := "res://scenes/base/BaseScene.tscn"
+const RETURN_BACKGROUND_PATH := "res://assets/originalphoto/backloadingphoto.png"
 const RETURN_STAGES := [
 	{"stage_id": "lock_settlement", "text": "封存本局记录...", "progress": 0.10},
 	{"stage_id": "transfer_items", "text": "整理带回物资...", "progress": 0.35},
@@ -94,13 +96,13 @@ func _build() -> void:
 	mouse_filter = Control.MOUSE_FILTER_STOP
 	z_index = 1100
 
-	var bg := ColorRect.new()
-	bg.name = "BlackBackground"
-	bg.color = Color.BLACK
-	bg.anchor_right = 1.0
-	bg.anchor_bottom = 1.0
-	bg.mouse_filter = Control.MOUSE_FILTER_STOP
-	add_child(bg)
+	FullscreenBackgroundBuilderScript.add_image_background(
+		self,
+		RETURN_BACKGROUND_PATH,
+		"ReturnLoadingBackground",
+		Color.BLACK,
+		Color(0.0, 0.0, 0.0, 0.50)
+	)
 
 	var frame := Panel.new()
 	frame.name = "ReturnLoadingFrame"

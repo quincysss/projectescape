@@ -250,7 +250,7 @@ func activate_chapter_1_goal_debug() -> void:
 func get_chapter_goal_snapshot() -> Dictionary:
 	return {
 		"chapter_id": "chapter_1",
-		"title": "第一章：买下旧制造机",
+		"title": "第一章：解锁制造所",
 		"active": chapter_1_goal_active and not chapter_1_completed,
 		"completed": chapter_1_completed,
 		"feature_id": "manufacturing_station",

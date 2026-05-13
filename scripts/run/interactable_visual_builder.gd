@@ -294,11 +294,12 @@ func _rebuild_requirement_bubbles(root: Node2D, requirements: Dictionary, delive
 		var need := int(data.get("amount", 0))
 		var submitted := int(delivered.get(item_id, 0))
 		var carried := int(get_inventory_count.call(item_id)) if get_inventory_count.is_valid() else 0
-		var text := "需要%s：%d/%d" % [String(data.get("display_name", item_id)), submitted, need]
-		entries.append({"item_id": item_id, "text": text, "ready": submitted >= need, "can_submit": carried > 0})
-		all_ready = all_ready and submitted >= need
+		var covered := mini(need, submitted + carried)
+		var text := "需要%s：%d/%d" % [String(data.get("display_name", item_id)), covered, need]
+		entries.append({"item_id": item_id, "text": text, "ready": covered >= need, "can_submit": carried > 0})
+		all_ready = all_ready and covered >= need
 		any_can_submit = any_can_submit or carried > 0
-		signature_parts.append("%s:%s:%s:%s" % [item_id, submitted, carried, need])
+		signature_parts.append("%s:%s:%s:%s:%s" % [item_id, submitted, carried, covered, need])
 	var signature := "|".join(signature_parts)
 	if String(root.get_meta(REQUIREMENT_BUBBLE_SIGNATURE_META, "")) == signature:
 		return

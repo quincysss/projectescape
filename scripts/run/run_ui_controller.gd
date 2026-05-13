@@ -1,14 +1,6 @@
 class_name RunUiController
 extends RefCounted
 
-const STABILITY_MAX := 100.0
-const STABILITY_TICKS := [
-	{"label": "0", "ratio": 0.0},
-	{"label": "25", "ratio": 0.25},
-	{"label": "50", "ratio": 0.5},
-	{"label": "75", "ratio": 0.75},
-	{"label": "100", "ratio": 1.0},
-]
 const CHARACTER_HUD_PORTRAIT_FRAME := preload("res://assets/ui/run_character_hud/character_status/components/ui_run_character_portrait_frame_empty_ref_01.png")
 const CHARACTER_HUD_DEFAULT_PORTRAIT := preload("res://assets/ui/run_character_hud/character_status/components/ui_run_character_portrait_male_01.png")
 const CHARACTER_HUD_STABILITY_FRAME := preload("res://assets/ui/run_character_hud/character_status/components/ui_run_character_stability_bar_frame_empty_ref_01.png")
@@ -122,12 +114,20 @@ func _build_character_status_hud(scene) -> void:
 	scene.stability_fill_texture.stretch_mode = TextureRect.STRETCH_SCALE
 	scene.stability_fill_clip.add_child(scene.stability_fill_texture)
 
-	_add_corrected_stability_ticks(scene)
-
 	scene.stability_value_label = Label.new()
 	scene.stability_value_label.name = "StabilityValue"
-	scene.stability_value_label.visible = false
-	scene.stability_hud_root.add_child(scene.stability_value_label)
+	scene.stability_value_label.position = STABILITY_FILL_OFFSET
+	scene.stability_value_label.size = STABILITY_FILL_SIZE
+	scene.stability_value_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	scene.stability_value_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	scene.stability_value_label.add_theme_font_size_override("font_size", 18)
+	scene.stability_value_label.add_theme_color_override("font_color", Color("#F1EBDD"))
+	scene.stability_value_label.add_theme_color_override("font_shadow_color", Color(0.0, 0.0, 0.0, 0.9))
+	scene.stability_value_label.add_theme_constant_override("shadow_offset_x", 1)
+	scene.stability_value_label.add_theme_constant_override("shadow_offset_y", 1)
+	scene.stability_value_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	scene.stability_value_label.z_index = 6
+	scene.stability_bar.add_child(scene.stability_value_label)
 
 	scene.stability_stage_label = Label.new()
 	scene.stability_stage_label.name = "StabilityStage"
@@ -154,27 +154,6 @@ func _build_character_status_hud(scene) -> void:
 	scene.portrait_frame.stretch_mode = TextureRect.STRETCH_SCALE
 	scene.portrait_frame.z_index = 5
 	scene.character_hud_root.add_child(scene.portrait_frame)
-
-func _add_corrected_stability_ticks(scene) -> void:
-	var label_mask := ColorRect.new()
-	label_mask.name = "StabilityLabelMask"
-	label_mask.position = Vector2(10, 62)
-	label_mask.size = Vector2(382, 26)
-	label_mask.color = Color(0.025, 0.024, 0.022, 0.92)
-	scene.stability_bar.add_child(label_mask)
-
-	for tick in STABILITY_TICKS:
-		var x := STABILITY_FILL_OFFSET.x + STABILITY_FILL_SIZE.x * float(tick.ratio)
-		var label := Label.new()
-		label.name = "CorrectedTick_%s" % tick.label
-		label.text = String(tick.label)
-		label.position = Vector2(x - 22.0, 63.0)
-		label.size = Vector2(44.0, 22.0)
-		label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-		label.add_theme_font_size_override("font_size", 15)
-		label.add_theme_color_override("font_color", Color(0.78, 0.74, 0.68))
-		scene.stability_bar.add_child(label)
 
 func _selected_character_hud_assets() -> Dictionary:
 	var tree := Engine.get_main_loop() as SceneTree
@@ -493,8 +472,10 @@ func _refresh_stability_hud(scene) -> void:
 	var ratio: float = current / max_value
 	if scene.stability_fill_clip != null:
 		scene.stability_fill_clip.size = Vector2(STABILITY_FILL_SIZE.x * ratio, STABILITY_FILL_SIZE.y)
-	scene.stability_value_label.text = "稳定值  %d/%d" % [int(round(current)), int(round(max_value))]
-	scene.stability_stage_label.text = _stability_stage_text(ratio)
+	if scene.stability_value_label != null:
+		scene.stability_value_label.text = "%d/%d" % [int(round(current)), int(round(max_value))]
+	if scene.stability_stage_label != null:
+		scene.stability_stage_label.text = _stability_stage_text(ratio)
 
 func _refresh_countdown(scene) -> void:
 	if scene.countdown_label == null:
@@ -948,6 +929,7 @@ func _make_item_slot(scene, pos: Vector2, slot_size: Vector2, item: Dictionary, 
 	button.size = slot_size
 	button.text = ""
 	button.clip_text = false
+	button.set_meta("ui_click_sfx", "ui_item_click")
 	button.add_theme_font_size_override("font_size", 12)
 	button.add_theme_color_override("font_color", _quality_color(item))
 	var selected := source_id == "inventory" and index == int(scene.selected_inventory_index)
@@ -971,6 +953,7 @@ func _make_empty_slot(scene, pos: Vector2, slot_size: Vector2, locked: bool = fa
 		button.position = pos
 		button.size = slot_size
 		button.text = ""
+		button.set_meta("ui_click_sfx", "ui_item_click")
 		button.add_theme_stylebox_override("normal", _slot_style(Color("#071116"), Color("#35C9D7"), 1))
 		button.add_theme_stylebox_override("hover", _slot_style(Color("#0B151A"), Color("#D1B850"), 2))
 		button.add_theme_stylebox_override("pressed", _slot_style(Color("#121817"), Color("#D1B850"), 3))
@@ -1029,13 +1012,14 @@ func _dispatch_grid_slot(scene, source_id: String, index: int) -> void:
 
 func _slot_text(item: Dictionary) -> String:
 	var name := String(item.get("display_name", item.get("item_id", "")))
-	var amount := int(item.get("amount", 1))
-	return "%s\nx%d" % [name, amount]
+	return "%s" % name
 
 func _add_item_slot_content(button: Button, slot_size: Vector2, item: Dictionary) -> void:
 	var texture := _item_icon_texture(item)
-	var icon_size := maxf(24.0, minf(slot_size.x - 28.0, slot_size.y * 0.48))
-	var icon_pos := Vector2((slot_size.x - icon_size) * 0.5, 4.0)
+	var label_height := clampf(slot_size.y * 0.28, 12.0, 18.0)
+	var icon_size := maxf(18.0, minf(slot_size.x - 12.0, slot_size.y - label_height - 6.0))
+	var content_height := icon_size + 2.0 + label_height
+	var icon_pos := Vector2((slot_size.x - icon_size) * 0.5, maxf(2.0, (slot_size.y - content_height) * 0.38))
 	if texture != null:
 		var icon := TextureRect.new()
 		icon.position = icon_pos
@@ -1060,18 +1044,10 @@ func _add_item_slot_content(button: Button, slot_size: Vector2, item: Dictionary
 	_add_slot_text_box(
 		button,
 		_slot_display_name(String(item.get("display_name", item.get("item_id", "")))),
-		Vector2(3.0, slot_size.y - 25.0),
-		Vector2(slot_size.x - 6.0, 14.0),
+		Vector2(3.0, minf(slot_size.y - label_height - 2.0, icon_pos.y + icon_size + 2.0)),
+		Vector2(slot_size.x - 6.0, label_height),
 		8,
 		_quality_color(item)
-	)
-	_add_slot_text_box(
-		button,
-		"x%d" % maxi(1, int(item.get("amount", 1))),
-		Vector2(3.0, slot_size.y - 12.0),
-		Vector2(slot_size.x - 6.0, 10.0),
-		9,
-		Color("#D8D6CE")
 	)
 
 func _item_icon_texture(item: Dictionary) -> Texture2D:
@@ -1091,8 +1067,6 @@ func _add_slot_text_box(button: Button, text: String, pos: Vector2, box_size: Ve
 
 	var label := Label.new()
 	label.text = text
-	label.position = Vector2(0.0, -4.0)
-	label.size = Vector2(box_size.x, box_size.y + 8.0)
 	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	label.clip_text = true
@@ -1101,6 +1075,9 @@ func _add_slot_text_box(button: Button, text: String, pos: Vector2, box_size: Ve
 	label.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0.85))
 	label.add_theme_constant_override("shadow_offset_x", 1)
 	label.add_theme_constant_override("shadow_offset_y", 1)
+	label.custom_minimum_size = Vector2.ZERO
+	label.position = Vector2(0.0, -4.0)
+	label.size = Vector2(box_size.x, box_size.y + 8.0)
 	label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	box.add_child(label)
 

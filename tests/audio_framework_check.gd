@@ -50,6 +50,8 @@ func _verify_manifest_paths(manager) -> bool:
 		"res://assets/audio/sfx/outpost_repair_complete.wav",
 		"res://assets/audio/sfx/cue_extraction_success.wav",
 		"res://assets/audio/sfx/cue_player_death.wav",
+		"res://assets/audio/sfx/ui_button_click.wav",
+		"res://assets/audio/sfx/ui_item_click.wav",
 	]
 	var actual: PackedStringArray = manager.get_expected_audio_paths()
 	for path in expected:
@@ -122,5 +124,7 @@ func _verify_sfx_assets_play(manager) -> bool:
 	manager.set_stability_critical_loop_active(false)
 	manager.play_extraction_success_cue()
 	manager.play_player_death_cue()
+	manager.play_ui_button_click()
+	manager.play_ui_item_click()
 	manager.stop_all_loops()
 	return true

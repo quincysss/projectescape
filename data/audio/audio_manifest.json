@@ -62,6 +62,20 @@
       "loop": false,
       "volume_db": -2.0,
       "priority": 100
+    },
+    "ui_button_click": {
+      "display_name": "通用按钮点击音效",
+      "path": "res://assets/audio/sfx/ui_button_click.wav",
+      "loop": false,
+      "volume_db": -7.0,
+      "priority": 10
+    },
+    "ui_item_click": {
+      "display_name": "道具格点击音效",
+      "path": "res://assets/audio/sfx/ui_item_click.wav",
+      "loop": false,
+      "volume_db": -6.0,
+      "priority": 15
     }
   }
 }

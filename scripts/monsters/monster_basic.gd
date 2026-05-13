@@ -1,7 +1,7 @@
 class_name MonsterBasic
 extends Node2D
 
-signal monster_removed(monster_id: String)
+signal monster_removed(monster_id: String, spawn_point_id: String, removal_reason: String)
 
 enum State {
 	PATROL,
@@ -12,15 +12,16 @@ enum State {
 
 @export var monster_id: String = ""
 @export var spawn_point_id: String = ""
-@export var patrol_radius: float = 220.0
-@export var patrol_speed: float = 84.0
-@export var charge_speed: float = 840.0
-@export var vision_radius: float = 720.0
+@export var patrol_radius: float = 520.0
+@export var patrol_speed: float = 168.0
+@export var charge_speed: float = 1680.0
+@export var vision_radius: float = 920.0
 @export var vision_angle_degrees: float = 100.0
-@export var warning_seconds: float = 5.0
+@export var warning_seconds: float = 1.0
 @export var stability_damage: float = 20.0
 @export var hit_radius: float = 128.0
 @export var patrol_target_reach_distance: float = 40.0
+@export var warning_exit_grace_seconds: float = 0.18
 
 @onready var vision_cone: MonsterVisionCone = $VisionCone
 @onready var visual_root: Node2D = $Visual
@@ -31,6 +32,7 @@ var spawn_position: Vector2 = Vector2.ZERO
 var state: int = State.PATROL
 var face_direction: Vector2 = Vector2.RIGHT
 var warning_time: float = 0.0
+var warning_outside_time: float = 0.0
 
 var _rng := RandomNumberGenerator.new()
 var _patrol_target: Vector2 = Vector2.ZERO
@@ -89,6 +91,7 @@ func debug_force_hit_player() -> void:
 func debug_force_warning(seconds: float) -> void:
 	state = State.WARNING
 	warning_time = maxf(0.0, seconds)
+	warning_outside_time = 0.0
 	_refresh_vision_cone()
 
 func get_patrol_point_count() -> int:
@@ -97,11 +100,15 @@ func get_patrol_point_count() -> int:
 func get_vision_origin_global() -> Vector2:
 	return _vision_origin_global()
 
+func get_attention_origin_global() -> Vector2:
+	return _attention_origin_global()
+
 func _update_patrol(delta: float) -> void:
 	_move_toward_patrol_target(delta)
 	if _player_in_patrol_cone():
 		state = State.WARNING
 		warning_time = 0.0
+		warning_outside_time = 0.0
 		_face_player()
 
 func _update_warning(delta: float) -> void:
@@ -109,9 +116,13 @@ func _update_warning(delta: float) -> void:
 	_move_toward_patrol_target(delta, false)
 	_face_player()
 	if not _player_in_vision_cone():
-		state = State.PATROL
-		warning_time = 0.0
+		warning_outside_time += delta
+		if warning_outside_time >= warning_exit_grace_seconds:
+			state = State.PATROL
+			warning_time = 0.0
+			warning_outside_time = 0.0
 		return
+	warning_outside_time = 0.0
 	warning_time += delta
 	if warning_time >= warning_seconds:
 		state = State.CHARGE
@@ -120,6 +131,7 @@ func _update_charge(delta: float) -> void:
 	if player == null or not is_instance_valid(player):
 		state = State.PATROL
 		warning_time = 0.0
+		warning_outside_time = 0.0
 		return
 	_face_player()
 	var distance := global_position.distance_to(player.global_position)
@@ -209,7 +221,7 @@ func _player_in_vision_cone() -> bool:
 func _face_player() -> void:
 	if player == null or not is_instance_valid(player):
 		return
-	var direction := player.global_position - _vision_origin_global()
+	var direction := player.global_position - _attention_origin_global()
 	if direction.length_squared() > 0.001:
 		face_direction = direction.normalized()
 
@@ -233,6 +245,11 @@ func _vision_origin_global() -> Vector2:
 		return global_position
 	return eye_focus.global_position
 
+func _attention_origin_global() -> Vector2:
+	if visual_root != null and is_instance_valid(visual_root):
+		return visual_root.global_position
+	return global_position
+
 func _apply_hit_and_remove() -> void:
 	if _hit_applied:
 		return
@@ -240,5 +257,5 @@ func _apply_hit_and_remove() -> void:
 	state = State.REMOVED
 	if run_director != null and run_director.has_method("apply_monster_stability_damage"):
 		run_director.apply_monster_stability_damage(stability_damage, monster_id)
-	monster_removed.emit(monster_id)
+	monster_removed.emit(monster_id, spawn_point_id, "hit_player")
 	queue_free()

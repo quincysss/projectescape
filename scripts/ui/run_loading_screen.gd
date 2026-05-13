@@ -4,9 +4,11 @@ extends Control
 signal loading_completed(run_scene: PackedScene)
 signal loading_failed(reason: String)
 
+const FullscreenBackgroundBuilderScript := preload("res://scripts/ui/fullscreen_background_builder.gd")
 const STAGES_PATH := "res://data/loading/run_loading_stages.json"
 const TIPS_PATH := "res://data/loading/run_loading_tips.json"
 const RUN_SCENE_PATH := "res://scenes/run/RunScene.tscn"
+const LOADING_BACKGROUND_PATH := "res://assets/originalphoto/loadingphoto.png"
 
 var title_label: Label
 var stage_label: Label
@@ -74,11 +76,13 @@ func _build() -> void:
 	anchor_bottom = 1.0
 	mouse_filter = Control.MOUSE_FILTER_STOP
 
-	var bg := ColorRect.new()
-	bg.color = Color("#11100E")
-	bg.anchor_right = 1.0
-	bg.anchor_bottom = 1.0
-	add_child(bg)
+	FullscreenBackgroundBuilderScript.add_image_background(
+		self,
+		LOADING_BACKGROUND_PATH,
+		"RunLoadingBackground",
+		Color("#11100E"),
+		Color(0.0, 0.0, 0.0, 0.42)
+	)
 
 	var frame := Panel.new()
 	frame.name = "LoadingFrame"

@@ -39,6 +39,21 @@ func _verify() -> bool:
 		printerr("Expected dialogue panel to not include the cinematic placeholder backdrop.")
 		_restore_username(game_state, original_username)
 		return false
+	var dialogue_box := panel.get_node_or_null("DialogueBox") as Panel
+	var gradient_bg := panel.get_node_or_null("DialogueBox/DialogueGradientBackground") as TextureRect
+	var dialogue_style := dialogue_box.get_theme_stylebox("panel") as StyleBoxFlat if dialogue_box != null else null
+	if dialogue_box == null or gradient_bg == null or dialogue_style == null:
+		printerr("Expected dialogue box to use a separate transparent gradient background.")
+		_restore_username(game_state, original_username)
+		return false
+	if dialogue_box.size.x < 650.0 or dialogue_box.size.y < 250.0:
+		printerr("Expected enlarged dialogue box, got %s." % str(dialogue_box.size))
+		_restore_username(game_state, original_username)
+		return false
+	if dialogue_style.border_color != Color("#7F6A34") or dialogue_style.get_border_width(SIDE_TOP) != 2:
+		printerr("Expected dialogue border to match the loading screen gold frame.")
+		_restore_username(game_state, original_username)
+		return false
 	if panel.get_node_or_null("SkipButton") != null:
 		printerr("Expected whole-sequence skip button to be removed.")
 		_restore_username(game_state, original_username)

@@ -1,0 +1,42 @@
+﻿dialogue_id	skippable	order	speaker_id	speaker_name	text	enabled	notes
+world_intro_dialogue	false	10	operator_404	404 哨所调度员	你回来了。	true	25-02 第一段剧情
+world_intro_dialogue	false	20	player	玩家	巡检记录已经交到终端。下层风道还是有杂音。	true	
+world_intro_dialogue	false	30	operator_404	404 哨所调度员	2050年那场核战以后，能听见风道响，反而算好消息。	true	
+world_intro_dialogue	false	40	operator_404	404 哨所调度员	活下来的人往地下退，矿井、旧地铁、避难层，能封住门的地方都成了家。404 也是这么留下来的。	true	
+world_intro_dialogue	false	50	player	玩家	地下待久了，大家都这么安慰自己。	true	
+world_intro_dialogue	false	60	operator_404	404 哨所调度员	404 哨所不是靠安慰撑到今天的。一切不起眼的物资，却撑着我们的生存。	true	
+world_intro_dialogue	false	70	operator_404	404 哨所调度员	仓库又压到警戒线了。	true	
+world_intro_dialogue	false	80	player	玩家	所以今天轮到我上去？	true	
+world_intro_dialogue	false	90	operator_404	404 哨所调度员	不是轮到。是还能在暗潮里撑住的人，已经没几个了。	true	
+world_intro_dialogue	false	100	operator_404	404 哨所调度员	普通人上去，几分钟就会被暗潮拖垮。你至少还能走一段。	true	
+world_intro_dialogue	false	110	player	玩家	别说得像什么好事。	true	
+world_intro_dialogue	false	120	operator_404	404 哨所调度员	不是好事。只是 404 还想活下去，也还想有一天回到地面。	true	
+world_intro_dialogue	false	130	operator_404	404 哨所调度员	地下已经没什么物资了，如果你真的还需要矿币的话...	true	
+world_intro_dialogue	false	140	player	玩家	说吧，这次要带什么回来？	true	
+world_intro_dialogue	false	150	operator_404	404 哨所调度员	你看到一切物资都别放过。	true	
+world_intro_dialogue	false	160	operator_404	404 哨所调度员	但，上去之后别逞强。暗潮一压近，人的判断会先出问题。	true	
+world_intro_dialogue	false	170	player	玩家	知道。带得回来才算数。	true	
+world_intro_dialogue	false	180	operator_404	404 哨所调度员	嗯，准备一下，出发吧。	true	
+first_departure_outpost_dialogue	false	10	operator_404	404 哨所调度员	出发前最后确认一次任务目标。	true	25-02 第二段剧情
+first_departure_outpost_dialogue	false	20	operator_404	404 哨所调度员	地表的旧通道已经不能稳定往返。你上去以后，升降通道会被暗潮反冲干扰，回来的路会暂时损坏。	true	
+first_departure_outpost_dialogue	false	30	player	玩家	也就是说，我不能直接回来？	true	
+first_departure_outpost_dialogue	false	40	operator_404	404 哨所调度员	不能。至少不能立刻回来。	true	
+first_departure_outpost_dialogue	false	50	operator_404	404 哨所调度员	你需要在地表找到前哨修复件。我们已经标成菱形信号，靠近后会更容易识别。	true	
+first_departure_outpost_dialogue	false	60	operator_404	404 哨所调度员	收集足够修复件后，修复两处前哨站。前哨站会重新建立地面信号链。	true	
+first_departure_outpost_dialogue	false	70	operator_404	404 哨所调度员	两处前哨都修好后，通道才能被重新激活，撤离信号才会亮起。	true	
+first_departure_outpost_dialogue	false	80	player	玩家	如果没来得及修好呢？	true	
+first_departure_outpost_dialogue	false	90	operator_404	404 哨所调度员	暗潮会不断压缩你的视野，也会让你的稳定值持续下降。	true	
+first_departure_outpost_dialogue	false	100	operator_404	404 哨所调度员	稳定值太低时，你会越来越难判断周围情况。不要贪，物资再多也得活着带回来。	true	
+first_departure_outpost_dialogue	false	110	operator_404	404 哨所调度员	记住顺序：先找菱形修复件，修复前哨站，再撤离。	true	
+first_departure_outpost_dialogue	false	120	operator_404	404 哨所调度员	回到基地后，你的稳定值会恢复。那里也是你整理物资、出售战利品和准备下一次探索的地方。	true	
+first_departure_outpost_dialogue	false	130	player	玩家	收到。先找修复件，修前哨，再回来。	true	
+first_departure_outpost_dialogue	false	140	operator_404	404 哨所调度员	祝你好运。404 哨所等你回来。	true	
+first_return_chapter_1	true	10	player	玩家	回来了……	true	25-03 首次返回独白
+first_return_chapter_1	true	20	player	玩家	门关上的声音，听起来比地表的风声踏实多了。	true	
+first_return_chapter_1	true	30	player	玩家	仓库终端刚把清单扫完。	true	
+first_return_chapter_1	true	40	player	玩家	也许，这些物资他们能用得上。	true	
+first_return_chapter_1	true	50	player	玩家	先去商人那看看吧，把这些物资换给商人，再让他们自己去分配这些物资吧。	true	
+first_return_chapter_1	true	60	player	玩家	毕竟，现在对我来说，矿币才是最重要的。	true	
+first_return_chapter_1	true	70	player	玩家	他们说的，旧时代制造机，说不定真能制造出那个...	true	
+first_return_chapter_1	true	80	player	玩家	如果是真的话，那妹妹说不定真的有救...	true	
+first_return_chapter_1	true	90	player	玩家	好吧，的尽可能快的攒够矿币购买制造机了。	true	
