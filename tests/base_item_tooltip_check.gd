@@ -14,6 +14,7 @@ func _verify_base_item_tooltip() -> bool:
 	if game_state == null:
 		printerr("Expected GameState autoload.")
 		return false
+	await process_frame
 	var registry = GameDataRegistryScript.new()
 	if not registry.load_all():
 		printerr("Expected registry to load.")

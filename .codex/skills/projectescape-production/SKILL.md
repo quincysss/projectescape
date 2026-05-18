@@ -14,29 +14,37 @@ This skill is the mandatory entry point for Project Escape work. It does not rep
 Before editing any file, answer these four questions internally:
 
 1. Which project module is this work touching?
-2. Which master document and split landing document define that module?
-3. Which V0.1 checklist or acceptance section proves the work is done?
-4. Are there newer user instructions in the current thread that override or extend the docs?
+2. Which `Doc/系统文档索引表.md` row and module `00_AI开工入口.md` define the read route?
+3. Which checklist, validation document, or acceptance section proves the work is done?
+4. If this is requirements documentation, which BDD `Feature` and `Scenario` describe the behavior?
+5. Are there newer user instructions in the current thread that override or extend the docs?
 
-If the answer to question 2 or 3 is unknown, inspect `references/doc-map.md` and the relevant `Doc/` files before editing.
+If the answer to question 2 or 3 is unknown, inspect `Doc/00_AI开工入口.md`, `Doc/00_AI文档读取规则.md`, `Doc/系统文档索引表.md`, `references/doc-map.md`, and the relevant `Doc/` files before editing.
 
 ## Required Start Sequence
 
 For all tasks:
 
-1. Read `Doc/00_落地执行文档总则.md`.
-2. Read `Doc/01_项目总纲_修订版_废土生存法则.md` when the task affects product direction, core experience, scope, or priority.
-3. Read `references/doc-map.md` and then the matching module docs.
-4. If implementing in Godot, read `Doc/16_Godot工程结构与代码模块规划_修订版_废土生存法则.md`.
-5. If touching assets, prompts, sprite sheets, UI art, or map art resources, read document 17 and, for UI, documents 20 and 21.
-6. If touching worldbuilding, narrative packaging, in-game copy voice, item naming, or place naming, read `Doc/23_世界观包装_废土生存法则.md`.
+1. Read `Doc/00_AI开工入口.md`.
+2. Read `Doc/00_AI文档读取规则.md`.
+3. Read `Doc/00_BDD需求文档规范.md` when creating, restructuring, or maintaining requirements docs, acceptance checklists, feature rules, or AI work prompts.
+4. Read `Doc/系统文档索引表.md` and the matching module `00_AI开工入口.md`.
+5. Read only the master document, split document, checklist, and AI prompt named by that module entry.
+6. Read `Doc/00_落地执行文档总则.md` when creating or restructuring execution documents.
+7. Read `Doc/01_项目总纲_修订版_废土生存法则.md` when the task affects product direction, core experience, scope, or priority.
+8. If implementing in Godot, read `Doc/16_Godot工程结构与代码模块规划_修订版_废土生存法则.md`.
+9. If touching assets, prompts, sprite sheets, UI art, or map art resources, read document 17 and, for UI, documents 20 and 21.
+10. If touching worldbuilding, narrative packaging, in-game copy voice, item naming, or place naming, read `Doc/23_世界观包装_废土生存法则.md`.
 
 ## Execution Discipline
 
-- Treat split documents under `Doc/02_*` to `Doc/09_*` as the operational source for implementation tasks.
+- Use `Doc/00_AI开工入口.md` and `Doc/系统文档索引表.md` to route work before reading long documents.
+- Future requirements documentation must be organized with BDD. Use `Doc/00_BDD需求文档规范.md`, and express key behavior with `Feature`, `Scenario`, `Given`, `When`, and `Then`.
+- Treat split documents under `Doc/02_*` to `Doc/10_*` as the operational source for implementation tasks.
+- Treat module `00_AI开工入口.md` files as routing documents only; do not copy full system rules into them.
 - Treat revised master documents as the source for intent and cross-module consistency.
 - All project text files must be read and written as UTF-8. On Windows, explicitly use UTF-8-aware reads/writes for Chinese docs, GDScript strings, `.tscn`, `.tab`, `.md`, and skill files; never rely on the shell default code page. Before finishing, inspect any touched Chinese text through a UTF-8 read and fix mojibake immediately.
-- Do not implement from a framework-only summary when a split landing document or V0.1 checklist exists.
+- Do not implement from a framework-only summary when a module AI entry, split landing document, or checklist exists.
 - When docs and implementation conflict, prefer the current docs and call out the conflict in the final response.
 - When the user changes a rule in the current thread, update the docs first or in the same patch as the implementation.
 - When maintaining docs or iterating features, check whether this skill and `references/doc-map.md` also need updates. If project rules, required reads, module routing, acceptance gates, or cross-module invariants change, update both the relevant `Doc/` files and this skill in the same work pass.
@@ -50,6 +58,7 @@ Update this skill when:
 
 - A new module document or split folder is added.
 - A V0.1 checklist, acceptance gate, required read order, or implementation workflow changes.
+- Requirements documentation format or BDD scenario requirements change.
 - A rule becomes cross-module and should constrain future implementation threads.
 - A user correction changes how production work should be started, routed, validated, or reported.
 - A document is renamed, moved, split, deprecated, or replaced.
@@ -73,7 +82,7 @@ Mandatory rule: the city base is built from walkable streets and non-walkable bl
 
 ## Core V0.1 System Rules
 
-For containers, stability and vision, outposts and repair materials, backpack and storage, extraction and settlement, or meta warehouse work, read the matching master document plus the module split folder listed in `references/doc-map.md`. Always read that module's `00_拆分规范与落地文档写法.md`, `V0_1最小交付清单.md`, and `模块功能规则细化与AI开工提示词.md` before implementation.
+For containers, stability and vision, outposts and repair materials, backpack and storage, extraction and settlement, meta warehouse, research, or crafting work, read the matching module `00_AI开工入口.md` first. Then read the master document, split landing document, checklist, and AI prompt listed there.
 
 ### Stability And Vision
 
@@ -151,6 +160,19 @@ Mandatory rules:
 - Research, crafting, and departure preparation may read/write warehouse items only through documented interfaces.
 - Warehouse, merchant, research, crafting, and departure preparation item actions must select a concrete warehouse item instance before selling, consuming, equipping, or moving it.
 - Save data fields must be stable and compatible with the data configuration rules.
+
+### Research And Crafting
+
+Required docs: `Doc/10_研究所与制作所系统_修订版_废土生存法则.md` and `Doc/10_研究所与制作所系统/00_AI开工入口.md`.
+
+Mandatory rules:
+
+- Research and crafting must be data-driven through documented TAB fields where the docs require table configuration.
+- Research costs and crafting costs consume items from the meta warehouse through documented warehouse interfaces.
+- Warehouse capacity research currently uses the 80 -> 120 capacity line: unresearched 80, then 80 / 90 / 100 / 110 / 120.
+- Blueprints unlock crafting recipes through documented blueprint and recipe relationships; do not hardcode title, detail, or recipe text in code.
+- Crafting outputs must enter the meta warehouse through the same capacity, stack, overflow, and item-instance rules used by warehouse and settlement systems.
+- Manufacturing/crafting unlocks tied to chapter progress must remain synchronized with the player profile and chapter goal documents.
 
 ## Art And Asset Rules
 

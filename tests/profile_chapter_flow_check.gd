@@ -201,9 +201,18 @@ func _verify() -> bool:
 		_restore_profile(game_state, original_profile)
 		return false
 	game_state.add_currency("mine_coin", 1, "test")
-	var unlock_result: Dictionary = game_state.unlock_manufacturing_station()
-	if not bool(unlock_result.get("ok", false)):
-		printerr("Expected 5000 mine_coin to unlock manufacturing: %s" % unlock_result)
+	crafting_unlock.emit_signal("pressed")
+	await process_frame
+	var unlock_confirm := base.get_node_or_null("BaseUIRoot/ManufacturingConfirmDialog") as ConfirmationDialog
+	if unlock_confirm == null or not unlock_confirm.visible:
+		printerr("Expected manufacturing unlock button to open confirmation dialog.")
+		base.queue_free()
+		_restore_profile(game_state, original_profile)
+		return false
+	unlock_confirm.emit_signal("confirmed")
+	await process_frame
+	if not game_state.manufacturing_station_unlocked:
+		printerr("Expected confirmed BaseScene manufacturing unlock to succeed.")
 		base.queue_free()
 		_restore_profile(game_state, original_profile)
 		return false

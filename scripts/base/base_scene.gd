@@ -2,6 +2,9 @@ extends Control
 
 const GameDataRegistryScript := preload("res://scripts/data/game_data_registry.gd")
 const DialogueServiceScript := preload("res://scripts/dialogue/dialogue_service.gd")
+const BaseMerchantPanelControllerScript := preload("res://scripts/base/base_merchant_panel_controller.gd")
+const BaseCraftingPanelControllerScript := preload("res://scripts/base/base_crafting_panel_controller.gd")
+const BaseDebugActionServiceScript := preload("res://scripts/debug/base_debug_action_service.gd")
 const DialoguePanelScene := preload("res://scenes/ui/DialoguePanel.tscn")
 const RunLoadingScreenScene := preload("res://scenes/ui/RunLoadingScreen.tscn")
 const FullscreenBackgroundBuilderScript := preload("res://scripts/ui/fullscreen_background_builder.gd")
@@ -66,13 +69,12 @@ const ITEM_TOOLTIP_MARGIN := 16.0
 
 var _game_state: Node
 var _active_tab := TAB_WAREHOUSE
-var _selected_sell_group_id := ""
-var _selected_shop_offer_id := ""
 var _selected_research_id := ""
-var _selected_sell_slot_index := -1
-var _selected_buy_slot_index := -1
-var _debug_registry = GameDataRegistryScript.new()
-var _debug_data_loaded := false
+var base_data_registry = GameDataRegistryScript.new()
+var base_data_loaded := false
+var base_merchant_panel = BaseMerchantPanelControllerScript.new()
+var base_crafting_panel = BaseCraftingPanelControllerScript.new()
+var base_debug_actions = BaseDebugActionServiceScript.new()
 var warehouse_panel: Panel
 var warehouse_grid_root: Control
 var warehouse_status_label: Label
@@ -121,6 +123,18 @@ var _tooltip_current_item_id := ""
 
 func _ready() -> void:
 	_game_state = get_node_or_null("/root/GameState")
+	base_merchant_panel.setup(
+		_game_state,
+		sell_count_spin_box,
+		sell_quote_label,
+		sell_button,
+		buy_count_spin_box,
+		buy_quote_label,
+		buy_button,
+		merchant_result_label,
+		Callable(self, "_currency_name")
+	)
+	base_crafting_panel.set_game_state(_game_state)
 	set_process_input(true)
 	_play_base_safe_house_bgm()
 	_build_background()
@@ -512,14 +526,15 @@ func _refresh() -> void:
 		research_button.disabled = true
 		_update_research_detail({})
 		_update_chapter_goal_view()
-		_update_crafting_panel()
+		base_crafting_panel.update_view()
 		merchant_result_label.text = ""
 		research_result_label.text = ""
 		debug_result_label.text = "GameState 不可用"
-		_update_sell_quote({})
-		_update_buy_quote({})
+		base_merchant_panel.clear_selection()
 		return
 
+	base_merchant_panel.set_game_state(_game_state)
+	base_crafting_panel.set_game_state(_game_state)
 	day_label.text = _game_state.get_day_display_text()
 	currency_label.text = _game_state.get_currency_display_text("mine_coin")
 	_set_warehouse_items_text(_game_state.get_warehouse_items_snapshot())
@@ -527,9 +542,8 @@ func _refresh() -> void:
 	_set_shop_stock_text(_game_state.query_shop_offers())
 	_set_research_items_text(_game_state.query_research_items())
 	_update_chapter_goal_view()
-	_update_crafting_panel()
-	_update_selected_sell_state()
-	_update_selected_buy_state()
+	base_crafting_panel.update_view()
+	base_merchant_panel.refresh_selection()
 	_update_selected_research_state()
 
 func _refresh_tabs() -> void:
@@ -580,13 +594,7 @@ func _is_research_tab_available() -> bool:
 	return bool(_game_state.get("research_station_unlocked"))
 
 func _is_crafting_tab_available() -> bool:
-	if _game_state == null:
-		return false
-	return (
-		bool(_game_state.get("chapter_1_goal_active"))
-		or bool(_game_state.get("manufacturing_station_unlocked"))
-		or bool(_game_state.get("chapter_1_completed"))
-	)
+	return base_crafting_panel.is_tab_available()
 
 func _build_visual_surfaces() -> void:
 	var ui_root := get_node("BaseUIRoot") as Control
@@ -815,6 +823,14 @@ func _build_crafting_surface() -> void:
 	manufacturing_confirm_dialog.cancel_button_text = "取消"
 	manufacturing_confirm_dialog.confirmed.connect(_on_manufacturing_unlock_confirmed)
 	ui_root.add_child(manufacturing_confirm_dialog)
+	base_crafting_panel.setup(
+		_game_state,
+		crafting_status_label,
+		crafting_unlock_button,
+		crafting_result_label,
+		manufacturing_confirm_dialog,
+		MANUFACTURING_UNLOCK_COST
+	)
 
 func _build_debug_story_tools() -> void:
 	if debug_panel == null:
@@ -913,7 +929,7 @@ func _set_warehouse_items_text(items: Array) -> void:
 
 func _set_merchant_items_text(items: Array) -> void:
 	merchant_list.clear()
-	var sell_slots := _expand_sell_groups_to_slots(items)
+	var sell_slots := base_merchant_panel.expand_sell_groups_to_slots(items)
 	_set_item_grid(merchant_sell_grid_root, sell_slots, maxi(10, sell_slots.size()), "sell")
 	if items.is_empty():
 		merchant_list.append_text("商人：暂无可出售道具")
@@ -932,7 +948,7 @@ func _set_merchant_items_text(items: Array) -> void:
 func _set_shop_stock_text(items: Array) -> void:
 	shop_stock_list.clear()
 	var level_text := "Lv.%d" % (_game_state.get_merchant_shop_level() if _game_state != null else 1)
-	var shop_slots := _expand_shop_offers_to_slots(items)
+	var shop_slots := base_merchant_panel.expand_shop_offers_to_slots(items)
 	_set_item_grid(merchant_shop_grid_root, shop_slots, maxi(10, shop_slots.size()), "buy")
 	if items.is_empty():
 		shop_stock_list.append_text("商人库存 %s：暂无资源" % level_text)
@@ -975,36 +991,6 @@ func _set_research_items_text(items: Array) -> void:
 				status_text,
 			])
 	research_list.append_text("\n".join(lines))
-
-func _expand_sell_groups_to_slots(groups: Array) -> Array[Dictionary]:
-	var result: Array[Dictionary] = []
-	for group in groups:
-		if not (group is Dictionary):
-			continue
-		var group_dict: Dictionary = group
-		var count := maxi(0, int(group_dict.get("count", 0)))
-		var group_id := String(group_dict.get("warehouse_item_id", ""))
-		for _index in range(count):
-			var slot: Dictionary = group_dict.duplicate(true)
-			slot["amount"] = 1
-			slot["grid_meta_id"] = group_id
-			result.append(slot)
-	return result
-
-func _expand_shop_offers_to_slots(offers: Array) -> Array[Dictionary]:
-	var result: Array[Dictionary] = []
-	for offer in offers:
-		if not (offer is Dictionary):
-			continue
-		var offer_dict: Dictionary = offer
-		var count := maxi(0, int(offer_dict.get("count", 0)))
-		var offer_id := String(offer_dict.get("shop_offer_id", ""))
-		for _index in range(count):
-			var slot: Dictionary = offer_dict.duplicate(true)
-			slot["amount"] = 1
-			slot["grid_meta_id"] = offer_id
-			result.append(slot)
-	return result
 
 func _set_item_grid(grid_root: Control, items: Array, capacity: int, source_id: String, unlocked_slots: int = -1) -> void:
 	if grid_root == null:
@@ -1049,15 +1035,7 @@ func _make_base_item_slot(pos: Vector2, slot_size: Vector2, item: Dictionary, in
 	button.add_theme_font_size_override("font_size", 12)
 	button.add_theme_color_override("font_color", _quality_color(item))
 	var meta_id := String(item.get("grid_meta_id", str(index)))
-	var selected := (
-		source_id == "sell"
-		and meta_id == _selected_sell_group_id
-		and index == _selected_sell_slot_index
-	) or (
-		source_id == "buy"
-		and meta_id == _selected_shop_offer_id
-		and index == _selected_buy_slot_index
-	)
+	var selected := base_merchant_panel.is_slot_selected(source_id, meta_id, index)
 	var border_color := Color("#D1B850") if selected else Color("#35C9D7")
 	var border_width := 3 if selected else 2
 	var normal_bg := Color("#151819") if locked else Color("#071116")
@@ -1271,9 +1249,9 @@ func _build_item_tooltip_data(item: Dictionary, context: Dictionary = {}) -> Dic
 				"description": "Tooltip 缺少 item_id。",
 			}
 		return {}
-	if not _ensure_debug_data_loaded():
+	if not _ensure_base_data_loaded():
 		return {}
-	var definition := _debug_registry.get_item(item_id)
+	var definition: Dictionary = base_data_registry.get_item(item_id)
 	if definition.is_empty():
 		if OS.is_debug_build():
 			push_warning("Item tooltip cannot find item_id: %s." % item_id)
@@ -1381,14 +1359,10 @@ func _dispatch_grid_slot(source_id: String, meta_id: String, index: int) -> void
 		TAB_WAREHOUSE:
 			_on_warehouse_item_meta_clicked("warehouse:%d" % index)
 		"sell":
-			sell_count_spin_box.value = 1
-			_selected_sell_slot_index = index
-			_on_merchant_item_meta_clicked("sell:%s" % meta_id)
+			base_merchant_panel.select_sell(meta_id, index)
 			_refresh()
 		"buy":
-			buy_count_spin_box.value = 1
-			_selected_buy_slot_index = index
-			_on_shop_stock_meta_clicked("buy:%s" % meta_id)
+			base_merchant_panel.select_buy(meta_id, index)
 			_refresh()
 
 func _set_research_tree(items: Array) -> void:
@@ -1441,9 +1415,9 @@ func _set_research_tree(items: Array) -> void:
 
 func _research_rows_by_id() -> Dictionary:
 	var result := {}
-	if not _ensure_debug_data_loaded():
+	if not _ensure_base_data_loaded():
 		return result
-	for row in _debug_registry.get_research_rows():
+	for row in base_data_registry.get_research_rows():
 		var research_id := String(row.get("research_id", ""))
 		if research_id.is_empty():
 			continue
@@ -1548,8 +1522,8 @@ func _roman_level(level: int) -> String:
 			return str(level)
 
 func _currency_name(currency_id: String) -> String:
-	if _ensure_debug_data_loaded():
-		var definition := _debug_registry.get_currency(currency_id)
+	if _ensure_base_data_loaded():
+		var definition: Dictionary = base_data_registry.get_currency(currency_id)
 		if not definition.is_empty():
 			return String(definition.get("name", currency_id))
 	match currency_id:
@@ -1564,72 +1538,13 @@ func _parse_bool(value: Variant) -> bool:
 	var normalized := String(value).strip_edges().to_lower()
 	return normalized == "true" or normalized == "1" or normalized == "yes"
 
-
-func _update_selected_sell_state() -> void:
-	var selected_group := _find_sell_group(_selected_sell_group_id)
-	if selected_group.is_empty():
-		_selected_sell_group_id = ""
-		_selected_sell_slot_index = -1
-		sell_count_spin_box.min_value = 1
-		sell_count_spin_box.max_value = 1
-		sell_count_spin_box.value = 1
-		_update_sell_quote({})
-		return
-
-	var max_count: int = maxi(1, int(selected_group.get("count", 1)))
-	if not _is_grid_meta_slot_valid("sell", _selected_sell_group_id, _selected_sell_slot_index):
-		_selected_sell_slot_index = _first_grid_meta_slot_index("sell", _selected_sell_group_id)
-	sell_count_spin_box.min_value = 1
-	sell_count_spin_box.max_value = max_count
-	sell_count_spin_box.value = clampi(int(sell_count_spin_box.value), 1, max_count)
-	_update_sell_quote(_game_state.get_sell_quote(_selected_sell_group_id, int(sell_count_spin_box.value)))
-
-func _update_sell_quote(quote: Dictionary) -> void:
-	var ok := bool(quote.get("ok", false))
-	sell_button.disabled = not ok
-	if not ok:
-		sell_quote_label.text = "选择一个可出售道具"
-		return
-	sell_quote_label.text = "出售 %s x%d，可获得 %d %s。当前 %s" % [
-		String(quote.get("display_name", "")),
-		int(quote.get("count", 0)),
-		int(quote.get("total_value", 0)),
-		_currency_name(String(quote.get("sell_currency_id", "mine_coin"))),
-		_game_state.get_currency_display_text(String(quote.get("sell_currency_id", "mine_coin"))),
-	]
-
-func _update_selected_buy_state() -> void:
-	var selected_offer := _find_shop_offer(_selected_shop_offer_id)
-	if selected_offer.is_empty():
-		_selected_shop_offer_id = ""
-		_selected_buy_slot_index = -1
-		buy_count_spin_box.min_value = 1
-		buy_count_spin_box.max_value = 1
-		buy_count_spin_box.value = 1
-		_update_buy_quote({})
-		return
-
-	var max_count: int = maxi(1, int(selected_offer.get("count", 1)))
-	if not _is_grid_meta_slot_valid("buy", _selected_shop_offer_id, _selected_buy_slot_index):
-		_selected_buy_slot_index = _first_grid_meta_slot_index("buy", _selected_shop_offer_id)
-	buy_count_spin_box.min_value = 1
-	buy_count_spin_box.max_value = max_count
-	buy_count_spin_box.value = clampi(int(buy_count_spin_box.value), 1, max_count)
-	_update_buy_quote(_game_state.get_buy_quote(_selected_shop_offer_id, int(buy_count_spin_box.value)))
-
-func _update_buy_quote(quote: Dictionary) -> void:
-	var ok := bool(quote.get("ok", false))
-	buy_button.disabled = not ok
-	if not ok:
-		buy_quote_label.text = "选择一个商人资源"
-		return
-	buy_quote_label.text = "购买 %s x%d，需要 %d %s。当前 %s" % [
-		String(quote.get("display_name", "")),
-		int(quote.get("count", 0)),
-		int(quote.get("total_price", 0)),
-		_currency_name(String(quote.get("buy_currency_id", "mine_coin"))),
-		_game_state.get_currency_display_text(String(quote.get("buy_currency_id", "mine_coin"))),
-	]
+func _ensure_base_data_loaded() -> bool:
+	if base_data_loaded:
+		return true
+	base_data_loaded = base_data_registry.load_all()
+	if not base_data_loaded and debug_result_label != null:
+		debug_result_label.text = "局外配置表加载失败：%s" % str(base_data_registry.load_errors)
+	return base_data_loaded
 
 func _update_selected_research_state() -> void:
 	if _game_state == null or _selected_research_id.is_empty():
@@ -1698,38 +1613,6 @@ func _update_chapter_goal_view() -> void:
 	else:
 		chapter_goal_label.text = ""
 
-func _update_crafting_panel() -> void:
-	if crafting_panel == null or crafting_status_label == null or crafting_unlock_button == null:
-		return
-	if _game_state == null:
-		crafting_status_label.text = "制造所状态不可用。"
-		crafting_unlock_button.disabled = true
-		return
-	var current_coin: int = int(_game_state.get_currency_amount("mine_coin")) if _game_state.has_method("get_currency_amount") else 0
-	var unlocked := bool(_game_state.get("manufacturing_station_unlocked"))
-	var goal_active := bool(_game_state.get("chapter_1_goal_active"))
-	if unlocked:
-		crafting_status_label.text = "制造所已解锁。\n\n旧时代制造机已经接入哨所电力。也许，一切都还来得及。"
-		crafting_unlock_button.visible = false
-		crafting_result_label.text = ""
-		return
-	crafting_unlock_button.visible = true
-	if not goal_active:
-		crafting_status_label.text = "制造所尚未开放。\n\n先完成首次地面探索并返回基地。首次返回剧情结束后，第一章目标会正式开启。"
-	else:
-		crafting_status_label.text = "当前目标：购买旧时代制造机，解锁制造所\n\n出售可售物资，积攒 5000 矿币。制造所解锁后，也许妹妹还有救。\n\n矿币：%d / %d" % [
-			current_coin,
-			MANUFACTURING_UNLOCK_COST,
-		]
-	var can_unlock: bool = bool(_game_state.can_unlock_manufacturing_station()) if _game_state.has_method("can_unlock_manufacturing_station") else false
-	crafting_unlock_button.disabled = not can_unlock
-	if not goal_active:
-		crafting_result_label.text = "完成首次地面返回剧情后开放。"
-	elif current_coin < MANUFACTURING_UNLOCK_COST:
-		crafting_result_label.text = "还差 %d 矿币。去商人页签出售带回的道具。" % (MANUFACTURING_UNLOCK_COST - current_coin)
-	else:
-		crafting_result_label.text = "矿币已足够。确认购买旧时代制造机，解锁制造所。"
-
 func _clear_research_requirement_slots() -> void:
 	if research_requirement_grid_root == null:
 		return
@@ -1766,7 +1649,7 @@ func _make_research_material_slot(detail: Dictionary, pos: Vector2) -> Panel:
 	var material_name := String(detail.get("display_name", detail.get("item_id", "")))
 	panel.tooltip_text = ""
 	var item_id := String(detail.get("item_id", ""))
-	var item_def := _debug_registry.get_item(item_id) if _ensure_debug_data_loaded() else {}
+	var item_def: Dictionary = base_data_registry.get_item(item_id) if _ensure_base_data_loaded() else {}
 	var icon_path := String(item_def.get("icon", ""))
 	var texture := _tooltip_icon_texture(icon_path)
 	if texture != null:
@@ -1813,14 +1696,14 @@ func _make_research_material_slot(detail: Dictionary, pos: Vector2) -> Panel:
 	return panel
 
 func _selected_research_detail_row() -> Dictionary:
-	if _selected_research_id.is_empty() or not _ensure_debug_data_loaded():
+	if _selected_research_id.is_empty() or not _ensure_base_data_loaded():
 		return {}
 	var current_level: int = 0
 	if _game_state != null and _game_state.has_method("get_research_level"):
 		current_level = int(_game_state.get_research_level(_selected_research_id))
 	var best_row: Dictionary = {}
 	var max_level := 0
-	for row in _debug_registry.get_research_rows():
+	for row in base_data_registry.get_research_rows():
 		if String(row.get("research_id", "")) != _selected_research_id:
 			continue
 		var level := int(row.get("level", 0))
@@ -1832,48 +1715,6 @@ func _selected_research_detail_row() -> Dictionary:
 	if current_level >= max_level:
 		return best_row
 	return best_row
-
-func _find_sell_group(warehouse_item_id: String) -> Dictionary:
-	if _game_state == null or warehouse_item_id.is_empty():
-		return {}
-	for item in _game_state.query_sellable_items():
-		if String(item.get("warehouse_item_id", "")) == warehouse_item_id:
-			return item
-	return {}
-
-func _find_shop_offer(shop_offer_id: String) -> Dictionary:
-	if _game_state == null or shop_offer_id.is_empty():
-		return {}
-	for item in _game_state.query_shop_offers():
-		if String(item.get("shop_offer_id", "")) == shop_offer_id:
-			return item
-	return {}
-
-func _is_grid_meta_slot_valid(source_id: String, meta_id: String, slot_index: int) -> bool:
-	if slot_index < 0 or meta_id.is_empty():
-		return false
-	var slots := _current_merchant_slots(source_id)
-	return slot_index < slots.size() and String(slots[slot_index].get("grid_meta_id", "")) == meta_id
-
-func _first_grid_meta_slot_index(source_id: String, meta_id: String) -> int:
-	if meta_id.is_empty():
-		return -1
-	var slots := _current_merchant_slots(source_id)
-	for index in range(slots.size()):
-		if String(slots[index].get("grid_meta_id", "")) == meta_id:
-			return index
-	return -1
-
-func _current_merchant_slots(source_id: String) -> Array[Dictionary]:
-	if _game_state == null:
-		return []
-	match source_id:
-		"sell":
-			return _expand_sell_groups_to_slots(_game_state.query_sellable_items())
-		"buy":
-			return _expand_shop_offers_to_slots(_game_state.query_shop_offers())
-		_:
-			return []
 
 func _format_research_quote(quote: Dictionary) -> String:
 	var material_parts: Array[String] = []
@@ -1994,17 +1835,13 @@ func _on_merchant_item_meta_clicked(meta: Variant) -> void:
 	var parts := String(meta).split(":", false, 1)
 	if parts.size() != 2 or parts[0] != "sell":
 		return
-	_selected_sell_group_id = parts[1]
-	merchant_result_label.text = ""
-	_update_selected_sell_state()
+	base_merchant_panel.select_sell(parts[1])
 
 func _on_shop_stock_meta_clicked(meta: Variant) -> void:
 	var parts := String(meta).split(":", false, 1)
 	if parts.size() != 2 or parts[0] != "buy":
 		return
-	_selected_shop_offer_id = parts[1]
-	merchant_result_label.text = ""
-	_update_selected_buy_state()
+	base_merchant_panel.select_buy(parts[1])
 
 func _on_research_meta_clicked(meta: Variant) -> void:
 	var parts := String(meta).split(":", false, 1)
@@ -2015,29 +1852,19 @@ func _on_research_meta_clicked(meta: Variant) -> void:
 	_update_selected_research_state()
 
 func _on_sell_count_changed(_value: float) -> void:
-	_update_selected_sell_state()
+	base_merchant_panel.update_selected_sell_state()
 
 func _on_buy_count_changed(_value: float) -> void:
-	_update_selected_buy_state()
+	base_merchant_panel.update_selected_buy_state()
 
 func _on_sell_pressed() -> void:
-	if _game_state == null or _selected_sell_group_id.is_empty():
-		return
-	var result: Dictionary = _game_state.sell_warehouse_item(_selected_sell_group_id, int(sell_count_spin_box.value))
+	var result: Dictionary = base_merchant_panel.sell_selected()
 	merchant_result_label.text = String(result.get("message", "出售失败。"))
-	if bool(result.get("ok", false)):
-		_selected_sell_group_id = ""
-		_selected_sell_slot_index = -1
 	_refresh()
 
 func _on_buy_pressed() -> void:
-	if _game_state == null or _selected_shop_offer_id.is_empty():
-		return
-	var result: Dictionary = _game_state.buy_shop_item(_selected_shop_offer_id, int(buy_count_spin_box.value))
+	var result: Dictionary = base_merchant_panel.buy_selected()
 	merchant_result_label.text = String(result.get("message", "购买失败。"))
-	if bool(result.get("ok", false)):
-		_selected_shop_offer_id = ""
-		_selected_buy_slot_index = -1
 	_refresh()
 
 func _on_research_pressed() -> void:
@@ -2061,142 +1888,71 @@ func _on_research_confirmed() -> void:
 	_refresh()
 
 func _on_crafting_unlock_pressed() -> void:
-	if _game_state == null:
-		return
-	if not _game_state.can_unlock_manufacturing_station():
-		crafting_result_label.text = "矿币或章节目标条件不足。"
-		_update_crafting_panel()
-		return
-	manufacturing_confirm_dialog.dialog_text = "确认解锁制造所？\n将消耗 5000 矿币。"
-	manufacturing_confirm_dialog.popup_centered()
+	base_crafting_panel.request_unlock()
 
 func _on_manufacturing_unlock_confirmed() -> void:
-	if _game_state == null:
-		return
-	var result: Dictionary = _game_state.unlock_manufacturing_station()
-	crafting_result_label.text = String(result.get("message", "制造所解锁失败。"))
+	var result: Dictionary = base_crafting_panel.confirm_unlock()
 	_refresh()
 	if bool(result.get("ok", false)):
 		_show_chapter_complete_popup(int(result.get("surface_day", _game_state.get_current_day())))
 
 func _on_debug_add_currency_pressed() -> void:
-	if _game_state == null:
-		return
-	var result: Dictionary = _game_state.add_currency("mine_coin", 500, "debug_panel")
-	debug_result_label.text = "已增加 500 矿币。" if bool(result.get("ok", false)) else "增加矿币失败。"
+	debug_result_label.text = String(base_debug_actions.add_currency(_game_state).get("message", "增加矿币失败。"))
 	_refresh()
 
 func _on_debug_add_sell_items_pressed() -> void:
-	if _game_state == null or not _ensure_debug_data_loaded():
-		return
-	var added := 0
-	added += _debug_add_item("field_bandage", 2)
-	added += _debug_add_item("gold_data_chip", 1)
-	added += _debug_add_item("stability_candy", 2)
-	debug_result_label.text = "已加入 %d 个可售卖测试道具。" % added
+	debug_result_label.text = String(base_debug_actions.add_sell_test_items(_game_state).get("message", "加入可售卖测试道具失败。"))
 	_show_tab(TAB_MERCHANT)
 
 func _on_debug_add_research_costs_pressed() -> void:
-	if _game_state == null:
-		return
-	var result := _debug_fill_next_research_costs()
+	var result := base_debug_actions.fill_next_research_costs(_game_state, _selected_research_id)
 	debug_result_label.text = String(result.get("message", "补齐研究资源失败。"))
 	_show_tab(TAB_RESEARCH)
 
 func _on_debug_refresh_shop_pressed() -> void:
-	if _game_state == null:
-		return
-	_game_state.set_merchant_shop_level(1)
-	var offers: Array = _game_state.refresh_shop_stock()
-	debug_result_label.text = "已刷新 Lv.1 商人库存：%d 项。" % offers.size()
+	debug_result_label.text = String(base_debug_actions.refresh_shop(_game_state, 1).get("message", "刷新商人库存失败。"))
 	_show_tab(TAB_MERCHANT)
 
 func _on_debug_max_shop_pressed() -> void:
-	if _game_state == null:
-		return
-	_game_state.set_merchant_shop_level(3)
-	var offers: Array = _game_state.refresh_shop_stock()
-	debug_result_label.text = "已切到 Lv.3 并刷新商人库存：%d 项。" % offers.size()
+	debug_result_label.text = String(base_debug_actions.refresh_shop(_game_state, 3).get("message", "刷新商人库存失败。"))
 	_show_tab(TAB_MERCHANT)
 
 func _on_debug_complete_research_pressed() -> void:
-	if _game_state == null:
-		return
-	var fill_result := _debug_fill_next_research_costs()
-	if not bool(fill_result.get("ok", false)):
-		debug_result_label.text = String(fill_result.get("message", "补齐研究资源失败。"))
-		_show_tab(TAB_RESEARCH)
-		return
-	var result: Dictionary = _game_state.complete_research(_debug_target_research_id())
+	var result := base_debug_actions.complete_next_research(_game_state, _selected_research_id)
 	debug_result_label.text = String(result.get("message", "研究失败。"))
 	_selected_research_id = ""
 	_show_tab(TAB_RESEARCH)
 
 func _on_debug_reset_research_pressed() -> void:
-	if _game_state == null:
-		return
-	_game_state.reset_research()
+	debug_result_label.text = String(base_debug_actions.reset_research(_game_state).get("message", "重置研究等级失败。"))
 	_selected_research_id = ""
-	debug_result_label.text = "已重置研究等级。"
 	_show_tab(TAB_RESEARCH)
 
 func _on_debug_reset_profile_pressed() -> void:
-	if _game_state == null:
-		return
-	var result: Dictionary = {}
-	if _game_state.has_method("reset_local_data_debug_only"):
-		result = _game_state.reset_local_data_debug_only()
-	elif _game_state.has_method("delete_profile_debug_only"):
-		result = _game_state.delete_profile_debug_only()
-	else:
-		debug_result_label.text = "GameState 不支持重置本地数据。"
-		return
-	debug_result_label.text = String(result.get("message", "已重置本地数据。")) if bool(result.get("ok", false)) else "重置本地数据失败：%s" % String(result.get("reason", result.get("error", "unknown")))
+	debug_result_label.text = String(base_debug_actions.reset_profile(_game_state).get("message", "重置本地数据失败。"))
 	_refresh()
 
 func _on_debug_reset_story_pressed() -> void:
-	if _game_state == null or not _game_state.has_method("reset_story_flags"):
-		return
-	_game_state.reset_story_flags()
-	debug_result_label.text = "已重置剧情 flag 与第一章状态。"
+	debug_result_label.text = String(base_debug_actions.reset_story(_game_state).get("message", "重置剧情 flag 失败。"))
 	_refresh()
 
 func _on_debug_add_chapter_currency_pressed() -> void:
-	if _game_state == null:
-		return
-	_game_state.add_currency("mine_coin", 5000, "debug_chapter")
-	debug_result_label.text = "已增加 5000 矿币。"
+	debug_result_label.text = String(base_debug_actions.add_chapter_currency(_game_state).get("message", "增加章节矿币失败。"))
 	_refresh()
 
 func _on_debug_surface_day_pressed() -> void:
-	if _game_state == null:
-		return
-	_game_state.reset_day(_game_state.get_current_day() + 1)
-	debug_result_label.text = "地表天数已 +1。"
+	debug_result_label.text = String(base_debug_actions.advance_surface_day(_game_state).get("message", "地表天数调整失败。"))
 	_refresh()
 
 func _on_debug_force_chapter_complete_pressed() -> void:
-	if _game_state == null:
-		return
-	if _game_state.has_method("activate_chapter_1_goal_debug"):
-		_game_state.activate_chapter_1_goal_debug()
-	var missing := maxi(0, MANUFACTURING_UNLOCK_COST - _game_state.get_currency_amount("mine_coin"))
-	if missing > 0:
-		_game_state.add_currency("mine_coin", missing, "debug_force_chapter")
-	var result: Dictionary = _game_state.unlock_manufacturing_station()
+	var result := base_debug_actions.force_chapter_complete(_game_state, MANUFACTURING_UNLOCK_COST)
 	debug_result_label.text = String(result.get("message", "强制完成第一章失败。"))
 	_refresh()
 	if bool(result.get("ok", false)):
 		_show_chapter_complete_popup(int(result.get("surface_day", _game_state.get_current_day())))
 
 func _on_debug_force_monster_pressed() -> void:
-	if _game_state == null:
-		return
-	if _game_state.has_method("debug_force_monster_presence_next_run"):
-		_game_state.debug_force_monster_presence_next_run()
-	elif _game_state.has_method("debug_force_scene_event_next_run"):
-		_game_state.debug_force_scene_event_next_run("monster_presence")
-	debug_result_label.text = "下一次出发：本日必出怪物。"
+	debug_result_label.text = String(base_debug_actions.force_monster_next_run(_game_state).get("message", "强制怪物事件失败。"))
 
 func _on_debug_slow_loading_pressed() -> void:
 	_debug_slow_next_loading = true
@@ -2205,49 +1961,3 @@ func _on_debug_slow_loading_pressed() -> void:
 func _on_debug_fail_loading_pressed() -> void:
 	_debug_fail_next_loading = true
 	debug_result_label.text = "下次出发将模拟加载失败。"
-
-func _debug_fill_next_research_costs() -> Dictionary:
-	if not _ensure_debug_data_loaded():
-		return {"ok": false, "message": "配置表加载失败。"}
-	var research_id := _debug_target_research_id()
-	var quote: Dictionary = _game_state.get_research_quote(research_id)
-	if String(quote.get("error", "")) == "max_level":
-		return {"ok": false, "message": "%s 已满级，无需补齐。" % String(quote.get("display_name", research_id))}
-	var added_items := 0
-	for detail in Array(quote.get("requirement_details", [])):
-		if not (detail is Dictionary):
-			continue
-		var item_id := String(detail.get("item_id", ""))
-		var missing := maxi(0, int(detail.get("required", 0)) - int(detail.get("owned", 0)))
-		added_items += _debug_add_item(item_id, missing)
-	var currency_id := String(quote.get("required_currency_id", "mine_coin"))
-	var missing_currency := maxi(0, int(quote.get("required_currency_amount", 0)) - int(quote.get("current_currency_amount", 0)))
-	if missing_currency > 0:
-		_game_state.add_currency(currency_id, missing_currency, "debug_research_costs")
-	return {
-		"ok": true,
-		"message": "已补齐 %s 下一档：材料 +%d，矿币 +%d。" % [String(quote.get("display_name", research_id)), added_items, missing_currency],
-	}
-
-func _debug_target_research_id() -> String:
-	return _selected_research_id if not _selected_research_id.is_empty() else "move_speed"
-
-func _debug_add_item(item_id: String, count: int) -> int:
-	if count <= 0 or item_id.is_empty():
-		return 0
-	var items: Array[Dictionary] = []
-	for _index in range(count):
-		var stack := _debug_registry.make_item_stack(item_id, 1)
-		if not stack.is_empty():
-			stack["source"] = "debug_panel"
-			items.append(stack)
-	var accepted: Array = _game_state.add_to_warehouse(items)
-	return accepted.size()
-
-func _ensure_debug_data_loaded() -> bool:
-	if _debug_data_loaded:
-		return true
-	_debug_data_loaded = _debug_registry.load_all()
-	if not _debug_data_loaded and debug_result_label != null:
-		debug_result_label.text = "Debug 配置表加载失败：%s" % str(_debug_registry.load_errors)
-	return _debug_data_loaded
