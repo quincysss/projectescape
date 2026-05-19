@@ -5,6 +5,7 @@ const CHARACTER_HUD_PORTRAIT_FRAME := preload("res://assets/ui/run_character_hud
 const CHARACTER_HUD_DEFAULT_PORTRAIT := preload("res://assets/ui/run_character_hud/character_status/components/ui_run_character_portrait_male_01.png")
 const CHARACTER_HUD_STABILITY_FRAME := preload("res://assets/ui/run_character_hud/character_status/components/ui_run_character_stability_bar_frame_empty_ref_01.png")
 const CHARACTER_HUD_STABILITY_FILL := preload("res://assets/ui/run_character_hud/character_status/components/ui_run_character_stability_fill_strip_current_ref_01.png")
+const RunMinimapScript := preload("res://scripts/run/run_minimap.gd")
 const TIMER_COUNTDOWN_FRAME := preload("res://assets/ui/run_timer_extraction_hud/components/ui_run_timer_countdown_frame_empty_01.png")
 const EXTRACTION_STATUS_FRAME_LEFT := preload("res://assets/ui/run_timer_extraction_hud/components/ui_run_extraction_status_frame_left_01.png")
 const EXTRACTION_STATUS_FRAME_CENTER := preload("res://assets/ui/run_timer_extraction_hud/components/ui_run_extraction_status_frame_center_tile_01.png")
@@ -37,6 +38,7 @@ const INVENTORY_PANEL_OPEN_SECONDS := 0.18
 func build(scene) -> void:
 	_build_character_status_hud(scene)
 	_build_outpost_status_hud(scene)
+	_build_minimap(scene)
 	_build_center_status_hud(scene)
 	_build_backpack_status_hud(scene)
 	_build_context_prompt(scene)
@@ -49,6 +51,7 @@ func refresh(scene) -> void:
 	_refresh_stability_hud(scene)
 	_refresh_countdown(scene)
 	_refresh_outpost_status_hud(scene)
+	_refresh_minimap(scene)
 	_refresh_backpack_status(scene)
 	_refresh_prompt(scene)
 	var story_paused: bool = scene.has_method("is_run_story_paused") and bool(scene.is_run_story_paused())
@@ -330,6 +333,17 @@ func _build_outpost_status_hud(scene) -> void:
 	scene.outpost_count_label = scene.objective_title_label
 	scene.outpost_first_status_label = scene.objective_next_step_label
 	scene.outpost_second_status_label = scene.objective_extraction_label
+
+func _build_minimap(scene) -> void:
+	scene.minimap = RunMinimapScript.new()
+	scene.minimap.name = "RunMinimap"
+	scene.minimap.anchor_left = 1.0
+	scene.minimap.anchor_right = 1.0
+	scene.minimap.offset_left = -214.0
+	scene.minimap.offset_top = 18.0
+	scene.minimap.offset_right = -26.0
+	scene.minimap.offset_bottom = 206.0
+	scene.ui_root.add_child(scene.minimap)
 
 func _build_backpack_status_hud(scene) -> void:
 	scene.backpack_hud_root = Panel.new()
@@ -617,6 +631,10 @@ func _refresh_outpost_status_hud(scene) -> void:
 		"font_color",
 		Color(0.56, 0.94, 0.58) if scene.run_director.context.is_extraction_unlocked else Color(0.64, 0.62, 0.56)
 	)
+
+func _refresh_minimap(scene) -> void:
+	if scene.minimap != null and is_instance_valid(scene.minimap):
+		scene.minimap.update_from_scene(scene)
 
 func _objective_chain_view(scene) -> Dictionary:
 	var context = scene.run_director.context

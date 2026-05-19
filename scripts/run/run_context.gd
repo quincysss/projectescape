@@ -28,8 +28,8 @@ var outpost_states: Dictionary = {}
 var repaired_outpost_count: int = 0
 
 var is_extraction_unlocked: bool = false
-var camera_mode: String = "observe"
-var darkness_enabled: bool = false
+var camera_mode: String = "follow"
+var darkness_enabled: bool = true
 var active_safe_zone_id: String = "home"
 var active_safe_zone_type: String = "home"
 var stability_stage: String = "SAFE"

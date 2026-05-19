@@ -78,6 +78,7 @@ func default_profile(username: String) -> Dictionary:
 		"currencies": {DEFAULT_CURRENCY_ID: 0},
 		"warehouse_items": [],
 		"research_levels": {},
+		"collected_item_ids": {},
 		"merchant_shop_level": 1,
 		"merchant_shop_offers": [],
 		"ss_roll_state": {},
@@ -109,6 +110,7 @@ func _with_defaults(profile: Dictionary) -> Dictionary:
 		merged["currencies"][DEFAULT_CURRENCY_ID] = 0
 	merged["warehouse_items"] = Array(merged.get("warehouse_items", []))
 	merged["research_levels"] = Dictionary(merged.get("research_levels", {}))
+	merged["collected_item_ids"] = Dictionary(merged.get("collected_item_ids", {}))
 	merged["merchant_shop_offers"] = Array(merged.get("merchant_shop_offers", []))
 	merged["surface_day"] = maxi(0, int(merged.get("surface_day", 0)))
 	merged["current_chapter"] = maxi(1, int(merged.get("current_chapter", 1)))

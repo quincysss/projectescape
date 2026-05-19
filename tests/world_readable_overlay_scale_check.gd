@@ -1,11 +1,11 @@
 extends SceneTree
 
 func _initialize() -> void:
-	var ok := await _verify_overview_readable_overlay_scale()
+	var ok := await _verify_follow_readable_overlay_scale()
 	print("World readable overlay scale verified." if ok else "World readable overlay scale failed.")
 	quit(0 if ok else 1)
 
-func _verify_overview_readable_overlay_scale() -> bool:
+func _verify_follow_readable_overlay_scale() -> bool:
 	var scene := load("res://scenes/run/RunScene.tscn")
 	if scene == null:
 		printerr("Failed to load RunScene.tscn")
@@ -16,7 +16,7 @@ func _verify_overview_readable_overlay_scale() -> bool:
 	await process_frame
 
 	var ok := true
-	root.camera.zoom = Vector2(0.10, 0.10)
+	root.camera.zoom = root.PLAYER_FOLLOW_ZOOM
 	if root.run_director.context != null:
 		root.run_director.context.active_safe_zone_id = "home"
 	await process_frame
@@ -33,17 +33,17 @@ func _verify_overview_readable_overlay_scale() -> bool:
 		var lifetime_background := container.get_node_or_null("ContainerReadableRoot/ContainerLifetimeBarBackground") as ColorRect
 		var name_label := container.get_node_or_null("ContainerReadableRoot/ContainerNameLabel") as Label
 		var marker_label := container.get_node_or_null("MarkerLabel") as Label
-		if readable_root == null or absf(readable_root.scale.x - 3.0) > 0.01:
-			printerr("Expected overview formal container root to cap at 3.0x scale.")
+		if readable_root == null or absf(readable_root.scale.x - 1.0) > 0.01:
+			printerr("Expected follow formal container root to stay at normal scale.")
 			ok = false
 		if visual == null or visual.texture == null:
-			printerr("Expected overview container formal icon.")
+			printerr("Expected follow container formal icon.")
 			ok = false
 		if lifetime_label == null or lifetime_background == null:
-			printerr("Expected overview container lifetime bar and label.")
+			printerr("Expected follow container lifetime bar and label.")
 			ok = false
 		if name_label == null:
-			printerr("Expected overview container name label.")
+			printerr("Expected follow container name label.")
 			ok = false
 		if marker_label != null:
 			printerr("Expected formal container to omit the old marker label.")
@@ -56,11 +56,11 @@ func _verify_overview_readable_overlay_scale() -> bool:
 	else:
 		var material_visual := material.get_node_or_null("BuildMaterialVisual") as Polygon2D
 		var material_label := material.get_node_or_null("MarkerLabel") as Label
-		if material_visual == null or absf(material_visual.scale.x - 3.0) > 0.01:
-			printerr("Expected overview material visual to cap at 3.0x scale.")
+		if material_visual == null or absf(material_visual.scale.x - 1.0) > 0.01:
+			printerr("Expected follow material visual to stay at normal scale.")
 			ok = false
-		if material_label == null or absf(material_label.scale.x - 3.0) > 0.01:
-			printerr("Expected overview material marker label to cap at 3.0x scale.")
+		if material_label == null or absf(material_label.scale.x - 1.0) > 0.01:
+			printerr("Expected follow material marker label to stay at normal scale.")
 			ok = false
 
 	var outpost: Node = _first_interactable(root.outpost_root, "outpost")
@@ -69,8 +69,8 @@ func _verify_overview_readable_overlay_scale() -> bool:
 		ok = false
 	else:
 		var outpost_label := outpost.get_node_or_null("WorldLabel") as Label
-		if outpost_label == null or absf(outpost_label.scale.x - 3.0) > 0.01:
-			printerr("Expected overview outpost label to cap at 3.0x scale.")
+		if outpost_label == null or absf(outpost_label.scale.x - 1.0) > 0.01:
+			printerr("Expected follow outpost label to stay at normal scale.")
 			ok = false
 		ok = _check_outpost_requirement_bubble_spacing(outpost) and ok
 
@@ -99,8 +99,8 @@ func _check_outpost_requirement_bubble_spacing(outpost: Node) -> bool:
 	if bubbles == null:
 		printerr("Expected outpost requirement bubbles.")
 		return false
-	if absf(bubbles.scale.x - 3.0) > 0.01 or absf(bubbles.scale.y - 3.0) > 0.01:
-		printerr("Expected outpost requirement bubbles to scale as one centered panel.")
+	if absf(bubbles.scale.x - 1.0) > 0.01 or absf(bubbles.scale.y - 1.0) > 0.01:
+		printerr("Expected outpost requirement bubbles to stay at normal scale.")
 		return false
 	var background := bubbles.get_node_or_null("RequirementBubbleBackground") as ColorRect
 	if background == null:

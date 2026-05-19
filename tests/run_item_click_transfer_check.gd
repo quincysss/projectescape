@@ -6,6 +6,10 @@ func _initialize() -> void:
 	quit(0 if ok else 1)
 
 func _verify_run_item_click_transfer() -> bool:
+	var game_state = get_root().get_node_or_null("GameState")
+	if game_state != null and game_state.has_method("create_profile"):
+		game_state.create_profile("RunCatalogPickup")
+		game_state.clear_collected_items_debug_only()
 	var scene := load("res://scenes/run/RunScene.tscn")
 	if scene == null:
 		printerr("Failed to load RunScene.")
@@ -25,9 +29,13 @@ func _verify_run_item_click_transfer() -> bool:
 	if initial_loot_count <= 0:
 		printerr("Expected opened container loot.")
 		return false
+	var first_loot_item_id := String(root.opened_loot[0].get("item_id", ""))
 	root._on_loot_item_meta_clicked("loot:0")
 	if root.run_director.inventory_component.items.size() != 1:
 		printerr("Expected clicked loot item to move into backpack.")
+		return false
+	if game_state != null and game_state.has_method("is_item_collected") and not game_state.is_item_collected(first_loot_item_id):
+		printerr("Expected clicked run loot to light catalog item %s." % first_loot_item_id)
 		return false
 	if initial_loot_count > 1 and root.opened_loot.size() != initial_loot_count - 1:
 		printerr("Expected only one clicked loot item to be removed from loot.")

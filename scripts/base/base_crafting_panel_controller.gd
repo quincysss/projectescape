@@ -6,7 +6,7 @@ var status_label: Label
 var unlock_button: Button
 var result_label: Label
 var confirm_dialog: ConfirmationDialog
-var unlock_cost := 5000
+var unlock_cost := 100
 
 
 func setup(
@@ -62,7 +62,8 @@ func update_view() -> void:
 	if not goal_active:
 		status_label.text = "制造所尚未开放。\n\n先完成首次地面探索并返回基地。首次返回剧情结束后，第一章目标会正式开启。"
 	else:
-		status_label.text = "当前目标：购买旧时代制造机，解锁制造所\n\n出售可售物资，积攒 5000 矿币。制造所解锁后，也许妹妹还有救。\n\n矿币：%d / %d" % [
+		status_label.text = "当前目标：购买旧时代制造机，解锁制造所\n\n出售可售物资，积攒 %d 矿币。制造所解锁后，也许妹妹还有救。\n\n矿币：%d / %d" % [
+			unlock_cost,
 			current_coin,
 			unlock_cost,
 		]

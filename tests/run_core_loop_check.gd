@@ -246,11 +246,11 @@ func _verify_safe_zone_and_stability(director) -> bool:
 	if not stability.is_recovering:
 		printerr("Expected stability recovery inside home.")
 		return false
-	if vision.darkness_enabled:
-		printerr("Expected darkness disabled inside home.")
+	if not vision.darkness_enabled:
+		printerr("Expected exploration fog to remain enabled inside home.")
 		return false
-	if camera.get_mode_name() != "OVERVIEW":
-		printerr("Expected overview camera inside home, got %s" % camera.get_mode_name())
+	if camera.get_mode_name() != "PLAYER_FOLLOW":
+		printerr("Expected follow camera inside home, got %s" % camera.get_mode_name())
 		return false
 
 	director.on_safe_zone_exited("home")

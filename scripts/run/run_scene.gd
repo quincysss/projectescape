@@ -3,7 +3,7 @@ extends Node2D
 const BasicPlayerScene := preload("res://scenes/entities/player/BasicPlayer.tscn")
 const InteractableScript := preload("res://scripts/run/run_interactable.gd")
 const VisionCircleScript := preload("res://scripts/vision/vision_debug_circle.gd")
-const VisionMaskScript := preload("res://scripts/vision/vision_mask_overlay.gd")
+const ExplorationFogScript := preload("res://scripts/vision/exploration_fog_overlay.gd")
 const LootInteractionControllerScript := preload("res://scripts/run/loot_interaction_controller.gd")
 const RunEndControllerScript := preload("res://scripts/run/run_end_controller.gd")
 const OutpostRepairControllerScript := preload("res://scripts/run/outpost_repair_controller.gd")
@@ -24,16 +24,12 @@ const MAP_UNITS := Vector2(280.0, 220.0)
 const MAP_ORIGIN_UNITS := Vector2(-140.0, -110.0)
 const HOME_SIZE_UNITS := Vector2(10.0, 8.0)
 const HOME_SAFE_SIZE_UNITS := Vector2(12.0, 10.0)
+const HOME_ART_LIGHT_PADDING_UNITS := 0.5
 const OUTPOST_SIZE_UNITS := Vector2(10.0, 8.0)
 const MAIN_ROAD_WIDTH_UNITS := 8.0
 const SECONDARY_ROAD_WIDTH_UNITS := 6.0
 const ALLEY_WIDTH_UNITS := 4.0
 const PLAYER_FOLLOW_ZOOM := Vector2(0.28, 0.28)
-const HOME_OVERVIEW_MAX_ZOOM := 0.11
-const HOME_OVERVIEW_MIN_ZOOM := 0.025
-const HOME_OVERVIEW_PADDING_UNITS := Vector2(0.0, 0.0)
-const HOME_OVERVIEW_READABLE_UI_SCALE_MULTIPLIER := 1.0
-const HOME_OVERVIEW_READABLE_UI_MAX_SCALE := 3.0
 const CAMERA_TRANSITION_SECONDS := 0.5
 const CONTAINER_OPEN_HOLD_SECONDS := 0.8
 const OUTPOST_REPAIR_HOLD_SECONDS := 1.5
@@ -103,6 +99,7 @@ var extraction_status_button: Button
 var extraction_progress_bar: ProgressBar
 var home_backpack_hint_label: Label
 var outpost_hud_root: Panel
+var minimap: Control
 var outpost_count_label: Label
 var outpost_first_icon: Panel
 var outpost_first_status_label: Label
@@ -192,8 +189,8 @@ func _ready() -> void:
 	_spawn_monsters_for_run()
 	_prepare_initial_story_gate()
 	if camera:
-		camera.zoom = _home_overview_zoom()
-		camera.position = _home_overview_offset()
+		camera.zoom = PLAYER_FOLLOW_ZOOM
+		camera.position = Vector2.ZERO
 	_play_run_safe_house_bgm()
 	_refresh_ui()
 	call_deferred("_maybe_start_run_story_gate")
@@ -255,9 +252,8 @@ func _configure_monster_spawn_controller() -> void:
 func _refresh_camera_for_viewport() -> void:
 	if camera == null or player == null:
 		return
-	if run_director.context != null and run_director.context.active_safe_zone_id == "home":
-		camera.zoom = _home_overview_zoom()
-		camera.position = _home_overview_offset()
+	camera.zoom = PLAYER_FOLLOW_ZOOM
+	camera.position = Vector2.ZERO
 
 func _ensure_input_actions() -> void:
 	_add_key_action("move_left", KEY_A)
@@ -316,6 +312,7 @@ func _build_run_world() -> void:
 	_create_player()
 	_create_camera()
 	_create_vision_circle()
+	_create_exploration_fog()
 
 func _apply_building_draw_overrides() -> void:
 	for child in y_sort_root.get_children():
@@ -431,8 +428,8 @@ func _create_camera() -> void:
 	camera.name = "PlayerCamera"
 	camera.position_smoothing_enabled = true
 	camera.position_smoothing_speed = 6.0
-	camera.zoom = _home_overview_zoom()
-	camera.position = _home_overview_offset()
+	camera.zoom = PLAYER_FOLLOW_ZOOM
+	camera.position = Vector2.ZERO
 	camera.limit_left = int(MAP_ORIGIN_UNITS.x * UNIT)
 	camera.limit_top = int(MAP_ORIGIN_UNITS.y * UNIT)
 	camera.limit_right = int((MAP_ORIGIN_UNITS.x + MAP_UNITS.x) * UNIT)
@@ -451,10 +448,77 @@ func _create_vision_circle() -> void:
 	vision_circle.z_index = 100
 	world_root.add_child(vision_circle)
 
-	vision_mask = VisionMaskScript.new()
-	vision_mask.name = "VisionMaskOverlay"
-	vision_mask.target = player
-	ui_root.add_child(vision_mask)
+func _create_exploration_fog() -> void:
+	vision_mask = ExplorationFogScript.new()
+	vision_mask.name = "ExplorationFogOverlay"
+	world_root.add_child(vision_mask)
+	var radius: float = run_director.vision_controller.current_radius if run_director.vision_controller != null else 20.0 * UNIT
+	vision_mask.setup(_map_bounds_px(), player, radius)
+	vision_mask.reveal_permanent_light_rect(Rect2(player_root.global_position - _u(HOME_SAFE_SIZE_UNITS) * 0.5, _u(HOME_SAFE_SIZE_UNITS)), 0.0)
+	var home_art_rect := _home_art_permanent_light_rect()
+	if home_art_rect.size.x > 0.0 and home_art_rect.size.y > 0.0:
+		vision_mask.reveal_permanent_light_rect(home_art_rect, 0.0)
+
+func _home_art_permanent_light_rect() -> Rect2:
+	var home_node := _find_home_art_node()
+	if home_node == null:
+		return Rect2()
+	var home_art_rect := _visual_world_rect_for_node(home_node)
+	if home_art_rect.size.x <= 0.0 or home_art_rect.size.y <= 0.0:
+		return Rect2()
+	return home_art_rect.grow(HOME_ART_LIGHT_PADDING_UNITS * UNIT)
+
+func _find_home_art_node() -> Node:
+	if y_sort_root == null:
+		return null
+	for child in y_sort_root.get_children():
+		if not is_instance_valid(child):
+			continue
+		if String(child.get_meta("building_type", "")) == "home":
+			return child
+	for child in y_sort_root.get_children():
+		if is_instance_valid(child) and String(child.name).contains("Building_Home"):
+			return child
+	return null
+
+func _visual_world_rect_for_node(root: Node) -> Rect2:
+	if root == null or not is_instance_valid(root):
+		return Rect2()
+	var combined := Rect2()
+	var has_rect := false
+	if root is Sprite2D:
+		combined = _sprite_world_rect(root)
+		has_rect = combined.size.x > 0.0 and combined.size.y > 0.0
+	for sprite in root.find_children("*", "Sprite2D", true, false):
+		var sprite_rect := _sprite_world_rect(sprite)
+		if sprite_rect.size.x <= 0.0 or sprite_rect.size.y <= 0.0:
+			continue
+		combined = combined.merge(sprite_rect) if has_rect else sprite_rect
+		has_rect = true
+	return combined if has_rect else Rect2()
+
+func _sprite_world_rect(sprite: Sprite2D) -> Rect2:
+	if sprite == null or not is_instance_valid(sprite) or sprite.texture == null:
+		return Rect2()
+	var texture_size := sprite.texture.get_size()
+	var top_left := (-texture_size * 0.5 if sprite.centered else Vector2.ZERO) + sprite.offset
+	return _world_rect_from_local_rect(sprite.global_transform, Rect2(top_left, texture_size))
+
+func _world_rect_from_local_rect(transform: Transform2D, local_rect: Rect2) -> Rect2:
+	var points := [
+		transform * local_rect.position,
+		transform * Vector2(local_rect.end.x, local_rect.position.y),
+		transform * local_rect.end,
+		transform * Vector2(local_rect.position.x, local_rect.end.y),
+	]
+	var min_point: Vector2 = points[0]
+	var max_point: Vector2 = points[0]
+	for point: Vector2 in points:
+		min_point.x = minf(min_point.x, point.x)
+		min_point.y = minf(min_point.y, point.y)
+		max_point.x = maxf(max_point.x, point.x)
+		max_point.y = maxf(max_point.y, point.y)
+	return Rect2(min_point, max_point - min_point)
 
 func _build_ui() -> void:
 	run_ui_controller.build(self)
@@ -469,11 +533,11 @@ func _connect_runtime() -> void:
 	home_safe_zone.safe_zone_entered.connect(func(_zone_id, _zone_type): _switch_camera_home())
 	home_safe_zone.safe_zone_exited.connect(func(_zone_id, _zone_type): _switch_camera_follow())
 	if run_director.vision_controller:
-		run_director.vision_controller.darkness_changed.connect(vision_mask.set_darkness_enabled)
 		if SHOW_DEBUG_VISION_CIRCLE:
 			run_director.vision_controller.darkness_changed.connect(vision_circle.set_darkness_enabled)
 			run_director.vision_controller.vision_radius_changed.connect(func(radius, _stage): vision_circle.set_radius(radius))
 		run_director.vision_controller.vision_radius_changed.connect(func(radius, _stage): vision_mask.set_radius(radius))
+		run_director.vision_controller.vision_radius_target_changed.connect(vision_mask.set_radius)
 
 func _on_run_initialized(context) -> void:
 	if run_timer_controller == null or run_director == null:
@@ -1256,6 +1320,7 @@ func _open_container(container) -> void:
 		prompt_label.text = loot_interaction_controller.last_prompt
 		return
 	_set_container_lifetime_paused(container, true)
+	_reveal_interaction_area(container, false)
 	_play_player_interact_once(container)
 	_sync_loot_state()
 	_open_loot_transfer_panels()
@@ -1270,6 +1335,8 @@ func _pick_material(pickup) -> void:
 		run_director.inventory_component,
 		Callable(self, "_remove_interactable")
 	):
+		_mark_catalog_item_collected_from_run(pickup.payload.get("item", {}), "run_material_pickup")
+		_reveal_interaction_area(pickup, false)
 		_play_player_interact_once(pickup)
 		_set_timed_status_prompt(run_ui_controller.outpost_material_pickup_prompt(self, pickup_outpost_id), 1.8)
 	else:
@@ -1279,10 +1346,12 @@ func _pick_material(pickup) -> void:
 func _take_all_loot() -> void:
 	if _is_story_paused():
 		return
+	var before_loot: Array = loot_interaction_controller.opened_loot.duplicate(true)
 	var transfer_finished: bool = loot_interaction_controller.take_all_loot(
 		run_director.inventory_component,
 		Callable(self, "_remove_interactable")
 	)
+	_mark_catalog_items_transferred_from_run(before_loot, loot_interaction_controller.opened_loot, "run_loot_take_all")
 	_sync_loot_state()
 	if transfer_finished:
 		loot_panel.visible = false
@@ -1320,6 +1389,7 @@ func _take_loot_item_at(index: int) -> void:
 	)
 	_sync_loot_state()
 	if bool(result.get("accepted", false)):
+		_mark_catalog_item_collected_from_run(Dictionary(result.get("item", {})), "run_loot_pickup")
 		_status_prompt = "已放入背包：%s" % result.item.get("display_name", result.item.get("item_id", ""))
 		if bool(result.get("finished", false)):
 			loot_panel.visible = false
@@ -1327,6 +1397,38 @@ func _take_loot_item_at(index: int) -> void:
 	else:
 		_status_prompt = loot_interaction_controller.last_prompt
 	_refresh_ui()
+
+func _mark_catalog_item_collected_from_run(item: Dictionary, source: String) -> void:
+	if _game_state == null or not _game_state.has_method("mark_item_collected"):
+		return
+	var item_id := String(item.get("item_id", "")).strip_edges()
+	if item_id.is_empty():
+		return
+	_game_state.mark_item_collected(item_id, source)
+
+func _mark_catalog_items_transferred_from_run(before_items: Array, remaining_items: Array, source: String) -> void:
+	if _game_state == null or not _game_state.has_method("mark_items_collected"):
+		return
+	var before_counts := _count_items_by_id(before_items)
+	var remaining_counts := _count_items_by_id(remaining_items)
+	var collected_ids: Array[String] = []
+	for item_id in before_counts.keys():
+		var transferred_count := int(before_counts.get(item_id, 0)) - int(remaining_counts.get(item_id, 0))
+		if transferred_count > 0:
+			collected_ids.append(String(item_id))
+	if not collected_ids.is_empty():
+		_game_state.mark_items_collected(collected_ids, source)
+
+func _count_items_by_id(items: Array) -> Dictionary:
+	var counts := {}
+	for item in items:
+		if not (item is Dictionary):
+			continue
+		var item_id := String(item.get("item_id", "")).strip_edges()
+		if item_id.is_empty():
+			continue
+		counts[item_id] = int(counts.get(item_id, 0)) + maxi(1, int(item.get("amount", 1)))
+	return counts
 
 func _deposit_inventory_item_at(index: int, inventory_index: int = -1) -> void:
 	if _is_story_paused():
@@ -1603,6 +1705,7 @@ func _try_repair_outpost(station) -> void:
 	_status_prompt = result.message
 	if bool(result.get("activated", false)):
 		_audio_manager_call("play_outpost_repair_complete")
+		_reveal_interaction_area(station, true)
 		_activate_outpost_safe_zone(station)
 		if run_director.get_outpost_storage_capacity(station.interact_id) > 0:
 			run_director.ensure_outpost_storage(station.interact_id)
@@ -1926,7 +2029,7 @@ func _toggle_inventory_panel() -> void:
 
 func _switch_camera_home() -> void:
 	_play_run_safe_house_bgm()
-	_tween_camera(_home_overview_zoom(), _home_overview_offset())
+	_tween_camera(PLAYER_FOLLOW_ZOOM, Vector2.ZERO)
 
 func _switch_camera_follow() -> void:
 	_play_run_exploration_bgm()
@@ -1954,53 +2057,8 @@ func _tween_camera(target_zoom: Vector2, target_position: Vector2) -> void:
 	_camera_tween.tween_property(camera, "zoom", target_zoom, CAMERA_TRANSITION_SECONDS).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
 	_camera_tween.tween_property(camera, "position", target_position, CAMERA_TRANSITION_SECONDS).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
 
-func _home_overview_zoom() -> Vector2:
-	var viewport_size := _camera_viewport_size()
-	if viewport_size.x <= 0.0 or viewport_size.y <= 0.0:
-		return Vector2(HOME_OVERVIEW_MAX_ZOOM, HOME_OVERVIEW_MAX_ZOOM)
-	var focus_bounds := _home_overview_bounds()
-	var zoom_value := minf(viewport_size.x / focus_bounds.size.x, viewport_size.y / focus_bounds.size.y)
-	zoom_value = clampf(zoom_value, HOME_OVERVIEW_MIN_ZOOM, HOME_OVERVIEW_MAX_ZOOM)
-	return Vector2(zoom_value, zoom_value)
-
-func _home_overview_offset() -> Vector2:
-	if player == null:
-		return Vector2.ZERO
-	return _home_overview_bounds().get_center() - player.global_position
-
-func _home_overview_bounds() -> Rect2:
-	var map_bounds := _map_bounds_px()
-	var padding: Vector2 = _u(HOME_OVERVIEW_PADDING_UNITS)
-	return Rect2(map_bounds.position - padding, map_bounds.size + padding * 2.0)
-
 func _map_bounds_px() -> Rect2:
 	return Rect2(_u(MAP_ORIGIN_UNITS), _u(MAP_UNITS))
-
-func _camera_viewport_size() -> Vector2:
-	return get_viewport_rect().size
-
-func _home_target_bounds() -> Rect2:
-	var points: Array[Vector2] = [player_root.global_position]
-	if run_director.context:
-		for pos in run_director.context.selected_outpost_positions.values():
-			points.append(pos)
-	for container in container_root.get_children():
-		if container is Node2D:
-			points.append(container.global_position)
-	for outpost_child in outpost_root.get_children():
-		if outpost_child is Node2D and not outpost_child.name == "OutpostCandidates":
-			points.append(outpost_child.global_position)
-	if points.size() == 1:
-		points.append(player_root.global_position + _u(Vector2(105.0, 70.0)))
-	var min_pos: Vector2 = points[0]
-	var max_pos: Vector2 = points[0]
-	for point in points:
-		min_pos.x = minf(min_pos.x, point.x)
-		min_pos.y = minf(min_pos.y, point.y)
-		max_pos.x = maxf(max_pos.x, point.x)
-		max_pos.y = maxf(max_pos.y, point.y)
-	var padding: Vector2 = _u(Vector2(16.0, 12.0))
-	return Rect2(min_pos - padding, (max_pos - min_pos) + padding * 2.0)
 
 func _update_container_lifetimes(delta: float) -> void:
 	if container_spawn_controller == null:
@@ -2042,11 +2100,41 @@ func _update_readable_world_ui_scale() -> void:
 	if camera == null or interactable_visual_builder == null:
 		return
 	var scale_value := 1.0
-	if run_director.context != null and run_director.context.active_safe_zone_id == "home":
-		var zoom_value := maxf(0.001, (absf(camera.zoom.x) + absf(camera.zoom.y)) * 0.5)
-		scale_value = clampf((1.0 / zoom_value) * HOME_OVERVIEW_READABLE_UI_SCALE_MULTIPLIER, 1.0, HOME_OVERVIEW_READABLE_UI_MAX_SCALE)
 	for root in [container_root, outpost_root, player_root]:
 		interactable_visual_builder.apply_readable_overlay_scale(root, scale_value)
+
+func _reveal_interaction_area(interactable, reveal_host_block: bool) -> void:
+	if vision_mask == null or not is_instance_valid(vision_mask) or interactable == null or not is_instance_valid(interactable):
+		return
+	if reveal_host_block:
+		var block_rect := _resolve_host_block_rect(interactable)
+		if block_rect.size.x > 0.0 and block_rect.size.y > 0.0:
+			vision_mask.reveal_permanent_light_rect(block_rect)
+			return
+	var radius_from_vision: float = run_director.vision_controller.current_radius * 0.28 if run_director.vision_controller != null else 3.5 * UNIT
+	var small_radius := maxf(3.5 * UNIT, radius_from_vision)
+	vision_mask.reveal_circle(interactable.global_position, small_radius)
+
+func _resolve_host_block_rect(node) -> Rect2:
+	var host_block_id := ""
+	if node != null and is_instance_valid(node):
+		host_block_id = String(node.get_meta("host_block_id", ""))
+		var payload_value = node.get("payload")
+		if host_block_id.is_empty() and payload_value is Dictionary:
+			host_block_id = String(payload_value.get("host_block_id", ""))
+	for block in _get_layout_rects("BlockSolid"):
+		if not block.has_method("get_rect_id"):
+			continue
+		if not host_block_id.is_empty() and block.get_rect_id() == host_block_id:
+			return block.get_rect_px(UNIT)
+	if node is Node2D:
+		var world_pos: Vector2 = node.global_position
+		for block in _get_layout_rects("BlockSolid"):
+			if block.has_method("get_rect_px"):
+				var rect: Rect2 = block.get_rect_px(UNIT)
+				if rect.has_point(world_pos):
+					return rect
+	return Rect2()
 
 func _remove_interactable(interactable) -> void:
 	if nearest_interactable == interactable:

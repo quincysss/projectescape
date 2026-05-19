@@ -13,8 +13,10 @@ systems/warehouse/settlement_transfer_service.gd
 systems/warehouse/warehouse_query_service.gd
 systems/warehouse/merchant_service.gd
 systems/warehouse/currency_wallet.gd
+systems/catalog/item_catalog_service.gd
 systems/warehouse/warehouse_ui.gd
 systems/warehouse/merchant_ui.gd
+systems/catalog/catalog_ui.gd
 systems/warehouse/warehouse_save_service.gd
 systems/warehouse/warehouse_debug_panel.gd
 systems/ui/item_tooltip/item_tooltip_service.gd
@@ -66,6 +68,14 @@ CurrencyWallet：
 - 通过 currency_id 增减和查询货币。
 - 读取 DataRegistry 中 currencies.tab 的静态定义用于显示。
 
+ItemCatalogService：
+
+- 绑定玩家存档中的 `collected_item_ids`。
+- 从 items.tab 查询所有可展示道具并组装图鉴卡片数据。
+- 在玩家获得道具时写入 item_id 点亮记录。
+- 出售、消耗、升级使用、制作使用、丢弃和仓库清空不得移除点亮记录。
+- 提供 `mark_collected`、`is_collected`、`get_catalog_items` 等只读/写入接口。
+
 ItemTooltipService：
 
 - 只在局外 BaseScene 的 TooltipLayer 中启用。
@@ -92,6 +102,7 @@ HoverableItemIcon：
 5. 仓库或货币变更后保存并 revision +1。
 6. 不要让外部系统直接修改 WarehouseData.items 或 currencies。
 7. 建立局外通用 ItemTooltipService / HoverableItemIcon / ItemTooltipPanel，仓库、商人、研究所、制作所中的道具图标 hover 时显示详情，数据来自 items.tab 和 currencies.tab。
+8. 建立 ItemCatalogService 和图鉴页签，图鉴读取 items.tab 全量道具和 collected_item_ids 点亮状态，每行四张卡片，纵向滚动。
 ```
 
 ## 5. 验收标准
@@ -101,6 +112,7 @@ HoverableItemIcon：
 - 首次成功返回剧情结束前商人不可进入；解锁后商人可通过接口出售物品并获得 mine_coin。
 - 保存服务独立。
 - 局外道具详情 Tooltip 模块职责独立，且不接入局内界面。
+- 图鉴模块职责独立，只记录曾经获得过的 item_id，不影响仓库数量、交易和消耗。
 
 ## 6. 暂不实现
 

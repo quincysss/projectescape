@@ -182,7 +182,7 @@ func _verify() -> bool:
 	if (
 		crafting_unlock.text != "解锁制造所"
 		or not crafting_status.text.contains("妹妹还有救")
-		or not crafting_status.text.contains("积攒 5000 矿币")
+		or not crafting_status.text.contains("积攒 100 矿币")
 		or not crafting_status.text.contains("解锁制造所")
 	):
 		printerr("Expected manufacturing objective copy to follow the chapter 1 rescue objective.")
@@ -190,13 +190,13 @@ func _verify() -> bool:
 		_restore_profile(game_state, original_profile)
 		return false
 	if game_state.can_unlock_manufacturing_station():
-		printerr("Expected manufacturing unlock to require 5000 mine_coin.")
+		printerr("Expected manufacturing unlock to require 100 mine_coin.")
 		base.queue_free()
 		_restore_profile(game_state, original_profile)
 		return false
-	game_state.add_currency("mine_coin", 4999, "test")
+	game_state.add_currency("mine_coin", 99, "test")
 	if game_state.can_unlock_manufacturing_station():
-		printerr("Expected 4999 mine_coin to be insufficient.")
+		printerr("Expected 99 mine_coin to be insufficient.")
 		base.queue_free()
 		_restore_profile(game_state, original_profile)
 		return false
@@ -211,6 +211,11 @@ func _verify() -> bool:
 		return false
 	unlock_confirm.emit_signal("confirmed")
 	await process_frame
+	if base.get_node_or_null("StoryPopupOverlay") != null:
+		printerr("Expected manufacturing unlock to avoid showing chapter completion popup.")
+		base.queue_free()
+		_restore_profile(game_state, original_profile)
+		return false
 	if not game_state.manufacturing_station_unlocked:
 		printerr("Expected confirmed BaseScene manufacturing unlock to succeed.")
 		base.queue_free()

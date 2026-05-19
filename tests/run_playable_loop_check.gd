@@ -6,6 +6,9 @@ func _initialize() -> void:
 
 func _verify_run_loop() -> bool:
 	var game_state = get_root().get_node("GameState")
+	await process_frame
+	game_state.reset_day(1)
+	game_state.mark_second_day_black_tide_reveal_seen()
 	game_state.clear_warehouse()
 	var scene := load("res://scenes/run/RunScene.tscn")
 	if scene == null:
@@ -27,12 +30,12 @@ func _verify_run_loop() -> bool:
 	root.run_director.on_camera_transition_finished()
 	await process_frame
 	if not root.vision_mask.visible:
-		printerr("Expected vision mask visible after leaving home")
+		printerr("Expected exploration fog visible after leaving home")
 		return false
 	root.run_director.on_safe_zone_entered("home")
 	await process_frame
-	if root.vision_mask.visible:
-		printerr("Expected vision mask hidden inside home")
+	if not root.vision_mask.visible:
+		printerr("Expected exploration fog visible inside home")
 		return false
 	if root.interactables.is_empty():
 		printerr("Expected interactables")

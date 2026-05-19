@@ -71,8 +71,8 @@ func reset_story(game_state: Node) -> Dictionary:
 func add_chapter_currency(game_state: Node) -> Dictionary:
 	if game_state == null:
 		return _failure("GameState 不可用。")
-	game_state.add_currency("mine_coin", 5000, "debug_chapter")
-	return {"ok": true, "message": "已增加 5000 矿币。"}
+	game_state.add_currency("mine_coin", 100, "debug_chapter")
+	return {"ok": true, "message": "已增加 100 矿币。"}
 
 func advance_surface_day(game_state: Node) -> Dictionary:
 	if game_state == null:

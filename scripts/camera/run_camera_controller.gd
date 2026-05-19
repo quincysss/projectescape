@@ -12,7 +12,7 @@ enum CameraMode {
 @export var overview_transition_seconds: float = 0.6
 @export var follow_transition_seconds: float = 0.5
 
-var current_mode: int = CameraMode.OVERVIEW
+var current_mode: int = CameraMode.PLAYER_FOLLOW
 var is_transitioning: bool = false
 
 func set_overview_mode() -> void:

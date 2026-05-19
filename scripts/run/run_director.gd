@@ -103,6 +103,7 @@ func on_home_exited() -> void:
 		context.active_safe_zone_id = ""
 		context.active_safe_zone_type = ""
 	_apply_danger_zone_runtime()
+	_complete_camera_transition_if_already_following()
 
 func on_camera_transition_finished() -> void:
 	_log("Event: camera_transition_finished")
@@ -115,8 +116,8 @@ func on_safe_zone_entered(zone_id: String = "home") -> void:
 	_log("Event: safe_zone_entered %s" % zone_id)
 	state_machine.on_safe_zone_entered(zone_id)
 	if context:
-		context.darkness_enabled = false
-		context.camera_mode = "observe" if zone_id == "home" else "safe_zone"
+		context.darkness_enabled = true
+		context.camera_mode = "follow"
 		context.active_safe_zone_id = zone_id
 		context.active_safe_zone_type = "home" if zone_id == "home" else "outpost"
 	_apply_safe_zone_runtime(zone_id)
@@ -130,6 +131,7 @@ func on_safe_zone_exited(zone_id: String = "home") -> void:
 		context.active_safe_zone_id = ""
 		context.active_safe_zone_type = ""
 	_apply_danger_zone_runtime()
+	_complete_camera_transition_if_already_following()
 
 func on_outpost_repair_started(outpost_id: String) -> void:
 	_log("Event: outpost_repair_started %s" % outpost_id)
@@ -196,7 +198,12 @@ func debug_add_item(item: Dictionary) -> bool:
 	if inventory_component == null:
 		_log("InventoryComponent missing; cannot add item.")
 		return false
-	return inventory_component.add_item(item)
+	var accepted: bool = inventory_component.add_item(item)
+	if accepted:
+		var game_state := get_node_or_null("/root/GameState")
+		if game_state != null and game_state.has_method("mark_item_collected"):
+			game_state.mark_item_collected(String(item.get("item_id", "")), "run_debug_add")
+	return accepted
 
 func debug_deposit_first_inventory_item() -> bool:
 	return deposit_inventory_item_to_home(0)
@@ -513,20 +520,22 @@ func _initialize_runtime_components() -> void:
 		)
 		stability_component.start_recover()
 	if vision_controller:
-		vision_controller.set_darkness_enabled(false)
+		vision_controller.set_darkness_enabled(true)
 		vision_controller.set_vision_stage(0)
 	if camera_controller:
-		camera_controller.set_overview_mode()
+		camera_controller.set_player_follow_mode()
+	if context:
+		context.darkness_enabled = true
+		context.camera_mode = "follow"
 	_sync_inventory_context()
 
 func _apply_safe_zone_runtime(zone_id: String) -> void:
 	if stability_component:
 		stability_component.start_recover()
 	if vision_controller:
-		vision_controller.set_darkness_enabled(false)
+		vision_controller.set_darkness_enabled(true)
 	if camera_controller:
-		if zone_id == "home":
-			camera_controller.set_overview_mode()
+		camera_controller.set_player_follow_mode()
 
 func _apply_danger_zone_runtime() -> void:
 	if stability_component:
@@ -535,6 +544,24 @@ func _apply_danger_zone_runtime() -> void:
 		vision_controller.set_darkness_enabled(true)
 	if camera_controller:
 		camera_controller.set_player_follow_mode()
+
+func _complete_camera_transition_if_already_following() -> void:
+	if state_machine == null or camera_controller == null:
+		return
+	if state_machine.current_phase != RunStateMachineScript.RunPhase.LEAVE_HOME:
+		return
+	if camera_controller.is_transitioning:
+		return
+	if camera_controller.get_mode_name() != "PLAYER_FOLLOW":
+		return
+	call_deferred("_finish_follow_transition_if_still_waiting")
+
+func _finish_follow_transition_if_still_waiting() -> void:
+	if state_machine == null:
+		return
+	if state_machine.current_phase != RunStateMachineScript.RunPhase.LEAVE_HOME:
+		return
+	on_camera_transition_finished()
 
 func _on_safe_zone_entered(zone_id: StringName, _zone_type: StringName) -> void:
 	on_safe_zone_entered(str(zone_id))
@@ -561,7 +588,7 @@ func _on_stability_depleted() -> void:
 
 func _on_camera_controller_transition_finished(_mode: int) -> void:
 	if context and camera_controller:
-		context.camera_mode = "observe" if camera_controller.current_mode == 0 else "follow"
+		context.camera_mode = "follow"
 	if state_machine.current_phase == RunStateMachineScript.RunPhase.LEAVE_HOME:
 		on_camera_transition_finished()
 

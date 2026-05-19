@@ -65,8 +65,8 @@ func create_context(
 	}
 	context.repaired_outpost_count = 0
 	context.is_extraction_unlocked = false
-	context.camera_mode = "observe"
-	context.darkness_enabled = false
+	context.camera_mode = "follow"
+	context.darkness_enabled = true
 	context.active_safe_zone_id = "home"
 	context.active_safe_zone_type = "home"
 	context.stability_stage = "SAFE"

@@ -6,6 +6,10 @@ func _initialize() -> void:
 	quit(0 if ok else 1)
 
 func _verify_outpost_safe_zone_and_extract_ui() -> bool:
+	var game_state = get_root().get_node("GameState")
+	await process_frame
+	game_state.reset_day(1)
+	game_state.mark_second_day_black_tide_reveal_seen()
 	var scene := load("res://scenes/run/RunScene.tscn")
 	if scene == null:
 		printerr("Failed to load RunScene")
@@ -80,8 +84,8 @@ func _verify_outpost_safe_zone_and_extract_ui() -> bool:
 	if not root.run_director.stability_component.is_recovering:
 		printerr("Expected stability recovery inside repaired outpost.")
 		return false
-	if root.vision_mask.visible:
-		printerr("Expected darkness mask hidden inside repaired outpost.")
+	if not root.vision_mask.visible:
+		printerr("Expected exploration fog visible inside repaired outpost.")
 		return false
 
 	root._on_outpost_safe_zone_body_exited(outpost, root.player)
@@ -95,6 +99,7 @@ func _verify_outpost_safe_zone_and_extract_ui() -> bool:
 
 	root.run_director.context.is_extraction_unlocked = true
 	root.run_director.state_machine.is_extraction_unlocked = true
+	root.player.global_position = root.player_root.global_position
 	root.run_director.on_safe_zone_entered("home")
 	root._refresh_ui()
 	await process_frame

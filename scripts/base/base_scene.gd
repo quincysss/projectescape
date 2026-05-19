@@ -13,11 +13,12 @@ const TAB_WAREHOUSE := "warehouse"
 const TAB_MERCHANT := "merchant"
 const TAB_RESEARCH := "research"
 const TAB_CRAFTING := "crafting"
+const TAB_CATALOG := "catalog"
 const BASE_BACKGROUND_PATH := "res://assets/originalphoto/basementphoto.png"
 const WORLD_INTRO_DIALOGUE_PATH := "res://setting/dialogues.tab#world_intro_dialogue"
 const FIRST_DEPARTURE_DIALOGUE_PATH := "res://setting/dialogues.tab#first_departure_outpost_dialogue"
 const FIRST_RETURN_DIALOGUE_PATH := "res://setting/dialogues.tab#first_return_chapter_1"
-const MANUFACTURING_UNLOCK_COST := 5000
+const MANUFACTURING_UNLOCK_COST := 100
 const BASE_GRID_COLUMNS := 5
 const BASE_GRID_SLOT_SIZE := 62.0
 const BASE_GRID_SLOT_GAP := 10.0
@@ -90,6 +91,10 @@ var crafting_panel: Panel
 var crafting_status_label: Label
 var crafting_unlock_button: Button
 var crafting_result_label: Label
+var catalog_tab_button: Button
+var catalog_panel: Panel
+var catalog_grid_root: Control
+var catalog_status_label: Label
 var chapter_goal_label: Label
 var manufacturing_confirm_dialog: ConfirmationDialog
 var dialogue_service = DialogueServiceScript.new()
@@ -138,11 +143,13 @@ func _ready() -> void:
 	set_process_input(true)
 	_play_base_safe_house_bgm()
 	_build_background()
+	_ensure_catalog_tab_button()
 	start_button.pressed.connect(_on_start_pressed)
 	warehouse_tab_button.pressed.connect(_on_warehouse_tab_pressed)
 	merchant_tab_button.pressed.connect(_on_merchant_tab_pressed)
 	research_tab_button.pressed.connect(_on_research_tab_pressed)
 	crafting_tab_button.pressed.connect(_on_crafting_tab_pressed)
+	catalog_tab_button.pressed.connect(_on_catalog_tab_pressed)
 	warehouse_label.meta_clicked.connect(_on_warehouse_item_meta_clicked)
 	merchant_list.meta_clicked.connect(_on_merchant_item_meta_clicked)
 	shop_stock_list.meta_clicked.connect(_on_shop_stock_meta_clicked)
@@ -214,6 +221,9 @@ func _on_crafting_tab_pressed() -> void:
 		_show_tab(TAB_WAREHOUSE)
 		return
 	_show_tab(TAB_CRAFTING)
+
+func _on_catalog_tab_pressed() -> void:
+	_show_tab(TAB_CATALOG)
 
 func _request_start_run() -> void:
 	if _is_dialogue_playing():
@@ -290,7 +300,6 @@ func _on_first_return_dialogue_finished(_dialogue_id: String = "", _skipped: boo
 	if _game_state != null and _game_state.has_method("mark_first_return_dialogue_seen_and_activate_chapter"):
 		_game_state.mark_first_return_dialogue_seen_and_activate_chapter()
 	_refresh()
-	_show_chapter_goal_popup()
 
 func _play_dialogue(path: String, finished_callback: Callable) -> void:
 	if _is_dialogue_playing():
@@ -326,7 +335,7 @@ func _is_debug_panel_enabled() -> bool:
 	return OS.is_debug_build() and not OS.has_feature("web")
 
 func _show_chapter_goal_popup() -> void:
-	var popup := _make_overlay_popup("第一章目标", "解锁制造所\n\n出售可售物资，积攒 5000 矿币。\n制造所解锁后，也许妹妹还有救。")
+	var popup := _make_overlay_popup("第一章目标", "解锁制造所\n\n出售可售物资，积攒 100 矿币。\n制造所解锁后，也许妹妹还有救。")
 	var panel := popup.get_node("PopupPanel") as Panel
 	var ok_button := _make_popup_button("知道了", Vector2(176, 258), func(): popup.queue_free())
 	var merchant_button := _make_popup_button("前往商人", Vector2(332, 258), func():
@@ -531,6 +540,7 @@ func _refresh() -> void:
 		research_result_label.text = ""
 		debug_result_label.text = "GameState 不可用"
 		base_merchant_panel.clear_selection()
+		_set_catalog_items([])
 		return
 
 	base_merchant_panel.set_game_state(_game_state)
@@ -541,6 +551,7 @@ func _refresh() -> void:
 	_set_merchant_items_text(_game_state.query_sellable_items())
 	_set_shop_stock_text(_game_state.query_shop_offers())
 	_set_research_items_text(_game_state.query_research_items())
+	_set_catalog_items(_game_state.query_catalog_items() if _game_state.has_method("query_catalog_items") else [])
 	_update_chapter_goal_view()
 	base_crafting_panel.update_view()
 	base_merchant_panel.refresh_selection()
@@ -564,10 +575,14 @@ func _refresh_tabs() -> void:
 	research_panel.visible = _active_tab == TAB_RESEARCH
 	if crafting_panel != null:
 		crafting_panel.visible = _active_tab == TAB_CRAFTING
+	if catalog_panel != null:
+		catalog_panel.visible = _active_tab == TAB_CATALOG
 	warehouse_tab_button.button_pressed = _active_tab == TAB_WAREHOUSE
 	merchant_tab_button.button_pressed = _active_tab == TAB_MERCHANT
 	research_tab_button.button_pressed = _active_tab == TAB_RESEARCH
 	crafting_tab_button.button_pressed = _active_tab == TAB_CRAFTING
+	if catalog_tab_button != null:
+		catalog_tab_button.button_pressed = _active_tab == TAB_CATALOG
 	warehouse_tab_button.text = "仓库"
 	merchant_tab_button.text = "商人"
 	research_tab_button.text = "研究所"
@@ -575,6 +590,10 @@ func _refresh_tabs() -> void:
 	merchant_tab_button.disabled = not merchant_available
 	research_tab_button.disabled = not research_available
 	crafting_tab_button.disabled = not crafting_available
+	if catalog_tab_button != null:
+		catalog_tab_button.text = "图鉴"
+		catalog_tab_button.disabled = false
+		catalog_tab_button.tooltip_text = ""
 	merchant_tab_button.tooltip_text = "" if merchant_available else "等待第一次地表回收后开放。"
 	research_tab_button.tooltip_text = "" if research_available else "等待第一次地表回收后开放。"
 	crafting_tab_button.tooltip_text = "" if crafting_available else "完成首次地面返回剧情后解锁制造所。"
@@ -598,6 +617,7 @@ func _is_crafting_tab_available() -> bool:
 
 func _build_visual_surfaces() -> void:
 	var ui_root := get_node("BaseUIRoot") as Control
+	_ensure_catalog_tab_button()
 	_style_top_navigation()
 	_build_item_tooltip_layer(ui_root)
 	warehouse_label.visible = false
@@ -635,6 +655,7 @@ func _build_visual_surfaces() -> void:
 	_build_merchant_surface()
 	_build_research_surface()
 	_build_crafting_surface()
+	_build_catalog_surface()
 
 func _build_item_tooltip_layer(ui_root: Control) -> void:
 	if tooltip_layer != null:
@@ -707,7 +728,8 @@ func _build_item_tooltip_layer(ui_root: Control) -> void:
 	tooltip_layer.add_child(item_tooltip_timer)
 
 func _style_top_navigation() -> void:
-	var tabs: Array[Button] = [warehouse_tab_button, merchant_tab_button, research_tab_button, crafting_tab_button]
+	_ensure_catalog_tab_button()
+	var tabs: Array[Button] = [warehouse_tab_button, merchant_tab_button, research_tab_button, crafting_tab_button, catalog_tab_button]
 	var left := 24.0
 	for index in range(tabs.size()):
 		var button := tabs[index]
@@ -716,7 +738,7 @@ func _style_top_navigation() -> void:
 		button.size = Vector2(108, 42)
 		_style_button(button, false)
 	_style_button(start_button, true)
-	start_button.position = Vector2(528, 96)
+	start_button.position = Vector2(648, 96)
 	start_button.size = Vector2(140, 42)
 	result_label.visible = false
 	result_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -732,6 +754,23 @@ func _style_top_navigation() -> void:
 	day_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	_style_label(day_label, 30, Color("#D8D6CE"))
 	_style_label(currency_label, 18, Color("#D1B850"))
+
+func _ensure_catalog_tab_button() -> void:
+	if catalog_tab_button != null and is_instance_valid(catalog_tab_button):
+		return
+	var ui_root := get_node_or_null("BaseUIRoot") as Control
+	if ui_root == null:
+		return
+	catalog_tab_button = ui_root.get_node_or_null("CatalogTabButton") as Button
+	if catalog_tab_button != null:
+		return
+	catalog_tab_button = Button.new()
+	catalog_tab_button.name = "CatalogTabButton"
+	catalog_tab_button.toggle_mode = true
+	catalog_tab_button.text = "图鉴"
+	catalog_tab_button.position = Vector2(504, 96)
+	catalog_tab_button.size = Vector2(108, 42)
+	ui_root.add_child(catalog_tab_button)
 
 func _build_merchant_surface() -> void:
 	_set_control_rect(merchant_panel, Vector2(24, 154), Vector2(980, 500))
@@ -832,6 +871,130 @@ func _build_crafting_surface() -> void:
 		MANUFACTURING_UNLOCK_COST
 	)
 
+func _build_catalog_surface() -> void:
+	var ui_root := get_node("BaseUIRoot") as Control
+	catalog_panel = _make_base_panel("CatalogPanel", Vector2(24, 154), Vector2(980, 500), "图鉴")
+	catalog_panel.visible = false
+	catalog_status_label = _make_section_label("", Vector2(780, 16), Vector2(170, 26), 15)
+	catalog_status_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	catalog_panel.add_child(catalog_status_label)
+	var catalog_scroll := _make_scroll_area(Vector2(18, 56), Vector2(928, 410))
+	catalog_scroll.name = "CatalogScroll"
+	catalog_grid_root = Control.new()
+	catalog_grid_root.name = "CatalogGrid"
+	catalog_scroll.add_child(catalog_grid_root)
+	catalog_panel.add_child(catalog_scroll)
+	ui_root.add_child(catalog_panel)
+
+func _set_catalog_items(items: Array) -> void:
+	if catalog_grid_root == null:
+		return
+	for child in catalog_grid_root.get_children():
+		catalog_grid_root.remove_child(child)
+		child.queue_free()
+	var columns := 4
+	var gap := 16.0
+	var card_width := 208.0
+	var card_height := 310.0
+	var rows := ceili(float(maxi(items.size(), 1)) / float(columns))
+	var grid_width := float(columns) * card_width + float(columns - 1) * gap
+	var grid_height := float(rows) * card_height + float(maxi(0, rows - 1)) * gap
+	catalog_grid_root.custom_minimum_size = Vector2(grid_width, grid_height)
+	catalog_grid_root.size = catalog_grid_root.custom_minimum_size
+	var collected_count := 0
+	for index in range(items.size()):
+		var item: Dictionary = items[index]
+		if bool(item.get("collected", false)):
+			collected_count += 1
+		var col := index % columns
+		var row := int(index / columns)
+		var card := _make_catalog_card(item, Vector2(card_width, card_height))
+		card.position = Vector2(float(col) * (card_width + gap), float(row) * (card_height + gap))
+		catalog_grid_root.add_child(card)
+	if catalog_status_label != null:
+		catalog_status_label.text = "%d/%d" % [collected_count, items.size()]
+	if items.is_empty():
+		catalog_grid_root.add_child(_make_section_label("暂无图鉴记录", Vector2(18, 18), Vector2(220, 28), 16))
+
+func _make_catalog_card(item: Dictionary, card_size: Vector2) -> Panel:
+	var collected := bool(item.get("collected", false))
+	var card := Panel.new()
+	card.name = "CatalogCard_%s" % String(item.get("item_id", ""))
+	card.size = card_size
+	card.set_meta("item_id", String(item.get("item_id", "")))
+	card.set_meta("catalog_collected", collected)
+	var bg := Color(0.035, 0.033, 0.032, 0.96) if collected else Color(0.035, 0.037, 0.037, 0.88)
+	var border := Color("#35C9D7") if collected else Color(0.16, 0.43, 0.47, 0.62)
+	card.add_theme_stylebox_override("panel", _panel_style(bg, border, 2 if collected else 1))
+	card.mouse_filter = Control.MOUSE_FILTER_IGNORE
+
+	var icon := TextureRect.new()
+	icon.name = "Icon"
+	icon.position = Vector2((card_size.x - 112.0) * 0.5, 22.0)
+	icon.size = Vector2(112.0, 112.0)
+	icon.texture = _tooltip_icon_texture(String(item.get("icon", "")))
+	icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	icon.modulate = Color(1, 1, 1, 1.0 if collected else 0.58)
+	icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	card.add_child(icon)
+
+	var name_label := _make_section_label(String(item.get("display_name", item.get("item_id", ""))), Vector2(14, 150), Vector2(card_size.x - 28.0, 34), 22)
+	name_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	name_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	name_label.clip_text = true
+	name_label.add_theme_color_override("font_color", _quality_name_color(String(item.get("quality", "C"))))
+	card.add_child(name_label)
+
+	var divider := ColorRect.new()
+	divider.position = Vector2(20, 194)
+	divider.size = Vector2(card_size.x - 40.0, 1)
+	divider.color = Color(0.20, 0.72, 0.78, 0.62 if collected else 0.32)
+	divider.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	card.add_child(divider)
+
+	var description_text := _format_catalog_description(String(item.get("description", "暂无记录。")), 12, 4)
+	var description := _make_section_label(description_text, Vector2(18, 208), Vector2(card_size.x - 36.0, 72), 13)
+	description.name = "Description"
+	description.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	description.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	description.autowrap_mode = TextServer.AUTOWRAP_OFF
+	description.clip_text = true
+	description.add_theme_color_override("font_color", Color("#D8D6CE") if collected else Color("#8C9292"))
+	card.add_child(description)
+
+	var status := _make_section_label("(已获得)" if collected else "(未获得)", Vector2(18, card_size.y - 28.0), Vector2(card_size.x - 36.0, 18), 12)
+	status.name = "CatalogStatusLabel"
+	status.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	status.add_theme_color_override("font_color", Color("#D1B850") if collected else Color("#6F7778"))
+	card.add_child(status)
+	return card
+
+func _format_catalog_description(raw_text: String, max_chars_per_line: int, max_lines: int) -> String:
+	var text := raw_text.strip_edges().replace("\r", " ").replace("\n", " ")
+	while text.contains("  "):
+		text = text.replace("  ", " ")
+	if text.is_empty():
+		text = "暂无记录。"
+	var lines: Array[String] = []
+	var line := ""
+	var index := 0
+	while index < text.length() and lines.size() < max_lines:
+		var character := text.substr(index, 1)
+		line += character
+		if line.length() >= max_chars_per_line:
+			lines.append(line.strip_edges())
+			line = ""
+		index += 1
+	if not line.strip_edges().is_empty() and lines.size() < max_lines:
+		lines.append(line.strip_edges())
+	if index < text.length() and not lines.is_empty():
+		var last_index := lines.size() - 1
+		var last_line := lines[last_index]
+		if last_line.length() >= 1:
+			lines[last_index] = last_line.substr(0, maxi(0, max_chars_per_line - 1)).strip_edges() + "..."
+	return "\n".join(lines)
+
 func _build_debug_story_tools() -> void:
 	if debug_panel == null:
 		return
@@ -839,13 +1002,15 @@ func _build_debug_story_tools() -> void:
 	debug_panel.offset_bottom = 876.0
 	debug_reset_profile_button = _make_debug_button("重置本地数据", 356.0, _on_debug_reset_profile_pressed)
 	debug_reset_story_button = _make_debug_button("重置剧情与章节", 398.0, _on_debug_reset_story_pressed)
-	debug_add_chapter_currency_button = _make_debug_button("+5000 矿币", 440.0, _on_debug_add_chapter_currency_pressed)
+	debug_add_chapter_currency_button = _make_debug_button("+100 矿币", 440.0, _on_debug_add_chapter_currency_pressed)
 	debug_surface_day_button = _make_debug_button("地表天数 +1", 482.0, _on_debug_surface_day_pressed)
 	debug_force_chapter_complete_button = _make_debug_button("强制完成第一章", 524.0, _on_debug_force_chapter_complete_pressed)
 	debug_slow_loading_button = _make_debug_button("下次慢加载", 566.0, _on_debug_slow_loading_pressed)
 	debug_fail_loading_button = _make_debug_button("下次加载失败", 608.0, _on_debug_fail_loading_pressed)
 	debug_force_monster_button = _make_debug_button("本日必出怪物", 650.0, _on_debug_force_monster_pressed)
-	_set_control_rect(debug_result_label, Vector2(12, 696), Vector2(204, 58))
+	_make_debug_button("点亮全部图鉴", 692.0, _on_debug_collect_all_catalog_pressed)
+	_make_debug_button("清空图鉴", 734.0, _on_debug_clear_catalog_pressed)
+	_set_control_rect(debug_result_label, Vector2(12, 776), Vector2(204, 58))
 
 func _make_debug_button(text: String, y: float, callback: Callable) -> Button:
 	var button := Button.new()
@@ -1893,8 +2058,6 @@ func _on_crafting_unlock_pressed() -> void:
 func _on_manufacturing_unlock_confirmed() -> void:
 	var result: Dictionary = base_crafting_panel.confirm_unlock()
 	_refresh()
-	if bool(result.get("ok", false)):
-		_show_chapter_complete_popup(int(result.get("surface_day", _game_state.get_current_day())))
 
 func _on_debug_add_currency_pressed() -> void:
 	debug_result_label.text = String(base_debug_actions.add_currency(_game_state).get("message", "增加矿币失败。"))
@@ -1948,8 +2111,6 @@ func _on_debug_force_chapter_complete_pressed() -> void:
 	var result := base_debug_actions.force_chapter_complete(_game_state, MANUFACTURING_UNLOCK_COST)
 	debug_result_label.text = String(result.get("message", "强制完成第一章失败。"))
 	_refresh()
-	if bool(result.get("ok", false)):
-		_show_chapter_complete_popup(int(result.get("surface_day", _game_state.get_current_day())))
 
 func _on_debug_force_monster_pressed() -> void:
 	debug_result_label.text = String(base_debug_actions.force_monster_next_run(_game_state).get("message", "强制怪物事件失败。"))
@@ -1961,3 +2122,19 @@ func _on_debug_slow_loading_pressed() -> void:
 func _on_debug_fail_loading_pressed() -> void:
 	_debug_fail_next_loading = true
 	debug_result_label.text = "下次出发将模拟加载失败。"
+
+func _on_debug_collect_all_catalog_pressed() -> void:
+	if _game_state == null or not _game_state.has_method("mark_all_catalog_items_collected_debug_only"):
+		debug_result_label.text = "GameState 不支持图鉴点亮。"
+		return
+	var result: Dictionary = _game_state.mark_all_catalog_items_collected_debug_only()
+	debug_result_label.text = "已点亮全部图鉴：%d 项。" % Array(result.get("marked_item_ids", [])).size()
+	_show_tab(TAB_CATALOG)
+
+func _on_debug_clear_catalog_pressed() -> void:
+	if _game_state == null or not _game_state.has_method("clear_collected_items_debug_only"):
+		debug_result_label.text = "GameState 不支持清空图鉴。"
+		return
+	_game_state.clear_collected_items_debug_only()
+	debug_result_label.text = "已清空图鉴点亮记录。"
+	_show_tab(TAB_CATALOG)

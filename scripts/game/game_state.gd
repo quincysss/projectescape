@@ -4,6 +4,7 @@ const WarehouseManagerScript := preload("res://scripts/game/warehouse_manager.gd
 const CurrencyWalletScript := preload("res://scripts/game/currency_wallet.gd")
 const MerchantServiceScript := preload("res://scripts/game/merchant_service.gd")
 const ResearchManagerScript := preload("res://scripts/game/research_manager.gd")
+const ItemCatalogServiceScript := preload("res://scripts/game/item_catalog_service.gd")
 const ProfileServiceScript := preload("res://scripts/profile/profile_service.gd")
 
 const BASE_INVENTORY_SLOTS := 8
@@ -11,7 +12,7 @@ const BASE_HOME_STORAGE_SLOTS := 1
 const BASE_OUTPOST_STORAGE_SLOTS := 0
 const BASE_MAX_STABILITY := 100.0
 const BASE_WAREHOUSE_CAPACITY := 80
-const MANUFACTURING_UNLOCK_COST := 5000
+const MANUFACTURING_UNLOCK_COST := 100
 const DEFAULT_CHARACTER_ID := "male_01"
 const DEFAULT_CHARACTER_HUD_ASSETS := {
 	"portrait_path": "res://assets/ui/run_character_hud/character_status/components/ui_run_character_portrait_male_01.png",
@@ -44,6 +45,7 @@ var character_hud_assets_by_id: Dictionary = {
 var merchant_shop_level: int = 1
 var merchant_shop_offers: Array[Dictionary] = []
 var research_levels: Dictionary = {}
+var collected_item_ids: Dictionary = {}
 var ss_chance_tier: int = 0
 var ss_miss_count: int = 0
 var ss_last_roll_day: int = 0
@@ -54,6 +56,7 @@ var warehouse_manager = WarehouseManagerScript.new()
 var currency_wallet = CurrencyWalletScript.new()
 var merchant_service = MerchantServiceScript.new()
 var research_manager = ResearchManagerScript.new()
+var item_catalog_service = ItemCatalogServiceScript.new()
 var profile_service = ProfileServiceScript.new()
 
 func _ready() -> void:
@@ -62,18 +65,21 @@ func _ready() -> void:
 	_bind_currency_wallet()
 	_bind_merchant_service()
 	_bind_research_manager()
+	_bind_item_catalog_service()
 
 func add_to_warehouse(items: Array) -> Array[Dictionary]:
 	_bind_warehouse_manager()
 	var accepted: Array[Dictionary] = warehouse_manager.add_items(items)
 	if not accepted.is_empty():
+		_mark_items_collected(accepted, "warehouse_add")
 		save_profile()
 	return accepted
 
 func apply_run_result(result: Dictionary) -> void:
 	_bind_warehouse_manager()
 	last_run_result = str(result.get("message", ""))
-	warehouse_manager.add_items(result.get("warehouse_items", []))
+	var accepted: Array[Dictionary] = warehouse_manager.add_items(result.get("warehouse_items", []))
+	_mark_items_collected(accepted, "run_result")
 	advance_day_after_run(result)
 	if _should_queue_first_return_dialogue(result):
 		pending_first_return_dialogue = true
@@ -187,6 +193,7 @@ func _reset_runtime_to_empty_profile_state() -> void:
 	merchant_shop_level = 1
 	merchant_shop_offers.clear()
 	research_levels.clear()
+	collected_item_ids.clear()
 	ss_chance_tier = 0
 	ss_miss_count = 0
 	ss_last_roll_day = 0
@@ -197,6 +204,7 @@ func _reset_runtime_to_empty_profile_state() -> void:
 	_bind_currency_wallet()
 	_bind_merchant_service()
 	_bind_research_manager()
+	_bind_item_catalog_service()
 
 func should_play_intro_cinematic() -> bool:
 	return not intro_cinematic_seen
@@ -460,6 +468,46 @@ func buy_shop_item(shop_offer_id: String, count: int) -> Dictionary:
 	_bind_merchant_service()
 	var result: Dictionary = merchant_service.buy_shop_item(shop_offer_id, count)
 	if bool(result.get("ok", false)):
+		_bind_item_catalog_service()
+		item_catalog_service.mark_collected(String(result.get("item_id", "")), "merchant_buy")
+		save_profile()
+	return result
+
+func mark_item_collected(item_id: String, source: String = "") -> Dictionary:
+	_bind_item_catalog_service()
+	var result: Dictionary = item_catalog_service.mark_collected(item_id, source)
+	if bool(result.get("changed", false)):
+		save_profile()
+	return result
+
+func mark_items_collected(item_ids: Array, source: String = "") -> Dictionary:
+	_bind_item_catalog_service()
+	var result: Dictionary = item_catalog_service.mark_many_collected(item_ids, source)
+	if bool(result.get("changed", false)):
+		save_profile()
+	return result
+
+func is_item_collected(item_id: String) -> bool:
+	_bind_item_catalog_service()
+	return item_catalog_service.is_collected(item_id)
+
+func get_collected_item_ids() -> Dictionary:
+	_bind_item_catalog_service()
+	return item_catalog_service.get_collected_item_ids()
+
+func query_catalog_items(filters: Dictionary = {}) -> Array[Dictionary]:
+	_bind_item_catalog_service()
+	return item_catalog_service.query_catalog_items(filters)
+
+func clear_collected_items_debug_only() -> void:
+	_bind_item_catalog_service()
+	item_catalog_service.clear_collected_debug_only()
+	save_profile()
+
+func mark_all_catalog_items_collected_debug_only() -> Dictionary:
+	_bind_item_catalog_service()
+	var result: Dictionary = item_catalog_service.mark_all_collected_debug_only()
+	if bool(result.get("changed", false)):
 		save_profile()
 	return result
 
@@ -594,6 +642,12 @@ func _apply_profile_to_runtime(loaded_profile: Dictionary) -> void:
 	for key in loaded_research_levels.keys():
 		research_levels[String(key)] = int(loaded_research_levels.get(key, 0))
 
+	collected_item_ids.clear()
+	var loaded_collected_item_ids: Dictionary = loaded_profile.get("collected_item_ids", {})
+	for key in loaded_collected_item_ids.keys():
+		if bool(loaded_collected_item_ids.get(key, false)):
+			collected_item_ids[String(key)] = true
+
 	merchant_shop_level = clampi(int(loaded_profile.get("merchant_shop_level", 1)), 1, 3)
 	merchant_shop_offers.clear()
 	for offer in Array(loaded_profile.get("merchant_shop_offers", [])):
@@ -643,6 +697,7 @@ func _sync_runtime_to_profile() -> void:
 	profile["currencies"] = currencies.duplicate(true)
 	profile["warehouse_items"] = warehouse_items.duplicate(true)
 	profile["research_levels"] = research_levels.duplicate(true)
+	profile["collected_item_ids"] = collected_item_ids.duplicate(true)
 	profile["merchant_shop_level"] = merchant_shop_level
 	profile["merchant_shop_offers"] = merchant_shop_offers.duplicate(true)
 	profile["ss_roll_state"] = {
@@ -670,6 +725,20 @@ func _bind_research_manager() -> void:
 	if research_manager == null:
 		research_manager = ResearchManagerScript.new()
 	research_manager.bind_dependencies(warehouse_manager, currency_wallet, research_levels)
+
+func _bind_item_catalog_service() -> void:
+	if item_catalog_service == null:
+		item_catalog_service = ItemCatalogServiceScript.new()
+	item_catalog_service.bind_collected_items(collected_item_ids)
+
+func _mark_items_collected(items: Array, source: String) -> Dictionary:
+	var item_ids: Array[String] = []
+	for item in items:
+		if item is Dictionary:
+			var item_id := String(item.get("item_id", ""))
+			if not item_id.is_empty():
+				item_ids.append(item_id)
+	return mark_items_collected(item_ids, source)
 
 func _get_research_effect_value(effect_type: String, default_value: float) -> float:
 	if research_manager == null:
