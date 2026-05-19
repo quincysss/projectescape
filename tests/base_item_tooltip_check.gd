@@ -46,23 +46,23 @@ func _verify_warehouse_tooltip(base_root) -> bool:
 		return false
 	button.emit_signal("mouse_entered")
 	await create_timer(0.22).timeout
-	var panel := base_root.item_tooltip_panel as Panel
+	var panel := base_root.item_tooltip_view.tooltip_panel as Panel
 	if panel == null or not panel.visible:
 		printerr("Expected warehouse hover to show item tooltip.")
 		return false
 	if panel.mouse_filter != Control.MOUSE_FILTER_IGNORE:
 		printerr("Expected tooltip panel not to intercept mouse.")
 		return false
-	if base_root.tooltip_layer == null or base_root.tooltip_layer.mouse_filter != Control.MOUSE_FILTER_IGNORE:
+	if base_root.item_tooltip_view.tooltip_layer == null or base_root.item_tooltip_view.tooltip_layer.mouse_filter != Control.MOUSE_FILTER_IGNORE:
 		printerr("Expected tooltip layer not to intercept mouse.")
 		return false
-	if base_root.item_tooltip_name_label.text != "金色数据芯片":
-		printerr("Expected tooltip name from items.tab, got %s." % base_root.item_tooltip_name_label.text)
+	if base_root.item_tooltip_view.tooltip_name_label.text != "金色数据芯片":
+		printerr("Expected tooltip name from items.tab, got %s." % base_root.item_tooltip_view.tooltip_name_label.text)
 		return false
-	if base_root.item_tooltip_price_label.text != "120矿币":
-		printerr("Expected tooltip price from items.tab/currencies.tab, got %s." % base_root.item_tooltip_price_label.text)
+	if base_root.item_tooltip_view.tooltip_price_label.text != "120矿币":
+		printerr("Expected tooltip price from items.tab/currencies.tab, got %s." % base_root.item_tooltip_view.tooltip_price_label.text)
 		return false
-	if not base_root.item_tooltip_description_label.text.contains("高价值芯片"):
+	if not base_root.item_tooltip_view.tooltip_description_label.text.contains("高价值芯片"):
 		printerr("Expected tooltip description from items.tab.")
 		return false
 	if not _panel_inside_viewport(base_root, panel):
@@ -86,14 +86,14 @@ func _verify_research_tooltip(base_root) -> bool:
 		return false
 	requirement_slot.emit_signal("mouse_entered")
 	await create_timer(0.22).timeout
-	var panel := base_root.item_tooltip_panel as Panel
+	var panel := base_root.item_tooltip_view.tooltip_panel as Panel
 	if panel == null or not panel.visible:
 		printerr("Expected research material hover to show tooltip.")
 		return false
-	if base_root.item_tooltip_name_label.text.is_empty():
+	if base_root.item_tooltip_view.tooltip_name_label.text.is_empty():
 		printerr("Expected research tooltip item name.")
 		return false
-	if base_root.item_tooltip_description_label.text.is_empty():
+	if base_root.item_tooltip_view.tooltip_description_label.text.is_empty():
 		printerr("Expected research tooltip description.")
 		return false
 	base_root._hide_item_tooltip("test_done")

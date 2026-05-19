@@ -1,7 +1,7 @@
 extends SceneTree
 
-const BaseSceneScript := preload("res://scripts/base/base_scene.gd")
 const GameDataRegistryScript := preload("res://scripts/data/game_data_registry.gd")
+const ItemGridViewScript := preload("res://scripts/ui/item_grid_view.gd")
 const RunUiControllerScript := preload("res://scripts/run/run_ui_controller.gd")
 
 
@@ -51,16 +51,13 @@ func _verify_slot_layouts(registry) -> bool:
 		return false
 	run_button.free()
 
-	var base_scene = BaseSceneScript.new()
-	var base_button := Button.new()
-	base_scene._add_base_item_slot_content(base_button, Vector2(62.0, 62.0), item, "warehouse")
+	var item_grid = ItemGridViewScript.new()
+	var base_button: Button = item_grid._make_item_slot(Vector2.ZERO, Vector2(62.0, 62.0), item, 0, "warehouse", false)
 	if not _slot_has_expected_content(base_button, expected_name):
 		printerr("Base item slot should render icon and centered name only.")
 		base_button.free()
-		base_scene.free()
 		return false
 	base_button.free()
-	base_scene.free()
 	return true
 
 
