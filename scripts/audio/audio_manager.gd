@@ -32,11 +32,36 @@ var _manifest: Dictionary = {}
 var _current_bgm_id := ""
 var _current_bgm_path := ""
 var _loop_players: Dictionary = {}
+var _one_shot_players: Array[AudioStreamPlayer] = []
 var _missing_assets: Dictionary = {}
 
 func _ready() -> void:
 	_ensure_players()
 	reload_manifest()
+
+func _exit_tree() -> void:
+	shutdown()
+
+func shutdown() -> void:
+	_free_loop_players()
+	_free_one_shot_players()
+	_stop_bgm_immediate()
+	if bgm_player != null and is_instance_valid(bgm_player):
+		bgm_player.free()
+	bgm_player = null
+
+func shutdown_and_flush(frame_count: int = 10) -> void:
+	shutdown()
+	var tree := get_tree()
+	if tree == null:
+		return
+	for _index in range(max(frame_count, 0)):
+		await tree.process_frame
+		await tree.physics_frame
+	shutdown()
+	for _index in range(max(frame_count, 0)):
+		await tree.process_frame
+		await tree.physics_frame
 
 func reload_manifest() -> bool:
 	_manifest = _load_manifest()
@@ -68,6 +93,7 @@ func play_bgm(bgm_id: String, force_restart: bool = false) -> bool:
 		_stop_bgm_immediate()
 		bgm_changed.emit(bgm_id, path, false)
 		return false
+	_clear_bgm_player_stream()
 	bgm_player.stream = stream
 	bgm_player.volume_db = float(config.get("volume_db", -8.0))
 	bgm_player.bus = MUSIC_BUS
@@ -148,8 +174,11 @@ func play_sfx(sfx_id: String) -> bool:
 	player.volume_db = float(config.get("volume_db", -4.0))
 	player.bus = SFX_BUS
 	add_child(player)
+	_one_shot_players.append(player)
 	player.finished.connect(func():
+		_one_shot_players.erase(player)
 		if is_instance_valid(player):
+			player.stream = null
 			player.queue_free()
 	)
 	player.play()
@@ -196,6 +225,7 @@ func stop_loop_sfx(sfx_id: String) -> void:
 	_loop_players.erase(sfx_id)
 	if is_instance_valid(player):
 		player.stop()
+		player.stream = null
 		player.queue_free()
 	var config := get_sfx_config(sfx_id)
 	loop_sfx_changed.emit(sfx_id, false, String(config.get("path", "")), true)
@@ -295,11 +325,31 @@ func _note_missing_asset(audio_id: String, path: String) -> void:
 	audio_asset_missing.emit(audio_id, path)
 
 func _stop_bgm_immediate() -> void:
-	if bgm_player != null and is_instance_valid(bgm_player):
-		bgm_player.stop()
-		bgm_player.stream = null
+	_clear_bgm_player_stream()
 	_current_bgm_id = ""
 	_current_bgm_path = ""
+
+func _clear_bgm_player_stream() -> void:
+	if bgm_player != null and is_instance_valid(bgm_player):
+		bgm_player.stop()
+		bgm_player.stream_paused = false
+		bgm_player.stream = null
+
+func _free_loop_players() -> void:
+	for player in _loop_players.values():
+		if is_instance_valid(player):
+			player.stop()
+			player.stream = null
+			player.free()
+	_loop_players.clear()
+
+func _free_one_shot_players() -> void:
+	for player in _one_shot_players.duplicate():
+		if is_instance_valid(player):
+			player.stop()
+			player.stream = null
+			player.free()
+	_one_shot_players.clear()
 
 func _safe_node_suffix(value: String) -> String:
 	return value.replace("/", "_").replace(":", "_").replace(".", "_")

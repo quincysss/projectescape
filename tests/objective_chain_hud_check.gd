@@ -2,6 +2,7 @@ extends SceneTree
 
 func _initialize() -> void:
 	var ok := await _verify_objective_chain_hud()
+	await _shutdown_audio()
 	print("Objective chain HUD verified." if ok else "Objective chain HUD failed.")
 	quit(0 if ok else 1)
 
@@ -120,3 +121,8 @@ func _item(item_id: String, display_name: String, amount: int, weight: float) ->
 		"stack_limit": 99,
 		"repair_material_id": item_id,
 	}
+
+func _shutdown_audio() -> void:
+	var audio_manager := root.get_node_or_null("AudioManager")
+	if audio_manager != null and audio_manager.has_method("shutdown_and_flush"):
+		await audio_manager.shutdown_and_flush()

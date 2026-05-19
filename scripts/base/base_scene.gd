@@ -3,6 +3,7 @@ extends Control
 const GameDataRegistryScript := preload("res://scripts/data/game_data_registry.gd")
 const DialogueServiceScript := preload("res://scripts/dialogue/dialogue_service.gd")
 const BaseMerchantPanelControllerScript := preload("res://scripts/base/base_merchant_panel_controller.gd")
+const BaseWarehousePanelControllerScript := preload("res://scripts/base/base_warehouse_panel_controller.gd")
 const BaseResearchPanelControllerScript := preload("res://scripts/base/base_research_panel_controller.gd")
 const BaseCraftingPanelControllerScript := preload("res://scripts/base/base_crafting_panel_controller.gd")
 const BaseCatalogPanelControllerScript := preload("res://scripts/base/base_catalog_panel_controller.gd")
@@ -64,6 +65,7 @@ var _selected_research_id := ""
 var base_data_registry = GameDataRegistryScript.new()
 var base_data_loaded := false
 var base_merchant_panel = BaseMerchantPanelControllerScript.new()
+var base_warehouse_panel = BaseWarehousePanelControllerScript.new()
 var base_research_panel = BaseResearchPanelControllerScript.new()
 var base_crafting_panel = BaseCraftingPanelControllerScript.new()
 var base_catalog_panel = BaseCatalogPanelControllerScript.new()
@@ -624,20 +626,24 @@ func _build_visual_surfaces() -> void:
 	chapter_goal_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	ui_root.add_child(chapter_goal_label)
 
-	warehouse_panel = _make_base_panel("WarehouseGridPanel", Vector2(24, 154), Vector2(980, 500), "局外仓库")
-	var warehouse_scroll := _make_scroll_area(Vector2(18, 58), Vector2(388, 394))
-	warehouse_grid_root = Control.new()
-	warehouse_scroll.add_child(warehouse_grid_root)
-	warehouse_panel.add_child(warehouse_scroll)
-	warehouse_status_label = _make_section_label("空仓位会显示为细框。每个格子只放一个道具。", Vector2(436, 62), Vector2(500, 96), 16)
-	warehouse_status_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	warehouse_panel.add_child(warehouse_status_label)
-	ui_root.add_child(warehouse_panel)
+	_build_warehouse_surface(ui_root)
 
 	_build_merchant_surface()
 	_build_research_surface()
 	_build_crafting_surface()
 	_build_catalog_surface()
+
+func _build_warehouse_surface(ui_root: Control) -> void:
+	var nodes := base_warehouse_panel.build_surface(ui_root)
+	warehouse_panel = nodes.get("panel") as Panel
+	warehouse_grid_root = nodes.get("grid_root") as Control
+	warehouse_status_label = nodes.get("status_label") as Label
+	base_warehouse_panel.setup_views(
+		warehouse_label,
+		item_grid_view,
+		warehouse_grid_root,
+		warehouse_status_label
+	)
 
 func _setup_base_ui_helpers(ui_root: Control) -> void:
 	item_tooltip_view.setup(
@@ -892,25 +898,11 @@ func _style_button(button: Button, important: bool) -> void:
 	button.add_theme_stylebox_override("disabled", _panel_style(Color(0.06, 0.06, 0.058, 0.55), Color("#4D575B"), 1))
 
 func _set_warehouse_items_text(items: Array) -> void:
-	warehouse_label.clear()
 	var capacity: int = _game_state.get_warehouse_capacity() if _game_state != null and _game_state.has_method("get_warehouse_capacity") else items.size()
 	var max_capacity := capacity
 	if _game_state != null and _game_state.has_method("get_warehouse_max_capacity"):
 		max_capacity = int(_game_state.get_warehouse_max_capacity())
-	_set_item_grid(warehouse_grid_root, items, max_capacity, TAB_WAREHOUSE, capacity)
-	if warehouse_status_label != null:
-		warehouse_status_label.text = "仓库容量：%d/%d\n格子规则：每格 1 个道具，不堆叠。" % [items.size(), capacity]
-	if items.is_empty():
-		warehouse_label.append_text("局外仓库：空（0/%d）" % capacity)
-		return
-	var lines: Array[String] = ["局外仓库：%d/%d" % [items.size(), capacity]]
-	for index in range(items.size()):
-		var item = items[index]
-		if item is Dictionary:
-			var name := String(item.get("display_name", item.get("item_id", "")))
-			var weight := float(item.get("weight_per_unit", 0.0))
-			lines.append("[url=warehouse:%d]- 第 %d 格：%s  单重 %.2f[/url]" % [index, index + 1, name, weight])
-	warehouse_label.append_text("\n".join(lines))
+	base_warehouse_panel.set_items(items, capacity, max_capacity, TAB_WAREHOUSE)
 
 func _set_merchant_items_text(items: Array) -> void:
 	base_merchant_panel.set_sell_items_text(items)
@@ -921,11 +913,6 @@ func _set_shop_stock_text(items: Array) -> void:
 func _set_research_items_text(items: Array) -> void:
 	base_research_panel.set_items_text(items)
 	_selected_research_id = base_research_panel.selected_research_id
-
-func _set_item_grid(grid_root: Control, items: Array, capacity: int, source_id: String, unlocked_slots: int = -1) -> void:
-	if grid_root == null:
-		return
-	item_grid_view.set_grid(grid_root, items, capacity, source_id, unlocked_slots)
 
 func _is_grid_slot_selected(source_id: String, meta_id: String, index: int) -> bool:
 	return base_merchant_panel.is_slot_selected(source_id, meta_id, index)
@@ -1020,11 +1007,7 @@ func _on_warehouse_item_meta_clicked(meta: Variant) -> void:
 	if item.is_empty():
 		return
 	result_label.text = "已选择：%s" % item.get("display_name", item.get("item_id", ""))
-	if warehouse_status_label != null:
-		warehouse_status_label.text = "已选择：%s\n品质：%s\n格子规则：每格 1 个道具，不堆叠。" % [
-			String(item.get("display_name", item.get("item_id", ""))),
-			String(item.get("quality", "C")),
-		]
+	base_warehouse_panel.show_selected_item(item)
 
 func _on_merchant_item_meta_clicked(meta: Variant) -> void:
 	var parts := String(meta).split(":", false, 1)

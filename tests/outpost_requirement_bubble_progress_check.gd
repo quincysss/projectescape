@@ -2,6 +2,7 @@ extends SceneTree
 
 func _initialize() -> void:
 	var ok := await _verify_outpost_requirement_bubble_uses_carried_materials()
+	await _shutdown_audio()
 	print("Outpost requirement bubble progress verified." if ok else "Outpost requirement bubble progress failed.")
 	quit(0 if ok else 1)
 
@@ -49,6 +50,11 @@ func _verify_outpost_requirement_bubble_uses_carried_materials() -> bool:
 	root.queue_free()
 	await process_frame
 	return true
+
+func _shutdown_audio() -> void:
+	var audio_manager := root.get_node_or_null("AudioManager")
+	if audio_manager != null and audio_manager.has_method("shutdown_and_flush"):
+		await audio_manager.shutdown_and_flush()
 
 func _find_interactable(root, interact_type: String):
 	for interactable in root.interactables:

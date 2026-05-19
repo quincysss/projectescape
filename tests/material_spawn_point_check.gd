@@ -2,6 +2,7 @@ extends SceneTree
 
 func _initialize() -> void:
 	var ok := await _verify_material_spawn_points()
+	await _shutdown_audio()
 	print("Material spawn point uniqueness verified." if ok else "Material spawn point uniqueness failed.")
 	quit(0 if ok else 1)
 
@@ -124,3 +125,8 @@ func _polygon_height(polygon: PackedVector2Array) -> float:
 		min_y = minf(min_y, point.y)
 		max_y = maxf(max_y, point.y)
 	return max_y - min_y
+
+func _shutdown_audio() -> void:
+	var audio_manager := root.get_node_or_null("AudioManager")
+	if audio_manager != null and audio_manager.has_method("shutdown_and_flush"):
+		await audio_manager.shutdown_and_flush()

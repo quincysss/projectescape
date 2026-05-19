@@ -5,18 +5,28 @@ const InteractableScript := preload("res://scripts/run/run_interactable.gd")
 const VisionCircleScript := preload("res://scripts/vision/vision_debug_circle.gd")
 const ExplorationFogScript := preload("res://scripts/vision/exploration_fog_overlay.gd")
 const LootInteractionControllerScript := preload("res://scripts/run/loot_interaction_controller.gd")
+const MaterialPickupFlowControllerScript := preload("res://scripts/run/material_pickup_flow_controller.gd")
+const RunActiveInteractionControllerScript := preload("res://scripts/run/run_active_interaction_controller.gd")
 const RunEndControllerScript := preload("res://scripts/run/run_end_controller.gd")
+const ExtractionFlowControllerScript := preload("res://scripts/extraction/extraction_flow_controller.gd")
 const OutpostRepairControllerScript := preload("res://scripts/run/outpost_repair_controller.gd")
+const OutpostRepairFlowControllerScript := preload("res://scripts/outpost/outpost_repair_flow_controller.gd")
 const InteractionProgressControllerScript := preload("res://scripts/run/interaction_progress_controller.gd")
+const ContainerInteractionControllerScript := preload("res://scripts/run/container_interaction_controller.gd")
 const ContainerSpawnControllerScript := preload("res://scripts/run/container_spawn_controller.gd")
 const OutpostMaterialSpawnControllerScript := preload("res://scripts/run/outpost_material_spawn_controller.gd")
 const InteractableVisualBuilderScript := preload("res://scripts/run/interactable_visual_builder.gd")
+const RunWorldPresentationControllerScript := preload("res://scripts/run/run_world_presentation_controller.gd")
 const RunUiControllerScript := preload("res://scripts/run/run_ui_controller.gd")
+const RunInventoryPanelControllerScript := preload("res://scripts/inventory/run_inventory_panel_controller.gd")
 const RunTimerControllerScript := preload("res://scripts/run/run_timer_controller.gd")
 const RunMapBuilderScript := preload("res://scripts/map/run_map_builder.gd")
 const MonsterSpawnControllerScript := preload("res://scripts/monsters/monster_spawn_controller.gd")
 const SettlementResultScreenScript := preload("res://scripts/ui/settlement_result_screen.gd")
 const ReturnToBaseLoadingScreenScript := preload("res://scripts/ui/return_to_base_loading_screen.gd")
+const WebVideoBridgeScript := preload("res://scripts/ui/web_video_bridge.gd")
+const RunSimulationPauseServiceScript := preload("res://scripts/flow/run_simulation_pause_service.gd")
+const RunStoryGateControllerScript := preload("res://scripts/flow/run_story_gate_controller.gd")
 const DialogueServiceScript := preload("res://scripts/dialogue/dialogue_service.gd")
 const DialoguePanelScene := preload("res://scenes/ui/DialoguePanel.tscn")
 const UNIT := 64.0
@@ -37,12 +47,6 @@ const EXTRACTION_HOLD_SECONDS := 3.0
 const STATUS_PROMPT_VISIBLE_SECONDS := 3.0
 const SHOW_DEBUG_VISION_CIRCLE := false
 const PLAYER_ALWAYS_IN_FRONT_BUILDING_Z_INDEX := -1
-const SECOND_DAY_BLACK_TIDE_DIALOGUE_PATH := "res://setting/dialogues.tab#second_day_black_tide_reveal_dialogue"
-const SECOND_DAY_BLACK_TIDE_CINEMATIC_PATH := "res://assets/cinematics/source/second_day_black_tide_reveal_720p.mp4"
-const SECOND_DAY_BLACK_TIDE_CINEMATIC_FALLBACK_PATH := "res://assets/cinematics/second_day_black_tide_reveal_720p.ogv"
-const SECOND_DAY_BLACK_TIDE_PLACEHOLDER_SECONDS := 1.2
-const WEB_SECOND_DAY_BLACK_TIDE_VIDEO_ID := "project-escape-second-day-black-tide-video"
-
 @onready var run_director: RunDirector = $RunDirector
 @onready var world_root: Node2D = $WorldRoot
 @onready var y_sort_root: Node2D = $WorldRoot/YSortRoot
@@ -134,16 +138,26 @@ var backpack_button: Button
 var _game_state: Node
 var _camera_tween: Tween
 var loot_interaction_controller
+var material_pickup_flow_controller
+var active_interaction_controller
 var run_end_controller
+var extraction_flow_controller
 var outpost_repair_controller
+var outpost_repair_flow_controller
 var interaction_progress_controller
+var container_interaction_controller
 var container_spawn_controller
 var outpost_material_spawn_controller
 var monster_spawn_controller
 var interactable_visual_builder
+var run_world_presentation_controller
 var run_ui_controller
+var run_inventory_panel_controller
 var run_timer_controller
 var map_builder
+var web_video_bridge = WebVideoBridgeScript.new()
+var run_simulation_pause_service = RunSimulationPauseServiceScript.new()
+var run_story_gate_controller = RunStoryGateControllerScript.new()
 var dialogue_service = DialogueServiceScript.new()
 var _timed_status_prompt_text: String = ""
 var _status_prompt_clear_time_msec: int = 0
@@ -155,19 +169,35 @@ var _status_prompt: String = "":
 var settlement_result_screen: SettlementResultScreen
 var return_to_base_loading_screen: ReturnToBaseLoadingScreen
 var _pending_run_result: Dictionary = {}
-var home_storage_user_closed: bool = false
-var active_outpost_storage_id: String = ""
-var selected_inventory_index: int = -1
+var home_storage_user_closed: bool:
+	get:
+		return bool(run_inventory_panel_controller.home_storage_user_closed) if run_inventory_panel_controller != null else false
+	set(value):
+		if run_inventory_panel_controller != null:
+			run_inventory_panel_controller.home_storage_user_closed = value
+var active_outpost_storage_id: String:
+	get:
+		return String(run_inventory_panel_controller.active_outpost_storage_id) if run_inventory_panel_controller != null else ""
+	set(value):
+		if run_inventory_panel_controller != null:
+			run_inventory_panel_controller.active_outpost_storage_id = value
+var selected_inventory_index: int:
+	get:
+		return int(run_inventory_panel_controller.selected_inventory_index) if run_inventory_panel_controller != null else -1
+	set(value):
+		if run_inventory_panel_controller != null:
+			run_inventory_panel_controller.selected_inventory_index = value
 var _extract_button_held: bool = false
 var _ui_refresh_queued: bool = false
-var _story_pause_tokens: Dictionary = {}
-var _story_gate_running: bool = false
-var _story_video_overlay: Control
-var _story_video_player: VideoStreamPlayer
-var _story_video_finish_timer: Timer
-var _story_video_bgm_paused: bool = false
-var _story_web_video_active := false
-var _active_story_dialogue_panel: Control
+var _story_video_overlay: Control:
+	get:
+		return run_story_gate_controller.video_overlay if run_story_gate_controller != null else null
+var _story_video_player: VideoStreamPlayer:
+	get:
+		return run_story_gate_controller.video_player if run_story_gate_controller != null else null
+var _active_story_dialogue_panel: Control:
+	get:
+		return run_story_gate_controller.active_dialogue_panel if run_story_gate_controller != null else null
 
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_WM_SIZE_CHANGED:
@@ -177,6 +207,19 @@ func _notification(what: int) -> void:
 func _ready() -> void:
 	_ensure_input_actions()
 	_game_state = get_node_or_null("/root/GameState")
+	web_video_bridge.setup(get_viewport())
+	if not run_simulation_pause_service.pause_changed.is_connected(_on_run_simulation_pause_changed):
+		run_simulation_pause_service.pause_changed.connect(_on_run_simulation_pause_changed)
+	run_story_gate_controller.setup(
+		self,
+		ui_root,
+		_game_state,
+		dialogue_service,
+		DialoguePanelScene,
+		web_video_bridge,
+		run_simulation_pause_service,
+		Callable(self, "_refresh_ui")
+	)
 	_create_runtime_controllers()
 	_build_run_world()
 	_configure_monster_spawn_controller()
@@ -196,23 +239,30 @@ func _ready() -> void:
 	call_deferred("_maybe_start_run_story_gate")
 
 func _exit_tree() -> void:
-	_story_web_video_active = false
-	_remove_web_video(WEB_SECOND_DAY_BLACK_TIDE_VIDEO_ID)
-	_set_web_canvas_transparent(false)
-	_resume_bgm_after_story_video()
+	run_story_gate_controller.cleanup()
+	run_simulation_pause_service.clear()
 	_audio_manager_call("stop_container_open_loop")
 	_audio_manager_call("set_stability_critical_loop_active", [false])
 
 func _create_runtime_controllers() -> void:
 	loot_interaction_controller = LootInteractionControllerScript.new()
+	material_pickup_flow_controller = MaterialPickupFlowControllerScript.new()
+	material_pickup_flow_controller.setup(loot_interaction_controller, run_director, Callable(self, "_remove_interactable"))
 	run_end_controller = RunEndControllerScript.new()
 	run_end_controller.setup(run_director, _game_state)
+	extraction_flow_controller = ExtractionFlowControllerScript.new()
+	extraction_flow_controller.setup(run_director, run_end_controller, EXTRACTION_HOLD_SECONDS)
 	outpost_repair_controller = OutpostRepairControllerScript.new()
 	outpost_repair_controller.setup(run_director, repaired_outposts)
+	outpost_repair_flow_controller = OutpostRepairFlowControllerScript.new()
+	outpost_repair_flow_controller.setup(outpost_repair_controller, OUTPOST_REPAIR_HOLD_SECONDS)
 	interaction_progress_controller = InteractionProgressControllerScript.new()
 	interactable_visual_builder = InteractableVisualBuilderScript.new()
 	interactable_visual_builder.setup(UNIT)
+	run_world_presentation_controller = RunWorldPresentationControllerScript.new()
+	run_world_presentation_controller.setup(UNIT, interactable_visual_builder, Callable(self, "_sync_outpost_visual_anchor"))
 	run_ui_controller = RunUiControllerScript.new()
+	run_inventory_panel_controller = RunInventoryPanelControllerScript.new()
 	run_timer_controller = RunTimerControllerScript.new()
 	run_timer_controller.time_expired.connect(_on_run_time_expired)
 	map_builder = RunMapBuilderScript.new()
@@ -226,6 +276,10 @@ func _create_runtime_controllers() -> void:
 		Callable(self, "_remove_interactable"),
 		UNIT
 	)
+	container_interaction_controller = ContainerInteractionControllerScript.new()
+	container_interaction_controller.setup(container_spawn_controller, loot_interaction_controller, CONTAINER_OPEN_HOLD_SECONDS)
+	active_interaction_controller = RunActiveInteractionControllerScript.new()
+	active_interaction_controller.setup(container_interaction_controller, outpost_repair_flow_controller, extraction_flow_controller)
 	outpost_material_spawn_controller = OutpostMaterialSpawnControllerScript.new()
 	outpost_material_spawn_controller.setup(
 		outpost_root,
@@ -292,10 +346,7 @@ func _process(delta: float) -> void:
 		container_spawn_controller.update(delta, interactables)
 	if outpost_material_spawn_controller != null:
 		outpost_material_spawn_controller.update_lifetimes(delta, interactables)
-	_update_container_lifetime_visuals()
-	_update_material_lifetime_visuals()
-	_update_outpost_requirement_bubbles()
-	_update_readable_world_ui_scale()
+	_update_run_world_presentation()
 	if Input.is_action_just_pressed("interact"):
 		_try_interact()
 	if Input.is_action_just_pressed("toggle_inventory"):
@@ -547,463 +598,25 @@ func _on_run_initialized(context) -> void:
 		container_spawn_controller.setup_ss_loot_director(run_director.get_ss_loot_director())
 
 func _prepare_initial_story_gate() -> void:
-	if _should_trigger_second_day_black_tide_story():
-		_acquire_story_pause("second_day_black_tide_reveal")
+	run_story_gate_controller.prepare_initial_gate(run_director.context if run_director != null else null)
 
 func _maybe_start_run_story_gate() -> void:
-	if _story_gate_running:
-		return
-	await get_tree().process_frame
-	if not _should_trigger_second_day_black_tide_story():
-		_release_story_pause("second_day_black_tide_reveal")
-		return
-	_story_gate_running = true
-	_acquire_story_pause("second_day_black_tide_reveal")
-	await _play_second_day_black_tide_story()
-	_story_gate_running = false
-
-func _should_trigger_second_day_black_tide_story() -> bool:
-	if _game_state == null or run_director == null or run_director.context == null:
-		return false
-	var run_day_index := int(run_director.context.run_day_index)
-	if _game_state.has_method("should_play_second_day_black_tide_reveal"):
-		return bool(_game_state.should_play_second_day_black_tide_reveal(run_day_index))
-	return run_day_index == 2 and not bool(_game_state.get("second_day_black_tide_reveal_seen"))
-
-func _play_second_day_black_tide_story() -> void:
-	_show_second_day_black_tide_cinematic()
-	while is_instance_valid(_story_video_overlay):
-		await get_tree().process_frame
-	await _play_run_story_dialogue(SECOND_DAY_BLACK_TIDE_DIALOGUE_PATH)
-	if _game_state != null and _game_state.has_method("mark_second_day_black_tide_reveal_seen"):
-		_game_state.mark_second_day_black_tide_reveal_seen()
-	_release_story_pause("second_day_black_tide_reveal")
-	_refresh_ui()
-
-func _show_second_day_black_tide_cinematic() -> void:
-	if is_instance_valid(_story_video_overlay):
-		return
-	var overlay := Control.new()
-	overlay.name = "SecondDayBlackTideCinematicOverlay"
-	overlay.anchor_right = 1.0
-	overlay.anchor_bottom = 1.0
-	overlay.mouse_filter = Control.MOUSE_FILTER_STOP
-	overlay.z_index = 200
-	ui_root.add_child(overlay)
-	_story_video_overlay = overlay
-
-	var background := ColorRect.new()
-	background.name = "SecondDayBlackTideCinematicBackground"
-	background.color = Color("#050505")
-	background.anchor_right = 1.0
-	background.anchor_bottom = 1.0
-	overlay.add_child(background)
-
-	var frame := ColorRect.new()
-	frame.name = "SecondDayBlackTideCinematicPlaceholder16x9"
-	frame.color = Color("#120E0E")
-	frame.anchor_right = 1.0
-	frame.anchor_bottom = 1.0
-	overlay.add_child(frame)
-
-	var placeholder_label := Label.new()
-	placeholder_label.name = "SecondDayBlackTideCinematicPlaceholderLabel"
-	placeholder_label.text = "暗潮影像同步中"
-	placeholder_label.anchor_left = 0.5
-	placeholder_label.anchor_right = 0.5
-	placeholder_label.anchor_top = 0.5
-	placeholder_label.anchor_bottom = 0.5
-	placeholder_label.offset_left = -180.0
-	placeholder_label.offset_top = -18.0
-	placeholder_label.offset_right = 180.0
-	placeholder_label.offset_bottom = 18.0
-	placeholder_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	placeholder_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	placeholder_label.add_theme_font_size_override("font_size", 18)
-	placeholder_label.add_theme_color_override("font_color", Color(0.82, 0.80, 0.76, 0.5))
-	overlay.add_child(placeholder_label)
-
-	var video_loaded := _add_second_day_black_tide_video(background, frame, placeholder_label)
-	var skip_button := Button.new()
-	skip_button.name = "SkipSecondDayBlackTideCinematicButton"
-	skip_button.text = "跳过影像"
-	skip_button.anchor_left = 1.0
-	skip_button.anchor_right = 1.0
-	skip_button.anchor_top = 1.0
-	skip_button.anchor_bottom = 1.0
-	skip_button.offset_left = -164.0
-	skip_button.offset_top = -72.0
-	skip_button.offset_right = -36.0
-	skip_button.offset_bottom = -34.0
-	skip_button.pressed.connect(func(): _finish_second_day_black_tide_cinematic(true))
-	overlay.add_child(skip_button)
-	if video_loaded and OS.has_feature("web"):
-		skip_button.visible = false
-
-	if not video_loaded:
-		push_warning("Second day black tide cinematic is missing or unsupported; continuing with placeholder.")
-		_story_video_finish_timer = Timer.new()
-		_story_video_finish_timer.one_shot = true
-		_story_video_finish_timer.wait_time = SECOND_DAY_BLACK_TIDE_PLACEHOLDER_SECONDS
-		_story_video_finish_timer.timeout.connect(func(): _finish_second_day_black_tide_cinematic(false))
-		overlay.add_child(_story_video_finish_timer)
-		_story_video_finish_timer.start()
-
-func _add_second_day_black_tide_video(background: ColorRect, frame: ColorRect, placeholder_label: Label) -> bool:
-	if OS.has_feature("web"):
-		var web_url := _res_path_to_web_url(SECOND_DAY_BLACK_TIDE_CINEMATIC_PATH)
-		if not _play_web_video(WEB_SECOND_DAY_BLACK_TIDE_VIDEO_ID, web_url, false, false, true):
-			return false
-		_story_web_video_active = true
-		background.visible = false
-		frame.visible = false
-		placeholder_label.visible = false
-		_pause_bgm_for_story_video()
-		return true
-
-	var stream := _load_first_story_video_stream([
-		SECOND_DAY_BLACK_TIDE_CINEMATIC_PATH,
-		SECOND_DAY_BLACK_TIDE_CINEMATIC_FALLBACK_PATH,
-	])
-	if stream == null:
-		return false
-	var video_player := VideoStreamPlayer.new()
-	video_player.name = "SecondDayBlackTideCinematicVideoPlayer"
-	video_player.stream = stream
-	video_player.expand = true
-	video_player.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	video_player.finished.connect(func(): _finish_second_day_black_tide_cinematic(false))
-	_story_video_overlay.add_child(video_player)
-	_story_video_player = video_player
-	_fit_control_to_16x9_cover(video_player)
-	background.visible = false
-	frame.visible = false
-	placeholder_label.visible = false
-	_pause_bgm_for_story_video()
-	video_player.play()
-	return true
+	await run_story_gate_controller.maybe_start_run_story_gate(run_director.context if run_director != null else null)
 
 func _finish_second_day_black_tide_cinematic(_skipped: bool = false) -> void:
-	_story_web_video_active = false
-	_remove_web_video(WEB_SECOND_DAY_BLACK_TIDE_VIDEO_ID)
-	_set_web_canvas_transparent(false)
-	if is_instance_valid(_story_video_finish_timer):
-		_story_video_finish_timer.stop()
-	if is_instance_valid(_story_video_player):
-		_story_video_player.stop()
-	if is_instance_valid(_story_video_overlay):
-		_story_video_overlay.queue_free()
-	_story_video_finish_timer = null
-	_story_video_player = null
-	_story_video_overlay = null
-	_resume_bgm_after_story_video()
-
-func _pause_bgm_for_story_video() -> void:
-	if _story_video_bgm_paused:
-		return
-	var audio_manager := get_node_or_null("/root/AudioManager")
-	if audio_manager != null and audio_manager.has_method("pause_bgm"):
-		audio_manager.pause_bgm()
-		_story_video_bgm_paused = true
-
-func _resume_bgm_after_story_video() -> void:
-	if not _story_video_bgm_paused:
-		return
-	_story_video_bgm_paused = false
-	var audio_manager := get_node_or_null("/root/AudioManager")
-	if audio_manager != null and audio_manager.has_method("resume_bgm"):
-		audio_manager.resume_bgm()
+	run_story_gate_controller.finish_second_day_black_tide_cinematic(_skipped)
 
 func _update_story_web_video() -> void:
-	if not _story_web_video_active:
-		return
-	if _is_web_video_ended(WEB_SECOND_DAY_BLACK_TIDE_VIDEO_ID):
-		_finish_second_day_black_tide_cinematic(false)
-
-func _play_web_video(element_id: String, url: String, loop: bool, muted: bool, foreground: bool = false) -> bool:
-	if not OS.has_feature("web") or element_id.is_empty() or url.is_empty():
-		return false
-	_set_web_canvas_transparent(not foreground)
-	_ensure_web_video_bridge()
-	var script := "window.ProjectEscapeStoryVideo.play(%s, %s, { loop: %s, muted: %s, foreground: %s, skipButton: %s });" % [
-		JSON.stringify(element_id),
-		JSON.stringify(url),
-		_bool_to_js(loop),
-		_bool_to_js(muted),
-		_bool_to_js(foreground),
-		_bool_to_js(foreground),
-	]
-	var result = JavaScriptBridge.eval(script, true)
-	return result == null or bool(result)
-
-func _remove_web_video(element_id: String) -> void:
-	if not OS.has_feature("web") or element_id.is_empty():
-		return
-	_ensure_web_video_bridge()
-	JavaScriptBridge.eval("window.ProjectEscapeStoryVideo.remove(%s);" % JSON.stringify(element_id), false)
-
-func _is_web_video_ended(element_id: String) -> bool:
-	if not OS.has_feature("web") or element_id.is_empty():
-		return false
-	_ensure_web_video_bridge()
-	return bool(JavaScriptBridge.eval("window.ProjectEscapeStoryVideo.ended(%s);" % JSON.stringify(element_id), true))
-
-func _set_web_canvas_transparent(enabled: bool) -> void:
-	if not OS.has_feature("web"):
-		return
-	get_viewport().transparent_bg = enabled
-	RenderingServer.set_default_clear_color(Color(0.0, 0.0, 0.0, 0.0) if enabled else Color.BLACK)
-	var alpha := "0" if enabled else "1"
-	JavaScriptBridge.eval("""
-(function() {
-	var canvas = document.getElementById('canvas');
-	if (!canvas) {
-		return;
-	}
-	canvas.style.background = 'rgba(0,0,0,%s)';
-	canvas.style.position = 'relative';
-	canvas.style.zIndex = '1';
-	document.body.style.backgroundColor = 'black';
-	document.documentElement.style.backgroundColor = 'black';
-})();
-""" % alpha, false)
-
-func _ensure_web_video_bridge() -> void:
-	if not OS.has_feature("web"):
-		return
-	JavaScriptBridge.eval("""
-(function() {
-	if (window.ProjectEscapeStoryVideo) {
-		return;
-	}
-	window.ProjectEscapeStoryVideo = {
-		play: function(id, src, options) {
-			options = options || {};
-			var canvas = document.getElementById('canvas');
-			var rootId = id + '-root';
-			var root = document.getElementById(rootId);
-			if (!root) {
-				root = document.createElement('div');
-				root.id = rootId;
-				document.body.appendChild(root);
-			}
-			root.style.position = 'fixed';
-			root.style.left = '0';
-			root.style.top = '0';
-			root.style.width = '100vw';
-			root.style.height = '100vh';
-			root.style.zIndex = options.foreground ? '2147483646' : '0';
-			root.style.pointerEvents = 'none';
-			root.style.backgroundColor = options.foreground ? '#050505' : 'transparent';
-			root.style.visibility = 'visible';
-			root.style.opacity = '1';
-			root.style.display = 'block';
-			root.style.transform = 'translateZ(0)';
-
-			var video = document.getElementById(id);
-			if (!video) {
-				video = document.createElement('video');
-				video.id = id;
-			}
-			if (options.foreground) {
-				root.appendChild(video);
-			} else if (canvas) {
-				document.body.insertBefore(video, canvas);
-			} else {
-				document.body.appendChild(video);
-			}
-			video.dataset.projectEscapeEnded = 'false';
-			video.src = src;
-			video.loop = !!options.loop;
-			video.muted = !!options.muted;
-			video.autoplay = true;
-			video.playsInline = true;
-			video.preload = 'auto';
-			video.controls = false;
-			video.style.position = 'fixed';
-			video.style.left = '0';
-			video.style.top = '0';
-			video.style.width = '100vw';
-			video.style.height = '100vh';
-			video.style.objectFit = 'cover';
-			video.style.zIndex = options.foreground ? '0' : '0';
-			video.style.pointerEvents = 'none';
-			video.style.backgroundColor = '#050505';
-			video.style.visibility = 'visible';
-			video.style.opacity = '1';
-			video.style.display = 'block';
-			video.onended = function() {
-				video.dataset.projectEscapeEnded = 'true';
-			};
-			video.onerror = function() {
-				video.dataset.projectEscapeEnded = 'true';
-				console.warn('ProjectEscape video failed: ' + src);
-			};
-			var promise = video.play();
-			if (promise && promise.catch) {
-				promise.catch(function(error) {
-					console.warn('ProjectEscape video play rejected: ' + error);
-					if (!options.loop) {
-						video.dataset.projectEscapeEnded = 'true';
-					}
-				});
-			}
-			var skipId = id + '-skip';
-			var skipButton = document.getElementById(skipId);
-			if (skipButton) {
-				skipButton.remove();
-			}
-			if (options.skipButton) {
-				skipButton = document.createElement('button');
-				skipButton.id = skipId;
-				skipButton.type = 'button';
-				skipButton.textContent = '\u8df3\u8fc7\u5f71\u50cf';
-				skipButton.style.position = 'fixed';
-				skipButton.style.right = '36px';
-				skipButton.style.bottom = '34px';
-				skipButton.style.zIndex = '2147483647';
-				skipButton.style.pointerEvents = 'auto';
-				skipButton.style.padding = '9px 18px';
-				skipButton.style.border = '1px solid rgba(233, 216, 158, 0.78)';
-				skipButton.style.borderRadius = '2px';
-				skipButton.style.background = 'rgba(8, 8, 8, 0.72)';
-				skipButton.style.color = '#f1e7bd';
-				skipButton.style.font = '16px sans-serif';
-				skipButton.style.cursor = 'pointer';
-				skipButton.onclick = function() {
-					video.dataset.projectEscapeEnded = 'true';
-					video.pause();
-				};
-				document.body.appendChild(skipButton);
-			}
-			return true;
-		},
-		remove: function(id) {
-			var skipButton = document.getElementById(id + '-skip');
-			if (skipButton) {
-				skipButton.remove();
-			}
-			var video = document.getElementById(id);
-			if (video) {
-				video.pause();
-				video.removeAttribute('src');
-				video.load();
-				video.remove();
-			}
-			var root = document.getElementById(id + '-root');
-			if (root) {
-				root.remove();
-			}
-		},
-		ended: function(id) {
-			var video = document.getElementById(id);
-			return !video || video.dataset.projectEscapeEnded === 'true' || video.ended;
-		}
-	};
-})();
-""", false)
-
-func _bool_to_js(value: bool) -> String:
-	return "true" if value else "false"
-
-func _res_path_to_web_url(path: String) -> String:
-	if path.begins_with("res://"):
-		return path.trim_prefix("res://")
-	return path
-
-func _load_first_story_video_stream(paths: Array) -> VideoStream:
-	for path in paths:
-		var stream := _load_story_video_stream(String(path))
-		if stream != null:
-			return stream
-	return null
-
-func _load_story_video_stream(path: String) -> VideoStream:
-	if OS.has_feature("web") and path.get_extension().to_lower() == "mp4":
-		return null
-	if path.is_empty() or not FileAccess.file_exists(path):
-		return null
-	if path.get_extension().to_lower() == "ogv" and not _is_ogg_theora_video(path):
-		push_warning("Video is not a valid Ogg Theora file: %s" % path)
-		return null
-	var resource := ResourceLoader.load(path, "VideoStream")
-	if resource is VideoStream:
-		return resource
-	resource = load(path)
-	if resource is VideoStream:
-		return resource
-	push_warning("Video stream could not be loaded. MP4 playback requires the FFmpeg GDExtension: %s" % path)
-	return null
-
-func _is_ogg_theora_video(path: String) -> bool:
-	if not FileAccess.file_exists(path):
-		return false
-	var file := FileAccess.open(path, FileAccess.READ)
-	if file == null:
-		return false
-	var header := file.get_buffer(512)
-	return _buffer_starts_with_ascii(header, "OggS") and _buffer_has_ascii(header, "theora")
-
-func _buffer_starts_with_ascii(buffer: PackedByteArray, value: String) -> bool:
-	var bytes := value.to_ascii_buffer()
-	if buffer.size() < bytes.size():
-		return false
-	for index in range(bytes.size()):
-		if buffer[index] != bytes[index]:
-			return false
-	return true
-
-func _buffer_has_ascii(buffer: PackedByteArray, value: String) -> bool:
-	var needle := value.to_ascii_buffer()
-	if needle.is_empty() or buffer.size() < needle.size():
-		return false
-	for start in range(buffer.size() - needle.size() + 1):
-		var found := true
-		for offset in range(needle.size()):
-			if buffer[start + offset] != needle[offset]:
-				found = false
-				break
-		if found:
-			return true
-	return false
-
-func _play_run_story_dialogue(path: String) -> void:
-	var sequence: Dictionary = dialogue_service.load_sequence(path)
-	if sequence.is_empty():
-		push_warning("Run story dialogue sequence is missing: %s" % path)
-		return
-	var panel = DialoguePanelScene.instantiate()
-	panel.name = "RunStoryDialoguePanel"
-	_active_story_dialogue_panel = panel
-	ui_root.add_child(panel)
-	var dialogue_finished := false
-	panel.dialogue_finished.connect(func(_dialogue_id: String, _skipped: bool):
-		dialogue_finished = true
-	)
-	panel.tree_exiting.connect(func():
-		if _active_story_dialogue_panel == panel:
-			_active_story_dialogue_panel = null
-	)
-	panel.play_sequence(sequence)
-	while not dialogue_finished and is_instance_valid(panel):
-		await get_tree().process_frame
-	if _active_story_dialogue_panel == panel:
-		_active_story_dialogue_panel = null
+	run_story_gate_controller.update_web_video()
 
 func _acquire_story_pause(token: String) -> void:
-	if token.is_empty():
-		return
-	var was_paused := _is_story_paused()
-	_story_pause_tokens[token] = true
-	if not was_paused:
-		_apply_story_pause_state(true)
+	run_simulation_pause_service.acquire(token)
 
 func _release_story_pause(token: String) -> void:
-	if token.is_empty():
-		return
-	_story_pause_tokens.erase(token)
-	if _story_pause_tokens.is_empty():
-		_apply_story_pause_state(false)
+	run_simulation_pause_service.release(token)
+
+func _on_run_simulation_pause_changed(paused: bool, _reason: String) -> void:
+	_apply_story_pause_state(paused)
 
 func _apply_story_pause_state(paused: bool) -> void:
 	_extract_button_held = false
@@ -1034,32 +647,13 @@ func _set_story_simulation_nodes_paused(paused: bool) -> void:
 				timer.paused = paused
 
 func _is_story_paused() -> bool:
-	return not _story_pause_tokens.is_empty()
+	return run_simulation_pause_service.is_paused()
 
 func is_run_story_paused() -> bool:
 	return _is_story_paused()
 
 func _refresh_story_video_cover() -> void:
-	if is_instance_valid(_story_video_player):
-		_fit_control_to_16x9_cover(_story_video_player)
-
-func _fit_control_to_16x9_cover(control: Control) -> void:
-	var viewport_size := get_viewport_rect().size
-	if viewport_size.x <= 0.0 or viewport_size.y <= 0.0:
-		return
-	var width := viewport_size.x
-	var height := width * 9.0 / 16.0
-	if height < viewport_size.y:
-		height = viewport_size.y
-		width = height * 16.0 / 9.0
-	control.anchor_left = 0.5
-	control.anchor_right = 0.5
-	control.anchor_top = 0.5
-	control.anchor_bottom = 0.5
-	control.offset_left = -width * 0.5
-	control.offset_right = width * 0.5
-	control.offset_top = -height * 0.5
-	control.offset_bottom = height * 0.5
+	run_story_gate_controller.refresh_video_cover()
 
 func _update_run_timer(delta: float) -> void:
 	if run_timer_controller != null:
@@ -1123,7 +717,10 @@ func _spawn_selected_outposts() -> void:
 			"footprint_units": footprint_units,
 		}
 		_sync_outpost_visual_anchor(station)
-		interactable_visual_builder.refresh_outpost_requirement_bubbles(station, Callable(self, "_inventory_count"))
+		if run_world_presentation_controller != null:
+			run_world_presentation_controller.refresh_outpost_requirement_bubble(station, Callable(self, "_inventory_count"))
+		else:
+			interactable_visual_builder.refresh_outpost_requirement_bubbles(station, Callable(self, "_inventory_count"))
 		_attach_outpost_safe_zone(station)
 		outpost_root.add_child(station)
 
@@ -1220,7 +817,7 @@ func _on_interactable_exited(node) -> void:
 		var interaction_id: String = interaction_progress_controller.active_id
 		interaction_progress_controller.cancel()
 		_end_player_interact_animation()
-		_status_prompt = _interaction_cancel_message(interaction_id)
+		_status_prompt = active_interaction_controller.cancel_message(interaction_id) if active_interaction_controller != null else "交互中断。"
 	_refresh_ui()
 
 func _on_outpost_safe_zone_body_entered(station, body: Node) -> void:
@@ -1280,26 +877,22 @@ func _begin_container_open(container) -> void:
 	if interaction_progress_controller == null:
 		_open_container(container)
 		return
-	if not is_instance_valid(container):
-		return
-	if container.payload.get("state", "") == "depleted" or (
-		bool(container.payload.get("loot_generated", false))
-		and container.payload.get("rewards", []).is_empty()
-	):
-		_status_prompt = "容器已不可开启。"
-		_refresh_ui()
-		return
-	_set_container_lifetime_paused(container, true)
-	if interaction_progress_controller.begin(
-		"open_container",
+	var result: Dictionary = container_interaction_controller.begin_open(
 		container,
-		float(container.payload.get("open_time", CONTAINER_OPEN_HOLD_SECONDS)),
+		interaction_progress_controller,
 		Callable(self, "_complete_held_container_open"),
 		Callable(self, "_cancel_held_container_open")
-	):
-		_status_prompt = ""
-		_begin_player_interact_animation(container)
-		_audio_manager_call("start_container_open_loop")
+	)
+	if not bool(result.get("accepted", false)):
+		if result.get("reason", "") == ContainerInteractionControllerScript.REASON_DEPLETED:
+			_status_prompt = "容器已不可开启。"
+		else:
+			_status_prompt = String(result.get("message", ""))
+		_refresh_ui()
+		return
+	_status_prompt = ""
+	_begin_player_interact_animation(container)
+	_audio_manager_call("start_container_open_loop")
 	_refresh_ui()
 
 func _complete_held_container_open(container) -> void:
@@ -1310,16 +903,17 @@ func _complete_held_container_open(container) -> void:
 
 func _cancel_held_container_open(container) -> void:
 	_audio_manager_call("stop_container_open_loop")
-	_set_container_lifetime_paused(container, false)
+	if container_interaction_controller != null:
+		container_interaction_controller.cancel_held_open(container)
 
 func _open_container(container) -> void:
-	if container_spawn_controller != null:
-		container_spawn_controller.ensure_container_rewards(container)
-	if not loot_interaction_controller.open_container(container):
-		_set_container_lifetime_paused(container, false)
-		prompt_label.text = loot_interaction_controller.last_prompt
+	var result: Dictionary = container_interaction_controller.open(container)
+	if not bool(result.get("accepted", false)):
+		if result.get("reason", "") == ContainerInteractionControllerScript.REASON_DEPLETED:
+			prompt_label.text = "容器已不可开启。"
+		else:
+			prompt_label.text = String(result.get("message", loot_interaction_controller.last_prompt))
 		return
-	_set_container_lifetime_paused(container, true)
 	_reveal_interaction_area(container, false)
 	_play_player_interact_once(container)
 	_sync_loot_state()
@@ -1329,18 +923,17 @@ func _open_container(container) -> void:
 func _pick_material(pickup) -> void:
 	if _is_story_paused():
 		return
-	var pickup_outpost_id := String(pickup.payload.get("outpost_id", "")) if pickup != null and is_instance_valid(pickup) else ""
-	if loot_interaction_controller.pick_material_immediate(
-		pickup,
-		run_director.inventory_component,
-		Callable(self, "_remove_interactable")
-	):
-		_mark_catalog_item_collected_from_run(pickup.payload.get("item", {}), "run_material_pickup")
+	if material_pickup_flow_controller == null:
+		return
+	var result: Dictionary = material_pickup_flow_controller.pick_material(pickup)
+	if bool(result.get("accepted", false)):
+		_mark_catalog_item_collected_from_run(result.get("item", {}), "run_material_pickup")
 		_reveal_interaction_area(pickup, false)
 		_play_player_interact_once(pickup)
+		var pickup_outpost_id := String(result.get("outpost_id", ""))
 		_set_timed_status_prompt(run_ui_controller.outpost_material_pickup_prompt(self, pickup_outpost_id), 1.8)
 	else:
-		_status_prompt = loot_interaction_controller.last_prompt
+		_status_prompt = String(result.get("message", ""))
 	_refresh_ui()
 
 func _take_all_loot() -> void:
@@ -1365,19 +958,18 @@ func _on_loot_item_meta_clicked(meta: Variant) -> void:
 		_take_loot_item_at(index)
 
 func _on_inventory_item_meta_clicked(meta: Variant) -> void:
-	var index := _item_meta_index(meta, "inventory")
-	if index >= 0:
-		_select_inventory_item_at(index)
+	if _is_story_paused():
+		return
+	if run_inventory_panel_controller == null:
+		return
+	_apply_inventory_panel_result(run_inventory_panel_controller.on_inventory_item_clicked(meta, run_director))
 
 func _on_home_storage_item_meta_clicked(meta: Variant) -> void:
-	var index := _item_meta_index(meta, "storage")
-	if index < 0:
-		index = _item_meta_index(meta, "home")
-	if index >= 0:
-		if has_selected_inventory_item():
-			_deposit_inventory_item_at(index, selected_inventory_index)
-		else:
-			_withdraw_active_storage_item_at(index)
+	if _is_story_paused():
+		return
+	if run_inventory_panel_controller == null:
+		return
+	_apply_inventory_panel_result(run_inventory_panel_controller.on_storage_item_clicked(meta, run_director, _is_inventory_panel_visible()))
 
 func _take_loot_item_at(index: int) -> void:
 	if _is_story_paused():
@@ -1433,126 +1025,75 @@ func _count_items_by_id(items: Array) -> Dictionary:
 func _deposit_inventory_item_at(index: int, inventory_index: int = -1) -> void:
 	if _is_story_paused():
 		return
-	var result: Dictionary
-	var storage_name := _active_storage_display_name()
-	var source_inventory_index := inventory_index if inventory_index >= 0 else index
-	var target_storage_index := index if inventory_index >= 0 else -1
-	if _is_active_outpost_storage():
-		result = run_director.deposit_inventory_item_to_outpost(active_outpost_storage_id, source_inventory_index, target_storage_index)
-	else:
-		result = run_director.deposit_inventory_item_to_home_by_selection(source_inventory_index, target_storage_index)
-	if bool(result.get("accepted", false)):
-		if selected_inventory_index == source_inventory_index:
-			selected_inventory_index = -1
-		_status_prompt = "已存入%s：%s" % [storage_name, result.item.get("display_name", result.item.get("item_id", ""))]
-	else:
-		_status_prompt = _selection_transfer_reason_text(str(result.get("reason", "")))
-		_sync_inventory_selection_state()
-	_refresh_ui()
+	if run_inventory_panel_controller == null:
+		return
+	_apply_inventory_panel_result(run_inventory_panel_controller.deposit_inventory_item_at(index, run_director, inventory_index, _is_inventory_panel_visible()))
 
 func _select_inventory_item_at(index: int) -> void:
 	if _is_story_paused():
 		return
-	if run_director == null or run_director.inventory_component == null:
-		selected_inventory_index = -1
-		_status_prompt = "背包不可用。"
-		_refresh_ui()
+	if run_inventory_panel_controller == null:
 		return
-	if index < 0 or index >= run_director.inventory_component.items.size():
-		selected_inventory_index = -1
-		_status_prompt = "道具不可用。"
-		_refresh_ui()
-		return
-	selected_inventory_index = index
-	var item: Dictionary = run_director.inventory_component.items[index]
-	_status_prompt = "已选中：%s" % item.get("display_name", item.get("item_id", ""))
-	_refresh_ui()
+	_apply_inventory_panel_result(run_inventory_panel_controller.select_inventory_item_at(index, run_director))
 
 func _discard_selected_inventory_item() -> void:
 	if _is_story_paused():
 		return
-	if not has_selected_inventory_item():
-		_status_prompt = "请先选择背包道具。"
-		_refresh_ui()
+	if run_inventory_panel_controller == null:
 		return
-	var result: Dictionary = run_director.discard_inventory_item_at(selected_inventory_index)
-	if bool(result.get("accepted", false)):
-		selected_inventory_index = -1
-		_status_prompt = "已丢弃：%s" % result.item.get("display_name", result.item.get("item_id", ""))
-	else:
-		_status_prompt = _inventory_discard_reason_text(str(result.get("reason", "")))
-		_sync_inventory_selection_state()
-	_refresh_ui()
+	_apply_inventory_panel_result(run_inventory_panel_controller.discard_selected_inventory_item(run_director, _is_inventory_panel_visible()))
 
 func has_selected_inventory_item() -> bool:
-	return not _selected_inventory_item().is_empty()
+	return run_inventory_panel_controller != null and run_inventory_panel_controller.has_selected_inventory_item(run_director)
 
 func selected_inventory_item_summary() -> String:
-	var item := _selected_inventory_item()
-	if item.is_empty():
+	if run_inventory_panel_controller == null:
 		return ""
-	return "已选：%s" % item.get("display_name", item.get("item_id", ""))
+	return run_inventory_panel_controller.selected_inventory_item_summary(run_director)
 
 func _selected_inventory_item() -> Dictionary:
-	if run_director == null or run_director.inventory_component == null:
+	if run_inventory_panel_controller == null:
 		return {}
-	if selected_inventory_index < 0 or selected_inventory_index >= run_director.inventory_component.items.size():
-		return {}
-	return run_director.inventory_component.items[selected_inventory_index]
+	return run_inventory_panel_controller.selected_inventory_item(run_director)
 
 func _sync_inventory_selection_state() -> void:
-	if selected_inventory_index < 0:
-		return
-	if inventory_panel == null or not inventory_panel.visible or _selected_inventory_item().is_empty():
-		selected_inventory_index = -1
+	if run_inventory_panel_controller != null:
+		run_inventory_panel_controller.sync_inventory_selection_state(_is_inventory_panel_visible(), run_director)
 
 func _inventory_discard_reason_text(reason: String) -> String:
-	match reason:
-		"missing_inventory":
-			return "背包不可用。"
-		"invalid_item":
-			return "道具不可用。"
-		_:
-			return "无法丢弃该道具。"
+	if run_inventory_panel_controller == null:
+		return "无法丢弃该道具。"
+	return run_inventory_panel_controller.inventory_discard_reason_text(reason)
 
 func _withdraw_active_storage_item_at(index: int) -> void:
 	if _is_story_paused():
 		return
-	var result: Dictionary
-	if _is_active_outpost_storage():
-		result = run_director.withdraw_outpost_storage_item_to_inventory(active_outpost_storage_id, index)
-	else:
-		result = run_director.withdraw_home_storage_item_to_inventory(index)
-	if bool(result.get("accepted", false)):
-		_status_prompt = "已放入背包：%s" % result.item.get("display_name", result.item.get("item_id", ""))
-	else:
-		_status_prompt = _selection_transfer_reason_text(str(result.get("reason", "")))
-	_refresh_ui()
+	if run_inventory_panel_controller == null:
+		return
+	_apply_inventory_panel_result(run_inventory_panel_controller.withdraw_active_storage_item_at(index, run_director))
 
 func _item_meta_index(meta: Variant, expected_source: String) -> int:
-	var parts := String(meta).split(":")
-	if parts.size() != 2 or parts[0] != expected_source:
+	if run_inventory_panel_controller == null:
 		return -1
-	return int(parts[1])
+	return run_inventory_panel_controller.item_meta_index(meta, expected_source)
 
 func _selection_transfer_reason_text(reason: String) -> String:
-	match reason:
-		"not_home":
-			return "请回到家中整理物品。"
-		"not_outpost":
-			return "请进入已修复前哨站整理物品。"
-		"outpost_inactive":
-			return "前哨站尚未修复，无法存储。"
-		"outpost_storage_locked":
-			return "前哨站安全箱尚未研究。"
-		"storage_rejected":
-			return "%s空间不足。" % _active_storage_display_name()
-		"inventory_rejected":
-			return "背包空间或负重不足。"
-		"invalid_item":
-			return "道具不可用。"
-		_:
-			return "无法移动该道具。"
+	if run_inventory_panel_controller == null:
+		return "无法移动该道具。"
+	return run_inventory_panel_controller.selection_transfer_reason_text(reason, run_director)
+
+func _apply_inventory_panel_result(result: Dictionary, direct_prompt: bool = false) -> void:
+	var message := String(result.get("message", ""))
+	if not message.is_empty():
+		if direct_prompt:
+			prompt_label.text = message
+		else:
+			_status_prompt = message
+	if bool(result.get("refresh", true)):
+		_refresh_ui()
+
+func _is_inventory_panel_visible() -> bool:
+	return inventory_panel != null and inventory_panel.visible
 
 func _open_loot_transfer_panels() -> void:
 	_set_container_lifetime_paused(opened_container, true)
@@ -1571,11 +1112,9 @@ func _save_opened_loot_to_source() -> void:
 	_sync_loot_state()
 
 func _set_container_lifetime_paused(container, paused: bool) -> void:
-	if container == null or not is_instance_valid(container):
+	if container_interaction_controller == null:
 		return
-	if container.get("interact_type") != "container":
-		return
-	container.payload["lifetime_paused"] = paused
+	container_interaction_controller.set_lifetime_paused(container, paused)
 
 func _sync_loot_state() -> void:
 	if loot_interaction_controller == null:
@@ -1588,47 +1127,55 @@ func _sync_loot_state() -> void:
 func _begin_outpost_repair(station) -> void:
 	if _is_story_paused():
 		return
-	if interaction_progress_controller == null or outpost_repair_controller == null:
+	if interaction_progress_controller == null or outpost_repair_flow_controller == null:
 		_try_repair_outpost(station)
 		return
-	var validation: Dictionary = outpost_repair_controller.can_repair(station)
-	if not validation.accepted:
-		_status_prompt = validation.message
-		_refresh_ui()
-		return
-	if interaction_progress_controller.begin(
-		"repair_outpost",
+	var result: Dictionary = outpost_repair_flow_controller.begin_repair(
 		station,
-		OUTPOST_REPAIR_HOLD_SECONDS,
+		interaction_progress_controller,
 		Callable(self, "_complete_held_outpost_repair"),
 		Callable(self, "_cancel_held_outpost_repair")
-	):
-		_status_prompt = ""
-		_begin_player_interact_animation(station)
-		outpost_repair_controller.mark_repairing(station)
+	)
+	if not bool(result.get("accepted", false)):
+		_status_prompt = String(result.get("message", ""))
+		_refresh_ui()
+		return
+	_status_prompt = ""
+	_begin_player_interact_animation(station)
 	_refresh_ui()
 
 func _complete_held_outpost_repair(station) -> void:
 	_try_repair_outpost(station)
 
 func _cancel_held_outpost_repair(station) -> void:
-	if outpost_repair_controller != null:
-		outpost_repair_controller.cancel_repairing(station)
+	if outpost_repair_flow_controller != null:
+		outpost_repair_flow_controller.cancel_repair(station)
 
 func _update_active_interaction(delta: float) -> void:
 	if interaction_progress_controller == null or not interaction_progress_controller.is_active():
 		return
 	var target = interaction_progress_controller.active_target
 	var interaction_id: String = interaction_progress_controller.active_id
-	var should_continue: bool = _should_continue_active_interaction(interaction_id, target)
+	var should_continue := false
+	if active_interaction_controller != null:
+		should_continue = active_interaction_controller.should_continue(
+			interaction_id,
+			target,
+			{
+				"nearest_interactable": nearest_interactable,
+				"interact_pressed": Input.is_action_pressed("interact"),
+				"extract_pressed": _is_extraction_hold_pressed(),
+				"story_paused": _is_story_paused(),
+			}
+		)
 	var result: Dictionary = interaction_progress_controller.update(delta, should_continue)
 	if bool(result.get("cancelled", false)):
 		_end_player_interact_animation()
-		_status_prompt = _interaction_cancel_message(interaction_id)
+		_status_prompt = active_interaction_controller.cancel_message(interaction_id) if active_interaction_controller != null else "交互中断。"
 	elif bool(result.get("completed", false)):
 		_end_player_interact_animation()
 		if _status_prompt.is_empty():
-			_status_prompt = _interaction_complete_message(interaction_id)
+			_status_prompt = active_interaction_controller.complete_message(interaction_id) if active_interaction_controller != null else "交互完成。"
 
 func _set_timed_status_prompt(text: String, seconds: float) -> void:
 	_status_prompt = text
@@ -1651,25 +1198,14 @@ func _update_status_prompt_timeout() -> void:
 	_timed_status_prompt_text = ""
 	_status_prompt_clear_time_msec = 0
 
-func _should_continue_active_interaction(interaction_id: String, target) -> bool:
-	match interaction_id:
-		"open_container", "repair_outpost":
-			return (
-				Input.is_action_pressed("interact")
-				and nearest_interactable == target
-				and is_instance_valid(target)
-			)
-		"extract":
-			return _is_extraction_hold_pressed() and _can_continue_extraction_hold()
-		_:
-			return false
-
 func _is_extraction_hold_pressed() -> bool:
 	if _is_story_paused():
 		return false
 	return Input.is_action_pressed("extract") or _extract_button_held
 
 func _can_continue_extraction_hold() -> bool:
+	if extraction_flow_controller != null:
+		return not _is_story_paused() and extraction_flow_controller.can_continue_hold(true)
 	return (
 		not _is_story_paused()
 		and run_director != null
@@ -1678,30 +1214,12 @@ func _can_continue_extraction_hold() -> bool:
 		and run_director.context.active_safe_zone_id == "home"
 	)
 
-func _interaction_cancel_message(interaction_id: String) -> String:
-	match interaction_id:
-		"open_container":
-			return "开箱中断。"
-		"repair_outpost":
-			return "修复中断。"
-		"extract":
-			return "撤离中断。"
-		_:
-			return "交互中断。"
-
-func _interaction_complete_message(interaction_id: String) -> String:
-	match interaction_id:
-		"open_container":
-			return "容器已打开。"
-		"repair_outpost":
-			return "前哨站修复完成。"
-		"extract":
-			return "撤离完成。"
-		_:
-			return "交互完成。"
-
 func _try_repair_outpost(station) -> void:
-	var result: Dictionary = outpost_repair_controller.repair(station)
+	var result: Dictionary
+	if outpost_repair_flow_controller != null:
+		result = outpost_repair_flow_controller.complete_repair(station)
+	else:
+		result = outpost_repair_controller.repair(station)
 	_status_prompt = result.message
 	if bool(result.get("activated", false)):
 		_audio_manager_call("play_outpost_repair_complete")
@@ -1723,27 +1241,20 @@ func _is_repaired_outpost(node) -> bool:
 	)
 
 func _enter_repaired_outpost_safe_zone(station) -> void:
-	if run_director.context == null:
+	if run_inventory_panel_controller == null:
 		return
-	if run_director.context.active_safe_zone_id == station.interact_id:
+	var result: Dictionary = run_inventory_panel_controller.enter_repaired_outpost_safe_zone(station, run_director)
+	if not bool(result.get("accepted", false)):
 		return
-	run_director.on_safe_zone_entered(station.interact_id)
 	_play_run_safe_house_bgm()
-	if run_director.get_outpost_storage_capacity(station.interact_id) > 0:
-		run_director.ensure_outpost_storage(station.interact_id)
-		active_outpost_storage_id = station.interact_id
-		home_storage_user_closed = false
-		_status_prompt = "前哨站安全区：稳定值正在恢复，安全箱已开启。"
-	else:
-		active_outpost_storage_id = ""
-		_status_prompt = "前哨站安全区：稳定值正在恢复，安全箱尚未研究。"
+	_status_prompt = String(result.get("message", ""))
 
 func _exit_repaired_outpost_safe_zone(station) -> void:
-	if run_director.context == null:
+	if run_inventory_panel_controller == null:
 		return
-	if run_director.context.active_safe_zone_id != station.interact_id:
+	var result: Dictionary = run_inventory_panel_controller.exit_repaired_outpost_safe_zone(station, run_director)
+	if not bool(result.get("accepted", false)):
 		return
-	run_director.on_safe_zone_exited(station.interact_id)
 	_play_run_exploration_bgm()
 
 func _activate_outpost_safe_zone(station) -> void:
@@ -1780,71 +1291,43 @@ func _inventory_count(item_id: String) -> int:
 func _deposit_all() -> void:
 	if _is_story_paused():
 		return
-	if not is_storage_zone_active():
-		prompt_label.text = "请进入家中或已修复前哨站存放物品。"
+	if run_inventory_panel_controller == null:
 		return
-	if has_selected_inventory_item():
-		_deposit_inventory_item_at(selected_inventory_index)
-		return
-	var index := 0
-	while index < run_director.inventory_component.items.size():
-		var moved := false
-		if _is_active_outpost_storage():
-			moved = bool(run_director.deposit_inventory_item_to_outpost(active_outpost_storage_id, index).get("accepted", false))
-		else:
-			moved = run_director.deposit_inventory_item_to_home(index)
-		if not moved:
-			index += 1
-	_refresh_ui()
+	var result: Dictionary = run_inventory_panel_controller.deposit_all(run_director, _is_inventory_panel_visible())
+	_apply_inventory_panel_result(result, String(result.get("reason", "")) == "not_storage_zone")
 
 func is_storage_zone_active() -> bool:
-	return (
-		run_director != null
-		and run_director.context != null
-		and (
-			run_director.context.active_safe_zone_id == "home"
-			or _is_active_outpost_storage()
-		)
-	)
+	return run_inventory_panel_controller != null and run_inventory_panel_controller.is_storage_zone_active(run_director)
 
 func is_home_storage_active() -> bool:
-	return run_director != null and run_director.context != null and run_director.context.active_safe_zone_id == "home"
+	return run_inventory_panel_controller != null and run_inventory_panel_controller.is_home_storage_active(run_director)
 
 func _is_active_outpost_storage() -> bool:
-	return (
-		not active_outpost_storage_id.is_empty()
-		and run_director != null
-		and run_director.context != null
-		and run_director.context.active_safe_zone_id == active_outpost_storage_id
-		and run_director.context.active_safe_zone_type == "outpost"
-	)
+	return run_inventory_panel_controller != null and run_inventory_panel_controller.is_active_outpost_storage(run_director)
 
 func get_active_storage_items_snapshot() -> Array:
-	if _is_active_outpost_storage():
-		return run_director.get_outpost_storage_slots_snapshot(active_outpost_storage_id)
-	if run_director.home_storage_component != null:
-		return run_director.home_storage_component.get_slots_snapshot()
-	return []
+	if run_inventory_panel_controller == null:
+		return []
+	return run_inventory_panel_controller.get_active_storage_items_snapshot(run_director)
 
 func get_active_storage_source_id() -> String:
-	return "storage"
+	if run_inventory_panel_controller == null:
+		return "storage"
+	return run_inventory_panel_controller.get_active_storage_source_id()
 
 func get_active_storage_title() -> String:
-	if _is_active_outpost_storage():
-		return "前哨存储"
-	return "家中存储"
+	if run_inventory_panel_controller == null:
+		return "家中存储"
+	return run_inventory_panel_controller.get_active_storage_title(run_director)
 
 func _active_storage_display_name() -> String:
-	return "前哨" if _is_active_outpost_storage() else "家中"
+	if run_inventory_panel_controller == null:
+		return "家中"
+	return run_inventory_panel_controller.active_storage_display_name(run_director)
 
 func _close_outpost_storage_ui(outpost_id: String) -> void:
-	if active_outpost_storage_id != outpost_id:
-		return
-	active_outpost_storage_id = ""
-	home_storage_user_closed = false
-	home_storage_panel.visible = false
-	if not loot_panel.visible:
-		inventory_panel.visible = false
+	if run_inventory_panel_controller != null:
+		run_inventory_panel_controller.close_outpost_storage_ui(outpost_id, home_storage_panel, loot_panel, inventory_panel)
 
 func _try_extract() -> void:
 	if _is_story_paused():
@@ -1864,36 +1347,33 @@ func _begin_extraction_hold() -> void:
 	if _is_story_paused():
 		_extract_button_held = false
 		return
-	if run_end_controller == null:
+	if extraction_flow_controller == null:
 		return
-	if _is_run_terminal():
-		return
-	if interaction_progress_controller != null and interaction_progress_controller.is_active():
-		return
-	var validation: Dictionary = run_end_controller.validate_extraction()
-	if not validation.accepted:
-		_status_prompt = validation.message
-		_refresh_ui()
-		return
-	if interaction_progress_controller == null:
-		_complete_held_extract(run_director)
-		return
-	if interaction_progress_controller.begin(
-		"extract",
-		run_director,
-		EXTRACTION_HOLD_SECONDS,
+	var result: Dictionary = extraction_flow_controller.begin_extraction(
+		interaction_progress_controller,
 		Callable(self, "_complete_held_extract"),
 		Callable(self, "_cancel_held_extract")
-	):
+	)
+	if not bool(result.get("accepted", false)):
+		_status_prompt = String(result.get("message", ""))
+		_refresh_ui()
+		return
+	if bool(result.get("complete_immediately", false)):
+		_complete_held_extract(run_director)
+		return
+	if bool(result.get("held", false)):
 		_status_prompt = ""
-		run_director.on_extraction_started()
 		_begin_player_interact_animation()
 	_refresh_ui()
 
 func _complete_held_extract(_target) -> void:
-	if run_end_controller == null:
+	if extraction_flow_controller == null and run_end_controller == null:
 		return
-	var result: Dictionary = run_end_controller.try_extract(get_tree())
+	var result: Dictionary
+	if extraction_flow_controller != null:
+		result = extraction_flow_controller.complete_extraction(get_tree())
+	else:
+		result = run_end_controller.try_extract(get_tree())
 	if bool(result.get("accepted", false)):
 		_audio_manager_call("play_extraction_success_cue")
 		if run_timer_controller != null:
@@ -1907,7 +1387,9 @@ func _complete_held_extract(_target) -> void:
 
 func _cancel_held_extract(_target) -> void:
 	_extract_button_held = false
-	if run_director != null and _is_current_run_phase("EXTRACT"):
+	if extraction_flow_controller != null:
+		extraction_flow_controller.cancel_extraction()
+	elif run_director != null and _is_current_run_phase("EXTRACT"):
 		run_director.on_extraction_interrupted()
 
 func _is_current_run_phase(phase_name: String) -> bool:
@@ -2066,28 +1548,29 @@ func _update_container_lifetimes(delta: float) -> void:
 	container_spawn_controller.update_lifetimes(delta, interactables)
 
 func _update_container_lifetime_visuals() -> void:
-	for container in container_root.get_children():
-		if not is_instance_valid(container) or not (container is Node2D):
-			continue
-		if container.get("interact_type") != "container":
-			continue
-		_refresh_container_lifetime_visual(container)
+	if run_world_presentation_controller != null:
+		run_world_presentation_controller.refresh_container_lifetime_visuals(container_root)
 
 func _refresh_container_lifetime_visual(container: Node) -> void:
-	interactable_visual_builder.refresh_container_lifetime_visual(container)
+	if run_world_presentation_controller != null:
+		run_world_presentation_controller.refresh_container_lifetime_visual(container)
+	elif interactable_visual_builder != null:
+		interactable_visual_builder.refresh_container_lifetime_visual(container)
 
 func _update_material_lifetime_visuals() -> void:
-	for material in outpost_root.get_children():
-		if not is_instance_valid(material) or not (material is Node2D):
-			continue
-		if material.get("interact_type") != "material":
-			continue
-		_refresh_material_lifetime_visual(material)
+	if run_world_presentation_controller != null:
+		run_world_presentation_controller.refresh_material_lifetime_visuals(outpost_root)
 
 func _refresh_material_lifetime_visual(material: Node) -> void:
-	interactable_visual_builder.refresh_material_lifetime_visual(material)
+	if run_world_presentation_controller != null:
+		run_world_presentation_controller.refresh_material_lifetime_visual(material)
+	elif interactable_visual_builder != null:
+		interactable_visual_builder.refresh_material_lifetime_visual(material)
 
 func _update_outpost_requirement_bubbles() -> void:
+	if run_world_presentation_controller != null:
+		run_world_presentation_controller.refresh_outpost_requirement_bubbles(outpost_root, Callable(self, "_inventory_count"))
+		return
 	if interactable_visual_builder == null:
 		return
 	for outpost in outpost_root.get_children():
@@ -2096,12 +1579,25 @@ func _update_outpost_requirement_bubbles() -> void:
 		_sync_outpost_visual_anchor(outpost)
 		interactable_visual_builder.refresh_outpost_requirement_bubbles(outpost, Callable(self, "_inventory_count"))
 
-func _update_readable_world_ui_scale() -> void:
-	if camera == null or interactable_visual_builder == null:
+func _update_run_world_presentation() -> void:
+	if run_world_presentation_controller == null:
+		_update_container_lifetime_visuals()
+		_update_material_lifetime_visuals()
+		_update_outpost_requirement_bubbles()
+		_update_readable_world_ui_scale()
 		return
-	var scale_value := 1.0
-	for root in [container_root, outpost_root, player_root]:
-		interactable_visual_builder.apply_readable_overlay_scale(root, scale_value)
+	run_world_presentation_controller.update(container_root, outpost_root, player_root, Callable(self, "_inventory_count"))
+
+func _update_readable_world_ui_scale() -> void:
+	if camera == null:
+		return
+	if run_world_presentation_controller != null:
+		run_world_presentation_controller.refresh_readable_overlay_layout([container_root, outpost_root, player_root])
+		return
+	if interactable_visual_builder != null:
+		var scale_value := 1.0
+		for root in [container_root, outpost_root, player_root]:
+			interactable_visual_builder.apply_readable_overlay_scale(root, scale_value)
 
 func _reveal_interaction_area(interactable, reveal_host_block: bool) -> void:
 	if vision_mask == null or not is_instance_valid(vision_mask) or interactable == null or not is_instance_valid(interactable):

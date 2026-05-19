@@ -6,6 +6,7 @@ const SEARCH_STEP := 32.0
 
 func _initialize() -> void:
 	var ok := await _verify_repairable_outposts_are_reachable()
+	await _shutdown_audio()
 	print("Repairable outpost entry verified." if ok else "Repairable outpost entry failed.")
 	quit(0 if ok else 1)
 
@@ -135,3 +136,8 @@ func _grid_pos(key: Vector2i) -> Vector2:
 
 func _fmt_units(pos: Vector2) -> String:
 	return "(%.1f, %.1f)u" % [pos.x / UNIT, pos.y / UNIT]
+
+func _shutdown_audio() -> void:
+	var audio_manager := root.get_node_or_null("AudioManager")
+	if audio_manager != null and audio_manager.has_method("shutdown_and_flush"):
+		await audio_manager.shutdown_and_flush()

@@ -4,6 +4,7 @@ const InventoryComponentScript := preload("res://scripts/inventory/inventory_com
 
 func _initialize() -> void:
 	var ok := await _verify_material_backpack_inventory()
+	await _shutdown_audio()
 	print("Material backpack inventory verified." if ok else "Material backpack inventory failed.")
 	quit(0 if ok else 1)
 
@@ -103,3 +104,8 @@ func _verify_run_ui_material_backpack() -> bool:
 	root.queue_free()
 	await process_frame
 	return true
+
+func _shutdown_audio() -> void:
+	var audio_manager := root.get_node_or_null("AudioManager")
+	if audio_manager != null and audio_manager.has_method("shutdown_and_flush"):
+		await audio_manager.shutdown_and_flush()

@@ -5,6 +5,7 @@ const REPAIRED_PATH := "res://assets/map/outposts/outpost_repaired_01.png"
 
 func _initialize() -> void:
 	var ok := await _verify_partial_outpost_repair()
+	await _shutdown_audio()
 	print("Outpost partial repair verified." if ok else "Outpost partial repair failed.")
 	quit(0 if ok else 1)
 
@@ -182,3 +183,8 @@ func _outpost_material(item_id: String, data: Dictionary, amount: int) -> Dictio
 		"repair_material_id": item_id,
 		"source": "repair_material_spawn",
 	}
+
+func _shutdown_audio() -> void:
+	var audio_manager := root.get_node_or_null("AudioManager")
+	if audio_manager != null and audio_manager.has_method("shutdown_and_flush"):
+		await audio_manager.shutdown_and_flush()

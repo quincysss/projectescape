@@ -30,6 +30,7 @@ func _initialize() -> void:
 
 	root.queue_free()
 	await process_frame
+	await _shutdown_audio()
 	quit(0 if ok else 1)
 
 func _verify_scene_loads() -> bool:
@@ -46,6 +47,11 @@ func _verify_scene_loads() -> bool:
 			return false
 	print("Scene load check verified.")
 	return true
+
+func _shutdown_audio() -> void:
+	var audio_manager := root.get_node_or_null("AudioManager")
+	if audio_manager != null and audio_manager.has_method("shutdown_and_flush"):
+		await audio_manager.shutdown_and_flush()
 
 func _verify_run_scene_points() -> bool:
 	var scene := load("res://scenes/run/RunScene.tscn")

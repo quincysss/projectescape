@@ -2,6 +2,7 @@ extends SceneTree
 
 func _initialize() -> void:
 	var ok := await _verify_run_item_click_transfer()
+	await _shutdown_audio()
 	print("Run item click transfer verified." if ok else "Run item click transfer failed.")
 	quit(0 if ok else 1)
 
@@ -60,6 +61,8 @@ func _verify_run_item_click_transfer() -> bool:
 	if not root.run_director.inventory_component.add_item(_item("medical_patch", "医疗贴片", 0.2).merged({"quality": "B", "quality_color": Color("#6FA8DC")}, true)):
 		printerr("Expected test item to enter backpack.")
 		return false
+	root.inventory_panel.visible = true
+	root.home_storage_panel.visible = true
 	root._on_inventory_item_meta_clicked("inventory:0")
 	root._refresh_ui()
 	await process_frame
@@ -82,6 +85,8 @@ func _verify_run_item_click_transfer() -> bool:
 	if not root.run_director.inventory_component.items[0].get("quality_color", Color.WHITE).is_equal_approx(Color("#6FA8DC")):
 		printerr("Expected quality color to survive home storage round trip.")
 		return false
+	root.queue_free()
+	await process_frame
 	return true
 
 func _find_interactable(root, interact_type: String):
@@ -101,3 +106,8 @@ func _item(item_id: String, display_name: String, weight: float) -> Dictionary:
 		"quality": "C",
 		"quality_color": Color("#D8D6CE"),
 	}
+
+func _shutdown_audio() -> void:
+	var audio_manager := root.get_node_or_null("AudioManager")
+	if audio_manager != null and audio_manager.has_method("shutdown_and_flush"):
+		await audio_manager.shutdown_and_flush()

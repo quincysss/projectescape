@@ -21,8 +21,7 @@ func _initialize() -> void:
 	if ok:
 		ok = _verify_sfx_assets_play(manager)
 
-	manager.stop_bgm()
-	manager.stop_all_loops()
+	await manager.shutdown_and_flush()
 	if created_manager:
 		manager.queue_free()
 		await process_frame

@@ -70,6 +70,9 @@ func _ready() -> void:
 	_connect_safe_zones()
 	call_deferred("_connect_safe_zones")
 
+func _exit_tree() -> void:
+	outpost_storage_controller.clear()
+
 func start_new_run() -> bool:
 	_log("Starting new run.")
 	state_machine.start_new_run()

@@ -2,6 +2,7 @@ extends SceneTree
 
 func _initialize() -> void:
 	var ok := await _verify_container_spawn_and_visuals()
+	await _shutdown_audio()
 	print("Container spawn and visual lifetime verified." if ok else "Container spawn and visual lifetime failed.")
 	quit(0 if ok else 1)
 
@@ -136,3 +137,8 @@ func _container_count(root: Node) -> int:
 		if is_instance_valid(container) and container.get("interact_type") == "container":
 			count += 1
 	return count
+
+func _shutdown_audio() -> void:
+	var audio_manager := root.get_node_or_null("AudioManager")
+	if audio_manager != null and audio_manager.has_method("shutdown_and_flush"):
+		await audio_manager.shutdown_and_flush()

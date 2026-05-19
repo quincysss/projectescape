@@ -4,13 +4,14 @@ func _initialize() -> void:
 	var ok := await _verify_locked_outpost_storage()
 	if ok:
 		ok = await _verify_outpost_storage()
+	await _shutdown_audio()
+	await process_frame
 	print("Outpost storage verified." if ok else "Outpost storage failed.")
 	quit(0 if ok else 1)
 
 func _verify_locked_outpost_storage() -> bool:
 	var game_state = get_root().get_node_or_null("GameState")
-	if game_state != null:
-		game_state.reset_research()
+	_prepare_profile(game_state, "OutpostStorageLocked")
 	var scene := load("res://scenes/run/RunScene.tscn")
 	if scene == null:
 		printerr("Failed to load RunScene.")
@@ -47,12 +48,13 @@ func _verify_locked_outpost_storage() -> bool:
 
 	root.queue_free()
 	await process_frame
+	await process_frame
 	return true
 
 func _verify_outpost_storage() -> bool:
 	var game_state = get_root().get_node_or_null("GameState")
+	_prepare_profile(game_state, "OutpostStorageUnlocked")
 	if game_state != null:
-		game_state.reset_research()
 		game_state.research_levels["outpost_storage_slots"] = 2
 	var scene := load("res://scenes/run/RunScene.tscn")
 	if scene == null:
@@ -139,6 +141,7 @@ func _verify_outpost_storage() -> bool:
 
 	root.queue_free()
 	await process_frame
+	await process_frame
 	return true
 
 func _item(item_id: String, display_name: String) -> Dictionary:
@@ -163,3 +166,18 @@ func _has_item(items: Array, item_id: String) -> bool:
 		if item is Dictionary and str(item.get("item_id", "")) == item_id:
 			return true
 	return false
+
+func _prepare_profile(game_state, profile_name: String) -> void:
+	if game_state == null:
+		return
+	if game_state.has_method("reset_local_data_debug_only"):
+		game_state.reset_local_data_debug_only()
+	if game_state.has_method("create_profile"):
+		game_state.create_profile(profile_name)
+	if game_state.has_method("reset_research"):
+		game_state.reset_research()
+
+func _shutdown_audio() -> void:
+	var audio_manager := root.get_node_or_null("AudioManager")
+	if audio_manager != null and audio_manager.has_method("shutdown_and_flush"):
+		await audio_manager.shutdown_and_flush()

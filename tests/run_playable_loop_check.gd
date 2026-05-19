@@ -2,6 +2,7 @@ extends SceneTree
 
 func _initialize() -> void:
 	var ok := await _verify_run_loop()
+	await _shutdown_audio()
 	quit(0 if ok else 1)
 
 func _verify_run_loop() -> bool:
@@ -166,8 +167,19 @@ func _verify_run_loop() -> bool:
 		return false
 	root.return_to_base_loading_screen._input(_key(KEY_ENTER))
 	await process_frame
+	if current_scene != null:
+		current_scene.queue_free()
+		current_scene = null
+	if is_instance_valid(root):
+		root.queue_free()
+	await process_frame
 	print("Run playable loop verified.")
 	return true
+
+func _shutdown_audio() -> void:
+	var audio_manager := root.get_node_or_null("AudioManager")
+	if audio_manager != null and audio_manager.has_method("shutdown_and_flush"):
+		await audio_manager.shutdown_and_flush()
 
 func _key(keycode: Key) -> InputEventKey:
 	var event := InputEventKey.new()

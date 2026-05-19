@@ -2,6 +2,7 @@ extends SceneTree
 
 func _initialize() -> void:
 	var ok := await _verify_outpost_safe_zone_and_extract_ui()
+	await _shutdown_audio()
 	print("Outpost safe zone and extract UI verified." if ok else "Outpost safe zone and extract UI failed.")
 	quit(0 if ok else 1)
 
@@ -141,3 +142,8 @@ func _find_interactable(root, interact_type: String):
 		if is_instance_valid(interactable) and interactable.interact_type == interact_type:
 			return interactable
 	return null
+
+func _shutdown_audio() -> void:
+	var audio_manager := root.get_node_or_null("AudioManager")
+	if audio_manager != null and audio_manager.has_method("shutdown_and_flush"):
+		await audio_manager.shutdown_and_flush()

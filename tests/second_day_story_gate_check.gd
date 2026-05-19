@@ -4,6 +4,7 @@ const RUN_SCENE := preload("res://scenes/run/RunScene.tscn")
 
 func _initialize() -> void:
 	var ok := await _verify()
+	await _shutdown_audio()
 	print("Second day story gate verified." if ok else "Second day story gate failed.")
 	quit(0 if ok else 1)
 
@@ -118,3 +119,8 @@ func _restore_profile(game_state: Node, original_profile: Dictionary) -> void:
 	game_state.profile = original_profile.duplicate(true)
 	game_state._apply_profile_to_runtime(game_state.profile)
 	game_state.save_profile()
+
+func _shutdown_audio() -> void:
+	var audio_manager := root.get_node_or_null("AudioManager")
+	if audio_manager != null and audio_manager.has_method("shutdown_and_flush"):
+		await audio_manager.shutdown_and_flush()

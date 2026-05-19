@@ -6,8 +6,15 @@ signal outpost_storage_changed(outpost_id: String, items: Array)
 const StorageContainerScript := preload("res://scripts/inventory/storage_container.gd")
 
 var storages: Dictionary = {}
+var storage_changed_callbacks: Dictionary = {}
 
 func clear() -> void:
+	for outpost_id in storage_changed_callbacks.keys():
+		var storage = storages.get(outpost_id, null)
+		var callback: Callable = storage_changed_callbacks.get(outpost_id, Callable())
+		if storage != null and callback.is_valid() and storage.storage_changed.is_connected(callback):
+			storage.storage_changed.disconnect(callback)
+	storage_changed_callbacks.clear()
 	storages.clear()
 
 func ensure_storage(outpost_id: String, capacity_slots: int):
@@ -17,10 +24,15 @@ func ensure_storage(outpost_id: String, capacity_slots: int):
 		return storages[outpost_id]
 	var storage = StorageContainerScript.new()
 	storage.setup("storage_%s" % outpost_id, outpost_id, capacity_slots, true)
-	storage.storage_changed.connect(func(items): outpost_storage_changed.emit(outpost_id, items))
+	var callback := Callable(self, "_on_storage_changed").bind(outpost_id)
+	storage.storage_changed.connect(callback)
+	storage_changed_callbacks[outpost_id] = callback
 	storages[outpost_id] = storage
 	outpost_storage_changed.emit(outpost_id, storage.get_items_snapshot())
 	return storage
+
+func _on_storage_changed(items: Array, outpost_id: String) -> void:
+	outpost_storage_changed.emit(outpost_id, items)
 
 func get_storage(outpost_id: String):
 	return storages.get(outpost_id, null)
