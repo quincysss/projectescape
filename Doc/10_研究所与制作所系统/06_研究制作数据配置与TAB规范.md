@@ -69,7 +69,8 @@ research_id	display_name	category	level	max_level	required_items	required_curren
 | `outpost_storage_slots` | 已修复前哨安全箱最终格数 |
 | `max_stability` | 玩家稳定值最终上限 |
 | `warehouse_capacity` | 局外仓库最终格数 |
-| `merchant_shop_level` | 商人库存最终等级 |
+| `shelf_slot_level` | 白天店铺货台格数最终等级 |
+| `logistics_order_level` | 后勤订购标准件可用等级 |
 
 仓库容量必须按当前工程口径：
 
@@ -113,13 +114,14 @@ setting/recipes.tab
 建议表头：
 
 ```text
-recipe_id	display_name	category	output_item_id	output_quantity	required_items	required_currency_id	required_currency_amount	required_research_ids	required_blueprint_id	craft_time_seconds	instant_craft	enabled	enabled_version	description
+recipe_id	display_name	category	output_item_id	output_quantity	required_items	required_currency_id	required_currency_amount	required_research_ids	required_blueprint_id	required_station_level	craft_time_seconds	instant_craft	enabled	enabled_version	description
 ```
 
 示例：
 
 ```text
-craft_backpack_small	小型加固背包	backpack	backpack_small_reinforced	1	cloth_dirty:6;duct_tape_roll:3;reinforced_strap:1	mine_coin	0		bp_backpack_small	0	true	true	v0.2	制作一个小型加固背包。
+craft_simple_gear	连轴齿轮	sale_good	sale_good_simple_gear	3	raw_scrap_metal:1;raw_dirty_cloth:1	mine_coin	0			basic	0	true	true	v0.2	基础手作台制造的 C 级可售物资。
+craft_backpack_small	小型加固背包	backpack	backpack_small_reinforced	1	cloth_dirty:6;duct_tape_roll:3;reinforced_strap:1	mine_coin	40		bp_backpack_small	advanced	0	true	true	v0.2	制作一个小型加固背包。
 ```
 
 ## 6. 数据校验
@@ -135,9 +137,11 @@ warehouse_capacity 数值不低于当前基础容量 80。
 blueprints.tab.item_id 必须是 items.tab 中 type=blueprint 的物品。
 blueprints.tab.unlock_recipe_id 必须存在于 recipes.tab。
 recipes.tab.output_item_id 必须存在于 items.tab。
+recipes.tab.category=sale_good 的产物必须用于白天货台上架，不得作为局内直接掉落物。
 recipes.tab.required_items 必须存在于 items.tab。
 recipes.tab.required_blueprint_id 为空或存在于 blueprints.tab。
 recipes.tab.required_research_ids 为空或存在于 research.tab 的 research_id。
+recipes.tab.required_station_level 只能为 `basic` 或 `advanced`，基础手作台只允许 C 级低阶可售物资。
 ```
 
 ## 7. 暂不实现

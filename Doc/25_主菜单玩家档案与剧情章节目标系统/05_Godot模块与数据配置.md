@@ -193,11 +193,11 @@ DialoguePortraitController：
 BaseFeatureUnlockService：
 
 - 管理局外功能入口解锁状态。
-- 新档默认 `merchant_unlocked=false`、`research_station_unlocked=false`、`manufacturing_station_unlocked=false`。
-- 第一段“回到404哨所与背景故事”对白完成后，只开放仓库和出发准备，不开放商人和研究所。
-- 首次成功撤离返回剧情播放完成后，设置 `merchant_unlocked=true` 和 `research_station_unlocked=true`。
-- 通知局外顶部页签刷新锁定/可点击状态。
-- 旧档缺少商人/研究所解锁字段时，如果 `first_return_dialogue_seen==true`，读取时补齐为已解锁。
+- 新档默认 `shop_loop_unlocked=false`、`research_station_unlocked=false`、`advanced_manufacturing_station_unlocked=false`。
+- 第一段“回到404哨所与背景故事”对白完成后，只开放序章夜晚出发入口和基础仓库。
+- 首次成功撤离返回剧情播放完成后，设置 `shop_loop_unlocked=true` 和 `research_station_unlocked=true`。
+- 通知局外昼夜阶段入口刷新锁定/可点击状态。
+- 旧档缺少 shop_loop/research 解锁字段时，如果 `first_return_dialogue_seen==true`，读取时补齐为已解锁。
 
 ChapterProgressService：
 
@@ -210,7 +210,7 @@ ManufacturingUnlockService：
 
 - 校验 5000 矿币。
 - 调用 CurrencyWallet 扣币。
-- 写入制造所解锁。
+- 写入高级制造所解锁。
 - 触发第一章结束弹窗。
 
 RunLoadingController：
@@ -291,8 +291,8 @@ V0.1 可以先拆文件保存，但必须由统一 SaveService 组织。
 - 重置首次出发任务对白 flag。
 - 重置第二日暗潮物质剧情 flag。
 - 重置首次返回剧情 flag。
-- 重置商人/研究所解锁状态。
-- 强制解锁商人/研究所。
+- 重置经营循环/研究所解锁状态。
+- 强制开启经营循环/研究所。
 - 增加 5000 矿币。
 - 强制完成第一章。
 - surface_day +1。
@@ -315,18 +315,18 @@ Debug 操作必须只在 Debug 模式显示。
 要求：
 1. 建立 MainMenuScene、UsernameInputDialog、DialoguePanel、ChapterGoalPopup、ChapterCompletePopup、RunLoadingScreen。
 2. 建立 ProfileService、SaveStorageAdapter、BaseFeatureUnlockService、DialogueService、DialogueSpeakerRegistry、DialoguePortraitController、ChapterProgressService、ManufacturingUnlockService、RunLoadingController。
-3. 玩家档案保存 username、surface_day、intro_cinematic_seen、world_intro_dialogue_seen、first_departure_outpost_dialogue_seen、second_day_black_tide_reveal_seen、first_return_dialogue_seen、merchant_unlocked、research_station_unlocked、manufacturing_station_unlocked、chapter_1_completed。
+3. 玩家档案保存 username、surface_day、intro_cinematic_seen、world_intro_dialogue_seen、first_departure_outpost_dialogue_seen、second_day_black_tide_reveal_seen、first_return_dialogue_seen、shop_loop_unlocked、research_station_unlocked、advanced_manufacturing_station_unlocked、chapter_1_completed。
 4. 桌面保存到 user://profile/profile.json；Web 通过 WebSaveStorageAdapter 适配，不在 UI 中写平台判断。
 5. 新档创建后播放 opening_intro_cinematic；视频可跳过，跳过后仍进入 world_intro_dialogue。该 DialogueSequence 的剧情定位是“回到404哨所与背景故事”：必须交代背景故事，但要通过自然对白呈现，不写成百科式世界观说明。
-6. world_intro_dialogue 完成后进入局外仓库/出发准备界面；商人和研究所仍为锁定状态，不允许点击。
+6. world_intro_dialogue 完成后进入序章夜晚出发入口；研究所和高级制造所仍为锁定状态，不允许点击。
 7. 玩家第一次点击出发探索且校验通过后，播放 first_departure_outpost_dialogue。
 8. DialoguePanel 必须从 setting/dialogue_speakers.tab 读取主角和 404 哨所管理员原画；player 说话显示主角，operator_404 说话显示 404 哨所管理员；所有立绘统一放在屏幕最左侧左对齐，当前说话者高亮；立绘槽位中心常量保持 `PORTRAIT_SLOT_CENTER_X_RATIO := 0.26`。
 9. first_departure_outpost_dialogue 完成后进入 RunLoadingScreen，由 RunLoadingController 加载局内资源。
 10. 出发加载到 100% 后显示“按下任意按钮继续”，并展示操作提示与稳定值/视野说明。
 11. 玩家按任意按钮后才提交 IN_RUN、surface_day +1，并保存 run_start。
 12. 如果本次 `run_day_index == 2` 且 second_day_black_tide_reveal_seen=false，进入 RunScene 后先播放第二日暗潮物质视频和主角独白；演出期间冻结所有局内计时，对白结束后才启动本局玩法。
-13. 首次成功撤离返回后播放 first_return_chapter_1_dialogue；对白结束后解锁商人和研究所，并激活第一章目标；该独白只显示主角原画。
-14. 制造所解锁消耗 5000 mine_coin，成功后弹出第一章结束，显示 surface_day。
+13. 首次成功撤离返回后播放 first_return_chapter_1_dialogue；对白结束后开启正式白天经营循环和研究所，并激活第一章目标；该独白只显示主角原画。
+14. 高级制造所解锁消耗 5000 mine_coin，成功后弹出第一章结束，显示 surface_day。
 15. 结算界面点击返回哨所后进入 RETURN_TO_BASE loading，100% 后显示“按下任意按钮继续”，玩家按任意按钮后才回局外。
 16. RETURN_TO_BASE loading 不增加 surface_day，不提交出发装备，不启用局内控制。
 ```
@@ -335,7 +335,7 @@ Debug 操作必须只在 Debug 模式显示。
 
 - 新档创建、保存、重启读取正常。
 - 开场视频、回到404哨所与背景故事对白、首次出发任务对白、首次返回剧情只触发一次。
-- 新档第一天商人和研究所锁定；首次成功返回剧情结束后才解锁。
+- 新档序章研究所和高级制造所锁定；首次成功返回剧情结束后开启正式白天经营循环和研究所。
 - 剧情对白能显示主角和 404 哨所管理员原画，并随 speaker_id 正确切换高亮；所有立绘均在最左侧左对齐，`PORTRAIT_SLOT_CENTER_X_RATIO` 保持 `0.26`。
 - 确认出发后进入加载界面，加载完成后等待任意按钮才进入可操作局内。
 - 第二日首次进入局内时会播放暗潮物质视频和主角独白，期间所有局内计时冻结。

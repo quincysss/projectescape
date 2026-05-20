@@ -9,7 +9,8 @@
 res://scripts/game/research_manager.gd
 res://scripts/game/game_state.gd
 res://scripts/game/warehouse_manager.gd
-res://scripts/game/merchant_service.gd
+res://scripts/game/shelf_inventory_service.gd
+res://scripts/game/currency_wallet.gd
 res://scripts/base/base_scene.gd
 res://setting/research.tab
 ```
@@ -76,6 +77,8 @@ func get_warehouse_capacity(default_capacity: int) -> int
 ```gdscript
 func can_unlock_manufacturing_station() -> bool
 func unlock_manufacturing_station() -> Dictionary
+func can_unlock_advanced_manufacturing_station() -> bool
+func unlock_advanced_manufacturing_station() -> Dictionary
 ```
 
 后续制作接口：
@@ -85,6 +88,7 @@ func query_recipes(filters: Dictionary = {}) -> Array[Dictionary]
 func get_crafting_quote(recipe_id: String, count: int = 1) -> Dictionary
 func craft_recipe(recipe_id: String, count: int = 1) -> Dictionary
 func learn_blueprint(blueprint_id: String) -> Dictionary
+func convert_same_grade_material(input_items: Array[Dictionary], target_item_id: String) -> Dictionary
 ```
 
 ## 4. Manager 职责
@@ -116,6 +120,7 @@ RecipeManager：
 加载 recipes.tab。
 判断配方是否可见、已解锁、可制作。
 处理默认解锁、图纸解锁、研究解锁。
+区分 basic / advanced 制造所等级。
 ```
 
 CraftingManager：
@@ -123,6 +128,7 @@ CraftingManager：
 ```text
 生成制作 quote。
 检查材料、货币、前置研究、前置图纸和仓库空间。
+检查配方产物是 sale_good、equipment 还是 consumable。
 原子扣除材料和货币。
 生成产物 ItemInstance。
 调用 WarehouseManager 入库。
@@ -134,7 +140,7 @@ ManufacturingUnlockService：
 校验第一章目标状态。
 校验 5000 mine_coin。
 调用 CurrencyWallet 扣币。
-写入 manufacturing_station_unlocked 和 chapter_1_completed。
+写入 advanced_manufacturing_station_unlocked 和 chapter_1_completed。
 保存玩家档案。
 ```
 
@@ -147,7 +153,8 @@ signal blueprint_learned(blueprint_id: StringName, recipe_id: StringName)
 signal recipe_unlocked(recipe_id: StringName, source: StringName)
 signal crafting_completed(recipe_id: StringName, output_item_id: StringName, count: int)
 signal crafting_failed(recipe_id: StringName, reason: StringName)
-signal manufacturing_station_unlocked(surface_day: int)
+signal advanced_manufacturing_station_unlocked(surface_day: int)
+signal sale_good_crafted(recipe_id: StringName, output_item_id: StringName, count: int)
 ```
 
 ## 6. UI 边界
@@ -157,7 +164,8 @@ signal manufacturing_station_unlocked(surface_day: int)
 - UI 不直接扣矿币。
 - UI 不直接写 `research_levels`。
 - UI 不直接写 `unlocked_recipe_ids`。
-- UI 不直接写 `manufacturing_station_unlocked`。
+- UI 不直接写 `advanced_manufacturing_station_unlocked`。
+- UI 不直接把仓库原材料换成货币。
 
 ## 7. 保存边界
 
@@ -168,10 +176,11 @@ research_levels
 learned_blueprint_ids
 unlocked_recipe_ids
 pending_claim_items
-manufacturing_station_unlocked
+advanced_manufacturing_station_unlocked
 chapter_1_completed
 currencies
 warehouse_items
+shelf_items
 ```
 
 首版如果没有图纸/制作，可先不写 `learned_blueprint_ids`、`unlocked_recipe_ids`、`pending_claim_items`，但字段命名需要预留。

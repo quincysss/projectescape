@@ -65,18 +65,18 @@ UI 资源分两层生成：
 | UI-05 | 背包/容器/安全格子拆分 sheet | 格子、装备槽、详情面板、关闭/确认按钮 | 2048x2048 |
 | UI-06 | 撤离与结算整体设计稿 | 成功撤离、入库、遗弃警告流程 | 1920x1080 |
 | UI-07 | 撤离与结算拆分 sheet | 撤离按钮状态、结算面板、警告弹窗 | 2048x2048 |
-| UI-08 | 局外基地整体框架设计稿 | 顶部页签、主内容、右侧详情、底部操作 | 1920x1080 |
-| UI-09 | 局外导航与通用面板 sheet | 页签、按钮、筛选、滚动条、标题牌 | 2048x2048 |
+| UI-08 | 局外基地整体框架设计稿 | 昼夜阶段、白天入口、主内容、右侧详情、底部操作 | 1920x1080 |
+| UI-09 | 局外导航与通用面板 sheet | 功能入口、按钮、筛选、滚动条、标题牌 | 2048x2048 |
 | UI-09A | 剧情对白界面与控件 sheet | 底部对白框、说话人名牌、跳过、继续提示、原画阴影底 | 2048x2048 |
 | UI-10 | 仓库系统整体稿 | 仓库格、分类筛选、物品详情、整理操作 | 1920x1080 |
 | UI-11 | 仓库系统拆分 sheet | 仓库专用格子、分类 chip、排序按钮、容量条 | 2048x2048 |
-| UI-12 | 商人与货币整体稿 | 可出售列表、数量选择、单价、总价、矿币栏 | 1920x1080 |
-| UI-13 | 商人与货币拆分 sheet | 矿币 icon、价格牌、出售按钮、数量步进器、商人条目 | 2048x2048 |
+| UI-12 | 店铺货台与需求整体稿 | 需求榜、货台格、可售物资、成交反馈、矿币栏 | 1920x1080 |
+| UI-13 | 店铺货台与货币拆分 sheet | 矿币 icon、货台格、需求榜、上架按钮、成交条目 | 2048x2048 |
 | UI-14 | 研究所整体稿 | 节点线路图、需求、进度、前置条件 | 1920x1080 |
 | UI-15 | 研究所拆分 sheet | 研究节点、连接线、完成标记、需求徽章 | 2048x2048 |
 | UI-16 | 制作所整体稿 | 配方列表、产物预览、材料需求、制作状态 | 1920x1080 |
 | UI-17 | 制作所拆分 sheet | 配方卡、产物框、工具灯、制作按钮状态 | 2048x2048 |
-| UI-18 | 出发准备整体稿 | 角色预览、装备槽、背包选择、开始探索 | 1920x1080 |
+| UI-18 | 出发准备整体稿 | 角色预览、装备槽、背包选择、确认出发 | 1920x1080 |
 | UI-19 | 出发准备拆分 sheet | 装备槽、锁定槽、开始按钮、角色底座 | 2048x2048 |
 | UI-20 | 通用图标 sheet | 系统入口、资源分类、状态角标、稀有度 | 2048x2048 |
 
@@ -229,8 +229,8 @@ Avoid: full screen UI, glossy modern buttons, huge glow, labels, watermark, over
 Create a full out-of-run base interface framework mockup for a 2D wasteland extraction game.
 Canvas: 1920x1080.
 Style: dark hand-drawn manga UI, thick black outlines, dirty grey panels, worn paper tabs, worn metal frames, small warm yellow and purple-blue accents.
-Content: top navigation tabs for warehouse, merchant, research, crafting, reserved locked tabs, global mine coin indicator area, main content region, optional right detail panel, bottom action bar.
-Layout rule: top tabs must appear in this order: warehouse, merchant, research, crafting. Current selected tab has clear purple-blue or warm yellow hand-drawn highlight. Unfinished tabs are visible but greyed out and disabled.
+Content: day prep function entries for warehouse, crafting, research, catalog, daily demand panel, global mine coin indicator area, main content region, optional right detail panel, bottom action bar, night departure state placeholder.
+Layout rule: day prep entries must appear in this order: warehouse, crafting, research, catalog. Current selected entry has clear purple-blue or warm yellow hand-drawn highlight. Unfinished entries are visible but greyed out and disabled.
 Requirement: full interface visual design mockup for the base UI shell, not a sliced sheet.
 Avoid: modern SaaS dashboard, clean sci-fi, marketing landing page, glossy UI, photorealistic room background, oversized decorative illustration.
 ```
@@ -244,7 +244,7 @@ Create a transparent PNG UI sprite sheet for out-of-run base navigation and reus
 Canvas: 2048x2048.
 Grid: 4x4, evenly spaced cells, one UI element per cell, no labels.
 Style: dark hand-drawn manga UI, thick black outlines, dirty grey paper panels, worn metal frames, small warm yellow and blue-purple accents.
-Elements: top navigation tab normal, top navigation tab selected, top navigation tab locked, page title plaque, large main panel frame, right detail panel frame, bottom action bar frame, global resource badge frame, primary confirm button frame, secondary button frame, warning button frame, category filter chip, small icon button frame, scrollbar track, scrollbar handle, disabled button frame.
+Elements: function entry normal, function entry selected, function entry locked, page title plaque, large main panel frame, right detail panel frame, bottom action bar frame, global resource badge frame, primary confirm button frame, secondary button frame, warning button frame, category filter chip, small icon button frame, scrollbar track, scrollbar handle, disabled button frame.
 Requirements: transparent background, clean cutout edges, consistent line width, suitable for slicing and nine-slice usage in Godot, no readable text.
 Avoid: full menu screenshot, labels, watermark, modern flat UI, glossy 3D, overlapping elements.
 ```
@@ -295,28 +295,28 @@ Avoid: full warehouse screen, item illustrations, labels, watermark, overlapping
 
 ---
 
-## 16. UI-12 商人与货币整体设计稿
+## 16. UI-12 店铺货台与需求整体设计稿
 
 ```text
-Create a full merchant selling interface mockup for a 2D wasteland extraction game.
+Create a full shop shelf and daily demand interface mockup for a 2D wasteland extraction game.
 Canvas: 1920x1080.
-Style: dark hand-drawn manga UI, thick black outlines, dirty grey merchant panels, worn paper price tags, muted warm yellow currency accents, controlled purple-blue selection accents.
-Content: sellable warehouse item list, selected item detail, item icon, owned count, unit sell price, quantity selector, total price, mine coin currency display, sell button active and disabled states, sale result toast, grey disabled rows for non-sellable examples if needed.
-Layout rule: practical out-of-run selling screen, no buy shop, no market board, no decorative storefront hero art.
-Requirement: full interface visual design mockup for merchant layout reference only.
+Style: dark hand-drawn manga UI, thick black outlines, dirty grey shelf panels, worn paper demand tags, muted warm yellow currency accents, controlled purple-blue selection accents.
+Content: daily demand ranking panel, three initial shelf slots, shelf item cards, sale_good item list, selected item detail, item icon, owned count, estimated base price, mine coin currency display, put-on-shelf button active and disabled states, shop settlement toast.
+Layout rule: practical out-of-run shop operation screen, no buy shop, no market board, no decorative storefront hero art.
+Requirement: full interface visual design mockup for shop shelf layout reference only.
 Avoid: sliced sheet, fantasy shop UI, shiny gold coins, e-commerce layout, photorealism, glossy 3D, readable generated text.
 ```
 
 ---
 
-## 17. UI-13 商人与货币拆分 Sheet
+## 17. UI-13 店铺货台与货币拆分 Sheet
 
 ```text
-Create a transparent PNG UI sprite sheet for merchant selling and currency interface elements in a 2D wasteland extraction game.
+Create a transparent PNG UI sprite sheet for shop shelf and currency interface elements in a 2D wasteland extraction game.
 Canvas: 2048x2048.
 Grid: 5x5, evenly spaced cells, one UI element per cell, no labels.
 Style: hand-drawn dark manga UI, dirty paper and worn metal, muted grey base, rough black outlines, small warm yellow mine coin accents.
-Elements: mine coin icon, currency badge frame, price tag frame, sell button active frame, sell button disabled frame, quantity stepper minus button, quantity stepper plus button, total price strip, merchant item row normal, merchant item row selected, merchant item row disabled, sale success toast frame, sale failure toast frame, trade arrow icon, top currency bar frame, small coin stack icon, selected price glow, warning mini badge, disabled grey overlay.
+Elements: mine coin icon, currency badge frame, shelf slot empty, shelf slot selected, shelf slot locked, demand rank row normal, demand rank row highlighted, put-on-shelf button active frame, put-on-shelf button disabled frame, settlement total strip, shelf item row normal, shelf item row selected, sold success toast frame, sale failure toast frame, deal arrow icon, top currency bar frame, small coin stack icon, selected price glow, warning mini badge, disabled grey overlay.
 Requirements: transparent background, no text, clean cutout edges, consistent line style, disabled states clearly greyed out, suitable for Godot slicing.
 Avoid: full shop screen, readable labels, watermark, bright fantasy gold, modern e-commerce icons, glossy 3D.
 ```
@@ -492,11 +492,11 @@ ui_[system]_[element]_[state].png
 
 ```text
 局内 UI 没有遮挡主要地图阅读。
-局外框架能容纳后续页签扩展。
-顶部页签顺序包含仓库、商人、研究所、制作所。
-未开发完成页签有明确置灰禁用态。
-仓库、商人、研究、制作视觉同源但有系统差异。
-矿币 icon 在顶部货币栏和商人总价中都清晰可读。
+局外框架能容纳昼夜阶段和后续功能入口扩展。
+白天准备入口顺序包含仓库、制造所、研究所、图鉴。
+未开发完成功能入口有明确置灰禁用态。
+仓库、制造、研究、图鉴、货台视觉同源但有系统差异。
+矿币 icon 在顶部货币栏和营业结算总价中都清晰可读。
 撤离、遗弃、低稳定值等危险信息优先级足够高。
 安全格子和前哨修复态能明显区别于普通容器。
 ```
@@ -555,8 +555,8 @@ ui_[system]_[element]_[state].png
 ```text
 12. UI-10 仓库系统整体稿。
 13. UI-11 仓库系统拆分 Sheet。
-14. UI-12 商人与货币整体稿。
-15. UI-13 商人与货币拆分 Sheet。
+14. UI-12 店铺货台与需求整体稿。
+15. UI-13 店铺货台与货币拆分 Sheet。
 16. UI-14 研究所整体稿。
 17. UI-15 研究所拆分 Sheet。
 18. UI-16 制作所整体稿。
@@ -616,7 +616,7 @@ res://assets/ui/ui_asset_manifest.tab
 背包 / 容器 / 安全格子。
 撤离与结算。
 局外导航框架。
-仓库 / 商人 / 研究 / 制作 / 出发准备。
+仓库 / 制造 / 研究 / 图鉴 / 货台 / 出发准备。
 通用系统图标。
 ```
 

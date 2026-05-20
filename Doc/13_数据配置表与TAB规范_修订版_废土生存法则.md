@@ -136,7 +136,7 @@ setting/dialogues.tab
 setting/dialogue_speakers.tab
 ```
 
-V0.1 局外商人开工时必须先有 `data/currencies.tab`。
+V0.2 局外店铺经营开工时必须先有 `data/currencies.tab`、`data/sale_goods.tab` 或等价可售物资配置。
 
 V0.3 初期可以先做 `items.tab`、`currencies.tab`、`materials.tab`、`equipment.tab`、`consumables.tab`、`effects.tab`、`research.tab`、`recipes.tab`。
 
@@ -266,7 +266,7 @@ blueprints.tab 的 id 必须能在 items.tab 中找到。
 
 ```text
 定义所有物品的基础信息。
-背包、仓库、掉落、结算、商人、UI 都优先读取这张表。
+背包、仓库、掉落、结算、制造所、货台、图鉴、UI 都优先读取这张表。
 ```
 
 建议字段：
@@ -274,16 +274,17 @@ blueprints.tab 的 id 必须能在 items.tab 中找到。
 | 字段 | 类型 | 说明 |
 |---|---|---|
 | id | string | 物品唯一ID |
-| item_type | enum | material/outpost_material/equipment/consumable/blueprint/rare |
+| item_type | enum | material/outpost_material/equipment/consumable/blueprint/rare/sale_good |
 | name | string | 显示名 |
 | quality | enum | C/B/A/S/SS |
 | stackable | bool | 是否可堆叠 |
 | stack_limit | int | 堆叠上限 |
 | weight | float | 单个重量 |
 | icon | path | 图标路径 |
-| sellable | bool | 是否可出售给局外商人 |
-| sell_currency_id | string | 售卖获得的货币 ID，V0.1 默认 mine_coin |
-| sell_value | int | 单个物品基础售价 |
+| sellable | bool | 历史兼容字段；新经济不表示仓库原材料可直接变现 |
+| sell_currency_id | string | 历史兼容字段；成交货币由货台结算读取 |
+| sell_value | int | 历史兼容字段；新经济优先使用可售物资基础成交价 |
+| base_sale_value | int | 可售物资基础成交价，仅 item_type=sale_good 时有效 |
 | description | string | 描述文本 |
 | tags | list | 标签 |
 | enabled_version | string | 启用版本 |
@@ -292,31 +293,31 @@ blueprints.tab 的 id 必须能在 items.tab 中找到。
 
 ```text
 所有可进入背包、家中存储、容器掉落、材料拾取、结算或仓库的道具都不可堆叠。
-items.tab 中所有数据行的 stackable 必须为 false。
-items.tab 中所有数据行的 stack_limit 必须为 1。
-当掉落、材料需求或奖励配置产生多个同 ID 道具时，运行时必须拆分为多个 amount=1 的单件实例。
-背包格子、家中存储格子、负重判断和后续 UI 选择都按单件实例处理，不按同 ID 叠加组处理。
+局内背包可按 31 文档的新经济口径允许材料堆叠，以支撑一次探索带回足够制造材料。
+装备、耐久不同的消耗品、任务物品仍按单件实例处理。
+仓库、制造所和货台必须按 item_id + quality + 状态字段判断是否可合堆，不能无脑合并所有同 ID 物品。
 ```
 
 示例表头：
 
 ```text
-id	item_type	name	quality	stackable	stack_limit	weight	icon	sellable	sell_currency_id	sell_value	description	tags	enabled_version
+id	item_type	name	quality	stackable	stack_limit	weight	icon	sellable	sell_currency_id	sell_value	base_sale_value	description	tags	enabled_version
 ```
 
 示例行：
 
 ```text
-scrap_metal	material	废金属	C	false	1	0.1	res://assets/icons/items/scrap_metal.png	true	mine_coin	3	常见的金属废料，可用于修复和制作。	material;craft	v0.3
+scrap_metal	material	废金属	C	true	20	0.1	res://assets/icons/items/scrap_metal.png	false	mine_coin	0	0	常见的金属废料，可用于修复和制作。	material;craft;metal	v0.3
+sale_good_simple_gear	sale_good	连轴齿轮	C	true	20	0.1	res://assets/icons/items/simple_gear.png	false	mine_coin	0	12	由废金属和布条加工出的基础可售物资。	sale_good;shop_goods;metal	v0.3
 ```
 
 局外道具详情 Tooltip 读取规则：
 
 ```text
-局外仓库、商人、研究所、制作所中的道具图标 hover Tooltip 不新增表字段。
-道具图标、名称、品质、售价、描述都从 items.tab 读取。
+局外仓库、制造所、研究所、货台、图鉴、夜晚出发准备中的道具图标 hover Tooltip 不新增表字段。
+道具图标、名称、品质、类型、描述都从 items.tab 读取。
 货币显示名和图标从 currencies.tab 读取。
-sellable=false 或 sell_value<=0 时，Tooltip 价格区显示“不可出售”。
+Tooltip 不显示仓库原材料“直接出售”价格；只有货台/需求榜上下文可显示可售物资预估基础成交价。
 description 为空时，Tooltip 显示“暂无记录。”。
 SS 品质必须保留为 quality=SS，不得降级成 S；Tooltip 需要能显示红色品质识别。
 ```
@@ -1495,8 +1496,8 @@ V0.3 若要开始配置表系统，最小需要：
 ```text
 TabDataLoader 可读取 .tab。
 DataRegistry 可加载 items.tab 和 currencies.tab。
-ItemDefinition 可被背包、仓库、结算、商人引用。
-CurrencyDefinition 可被商人、局外顶部货币栏和存档读取引用。
+ItemDefinition 可被背包、仓库、结算、制造所、货台、图鉴引用。
+CurrencyDefinition 可被货台结算、局外货币栏、研究制造消耗和存档读取引用。
 equipment.tab 可生成 EquipmentDefinition。
 consumables.tab 可生成 ConsumableDefinition。
 effects.tab 可注册基础效果。

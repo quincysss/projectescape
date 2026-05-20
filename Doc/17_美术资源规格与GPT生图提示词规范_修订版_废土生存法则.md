@@ -989,7 +989,7 @@ Avoid: glossy candy art, bright cartoon, photorealism, complex shadow.
 
 ```text
 Create a UI icon for a dark hand-drawn 2D wasteland game.
-Subject: [inventory / safe storage / extract / merchant / mine coin currency / research / crafting / earphone signal].
+Subject: [inventory / safe storage / extract / shop shelf / mine coin currency / research / crafting / earphone signal].
 Style: rough black ink line icon, dirty grayscale fill, minimal shape, small purple or blue accent only if useful.
 Background: transparent.
 Requirements: readable at 32x32, no text, no watermark, simple strong silhouette.

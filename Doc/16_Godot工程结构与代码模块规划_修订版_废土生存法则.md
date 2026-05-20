@@ -210,32 +210,34 @@ Autoload 只负责跨场景生命周期和服务入口。
 ```text
 BaseScene
   BaseUIRoot
-  BaseTopTabs
+  DayPrepPanel
+  ShopOpenPanel
+  NightPlanPanel
+  DepartureLoadoutPanel
   CurrencyBar
   WarehousePanel
-  MerchantPanel
+  ShelfPanel
+  DemandRankPanel
   ResearchPanel
   CraftingPanel
-  LoadoutPanel
-  StartRunButton
 ```
 
-局外顶部页签顺序：
+白天准备阶段功能入口顺序：
 
 ```text
 仓库
-商人
+制造所
 研究所
-制作所
+图鉴
 ```
 
 规则：
 
 ```text
-BaseTopTabs 只负责导航和状态显示，不直接改仓库或货币数据。
-未开发完成的页签置灰并禁止点击。
+DayPrepPanel 只负责白天准备入口协调，不直接改仓库或货币数据。
+未开发完成的功能入口置灰并禁止点击。
 CurrencyBar 显示玩家持有货币，V0.1 至少显示 mine_coin。
-MerchantPanel 通过 MerchantService 出售仓库物品，不直接修改 WarehouseData.items 或 currencies。
+ShelfPanel 通过 ShelfInventoryService 上架、撤下和成交可售物资，不直接修改 WarehouseData.items 或 currencies。
 ```
 
 ---
