@@ -289,11 +289,10 @@ blueprints.tab 的 id 必须能在 items.tab 中找到。
 | tags | list | 标签 |
 | enabled_version | string | 启用版本 |
 
-当前 V0.1 规则覆写：
+当前 V0.2 经济规则覆写：
 
 ```text
-所有可进入背包、家中存储、容器掉落、材料拾取、结算或仓库的道具都不可堆叠。
-局内背包可按 31 文档的新经济口径允许材料堆叠，以支撑一次探索带回足够制造材料。
+材料、基础零件和可售物资允许按 stackable / stack_limit 堆叠，以支撑一次探索带回足够制造材料并支撑白天开店供货。
 装备、耐久不同的消耗品、任务物品仍按单件实例处理。
 仓库、制造所和货台必须按 item_id + quality + 状态字段判断是否可合堆，不能无脑合并所有同 ID 物品。
 ```
@@ -814,7 +813,8 @@ outpost_requirements.tab
   items.tab
 
 currencies.tab
-  items.tab.sell_currency_id
+  sale_good 结算货币配置
+  items.tab.sell_currency_id（仅历史兼容字段非空时校验）
 ```
 
 ---
@@ -833,10 +833,11 @@ Godot 启动或开发调试时必须校验：
 所有 effect_id 必须存在于 effects.tab，除非该效果由代码内置并明确登记。
 所有 recipe.output_item 必须存在于 items.tab。
 所有 required_items 中的 item_id 必须存在于 items.tab。
-所有 items.tab.sell_currency_id 必须存在于 currencies.tab。
+历史兼容字段 items.tab.sell_currency_id 非空时必须存在于 currencies.tab；新经济不要求原材料配置该字段。
 所有 currencies.tab.id 不重复。
-所有 sellable = true 的物品 sell_value 必须大于 0。
-所有 sell_value > 0 的物品必须有 sell_currency_id。
+`sellable`、`sell_value`、`sell_currency_id` 为历史兼容字段，不得作为仓库直接出售的实现依据。
+所有 `item_type = sale_good` 的物品必须配置 `base_sale_value > 0`。
+所有可售物资的成交货币必须能从店铺结算规则或 currencies.tab 映射到有效 currency_id，当前默认为 mine_coin。
 所有 required_research 必须存在于 research.tab。
 所有 required_blueprint 必须存在于 blueprints.tab。
 所有 icon 路径允许为空，但填写后资源必须存在。

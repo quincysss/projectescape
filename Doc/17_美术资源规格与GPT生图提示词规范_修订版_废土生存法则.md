@@ -1150,9 +1150,9 @@ item_type
 quality
 tags
 icon
-sellable
-sell_currency_id
-sell_value
+stackable
+stack_limit
+base_sale_value
 appearance_scene
 ```
 
