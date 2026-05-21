@@ -1,0 +1,4 @@
+recipe_id	output_item_id	output_count	required_items	required_currency_id	required_currency_amount	description	enabled
+recipe_repaired_filter	sale_good_repaired_filter	1	scrap_metal:1;cloth_dirty:1	mine_coin	0	把废金属和布条整理成可售卖的修复滤芯。	true
+recipe_emergency_wrap	sale_good_emergency_wrap	1	cloth_dirty:1;medicine_powder:1;duct_tape_roll:1	mine_coin	0	制作白天店铺可售卖的应急包扎卷。	true
+recipe_signal_lamp	sale_good_signal_lamp	1	wire_coil:1;battery_old:1;tool_parts:1	mine_coin	0	组装白天店铺可售卖的简易信号灯。	true

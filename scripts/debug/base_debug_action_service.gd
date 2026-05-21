@@ -19,9 +19,9 @@ func add_sell_test_items(game_state: Node) -> Dictionary:
 	if not ensure_data_loaded():
 		return _failure(load_error_message)
 	var added := 0
-	added += _add_item(game_state, "field_bandage", 2)
-	added += _add_item(game_state, "gold_data_chip", 1)
-	added += _add_item(game_state, "stability_candy", 2)
+	added += _add_item(game_state, "sale_good_repaired_filter", 2)
+	added += _add_item(game_state, "sale_good_emergency_wrap", 2)
+	added += _add_item(game_state, "sale_good_signal_lamp", 1)
 	return {"ok": true, "message": "已加入 %d 个可售卖测试道具。" % added}
 
 func refresh_shop(game_state: Node, level: int) -> Dictionary:

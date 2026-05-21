@@ -82,6 +82,20 @@ func default_profile(username: String) -> Dictionary:
 		"merchant_shop_level": 1,
 		"merchant_shop_offers": [],
 		"ss_roll_state": {},
+		"selected_character_id": "male_01",
+		"selected_night_location_id": "abandoned_house",
+		"outgame_phase": "DAY_PREP",
+		"daily_demand_day": 0,
+		"daily_demand_entries": [],
+		"shop_shelf_items": [],
+		"shop_sales_records": [],
+		"shop_elapsed_seconds": 0.0,
+		"shop_next_sale_second": 5.0,
+		"shop_duration_seconds": 60.0,
+		"shop_settlement_applied": false,
+		"shop_ended_by": "",
+		"loadout_equipment_slots": {"HEAD": "", "BODY": "", "HAND": "", "FOOT": ""},
+		"loadout_consumable_slots": ["", "", "", ""],
 	}
 
 func _with_defaults(profile: Dictionary) -> Dictionary:
@@ -112,6 +126,11 @@ func _with_defaults(profile: Dictionary) -> Dictionary:
 	merged["research_levels"] = Dictionary(merged.get("research_levels", {}))
 	merged["collected_item_ids"] = Dictionary(merged.get("collected_item_ids", {}))
 	merged["merchant_shop_offers"] = Array(merged.get("merchant_shop_offers", []))
+	merged["daily_demand_entries"] = Array(merged.get("daily_demand_entries", []))
+	merged["shop_shelf_items"] = Array(merged.get("shop_shelf_items", []))
+	merged["shop_sales_records"] = Array(merged.get("shop_sales_records", []))
+	merged["loadout_equipment_slots"] = Dictionary(merged.get("loadout_equipment_slots", {"HEAD": "", "BODY": "", "HAND": "", "FOOT": ""}))
+	merged["loadout_consumable_slots"] = Array(merged.get("loadout_consumable_slots", ["", "", "", ""]))
 	merged["surface_day"] = maxi(0, int(merged.get("surface_day", 0)))
 	merged["current_chapter"] = maxi(1, int(merged.get("current_chapter", 1)))
 	merged["last_played_at_unix"] = Time.get_unix_time_from_system()

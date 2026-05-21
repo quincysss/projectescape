@@ -5,6 +5,9 @@ wire_coil	material	旧线圈	B	false	1	0.12	res://assets/ui/itemicon/wire_coil.p
 battery_old	material	旧电池	B	false	1	0.20	res://assets/ui/itemicon/battery_old.png	true	mine_coin	6	容量不稳定的旧电池。	material;electronic;power	v0.1
 medicine_powder	material	药粉	B	false	1	0.08	res://assets/ui/itemicon/medicine_powder.png	true	mine_coin	5	未标记来源的药粉，可用于制作稳定类消耗品。	material;medical;craft	v0.1
 tool_parts	material	工具零件	B	false	1	0.18	res://assets/ui/itemicon/tool_parts.png	true	mine_coin	6	来自旧工具的齿轮、螺丝和卡扣。	material;tool;craft	v0.1
+sale_good_repaired_filter	sale_good	修复滤芯	C	false	1	0.14	res://assets/ui/itemicon/duct_tape_roll.png	true	mine_coin	18	把旧滤芯和布料重新封装后的日用品，白天店铺可出售。	sale_good;tool;common	v0.4
+sale_good_emergency_wrap	sale_good	应急包扎卷	C	false	1	0.10	res://assets/ui/itemicon/field_bandage.png	true	mine_coin	22	用脏布条、药粉和胶带整理出的包扎卷，白天店铺可出售。	sale_good;medical;common	v0.4
+sale_good_signal_lamp	sale_good	简易信号灯	B	false	1	0.24	res://assets/ui/itemicon/battery_old.png	true	mine_coin	36	用旧电池和线圈组装的小信号灯，白天店铺可出售。	sale_good;electronic;tool	v0.4
 stability_candy	consumable	安定糖	C	false	1	0.05	res://assets/ui/itemicon/stability_candy.png	true	mine_coin	18	短时间内帮助角色稳住情绪的小糖块。	consumable;stability	v0.1
 field_bandage	consumable	临时绷带	C	false	1	0.08	res://assets/ui/itemicon/field_bandage.png	true	mine_coin	14	粗糙但能应急处理伤口的绷带。	consumable;medical	v0.1
 signal_injector	consumable	信号针剂	A	false	1	0.12	res://assets/ui/itemicon/signal_injector.png	true	mine_coin	48	短时增强感知和信号反馈的危险针剂。	consumable;stability;rare	v0.1

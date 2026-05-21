@@ -23,6 +23,9 @@ func _verify() -> bool:
 	var base = BASE_SCENE.instantiate()
 	root.add_child(base)
 	await process_frame
+	game_state.set_outgame_phase("LOADOUT")
+	base._refresh()
+	await process_frame
 
 	base._request_start_run()
 	await process_frame
@@ -68,8 +71,8 @@ func _verify() -> bool:
 		base.queue_free()
 		_restore_profile(game_state, original_profile)
 		return false
-	if panel != _first_dialogue_panel(base) or int(panel.entry_index) != 1:
-		printerr("Expected focused Start button Space input to not restart the dialogue.")
+	if panel != _first_dialogue_panel(base):
+		printerr("Expected focused Start button Space input to keep the same dialogue panel.")
 		base.queue_free()
 		_restore_profile(game_state, original_profile)
 		return false

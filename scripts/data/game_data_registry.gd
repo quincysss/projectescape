@@ -11,6 +11,7 @@ const CONTAINER_TYPES_PATH := "res://setting/container_types.tab"
 const DROP_TABLES_PATH := "res://setting/drop_tables.tab"
 const SHOP_STOCK_PATH := "res://setting/shop_stock.tab"
 const RESEARCH_PATH := "res://setting/research.tab"
+const CRAFTING_RECIPES_PATH := "res://setting/crafting_recipes.tab"
 const SS_CHANCE_TIERS_PATH := "res://setting/ss_chance_tiers.tab"
 const SS_CONTAINER_CHANCES_PATH := "res://setting/ss_container_chances.tab"
 const SS_LOOT_POOL_PATH := "res://setting/ss_loot_pool.tab"
@@ -67,6 +68,7 @@ var containers_by_id: Dictionary = {}
 var drop_rows_by_context: Dictionary = {}
 var shop_stock_rows: Array[Dictionary] = []
 var research_rows: Array[Dictionary] = []
+var crafting_recipe_rows: Array[Dictionary] = []
 var ss_chance_tier_rows: Array[Dictionary] = []
 var ss_container_chance_rows_by_type: Dictionary = {}
 var ss_loot_pool_rows: Array[Dictionary] = []
@@ -81,6 +83,7 @@ func load_all() -> bool:
 	containers_by_id = _index_rows(_load_rows(CONTAINER_TYPES_PATH), "type_id")
 	shop_stock_rows = _load_rows(SHOP_STOCK_PATH)
 	research_rows = _load_rows(RESEARCH_PATH)
+	crafting_recipe_rows = _load_rows(CRAFTING_RECIPES_PATH)
 	ss_chance_tier_rows = _load_rows(SS_CHANCE_TIERS_PATH)
 	ss_container_chance_rows_by_type = _index_rows(_load_rows(SS_CONTAINER_CHANCES_PATH), "type_id")
 	ss_loot_pool_rows = _load_rows(SS_LOOT_POOL_PATH)
@@ -141,6 +144,18 @@ func get_research_rows() -> Array[Dictionary]:
 			return id_a < id_b
 		return int(a.get("level", 0)) < int(b.get("level", 0))
 	)
+	return result
+
+func get_crafting_recipe_rows() -> Array[Dictionary]:
+	var result: Array[Dictionary] = []
+	for row in crafting_recipe_rows:
+		if not TabDataLoader.parse_bool(String(row.get("enabled", "true")), true):
+			continue
+		var output_item_id := String(row.get("output_item_id", ""))
+		if output_item_id.is_empty() or get_item(output_item_id).is_empty():
+			continue
+		result.append(row.duplicate(true))
+	result.sort_custom(func(a, b): return String(a.get("recipe_id", "")) < String(b.get("recipe_id", "")))
 	return result
 
 func get_ss_chance_tier_rows() -> Array[Dictionary]:

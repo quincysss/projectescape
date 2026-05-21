@@ -318,6 +318,8 @@ func _can_sell_item(item: Dictionary) -> bool:
 		return false
 	if int(item.get("sell_value", 0)) <= 0:
 		return false
+	if String(item.get("item_type", "")) == "material":
+		return false
 	if not String(item.get("repair_material_id", "")).is_empty():
 		return false
 	for tag in _get_tags(item):

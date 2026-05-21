@@ -1,7 +1,7 @@
 # 10-07 Godot 模块与接口边界
 
 > 来源文档：`10_研究所与制作所系统_修订版_废土生存法则.md`  
-> 目标：定义研究、图纸、配方、制作和制造所解锁的脚本边界，避免 UI 直接改核心数据。
+> 目标：定义研究、图纸、配方、制作、周转物资和首次开店教学的脚本边界，避免 UI 直接改核心数据。
 
 ## 1. 当前已落地模块
 
@@ -15,7 +15,7 @@ res://scripts/base/base_scene.gd
 res://setting/research.tab
 ```
 
-当前 `BaseScene` 已承担研究 UI 和制造所解锁页，后续可继续拆分为独立面板控制器。
+当前 `BaseScene` 已承担研究 UI 和部分制造所 UI，后续应继续拆分为独立面板控制器，并移除旧的制造所固定矿币解锁页。
 
 ## 2. 推荐新增模块
 
@@ -42,10 +42,11 @@ scripts/base/base_crafting_panel_controller.gd
 scripts/ui/item_tooltip_view.gd
 ```
 
-章节与功能解锁：
+章节、周转物资与功能解锁：
 
 ```text
-scripts/game/manufacturing_unlock_service.gd
+scripts/game/starter_supply_service.gd
+scripts/game/first_shop_tutorial_service.gd
 scripts/chapters/chapter_progress_service.gd
 ```
 
@@ -72,13 +73,14 @@ func get_player_max_stability(default_value: float) -> float
 func get_warehouse_capacity(default_capacity: int) -> int
 ```
 
-制造所解锁接口：
+周转物资与首次开店接口：
 
 ```gdscript
-func can_unlock_manufacturing_station() -> bool
-func unlock_manufacturing_station() -> Dictionary
-func can_unlock_advanced_manufacturing_station() -> bool
-func unlock_advanced_manufacturing_station() -> Dictionary
+func can_grant_starter_shop_supply() -> bool
+func grant_starter_shop_supply() -> Dictionary
+func mark_first_sale_good_crafted(recipe_id: String, item_id: String, count: int) -> Dictionary
+func mark_first_sale_good_shelved(item_id: String) -> Dictionary
+func mark_first_shop_settlement_finished(settlement: Dictionary) -> Dictionary
 ```
 
 后续制作接口：
@@ -120,7 +122,7 @@ RecipeManager：
 加载 recipes.tab。
 判断配方是否可见、已解锁、可制作。
 处理默认解锁、图纸解锁、研究解锁。
-区分 basic / advanced 制造所等级。
+区分默认开放、图纸开放、研究开放、章节开放等配方来源。
 ```
 
 CraftingManager：
@@ -134,14 +136,22 @@ CraftingManager：
 调用 WarehouseManager 入库。
 ```
 
-ManufacturingUnlockService：
+StarterSupplyService：
 
 ```text
-校验第一章目标状态。
-校验 5000 mine_coin。
-调用 CurrencyWallet 扣币。
-写入 advanced_manufacturing_station_unlocked 和 chapter_1_completed。
-保存玩家档案。
+校验 starter_shop_supply_granted。
+读取 prologue_shop_starter_pack。
+写入仓库材料。
+写入 starter_shop_supply_granted。
+保存玩家档案和仓库。
+```
+
+FirstShopTutorialService：
+
+```text
+监听 sale_good_crafted、货台上架和营业结算事件。
+推进 craft_first_sale_good、shelve_first_sale_good、finish_first_shop_day。
+三步完成后写入 first_shop_tutorial_completed 和 chapter_1_completed。
 ```
 
 ## 5. 信号建议
@@ -153,7 +163,8 @@ signal blueprint_learned(blueprint_id: StringName, recipe_id: StringName)
 signal recipe_unlocked(recipe_id: StringName, source: StringName)
 signal crafting_completed(recipe_id: StringName, output_item_id: StringName, count: int)
 signal crafting_failed(recipe_id: StringName, reason: StringName)
-signal advanced_manufacturing_station_unlocked(surface_day: int)
+signal starter_shop_supply_granted(pack_id: StringName)
+signal first_shop_tutorial_completed(chapter_id: StringName)
 signal sale_good_crafted(recipe_id: StringName, output_item_id: StringName, count: int)
 ```
 
@@ -164,7 +175,8 @@ signal sale_good_crafted(recipe_id: StringName, output_item_id: StringName, coun
 - UI 不直接扣矿币。
 - UI 不直接写 `research_levels`。
 - UI 不直接写 `unlocked_recipe_ids`。
-- UI 不直接写 `advanced_manufacturing_station_unlocked`。
+- UI 不直接写 `starter_shop_supply_granted`。
+- UI 不直接写 `first_shop_tutorial_completed`。
 - UI 不直接把仓库原材料换成货币。
 
 ## 7. 保存边界
@@ -176,7 +188,8 @@ research_levels
 learned_blueprint_ids
 unlocked_recipe_ids
 pending_claim_items
-advanced_manufacturing_station_unlocked
+starter_shop_supply_granted
+first_shop_tutorial_completed
 chapter_1_completed
 currencies
 warehouse_items

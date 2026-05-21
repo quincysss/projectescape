@@ -81,7 +81,8 @@ func _verify_base_catalog_ui(registry, game_state: Node) -> bool:
 	var catalog_panel := base_root.get("catalog_panel") as Panel
 	var catalog_scroll := base_root.get_node_or_null("BaseUIRoot/CatalogPanel/CatalogScroll") as ScrollContainer
 	var catalog_grid := base_root.get_node_or_null("BaseUIRoot/CatalogPanel/CatalogScroll/CatalogGrid") as Control
-	if catalog_tab == null or catalog_panel == null or catalog_scroll == null or catalog_grid == null:
+	var shop_day_panel := base_root.get_node_or_null("BaseUIRoot/ShopDayPrepPanel") as Panel
+	if catalog_tab == null or catalog_panel == null or catalog_scroll == null or catalog_grid == null or shop_day_panel == null:
 		printerr("Expected catalog tab, panel, and grid nodes.")
 		base_root.queue_free()
 		return false
@@ -93,6 +94,10 @@ func _verify_base_catalog_ui(registry, game_state: Node) -> bool:
 	await process_frame
 	if not catalog_panel.visible:
 		printerr("Expected catalog panel to show after pressing catalog tab.")
+		base_root.queue_free()
+		return false
+	if catalog_panel.get_rect().intersects(shop_day_panel.get_rect()):
+		printerr("Expected day demand panel to stay outside the catalog content area.")
 		base_root.queue_free()
 		return false
 	var cards := catalog_grid.get_children()

@@ -1,102 +1,128 @@
 extends SceneTree
 
 const GameDataRegistryScript := preload("res://scripts/data/game_data_registry.gd")
-const SELECTED_BORDER := Color("#D1B850")
 
 func _initialize() -> void:
-	var ok := await _verify_merchant_grid_selection()
-	print("Merchant grid selection verified." if ok else "Merchant grid selection failed.")
+	var ok := await _verify_shop_shelf_buttons()
+	print("Shop shelf button flow verified." if ok else "Shop shelf button flow failed.")
 	quit(0 if ok else 1)
 
-func _verify_merchant_grid_selection() -> bool:
+
+func _verify_shop_shelf_buttons() -> bool:
 	var game_state = root.get_node_or_null("GameState")
 	if game_state == null:
 		printerr("Expected GameState autoload.")
 		return false
 	await process_frame
+	var original_profile: Dictionary = game_state.load_profile() if game_state.has_profile() else {}
+	game_state.reset_local_data_debug_only()
+	var create_result: Dictionary = game_state.create_profile("ShopGrid")
+	if not bool(create_result.get("ok", false)):
+		printerr("Expected profile creation to pass: %s" % create_result)
+		_restore_profile(game_state, original_profile)
+		return false
+	game_state.mark_intro_cinematic_seen()
+	game_state.mark_world_intro_dialogue_seen()
+	game_state.mark_first_departure_outpost_dialogue_seen()
+	game_state.mark_first_return_dialogue_seen_and_activate_chapter()
 	var registry = GameDataRegistryScript.new()
 	if not registry.load_all():
 		printerr("Expected registry to load.")
+		_restore_profile(game_state, original_profile)
 		return false
 
 	game_state.clear_warehouse()
 	game_state.clear_currencies()
-	game_state.add_currency("mine_coin", 100, "merchant_grid_selection")
+	game_state.set_outgame_phase("DAY_PREP")
 	game_state.add_to_warehouse([
-		registry.make_item_stack("field_bandage"),
-		registry.make_item_stack("field_bandage"),
-		registry.make_item_stack("field_bandage"),
+		registry.make_item_stack("sale_good_repaired_filter"),
+		registry.make_item_stack("sale_good_emergency_wrap"),
+		registry.make_item_stack("scrap_metal"),
 	])
-	game_state.merchant_shop_offers.clear()
-	game_state.merchant_shop_offers.append({
-		"shop_offer_id": "test_offer_scrap",
-		"shop_id": "base_merchant",
-		"shop_level": 1,
-		"min_shop_level": 1,
-		"item_id": "scrap_metal",
-		"display_name": "废金属",
-		"item_type": "material",
-		"quality": "C",
-		"count": 4,
-		"buy_currency_id": "mine_coin",
-		"buy_price": 1,
-	})
 
 	var base_scene := load("res://scenes/base/BaseScene.tscn")
 	if base_scene == null:
 		printerr("Expected BaseScene to load.")
+		_restore_profile(game_state, original_profile)
 		return false
 	var base_root = base_scene.instantiate()
 	root.add_child(base_root)
 	await process_frame
 
-	var merchant_tab := base_root.get_node_or_null("BaseUIRoot/MerchantTabButton") as Button
-	if merchant_tab == null:
-		printerr("Expected merchant tab.")
-		base_root.queue_free()
-		return false
-	merchant_tab.emit_signal("pressed")
+	base_root._request_start_run()
 	await process_frame
-
-	var ok := true
-	ok = await _select_and_expect_one(base_root.merchant_sell_grid_root, 1, "sell") and ok
-	ok = await _select_and_expect_one(base_root.merchant_shop_grid_root, 2, "buy") and ok
+	if game_state.get_outgame_phase() != "SHOP_OPEN":
+		printerr("Expected opening entry to enter SHOP_OPEN.")
+		base_root.queue_free()
+		_restore_profile(game_state, original_profile)
+		return false
+	var shelf_buttons := _find_buttons_by_text(base_root, "上架")
+	if shelf_buttons.size() < 2:
+		printerr("Expected shelf buttons for two sale_goods.")
+		base_root.queue_free()
+		_restore_profile(game_state, original_profile)
+		return false
+	shelf_buttons[0].emit_signal("pressed")
+	await process_frame
+	var shelf_items: Array = game_state.get_shelf_items()
+	if _filled_shelf_count(shelf_items) != 1:
+		printerr("Expected one shelf slot to be filled after shelf button press.")
+		base_root.queue_free()
+		_restore_profile(game_state, original_profile)
+		return false
+	if not _find_group_by_item_id(game_state.query_shelfable_sale_goods(), "scrap_metal").is_empty():
+		printerr("Expected raw materials to stay excluded from shelfable goods.")
+		base_root.queue_free()
+		_restore_profile(game_state, original_profile)
+		return false
+	var return_buttons := _find_buttons_by_text(base_root, "下架")
+	if return_buttons.is_empty():
+		printerr("Expected return button on filled shelf slot.")
+		base_root.queue_free()
+		_restore_profile(game_state, original_profile)
+		return false
+	return_buttons[0].emit_signal("pressed")
+	await process_frame
+	if _filled_shelf_count(game_state.get_shelf_items()) != 0:
+		printerr("Expected shelf slot to be empty after return button press.")
+		base_root.queue_free()
+		_restore_profile(game_state, original_profile)
+		return false
 
 	base_root.queue_free()
 	await process_frame
-	return ok
-
-func _select_and_expect_one(grid_root: Control, button_index: int, label: String) -> bool:
-	var buttons := _grid_buttons(grid_root)
-	if buttons.size() <= button_index:
-		printerr("Expected enough %s grid buttons." % label)
-		return false
-	buttons[button_index].emit_signal("button_up")
-	await process_frame
-	buttons = _grid_buttons(grid_root)
-	var selected_count := 0
-	for button in buttons:
-		if _is_selected_button(button):
-			selected_count += 1
-	if selected_count != 1:
-		printerr("Expected exactly one selected %s grid slot, got %d." % [label, selected_count])
-		return false
-	if not _is_selected_button(buttons[button_index]):
-		printerr("Expected clicked %s grid slot to be selected." % label)
-		return false
+	_restore_profile(game_state, original_profile)
 	return true
 
-func _grid_buttons(grid_root: Control) -> Array[Button]:
-	var buttons: Array[Button] = []
-	if grid_root == null:
-		return buttons
-	for child in grid_root.get_children():
-		if child is Button:
-			buttons.append(child)
-	return buttons
 
-func _is_selected_button(button: Button) -> bool:
-	var style := button.get_theme_stylebox("normal") as StyleBoxFlat
-	if style == null:
-		return false
-	return style.border_color.is_equal_approx(SELECTED_BORDER) and style.border_width_left >= 3
+func _find_buttons_by_text(root_node: Node, text: String) -> Array[Button]:
+	var result: Array[Button] = []
+	for child in root_node.find_children("*", "Button", true, false):
+		var button := child as Button
+		if button != null and button.text == text:
+			result.append(button)
+	return result
+
+
+func _filled_shelf_count(shelf_items: Array) -> int:
+	var count := 0
+	for item in shelf_items:
+		if item is Dictionary and not Dictionary(item).is_empty():
+			count += 1
+	return count
+
+
+func _find_group_by_item_id(items: Array, item_id: String) -> Dictionary:
+	for item in items:
+		if item is Dictionary and String(item.get("item_id", "")) == item_id:
+			return item
+	return {}
+
+
+func _restore_profile(game_state: Node, original_profile: Dictionary) -> void:
+	game_state.reset_local_data_debug_only()
+	if original_profile.is_empty():
+		return
+	game_state.profile = original_profile.duplicate(true)
+	game_state._apply_profile_to_runtime(game_state.profile)
+	game_state.save_profile()

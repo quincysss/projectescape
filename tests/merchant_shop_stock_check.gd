@@ -82,11 +82,11 @@ func _verify_merchant_shop_stock() -> bool:
 	for offer in level_three_offers:
 		if not _offer_price_matches_item(registry, offer):
 			return false
-	if not await _verify_base_shop_buy(game_state):
+	if not await _verify_base_hides_legacy_shop_buy(game_state):
 		return false
 	return true
 
-func _verify_base_shop_buy(game_state: Node) -> bool:
+func _verify_base_hides_legacy_shop_buy(game_state: Node) -> bool:
 	game_state.clear_warehouse()
 	game_state.clear_currencies()
 	game_state.reset_research()
@@ -113,29 +113,17 @@ func _verify_base_shop_buy(game_state: Node) -> bool:
 		printerr("Expected merchant shop UI controls in BaseScene.")
 		base_root.queue_free()
 		return false
-
-	merchant_tab.emit_signal("pressed")
-	await process_frame
-	if not shop_stock_list.get_parsed_text().contains(String(first_offer.get("display_name", ""))):
-		printerr("Expected BaseScene merchant tab to list shop stock.")
+	if merchant_tab.visible:
+		printerr("Expected legacy merchant stock tab to be hidden from the main outgame flow.")
 		base_root.queue_free()
 		return false
-
-	var before_currency: int = game_state.get_currency_amount("mine_coin")
-	var before_count: int = game_state.get_warehouse_items_snapshot().size()
+	if not shop_stock_list.get_parsed_text().contains(String(first_offer.get("display_name", ""))):
+		printerr("Expected legacy merchant controller data to remain populated for compatibility.")
+		base_root.queue_free()
+		return false
 	base_root._on_shop_stock_meta_clicked("buy:%s" % String(first_offer.get("shop_offer_id", "")))
 	if buy_button.disabled:
-		printerr("Expected buy button to enable after selecting affordable stock.")
-		base_root.queue_free()
-		return false
-	base_root._on_buy_pressed()
-	await process_frame
-	if game_state.get_warehouse_items_snapshot().size() != before_count + 1:
-		printerr("Expected BaseScene buy action to add resource to warehouse.")
-		base_root.queue_free()
-		return false
-	if game_state.get_currency_amount("mine_coin") >= before_currency:
-		printerr("Expected BaseScene buy action to spend mine_coin.")
+		printerr("Expected legacy buy controller to remain callable for compatibility.")
 		base_root.queue_free()
 		return false
 	base_root.queue_free()

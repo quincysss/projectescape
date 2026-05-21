@@ -5,6 +5,10 @@ const CurrencyWalletScript := preload("res://scripts/game/currency_wallet.gd")
 const MerchantServiceScript := preload("res://scripts/game/merchant_service.gd")
 const ResearchManagerScript := preload("res://scripts/game/research_manager.gd")
 const ItemCatalogServiceScript := preload("res://scripts/game/item_catalog_service.gd")
+const DailyDemandServiceScript := preload("res://scripts/game/daily_demand_service.gd")
+const ShelfInventoryServiceScript := preload("res://scripts/game/shelf_inventory_service.gd")
+const ShopSalesServiceScript := preload("res://scripts/game/shop_sales_service.gd")
+const CraftingManagerScript := preload("res://scripts/game/crafting_manager.gd")
 const ProfileServiceScript := preload("res://scripts/profile/profile_service.gd")
 
 const BASE_INVENTORY_SLOTS := 8
@@ -13,6 +17,17 @@ const BASE_OUTPOST_STORAGE_SLOTS := 0
 const BASE_MAX_STABILITY := 100.0
 const BASE_WAREHOUSE_CAPACITY := 80
 const MANUFACTURING_UNLOCK_COST := 100
+const OUTGAME_PHASE_DAY_PREP := "DAY_PREP"
+const OUTGAME_PHASE_SHOP_OPEN := "SHOP_OPEN"
+const OUTGAME_PHASE_SHOP_SETTLEMENT := "SHOP_SETTLEMENT"
+const OUTGAME_PHASE_NIGHT := "NIGHT"
+const OUTGAME_PHASE_NIGHT_PLAN := "NIGHT_PLAN"
+const OUTGAME_PHASE_LOADOUT := "LOADOUT"
+const OUTGAME_PHASE_LOADING_TO_RUN := "LOADING_TO_RUN"
+const SHOP_DURATION_SECONDS := 60.0
+const SHOP_SHELF_SLOT_COUNT := 3
+const LOADOUT_CONSUMABLE_SLOT_COUNT := 4
+const LOADOUT_UNLOCKED_CONSUMABLE_SLOTS := 1
 const DEFAULT_CHARACTER_ID := "male_01"
 const DEFAULT_CHARACTER_HUD_ASSETS := {
 	"portrait_path": "res://assets/ui/run_character_hud/character_status/components/ui_run_character_portrait_male_01.png",
@@ -52,11 +67,33 @@ var ss_last_roll_day: int = 0
 var ss_last_roll_result: Dictionary = {}
 var forced_scene_events_next_run: Dictionary = {}
 var last_run_result: String = ""
+var outgame_phase: String = OUTGAME_PHASE_DAY_PREP
+var daily_demand_day: int = 0
+var daily_demand_entries: Array[Dictionary] = []
+var shop_shelf_items: Array[Dictionary] = []
+var shop_sales_records: Array[Dictionary] = []
+var shop_elapsed_seconds: float = 0.0
+var shop_next_sale_second: float = 5.0
+var shop_duration_seconds: float = SHOP_DURATION_SECONDS
+var shop_settlement_applied: bool = false
+var shop_ended_by: String = ""
+var selected_night_location_id: String = "abandoned_house"
+var loadout_equipment_slots: Dictionary = {
+	"HEAD": "",
+	"BODY": "",
+	"HAND": "",
+	"FOOT": "",
+}
+var loadout_consumable_slots: Array = ["", "", "", ""]
 var warehouse_manager = WarehouseManagerScript.new()
 var currency_wallet = CurrencyWalletScript.new()
 var merchant_service = MerchantServiceScript.new()
 var research_manager = ResearchManagerScript.new()
 var item_catalog_service = ItemCatalogServiceScript.new()
+var daily_demand_service = DailyDemandServiceScript.new()
+var shelf_inventory_service = ShelfInventoryServiceScript.new()
+var shop_sales_service = ShopSalesServiceScript.new()
+var crafting_manager = CraftingManagerScript.new()
 var profile_service = ProfileServiceScript.new()
 
 func _ready() -> void:
@@ -66,6 +103,8 @@ func _ready() -> void:
 	_bind_merchant_service()
 	_bind_research_manager()
 	_bind_item_catalog_service()
+	_bind_crafting_manager()
+	_bind_shop_services()
 
 func add_to_warehouse(items: Array) -> Array[Dictionary]:
 	_bind_warehouse_manager()
@@ -97,7 +136,9 @@ func advance_day_after_run(_result: Dictionary = {}) -> int:
 		_run_start_pending_result = false
 	current_day = maxi(1, get_current_day()) + 1
 	merchant_shop_offers.clear()
+	_reset_shop_day_state(OUTGAME_PHASE_DAY_PREP)
 	_bind_merchant_service()
+	_bind_shop_services()
 	save_profile()
 	return current_day
 
@@ -105,7 +146,9 @@ func reset_day(day: int = 1) -> void:
 	current_day = maxi(0, day)
 	_run_start_pending_result = false
 	merchant_shop_offers.clear()
+	_reset_shop_day_state(OUTGAME_PHASE_DAY_PREP)
 	_bind_merchant_service()
+	_bind_shop_services()
 	save_profile()
 
 func commit_run_start(debug_run: bool = false) -> Dictionary:
@@ -114,11 +157,206 @@ func commit_run_start(debug_run: bool = false) -> Dictionary:
 	current_day = maxi(1, get_current_day())
 	_run_start_pending_result = true
 	merchant_shop_offers.clear()
+	outgame_phase = OUTGAME_PHASE_LOADING_TO_RUN
 	_bind_merchant_service()
 	var save_result := save_profile()
 	if not bool(save_result.get("ok", true)):
 		return save_result
 	return {"ok": true, "surface_day": current_day}
+
+func get_outgame_phase() -> String:
+	_normalize_outgame_phase()
+	return outgame_phase
+
+func set_outgame_phase(phase: String) -> Dictionary:
+	if not _is_valid_outgame_phase(phase):
+		return {"ok": false, "reason": "invalid_phase", "phase": phase}
+	outgame_phase = phase
+	save_profile()
+	return {"ok": true, "phase": outgame_phase}
+
+func ensure_daily_demand() -> Array[Dictionary]:
+	var day := maxi(1, get_current_day())
+	if daily_demand_day != day or daily_demand_entries.is_empty():
+		_bind_shop_services()
+		daily_demand_day = day
+		daily_demand_entries = daily_demand_service.generate_for_day(day)
+		save_profile()
+	return get_daily_demand_entries()
+
+func get_daily_demand_entries() -> Array[Dictionary]:
+	var result: Array[Dictionary] = []
+	for entry in daily_demand_entries:
+		if entry is Dictionary:
+			result.append(entry.duplicate(true))
+	return result
+
+func start_shop_open() -> Dictionary:
+	_bind_shop_services()
+	_return_all_shelf_items_without_save()
+	ensure_daily_demand()
+	outgame_phase = OUTGAME_PHASE_SHOP_OPEN
+	shop_elapsed_seconds = 0.0
+	shop_next_sale_second = 5.0
+	shop_duration_seconds = SHOP_DURATION_SECONDS
+	shop_settlement_applied = false
+	shop_ended_by = ""
+	shop_sales_records.clear()
+	_bind_shop_services()
+	save_profile()
+	return {"ok": true, "phase": outgame_phase}
+
+func advance_shop_open(delta_seconds: float) -> Dictionary:
+	if get_outgame_phase() != OUTGAME_PHASE_SHOP_OPEN:
+		return {"ok": false, "reason": "shop_not_open"}
+	_bind_shop_services()
+	var result: Dictionary = shop_sales_service.advance(delta_seconds, shop_elapsed_seconds, shop_duration_seconds, shop_next_sale_second)
+	if bool(result.get("ok", false)):
+		shop_elapsed_seconds = float(result.get("elapsed_seconds", shop_elapsed_seconds))
+		shop_next_sale_second = float(result.get("next_sale_second", shop_next_sale_second))
+		if bool(result.get("ended", false)):
+			finish_shop_open("timer")
+		elif not Array(result.get("sold_records", [])).is_empty():
+			save_profile()
+	return result
+
+func finish_shop_open(ended_by: String = "manual") -> Dictionary:
+	if get_outgame_phase() != OUTGAME_PHASE_SHOP_OPEN:
+		return {"ok": false, "reason": "shop_not_open"}
+	outgame_phase = OUTGAME_PHASE_SHOP_SETTLEMENT
+	shop_ended_by = ended_by
+	shop_elapsed_seconds = clampf(shop_elapsed_seconds, 0.0, shop_duration_seconds)
+	save_profile()
+	return {"ok": true, "phase": outgame_phase, "ended_by": shop_ended_by}
+
+func close_shop_settlement_to_night() -> Dictionary:
+	if get_outgame_phase() != OUTGAME_PHASE_SHOP_SETTLEMENT:
+		return {"ok": false, "reason": "not_in_settlement"}
+	_bind_shop_services()
+	_bind_currency_wallet()
+	var return_result := shelf_inventory_service.return_all_to_warehouse()
+	if not bool(return_result.get("ok", false)):
+		return return_result
+	var settlement_result: Dictionary = shop_sales_service.apply_settlement(currency_wallet, shop_settlement_applied)
+	if not bool(settlement_result.get("ok", false)):
+		return settlement_result
+	shop_settlement_applied = true
+	outgame_phase = OUTGAME_PHASE_NIGHT
+	save_profile()
+	return {"ok": true, "phase": outgame_phase, "settlement": settlement_result}
+
+func get_shop_time_remaining() -> float:
+	return maxf(0.0, shop_duration_seconds - shop_elapsed_seconds)
+
+func get_shop_settlement_snapshot() -> Dictionary:
+	_bind_shop_services()
+	return shop_sales_service.build_settlement_snapshot(shop_elapsed_seconds, shop_duration_seconds, shop_settlement_applied)
+
+func get_shop_sales_records() -> Array[Dictionary]:
+	var result: Array[Dictionary] = []
+	for record in shop_sales_records:
+		if record is Dictionary:
+			result.append(record.duplicate(true))
+	return result
+
+func get_shelf_items() -> Array[Dictionary]:
+	_bind_shop_services()
+	return shelf_inventory_service.get_shelf_items()
+
+func query_shelfable_sale_goods() -> Array[Dictionary]:
+	_bind_shop_services()
+	return shelf_inventory_service.query_shelfable_sale_goods()
+
+func move_sale_good_to_shelf(shelf_group_id: String, slot_index: int) -> Dictionary:
+	if get_outgame_phase() != OUTGAME_PHASE_SHOP_OPEN:
+		return {"ok": false, "reason": "shop_not_open", "message": "只有开店营业时可以上架商品。"}
+	_bind_shop_services()
+	var result: Dictionary = shelf_inventory_service.move_group_to_shelf(shelf_group_id, slot_index)
+	if bool(result.get("ok", false)):
+		save_profile()
+	return result
+
+func return_shelf_item_to_warehouse(slot_index: int) -> Dictionary:
+	if get_outgame_phase() != OUTGAME_PHASE_SHOP_OPEN:
+		return {"ok": false, "reason": "shop_not_open", "message": "只有开店营业时可以调整货台。"}
+	_bind_shop_services()
+	var result: Dictionary = shelf_inventory_service.return_slot_to_warehouse(slot_index)
+	if bool(result.get("ok", false)):
+		save_profile()
+	return result
+
+func should_highlight_early_close() -> bool:
+	_bind_shop_services()
+	return not shelf_inventory_service.has_shelf_goods() and not shelf_inventory_service.has_warehouse_sale_goods()
+
+func go_to_night_plan() -> Dictionary:
+	if get_outgame_phase() != OUTGAME_PHASE_NIGHT:
+		return {"ok": false, "reason": "not_night"}
+	outgame_phase = OUTGAME_PHASE_NIGHT_PLAN
+	save_profile()
+	return {"ok": true, "phase": outgame_phase}
+
+func go_to_loadout() -> Dictionary:
+	if get_outgame_phase() != OUTGAME_PHASE_NIGHT_PLAN:
+		return {"ok": false, "reason": "not_night_plan"}
+	outgame_phase = OUTGAME_PHASE_LOADOUT
+	save_profile()
+	return {"ok": true, "phase": outgame_phase}
+
+func get_night_plan_snapshot() -> Dictionary:
+	return {
+		"selected_character_id": get_selected_character_id(),
+		"selected_location_id": selected_night_location_id,
+		"characters": [
+			{
+				"character_id": DEFAULT_CHARACTER_ID,
+				"display_name": "店主",
+				"description": "当前唯一可出发角色。",
+				"selected": get_selected_character_id() == DEFAULT_CHARACTER_ID,
+			},
+		],
+		"locations": [
+			{
+				"location_id": "abandoned_house",
+				"display_name": "废弃民居",
+				"description": "当前开放的夜间探索地点。",
+				"selected": selected_night_location_id == "abandoned_house",
+			},
+		],
+	}
+
+func set_night_plan_selection(character_id: String, location_id: String) -> Dictionary:
+	if not character_id.is_empty():
+		set_selected_character(character_id)
+	if not location_id.is_empty():
+		selected_night_location_id = "abandoned_house" if location_id != "abandoned_house" else location_id
+	save_profile()
+	return {"ok": true, "snapshot": get_night_plan_snapshot()}
+
+func get_loadout_snapshot() -> Dictionary:
+	_normalize_loadout_slots()
+	return {
+		"equipment_slots": loadout_equipment_slots.duplicate(true),
+		"consumable_slots": loadout_consumable_slots.duplicate(true),
+		"unlocked_consumable_slots": LOADOUT_UNLOCKED_CONSUMABLE_SLOTS,
+		"consumable_slot_count": LOADOUT_CONSUMABLE_SLOT_COUNT,
+	}
+
+func query_crafting_recipes(filters: Dictionary = {}) -> Array[Dictionary]:
+	_bind_crafting_manager()
+	return crafting_manager.query_recipes(filters)
+
+func get_craft_quote(recipe_id: String) -> Dictionary:
+	_bind_crafting_manager()
+	return crafting_manager.get_craft_quote(recipe_id)
+
+func craft_recipe(recipe_id: String) -> Dictionary:
+	_bind_crafting_manager()
+	var result: Dictionary = crafting_manager.craft_recipe(recipe_id)
+	if bool(result.get("ok", false)):
+		_mark_items_collected(Array(result.get("crafted_items", [])), "crafting")
+		save_profile()
+	return result
 
 func _should_queue_first_return_dialogue(result: Dictionary) -> bool:
 	if first_return_dialogue_seen:
@@ -200,11 +438,17 @@ func _reset_runtime_to_empty_profile_state() -> void:
 	ss_last_roll_result = {}
 	forced_scene_events_next_run.clear()
 	last_run_result = ""
+	_reset_shop_day_state(OUTGAME_PHASE_DAY_PREP)
+	selected_night_location_id = "abandoned_house"
+	loadout_equipment_slots = {"HEAD": "", "BODY": "", "HAND": "", "FOOT": ""}
+	loadout_consumable_slots = ["", "", "", ""]
 	_bind_warehouse_manager()
 	_bind_currency_wallet()
 	_bind_merchant_service()
 	_bind_research_manager()
 	_bind_item_catalog_service()
+	_bind_crafting_manager()
+	_bind_shop_services()
 
 func should_play_intro_cinematic() -> bool:
 	return not intro_cinematic_seen
@@ -275,6 +519,7 @@ func reset_story_flags() -> void:
 	chapter_1_goal_active = false
 	chapter_1_completed = false
 	manufacturing_station_unlocked = false
+	_reset_shop_day_state(OUTGAME_PHASE_DAY_PREP)
 	save_profile()
 
 func activate_chapter_1_goal_debug() -> void:
@@ -624,6 +869,9 @@ func _apply_profile_to_runtime(loaded_profile: Dictionary) -> void:
 	chapter_1_completed = bool(loaded_profile.get("chapter_1_completed", false))
 	pending_first_return_dialogue = bool(loaded_profile.get("pending_first_return_dialogue", false))
 	_run_start_pending_result = bool(loaded_profile.get("run_start_pending_result", false))
+	selected_character_id = String(loaded_profile.get("selected_character_id", DEFAULT_CHARACTER_ID))
+	selected_night_location_id = String(loaded_profile.get("selected_night_location_id", "abandoned_house"))
+	outgame_phase = String(loaded_profile.get("outgame_phase", OUTGAME_PHASE_DAY_PREP))
 	_repair_legacy_first_run_return_state()
 
 	warehouse_items.clear()
@@ -661,6 +909,34 @@ func _apply_profile_to_runtime(loaded_profile: Dictionary) -> void:
 	ss_last_roll_day = maxi(0, int(ss_state.get("last_roll_day", loaded_profile.get("ss_last_roll_day", 0))))
 	var loaded_ss_result: Dictionary = ss_state.get("last_roll_result", loaded_profile.get("ss_last_roll_result", {}))
 	ss_last_roll_result = loaded_ss_result.duplicate(true)
+	last_run_result = String(loaded_profile.get("last_run_result", ""))
+
+	daily_demand_day = maxi(0, int(loaded_profile.get("daily_demand_day", 0)))
+	daily_demand_entries.clear()
+	for entry in Array(loaded_profile.get("daily_demand_entries", [])):
+		if entry is Dictionary:
+			var entry_dict: Dictionary = entry
+			daily_demand_entries.append(entry_dict.duplicate(true))
+	shop_shelf_items.clear()
+	for item in Array(loaded_profile.get("shop_shelf_items", [])):
+		if item is Dictionary:
+			var shelf_item: Dictionary = item
+			shop_shelf_items.append(shelf_item.duplicate(true))
+	shop_sales_records.clear()
+	for record in Array(loaded_profile.get("shop_sales_records", [])):
+		if record is Dictionary:
+			var record_dict: Dictionary = record
+			shop_sales_records.append(record_dict.duplicate(true))
+	shop_elapsed_seconds = maxf(0.0, float(loaded_profile.get("shop_elapsed_seconds", 0.0)))
+	shop_next_sale_second = maxf(0.0, float(loaded_profile.get("shop_next_sale_second", 5.0)))
+	shop_duration_seconds = maxf(1.0, float(loaded_profile.get("shop_duration_seconds", SHOP_DURATION_SECONDS)))
+	shop_settlement_applied = bool(loaded_profile.get("shop_settlement_applied", false))
+	shop_ended_by = String(loaded_profile.get("shop_ended_by", ""))
+	loadout_equipment_slots = Dictionary(loaded_profile.get("loadout_equipment_slots", {"HEAD": "", "BODY": "", "HAND": "", "FOOT": ""})).duplicate(true)
+	loadout_consumable_slots = Array(loaded_profile.get("loadout_consumable_slots", ["", "", "", ""])).duplicate(true)
+	_normalize_outgame_phase()
+	_normalize_loadout_slots()
+	_bind_shop_services()
 
 func _repair_legacy_first_run_return_state() -> void:
 	if first_return_dialogue_seen or pending_first_return_dialogue or _run_start_pending_result:
@@ -694,6 +970,9 @@ func _sync_runtime_to_profile() -> void:
 	profile["chapter_1_completed"] = chapter_1_completed
 	profile["pending_first_return_dialogue"] = pending_first_return_dialogue
 	profile["run_start_pending_result"] = _run_start_pending_result
+	profile["selected_character_id"] = get_selected_character_id()
+	profile["selected_night_location_id"] = selected_night_location_id
+	profile["outgame_phase"] = get_outgame_phase()
 	profile["currencies"] = currencies.duplicate(true)
 	profile["warehouse_items"] = warehouse_items.duplicate(true)
 	profile["research_levels"] = research_levels.duplicate(true)
@@ -706,6 +985,18 @@ func _sync_runtime_to_profile() -> void:
 		"last_roll_day": ss_last_roll_day,
 		"last_roll_result": ss_last_roll_result.duplicate(true),
 	}
+	profile["last_run_result"] = last_run_result
+	profile["daily_demand_day"] = daily_demand_day
+	profile["daily_demand_entries"] = daily_demand_entries.duplicate(true)
+	profile["shop_shelf_items"] = shop_shelf_items.duplicate(true)
+	profile["shop_sales_records"] = shop_sales_records.duplicate(true)
+	profile["shop_elapsed_seconds"] = shop_elapsed_seconds
+	profile["shop_next_sale_second"] = shop_next_sale_second
+	profile["shop_duration_seconds"] = shop_duration_seconds
+	profile["shop_settlement_applied"] = shop_settlement_applied
+	profile["shop_ended_by"] = shop_ended_by
+	profile["loadout_equipment_slots"] = loadout_equipment_slots.duplicate(true)
+	profile["loadout_consumable_slots"] = loadout_consumable_slots.duplicate(true)
 
 func _bind_currency_wallet() -> void:
 	if currency_wallet == null:
@@ -730,6 +1021,70 @@ func _bind_item_catalog_service() -> void:
 	if item_catalog_service == null:
 		item_catalog_service = ItemCatalogServiceScript.new()
 	item_catalog_service.bind_collected_items(collected_item_ids)
+
+func _bind_crafting_manager() -> void:
+	_bind_warehouse_manager()
+	_bind_currency_wallet()
+	if crafting_manager == null:
+		crafting_manager = CraftingManagerScript.new()
+	crafting_manager.bind_dependencies(warehouse_manager, currency_wallet)
+
+func _bind_shop_services() -> void:
+	_bind_warehouse_manager()
+	_bind_currency_wallet()
+	if daily_demand_service == null:
+		daily_demand_service = DailyDemandServiceScript.new()
+	if shelf_inventory_service == null:
+		shelf_inventory_service = ShelfInventoryServiceScript.new()
+	if shop_sales_service == null:
+		shop_sales_service = ShopSalesServiceScript.new()
+	shelf_inventory_service.bind_dependencies(warehouse_manager, shop_shelf_items, SHOP_SHELF_SLOT_COUNT)
+	shop_sales_service.bind_dependencies(shelf_inventory_service, daily_demand_entries, shop_sales_records)
+
+func _reset_shop_day_state(next_phase: String) -> void:
+	outgame_phase = next_phase if _is_valid_outgame_phase(next_phase) else OUTGAME_PHASE_DAY_PREP
+	daily_demand_day = 0
+	daily_demand_entries.clear()
+	shop_shelf_items.clear()
+	for _index in range(SHOP_SHELF_SLOT_COUNT):
+		shop_shelf_items.append({})
+	shop_sales_records.clear()
+	shop_elapsed_seconds = 0.0
+	shop_next_sale_second = 5.0
+	shop_duration_seconds = SHOP_DURATION_SECONDS
+	shop_settlement_applied = false
+	shop_ended_by = ""
+
+func _return_all_shelf_items_without_save() -> void:
+	_bind_shop_services()
+	if shelf_inventory_service != null:
+		shelf_inventory_service.return_all_to_warehouse()
+
+func _normalize_outgame_phase() -> void:
+	if not _is_valid_outgame_phase(outgame_phase):
+		outgame_phase = OUTGAME_PHASE_DAY_PREP
+	if outgame_phase == OUTGAME_PHASE_LOADING_TO_RUN and not _run_start_pending_result:
+		outgame_phase = OUTGAME_PHASE_DAY_PREP
+
+func _is_valid_outgame_phase(phase: String) -> bool:
+	return [
+		OUTGAME_PHASE_DAY_PREP,
+		OUTGAME_PHASE_SHOP_OPEN,
+		OUTGAME_PHASE_SHOP_SETTLEMENT,
+		OUTGAME_PHASE_NIGHT,
+		OUTGAME_PHASE_NIGHT_PLAN,
+		OUTGAME_PHASE_LOADOUT,
+		OUTGAME_PHASE_LOADING_TO_RUN,
+	].has(phase)
+
+func _normalize_loadout_slots() -> void:
+	for key in ["HEAD", "BODY", "HAND", "FOOT"]:
+		if not loadout_equipment_slots.has(key):
+			loadout_equipment_slots[key] = ""
+	while loadout_consumable_slots.size() < LOADOUT_CONSUMABLE_SLOT_COUNT:
+		loadout_consumable_slots.append("")
+	while loadout_consumable_slots.size() > LOADOUT_CONSUMABLE_SLOT_COUNT:
+		loadout_consumable_slots.pop_back()
 
 func _mark_items_collected(items: Array, source: String) -> Dictionary:
 	var item_ids: Array[String] = []

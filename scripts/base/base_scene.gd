@@ -7,6 +7,8 @@ const BaseWarehousePanelControllerScript := preload("res://scripts/base/base_war
 const BaseResearchPanelControllerScript := preload("res://scripts/base/base_research_panel_controller.gd")
 const BaseCraftingPanelControllerScript := preload("res://scripts/base/base_crafting_panel_controller.gd")
 const BaseCatalogPanelControllerScript := preload("res://scripts/base/base_catalog_panel_controller.gd")
+const BaseShopPanelControllerScript := preload("res://scripts/base/base_shop_panel_controller.gd")
+const BaseNightPlanPanelControllerScript := preload("res://scripts/base/base_night_plan_panel_controller.gd")
 const BaseDebugActionServiceScript := preload("res://scripts/debug/base_debug_action_service.gd")
 const DialoguePanelScene := preload("res://scenes/ui/DialoguePanel.tscn")
 const RunLoadingScreenScene := preload("res://scenes/ui/RunLoadingScreen.tscn")
@@ -19,6 +21,14 @@ const TAB_MERCHANT := "merchant"
 const TAB_RESEARCH := "research"
 const TAB_CRAFTING := "crafting"
 const TAB_CATALOG := "catalog"
+const PHASE_DAY_PREP := "DAY_PREP"
+const PHASE_SHOP_OPEN := "SHOP_OPEN"
+const PHASE_SHOP_SETTLEMENT := "SHOP_SETTLEMENT"
+const PHASE_NIGHT := "NIGHT"
+const PHASE_NIGHT_PLAN := "NIGHT_PLAN"
+const PHASE_LOADOUT := "LOADOUT"
+const PHASE_LOADING_TO_RUN := "LOADING_TO_RUN"
+const COMPETITION_DIRECT_DEPARTURE := true
 const BASE_BACKGROUND_PATH := "res://assets/originalphoto/basementphoto.png"
 const WORLD_INTRO_DIALOGUE_PATH := "res://setting/dialogues.tab#world_intro_dialogue"
 const FIRST_DEPARTURE_DIALOGUE_PATH := "res://setting/dialogues.tab#first_departure_outpost_dialogue"
@@ -69,6 +79,8 @@ var base_warehouse_panel = BaseWarehousePanelControllerScript.new()
 var base_research_panel = BaseResearchPanelControllerScript.new()
 var base_crafting_panel = BaseCraftingPanelControllerScript.new()
 var base_catalog_panel = BaseCatalogPanelControllerScript.new()
+var base_shop_panel = BaseShopPanelControllerScript.new()
+var base_night_plan_panel = BaseNightPlanPanelControllerScript.new()
 var base_debug_actions = BaseDebugActionServiceScript.new()
 var item_tooltip_view = ItemTooltipViewScript.new()
 var item_grid_view = ItemGridViewScript.new()
@@ -87,6 +99,8 @@ var crafting_panel: Panel
 var crafting_status_label: Label
 var crafting_unlock_button: Button
 var crafting_result_label: Label
+var crafting_recipe_scroll: ScrollContainer
+var crafting_recipe_root: Control
 var catalog_tab_button: Button
 var catalog_panel: Panel
 var catalog_grid_root: Control
@@ -108,6 +122,7 @@ var _esc_settings_popup: Control
 var _debug_slow_next_loading := false
 var _debug_fail_next_loading := false
 var _active_run_loading_screen: RunLoadingScreen
+var _shop_refresh_accumulator := 0.0
 
 func _ready() -> void:
 	_game_state = get_node_or_null("/root/GameState")
@@ -124,6 +139,7 @@ func _ready() -> void:
 	)
 	base_crafting_panel.set_game_state(_game_state)
 	set_process_input(true)
+	set_process(true)
 	_play_base_safe_house_bgm()
 	_build_background()
 	_ensure_catalog_tab_button()
@@ -160,6 +176,17 @@ func _ready() -> void:
 	_refresh()
 	call_deferred("_maybe_show_base_story_dialogue")
 
+func _process(delta: float) -> void:
+	if _game_state == null or not _game_state.has_method("get_outgame_phase"):
+		return
+	if String(_game_state.get_outgame_phase()) != PHASE_SHOP_OPEN:
+		return
+	var result: Dictionary = _game_state.advance_shop_open(delta)
+	_shop_refresh_accumulator += delta
+	if bool(result.get("ok", false)) and (_shop_refresh_accumulator >= 0.25 or bool(result.get("ended", false))):
+		_shop_refresh_accumulator = 0.0
+		_refresh()
+
 func _input(event: InputEvent) -> void:
 	if not _is_escape_pressed(event):
 		return
@@ -191,7 +218,7 @@ func _on_merchant_tab_pressed() -> void:
 	if not _is_merchant_tab_available():
 		_show_locked_tab_notice("商人将在第一次地表回收返回后开放。")
 		return
-	_show_tab(TAB_MERCHANT)
+	_show_tab(TAB_WAREHOUSE)
 
 func _on_research_tab_pressed() -> void:
 	if not _is_research_tab_available():
@@ -211,12 +238,34 @@ func _on_catalog_tab_pressed() -> void:
 func _request_start_run() -> void:
 	if _is_dialogue_playing():
 		return
+	var phase := _get_outgame_phase()
+	if phase == PHASE_DAY_PREP:
+		if _game_state != null and _game_state.has_method("start_shop_open"):
+			_game_state.start_shop_open()
+			_refresh()
+		return
+	if phase == PHASE_NIGHT:
+		if COMPETITION_DIRECT_DEPARTURE:
+			_begin_competition_direct_departure()
+			return
+		if _game_state != null and _game_state.has_method("go_to_night_plan"):
+			_game_state.go_to_night_plan()
+			_refresh()
+		return
+	if phase != PHASE_LOADOUT:
+		return
 	if _game_state != null and _game_state.has_method("should_play_first_departure_outpost_dialogue") and _game_state.should_play_first_departure_outpost_dialogue():
 		_play_dialogue(FIRST_DEPARTURE_DIALOGUE_PATH, Callable(self, "_on_first_departure_dialogue_finished"))
 		return
 	_begin_run_loading()
 
 func _on_first_departure_dialogue_finished(_dialogue_id: String = "", _skipped: bool = false) -> void:
+	if _game_state != null and _game_state.has_method("mark_first_departure_outpost_dialogue_seen"):
+		_game_state.mark_first_departure_outpost_dialogue_seen()
+	_begin_run_loading()
+
+func _begin_competition_direct_departure() -> void:
+	# 临时比赛版本：跳过夜间角色/地点选择与携行配置，点出击后直接进地表加载。
 	if _game_state != null and _game_state.has_method("mark_first_departure_outpost_dialogue_seen"):
 		_game_state.mark_first_departure_outpost_dialogue_seen()
 	_begin_run_loading()
@@ -316,6 +365,14 @@ func _play_base_safe_house_bgm() -> void:
 
 func _is_debug_panel_enabled() -> bool:
 	return OS.is_debug_build() and not OS.has_feature("web")
+
+func _get_outgame_phase() -> String:
+	if _game_state != null and _game_state.has_method("get_outgame_phase"):
+		return String(_game_state.get_outgame_phase())
+	return PHASE_DAY_PREP
+
+func _is_day_prep_phase() -> bool:
+	return _get_outgame_phase() == PHASE_DAY_PREP
 
 func _show_chapter_goal_popup() -> void:
 	var popup := _make_overlay_popup("第一章目标", "解锁制造所\n\n出售可售物资，积攒 100 矿币。\n制造所解锁后，也许妹妹还有救。")
@@ -483,6 +540,8 @@ func _is_left_mouse_pressed(event: InputEvent) -> bool:
 	return event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT
 
 func _show_tab(tab_id: String) -> void:
+	if not _is_day_prep_phase():
+		return
 	var locked_message := ""
 	if tab_id == TAB_MERCHANT and not _is_merchant_tab_available():
 		tab_id = TAB_WAREHOUSE
@@ -529,6 +588,10 @@ func _refresh() -> void:
 	base_merchant_panel.set_game_state(_game_state)
 	base_research_panel.set_game_state(_game_state)
 	base_crafting_panel.set_game_state(_game_state)
+	base_shop_panel.set_game_state(_game_state)
+	base_night_plan_panel.set_game_state(_game_state)
+	if _game_state.has_method("ensure_daily_demand"):
+		_game_state.ensure_daily_demand()
 	day_label.text = _game_state.get_day_display_text()
 	currency_label.text = _game_state.get_currency_display_text("mine_coin")
 	_set_warehouse_items_text(_game_state.get_warehouse_items_snapshot())
@@ -538,11 +601,17 @@ func _refresh() -> void:
 	_set_catalog_items(_game_state.query_catalog_items() if _game_state.has_method("query_catalog_items") else [])
 	_update_chapter_goal_view()
 	base_crafting_panel.update_view()
+	if crafting_recipe_scroll != null:
+		crafting_recipe_scroll.visible = bool(_game_state.get("manufacturing_station_unlocked"))
 	base_merchant_panel.refresh_selection()
 	_update_selected_research_state()
+	base_shop_panel.update_view(_get_outgame_phase())
+	base_night_plan_panel.update_view(_get_outgame_phase())
 
 func _refresh_tabs() -> void:
 	_hide_item_tooltip("refresh_tabs")
+	var phase := _get_outgame_phase()
+	var base_tabs_visible := phase == PHASE_DAY_PREP
 	var merchant_available := _is_merchant_tab_available()
 	var research_available := _is_research_tab_available()
 	var crafting_available := _is_crafting_tab_available()
@@ -554,13 +623,25 @@ func _refresh_tabs() -> void:
 		_active_tab = TAB_WAREHOUSE
 	warehouse_label.visible = false
 	if warehouse_panel != null:
-		warehouse_panel.visible = _active_tab == TAB_WAREHOUSE
-	merchant_panel.visible = _active_tab == TAB_MERCHANT
-	research_panel.visible = _active_tab == TAB_RESEARCH
+		warehouse_panel.visible = base_tabs_visible and _active_tab == TAB_WAREHOUSE
+	merchant_panel.visible = base_tabs_visible and _active_tab == TAB_MERCHANT
+	research_panel.visible = base_tabs_visible and _active_tab == TAB_RESEARCH
 	if crafting_panel != null:
-		crafting_panel.visible = _active_tab == TAB_CRAFTING
+		crafting_panel.visible = base_tabs_visible and _active_tab == TAB_CRAFTING
 	if catalog_panel != null:
-		catalog_panel.visible = _active_tab == TAB_CATALOG
+		catalog_panel.visible = base_tabs_visible and _active_tab == TAB_CATALOG
+	warehouse_tab_button.visible = base_tabs_visible
+	merchant_tab_button.visible = false
+	research_tab_button.visible = base_tabs_visible
+	crafting_tab_button.visible = base_tabs_visible
+	if catalog_tab_button != null:
+		catalog_tab_button.visible = base_tabs_visible
+	start_button.visible = phase == PHASE_DAY_PREP or phase == PHASE_NIGHT
+	start_button.disabled = phase != PHASE_DAY_PREP and phase != PHASE_NIGHT
+	if phase == PHASE_DAY_PREP:
+		start_button.text = "开店营业"
+	elif phase == PHASE_NIGHT:
+		start_button.text = "出击"
 	warehouse_tab_button.button_pressed = _active_tab == TAB_WAREHOUSE
 	merchant_tab_button.button_pressed = _active_tab == TAB_MERCHANT
 	research_tab_button.button_pressed = _active_tab == TAB_RESEARCH
@@ -581,6 +662,7 @@ func _refresh_tabs() -> void:
 	merchant_tab_button.tooltip_text = "" if merchant_available else "等待第一次地表回收后开放。"
 	research_tab_button.tooltip_text = "" if research_available else "等待第一次地表回收后开放。"
 	crafting_tab_button.tooltip_text = "" if crafting_available else "完成首次地面返回剧情后解锁制造所。"
+	_layout_top_navigation()
 
 func _is_merchant_tab_available() -> bool:
 	if _game_state == null:
@@ -632,6 +714,8 @@ func _build_visual_surfaces() -> void:
 	_build_research_surface()
 	_build_crafting_surface()
 	_build_catalog_surface()
+	base_shop_panel.setup(_game_state, ui_root, Callable(self, "_refresh"), Callable(self, "_begin_competition_direct_departure"))
+	base_night_plan_panel.setup(_game_state, ui_root, Callable(self, "_refresh"), Callable(self, "_begin_run_loading"))
 
 func _build_warehouse_surface(ui_root: Control) -> void:
 	var nodes := base_warehouse_panel.build_surface(ui_root)
@@ -663,16 +747,13 @@ func _setup_base_ui_helpers(ui_root: Control) -> void:
 func _style_top_navigation() -> void:
 	_ensure_catalog_tab_button()
 	var tabs: Array[Button] = [warehouse_tab_button, merchant_tab_button, research_tab_button, crafting_tab_button, catalog_tab_button]
-	var left := 24.0
-	for index in range(tabs.size()):
-		var button := tabs[index]
+	for button in tabs:
 		button.toggle_mode = true
-		button.position = Vector2(left + float(index) * 120.0, 96)
 		button.size = Vector2(108, 42)
 		_style_button(button, false)
 	_style_button(start_button, true)
-	start_button.position = Vector2(648, 96)
 	start_button.size = Vector2(140, 42)
+	_layout_top_navigation()
 	result_label.visible = false
 	result_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	day_label.anchor_left = 0.0
@@ -687,6 +768,26 @@ func _style_top_navigation() -> void:
 	day_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	_style_label(day_label, 30, Color("#D8D6CE"))
 	_style_label(currency_label, 18, Color("#D1B850"))
+
+func _layout_top_navigation() -> void:
+	var next_x := 24.0
+	var top_y := 96.0
+	var tab_step := 120.0
+	var visible_tabs := 0
+	var tabs: Array[Button] = [warehouse_tab_button, research_tab_button, crafting_tab_button]
+	if catalog_tab_button != null:
+		tabs.append(catalog_tab_button)
+	for button in tabs:
+		if button == null or not button.visible:
+			continue
+		button.position = Vector2(next_x, top_y)
+		button.size = Vector2(108, 42)
+		next_x += tab_step
+		visible_tabs += 1
+	if start_button.visible:
+		var action_x := 24.0 if visible_tabs == 0 else next_x + 24.0
+		start_button.position = Vector2(action_x, top_y)
+		start_button.size = Vector2(140, 42)
 
 func _ensure_catalog_tab_button() -> void:
 	if catalog_tab_button != null and is_instance_valid(catalog_tab_button):
@@ -777,10 +878,16 @@ func _build_crafting_surface() -> void:
 	var ui_root := get_node("BaseUIRoot") as Control
 	crafting_panel = _make_base_panel("CraftingPanel", Vector2(24, 154), Vector2(980, 500), "制造所")
 	crafting_panel.visible = false
-	crafting_status_label = _make_section_label("", Vector2(36, 70), Vector2(650, 190), 18)
+	crafting_status_label = _make_section_label("", Vector2(36, 70), Vector2(650, 160), 18)
 	crafting_status_label.name = "CraftingStatusLabel"
 	crafting_status_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	crafting_panel.add_child(crafting_status_label)
+	crafting_recipe_scroll = _make_scroll_area(Vector2(36, 246), Vector2(650, 188), true)
+	crafting_recipe_scroll.name = "CraftingRecipeScroll"
+	crafting_recipe_root = Control.new()
+	crafting_recipe_root.name = "CraftingRecipeRoot"
+	crafting_recipe_scroll.add_child(crafting_recipe_root)
+	crafting_panel.add_child(crafting_recipe_scroll)
 	crafting_unlock_button = Button.new()
 	crafting_unlock_button.name = "CraftingUnlockButton"
 	crafting_unlock_button.text = "解锁制造所"
@@ -789,7 +896,7 @@ func _build_crafting_surface() -> void:
 	crafting_unlock_button.pressed.connect(_on_crafting_unlock_pressed)
 	_style_button(crafting_unlock_button, true)
 	crafting_panel.add_child(crafting_unlock_button)
-	crafting_result_label = _make_section_label("", Vector2(36, 350), Vector2(620, 80), 15)
+	crafting_result_label = _make_section_label("", Vector2(36, 440), Vector2(620, 42), 15)
 	crafting_result_label.name = "CraftingResultLabel"
 	crafting_result_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	crafting_panel.add_child(crafting_result_label)
@@ -808,7 +915,8 @@ func _build_crafting_surface() -> void:
 		crafting_unlock_button,
 		crafting_result_label,
 		manufacturing_confirm_dialog,
-		MANUFACTURING_UNLOCK_COST
+		MANUFACTURING_UNLOCK_COST,
+		crafting_recipe_root
 	)
 
 func _build_catalog_surface() -> void:
@@ -1065,7 +1173,7 @@ func _on_debug_add_currency_pressed() -> void:
 
 func _on_debug_add_sell_items_pressed() -> void:
 	debug_result_label.text = String(base_debug_actions.add_sell_test_items(_game_state).get("message", "加入可售卖测试道具失败。"))
-	_show_tab(TAB_MERCHANT)
+	_show_tab(TAB_WAREHOUSE)
 
 func _on_debug_add_research_costs_pressed() -> void:
 	var result := base_debug_actions.fill_next_research_costs(_game_state, _selected_research_id)
@@ -1074,7 +1182,7 @@ func _on_debug_add_research_costs_pressed() -> void:
 
 func _on_debug_refresh_shop_pressed() -> void:
 	debug_result_label.text = String(base_debug_actions.refresh_shop(_game_state, 1).get("message", "刷新商人库存失败。"))
-	_show_tab(TAB_MERCHANT)
+	_show_tab(TAB_WAREHOUSE)
 
 func _on_debug_max_shop_pressed() -> void:
 	debug_result_label.text = String(base_debug_actions.refresh_shop(_game_state, 3).get("message", "刷新商人库存失败。"))

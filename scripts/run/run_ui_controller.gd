@@ -34,6 +34,14 @@ const OBJECTIVE_HUD_SIZE := Vector2(356.0, 136.0)
 const OBJECTIVE_HUD_HOME_ALPHA := 1.0
 const OBJECTIVE_HUD_FIELD_ALPHA := 0.58
 const INVENTORY_PANEL_OPEN_SECONDS := 0.18
+const LOW_STABILITY_WARNING_THRESHOLD := 30.0
+const LOW_STABILITY_WARNING_MAX_ALPHA := 0.62
+const LOW_STABILITY_WARNING_NEAR_EDGE_WIDTH := 0.034
+const LOW_STABILITY_WARNING_NEAR_FADE_WIDTH := 0.22
+const LOW_STABILITY_WARNING_CRITICAL_EDGE_WIDTH := 0.013
+const LOW_STABILITY_WARNING_CRITICAL_FADE_WIDTH := 0.09
+const LOW_STABILITY_WARNING_PULSE_SPEED := 3.4
+const LOW_STABILITY_WARNING_PULSE_FLOOR := 0.42
 
 func build(scene) -> void:
 	_build_character_status_hud(scene)
@@ -44,6 +52,7 @@ func build(scene) -> void:
 	_build_context_prompt(scene)
 	_build_hidden_action_buttons(scene)
 	_build_inventory_panels(scene)
+	_build_low_stability_warning_overlay(scene)
 
 func refresh(scene) -> void:
 	if scene.run_director.context == null:
@@ -558,6 +567,66 @@ func _refresh_stability_hud(scene) -> void:
 		scene.stability_value_label.text = "%d/%d" % [int(round(current)), int(round(max_value))]
 	if scene.stability_stage_label != null:
 		scene.stability_stage_label.text = _stability_stage_text(ratio)
+	_refresh_low_stability_warning(scene, current)
+
+func _build_low_stability_warning_overlay(scene) -> void:
+	scene.stability_warning_overlay = ColorRect.new()
+	scene.stability_warning_overlay.name = "LowStabilityWarningOverlay"
+	scene.stability_warning_overlay.anchor_right = 1.0
+	scene.stability_warning_overlay.anchor_bottom = 1.0
+	scene.stability_warning_overlay.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	scene.stability_warning_overlay.color = Color.WHITE
+	scene.stability_warning_overlay.z_index = 170
+	scene.stability_warning_overlay.visible = false
+	scene.stability_warning_material = _make_low_stability_warning_material()
+	scene.stability_warning_overlay.material = scene.stability_warning_material
+	scene.ui_root.add_child(scene.stability_warning_overlay)
+
+func _refresh_low_stability_warning(scene, current_stability: float) -> void:
+	if scene.stability_warning_overlay == null or scene.stability_warning_material == null:
+		return
+	var low_ratio := clampf((LOW_STABILITY_WARNING_THRESHOLD - current_stability) / LOW_STABILITY_WARNING_THRESHOLD, 0.0, 1.0)
+	var strength := low_ratio * low_ratio * (3.0 - 2.0 * low_ratio)
+	scene.stability_warning_overlay.visible = strength > 0.001
+	scene.stability_warning_material.set_shader_parameter("warning_strength", strength)
+
+func _make_low_stability_warning_material() -> ShaderMaterial:
+	var shader := Shader.new()
+	shader.code = """
+shader_type canvas_item;
+
+uniform float warning_strength = 0.0;
+uniform vec4 warning_color : source_color = vec4(0.92, 0.04, 0.03, 1.0);
+uniform float max_alpha = 0.62;
+uniform float near_edge_width = 0.034;
+uniform float near_fade_width = 0.22;
+uniform float critical_edge_width = 0.013;
+uniform float critical_fade_width = 0.09;
+uniform float pulse_speed = 3.4;
+uniform float pulse_floor = 0.42;
+
+void fragment() {
+	float edge_distance = min(min(UV.x, 1.0 - UV.x), min(UV.y, 1.0 - UV.y));
+	float range_shrink = smoothstep(0.05, 0.5, warning_strength);
+	float edge_width = mix(near_edge_width, critical_edge_width, range_shrink);
+	float fade_width = mix(near_fade_width, critical_fade_width, range_shrink);
+	float edge_mask = 1.0 - smoothstep(edge_width, fade_width, edge_distance);
+	float pulse = mix(pulse_floor, 1.0, 0.5 + 0.5 * sin(TIME * pulse_speed));
+	float alpha = warning_strength * max_alpha * pulse * edge_mask;
+	COLOR = vec4(warning_color.rgb, alpha);
+}
+"""
+	var material := ShaderMaterial.new()
+	material.shader = shader
+	material.set_shader_parameter("warning_strength", 0.0)
+	material.set_shader_parameter("max_alpha", LOW_STABILITY_WARNING_MAX_ALPHA)
+	material.set_shader_parameter("near_edge_width", LOW_STABILITY_WARNING_NEAR_EDGE_WIDTH)
+	material.set_shader_parameter("near_fade_width", LOW_STABILITY_WARNING_NEAR_FADE_WIDTH)
+	material.set_shader_parameter("critical_edge_width", LOW_STABILITY_WARNING_CRITICAL_EDGE_WIDTH)
+	material.set_shader_parameter("critical_fade_width", LOW_STABILITY_WARNING_CRITICAL_FADE_WIDTH)
+	material.set_shader_parameter("pulse_speed", LOW_STABILITY_WARNING_PULSE_SPEED)
+	material.set_shader_parameter("pulse_floor", LOW_STABILITY_WARNING_PULSE_FLOOR)
+	return material
 
 func _refresh_countdown(scene) -> void:
 	if scene.countdown_label == null:

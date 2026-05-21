@@ -90,6 +90,8 @@ var stability_fill_texture: TextureRect
 var stability_frame_texture: TextureRect
 var stability_value_label: Label
 var stability_stage_label: Label
+var stability_warning_overlay: ColorRect
+var stability_warning_material: ShaderMaterial
 var center_hud_root: Control
 var countdown_panel: TextureRect
 var countdown_label: Label
