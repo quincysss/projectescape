@@ -41,15 +41,15 @@ func _fallback_speaker(speaker_id: String) -> Dictionary:
 	return {
 		"display_name": speaker_id,
 		"portrait_path": PLACEHOLDER_PORTRAIT_PATH,
-		"portrait_side": "right" if speaker_id == "player" else "left",
+		"portrait_side": "left",
 		"nameplate_color": "#EFEDEA",
 	}
 
-func _normalized_side(side: String, speaker_id: String) -> String:
+func _normalized_side(side: String, _speaker_id: String) -> String:
 	var lower := side.strip_edges().to_lower()
 	if lower == "left" or lower == "right":
-		return lower
-	return "right" if speaker_id == "player" else "left"
+		return "left"
+	return "left"
 
 func _resolved_portrait_path(speaker_id: String, portrait_path: String) -> String:
 	var path := portrait_path.strip_edges()

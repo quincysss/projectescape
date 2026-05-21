@@ -1,0 +1,14 @@
+{
+	"pack_id": "prologue_shop_starter_pack",
+	"grant_once_profile_flag": "starter_shop_supply_granted",
+	"items": [
+		{"item_id": "scrap_metal", "count": 2},
+		{"item_id": "cloth_dirty", "count": 2},
+		{"item_id": "duct_tape_roll", "count": 1},
+		{"item_id": "medicine_powder", "count": 1},
+		{"item_id": "wire_coil", "count": 1},
+		{"item_id": "battery_old", "count": 1},
+		{"item_id": "tool_parts", "count": 1}
+	],
+	"notes": "One-time prologue shop starter materials. Materials only; never grant sale_good items directly."
+}

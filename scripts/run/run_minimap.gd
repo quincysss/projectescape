@@ -5,8 +5,10 @@ const OUTER_SIZE := Vector2(188.0, 188.0)
 const INNER_RADIUS := 82.0
 const BORDER_RADIUS := 88.0
 const REDRAW_INTERVAL_MSEC := 50
+const WEB_REDRAW_INTERVAL_MSEC := 150
 const LOCAL_VIEW_RADIUS_PX := 3600.0
 const FOG_SAMPLE_STEP := 4.0
+const WEB_FOG_SAMPLE_STEP := 8.0
 
 var map_bounds: Rect2 = Rect2()
 var fog_overlay
@@ -14,11 +16,16 @@ var player: Node2D
 var current_radius: float = 0.0
 var markers: Array[Dictionary] = []
 var _last_redraw_msec: int = 0
+var _redraw_interval_msec: int = REDRAW_INTERVAL_MSEC
+var _fog_sample_step_px: float = FOG_SAMPLE_STEP
 
 func _ready() -> void:
 	size = OUTER_SIZE
 	custom_minimum_size = OUTER_SIZE
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
+	if OS.has_feature("web"):
+		_redraw_interval_msec = WEB_REDRAW_INTERVAL_MSEC
+		_fog_sample_step_px = WEB_FOG_SAMPLE_STEP
 
 func update_from_scene(scene) -> void:
 	if scene == null:
@@ -34,7 +41,7 @@ func update_from_scene(scene) -> void:
 	)
 	markers = _collect_markers(scene)
 	var now := Time.get_ticks_msec()
-	if _last_redraw_msec == 0 or now - _last_redraw_msec >= REDRAW_INTERVAL_MSEC:
+	if _last_redraw_msec == 0 or now - _last_redraw_msec >= _redraw_interval_msec:
 		_last_redraw_msec = now
 		queue_redraw()
 
@@ -92,7 +99,7 @@ func _draw_exploration_layer(center: Vector2) -> void:
 	if image == null:
 		draw_circle(center, INNER_RADIUS, Color(0.0, 0.0, 0.0, 0.85))
 		return
-	var radius := FOG_SAMPLE_STEP * 0.72
+	var radius := _fog_sample_step_px * 0.72
 	var start := center - Vector2.ONE * INNER_RADIUS
 	var end := center + Vector2.ONE * INNER_RADIUS
 	var y := start.y
@@ -101,7 +108,7 @@ func _draw_exploration_layer(center: Vector2) -> void:
 		while x <= end.x:
 			var pos := Vector2(x, y)
 			if pos.distance_to(center) > INNER_RADIUS - radius:
-				x += FOG_SAMPLE_STEP
+				x += _fog_sample_step_px
 				continue
 			var world_pos := _minimap_to_world(pos)
 			var explored := 0.0
@@ -115,8 +122,8 @@ func _draw_exploration_layer(center: Vector2) -> void:
 			alpha = lerpf(alpha, 0.0, permanent_light)
 			if alpha > 0.02:
 				draw_circle(pos, radius, Color(0.0, 0.0, 0.0, alpha))
-			x += FOG_SAMPLE_STEP
-		y += FOG_SAMPLE_STEP
+			x += _fog_sample_step_px
+		y += _fog_sample_step_px
 
 func _draw_local_base_layer(center: Vector2) -> void:
 	var grid_spacing_px := 512.0 * _map_scale()

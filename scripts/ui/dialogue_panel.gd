@@ -266,7 +266,7 @@ func _update_portraits(entry: Dictionary) -> void:
 	var viewport_size := get_viewport_rect().size
 	portrait_controller.update_for_entry(entry, _sequence_speaker_ids, viewport_size)
 	if portrait_bottom_fade != null:
-		portrait_bottom_fade.visible = right_portrait != null and right_portrait.visible
+		portrait_bottom_fade.visible = left_portrait != null and left_portrait.visible
 
 func _panel_style(bg_color: Color, border_color: Color, border_width: int) -> StyleBoxFlat:
 	var style := StyleBoxFlat.new()

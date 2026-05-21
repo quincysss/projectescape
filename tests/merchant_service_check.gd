@@ -90,6 +90,12 @@ func _verify_base_uses_new_shop_entry(game_state: Node, registry) -> bool:
 		game_state.mark_world_intro_dialogue_seen()
 	if game_state.has_method("mark_first_departure_outpost_dialogue_seen"):
 		game_state.mark_first_departure_outpost_dialogue_seen()
+	if game_state.has_method("mark_first_return_dialogue_seen_and_activate_chapter"):
+		game_state.pending_first_return_dialogue = true
+		var return_result: Dictionary = game_state.mark_first_return_dialogue_seen_and_activate_chapter()
+		if not bool(return_result.get("ok", false)):
+			printerr("Expected first return setup to unlock shop entry: %s" % return_result)
+			return false
 	game_state.add_to_warehouse([registry.make_item_stack("sale_good_repaired_filter")])
 
 	var base_scene := load("res://scenes/base/BaseScene.tscn")

@@ -17,6 +17,9 @@ func _verify() -> bool:
 	var overlay := base.get_node_or_null("StoryPopupOverlay") as Control
 	var panel := base.get_node_or_null("StoryPopupOverlay/PopupPanel") as Panel
 	var ok_button := _first_button(panel)
+	var order_button := _button_with_text(panel, "查看今日订单")
+	var old_demand_button := _button_with_text(panel, "查看需求榜")
+	var body_label := _label_containing(panel, "查看今日订单")
 	var ok := true
 	if overlay == null or panel == null:
 		printerr("Expected chapter goal popup to be created.")
@@ -31,6 +34,15 @@ func _verify() -> bool:
 		if ok_button == null or ok_button.size != Vector2(132, 40):
 			printerr("Expected popup buttons to use the enlarged button size.")
 			ok = false
+		if order_button == null or old_demand_button != null:
+			printerr("Expected chapter goal popup to use 今日订单 wording.")
+			ok = false
+		if body_label == null or body_label.autowrap_mode != TextServer.AUTOWRAP_ARBITRARY:
+			printerr("Expected chapter goal popup body to wrap safely inside the panel.")
+			ok = false
+		elif body_label.position.x < 0.0 or body_label.position.x + body_label.size.x > panel.size.x:
+			printerr("Expected chapter goal popup body text box to stay inside the panel.")
+			ok = false
 
 	base.queue_free()
 	await process_frame
@@ -41,5 +53,21 @@ func _first_button(node: Node) -> Button:
 		return null
 	for child in node.get_children():
 		if child is Button:
+			return child
+	return null
+
+func _button_with_text(node: Node, text: String) -> Button:
+	if node == null:
+		return null
+	for child in node.get_children():
+		if child is Button and String(child.text) == text:
+			return child
+	return null
+
+func _label_containing(node: Node, text: String) -> Label:
+	if node == null:
+		return null
+	for child in node.get_children():
+		if child is Label and String(child.text).contains(text):
 			return child
 	return null

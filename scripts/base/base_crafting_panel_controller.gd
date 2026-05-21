@@ -38,6 +38,8 @@ func set_game_state(p_game_state: Node) -> void:
 func is_tab_available() -> bool:
 	if game_state == null:
 		return false
+	if game_state.has_method("is_shop_loop_unlocked"):
+		return bool(game_state.is_shop_loop_unlocked())
 	return (
 		bool(game_state.get("chapter_1_goal_active"))
 		or bool(game_state.get("manufacturing_station_unlocked"))
@@ -54,55 +56,29 @@ func update_view() -> void:
 		_clear_recipe_root()
 		return
 
-	var current_coin := _current_coin()
-	var unlocked := bool(game_state.get("manufacturing_station_unlocked"))
-	var goal_active := bool(game_state.get("chapter_1_goal_active"))
-	if unlocked:
-		status_label.text = "制作所已解锁。\n\n选择配方，把仓库材料加工成白天店铺可上架的商品。"
+	var available := is_tab_available()
+	var unlocked := bool(game_state.get("manufacturing_station_unlocked")) or available
+	if available and unlocked:
+		status_label.text = "制造所已预热。\n\n选择配方，把仓库材料加工成白天店铺可上架的商品。"
 		unlock_button.visible = false
 		_set_result("")
 		_set_recipe_cards()
 		return
 
-	unlock_button.visible = true
+	unlock_button.visible = false
 	_clear_recipe_root()
-	if not goal_active:
-		status_label.text = "制作所尚未开放。\n\n先完成首次地面探索并返回基地。首次返回剧情结束后，第一章目标会正式开启。"
-	else:
-		status_label.text = "当前目标：购买旧时代制造机，解锁制作所。\n\n出售可售物资，积攒 %d 矿币。制作所解锁后，可以把材料加工成白天店铺商品。\n\n矿币：%d / %d" % [
-			unlock_cost,
-			current_coin,
-			unlock_cost,
-		]
-
-	unlock_button.disabled = not _can_unlock()
-	if not goal_active:
-		_set_result("完成首次地面返回剧情后开放。")
-	elif current_coin < unlock_cost:
-		_set_result("还差 %d 矿币。先完成白天营业结算。" % (unlock_cost - current_coin))
-	else:
-		_set_result("矿币已足够。确认购买旧时代制造机，解锁制作所。")
+	status_label.text = "制造所设施已存在。\n\n完成序章返回剧情后，404 哨所会送来第一天开店周转材料，再开放正式白天经营。"
+	_set_result("等待序章返回剧情。")
 
 
 func request_unlock() -> bool:
-	if game_state == null:
-		return false
-	if not _can_unlock():
-		_set_result("矿币或章节目标条件不足。")
-		update_view()
-		return false
-	if confirm_dialog != null:
-		confirm_dialog.dialog_text = "确认解锁制作所？\n将消耗 %d 矿币。" % unlock_cost
-		confirm_dialog.popup_centered()
-	return true
+	_set_result("制造所默认开放，不再需要矿币解锁。")
+	update_view()
+	return false
 
 
 func confirm_unlock() -> Dictionary:
-	if game_state == null:
-		return {"ok": false, "message": "制作所状态不可用。"}
-	var result: Dictionary = game_state.unlock_manufacturing_station()
-	_set_result(String(result.get("message", "制作所解锁失败。")))
-	return result
+	return {"ok": false, "deprecated": true, "message": "制造所默认开放，不再需要矿币解锁。"}
 
 
 func craft_selected(recipe_id: String = "") -> Dictionary:

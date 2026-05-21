@@ -21,6 +21,7 @@ const INVENTORY_GRID_SLOT_SIZE := 62.0
 const INVENTORY_GRID_SLOT_GAP := 10.0
 const INVENTORY_BACKPACK_DISPLAY_SLOTS := 30
 const MATERIAL_BACKPACK_DISPLAY_SLOTS := 5
+const ITEM_GRID_SIGNATURE_META := "item_grid_signature"
 const INVENTORY_PANEL_TOP := 128.0
 const INVENTORY_PANEL_RIGHT_MARGIN := 20.0
 const INVENTORY_PANEL_SIZE := Vector2(460.0, 760.0)
@@ -30,7 +31,7 @@ const INVENTORY_LOOT_PANEL_SIZE := Vector2(430.0, 336.0)
 const INVENTORY_LOOT_PANEL_TOP := 252.0
 const PORTRAIT_SIZE := Vector2(168.0, 184.0)
 const OBJECTIVE_HUD_POSITION := Vector2(2.0, 242.0)
-const OBJECTIVE_HUD_SIZE := Vector2(356.0, 136.0)
+const OBJECTIVE_HUD_SIZE := Vector2(430.0, 170.0)
 const OBJECTIVE_HUD_HOME_ALPHA := 1.0
 const OBJECTIVE_HUD_FIELD_ALPHA := 0.58
 const INVENTORY_PANEL_OPEN_SECONDS := 0.18
@@ -79,10 +80,13 @@ func refresh(scene) -> void:
 	_refresh_extraction_status(scene)
 	_layout_inventory_surfaces(scene, is_storage_zone, scene.loot_panel.visible)
 	_refresh_inventory_actions(scene)
-	_set_items_grid(scene, scene.inventory_label, scene.run_director.inventory_component.get_items_snapshot(), "inventory", scene.run_director.inventory_component.max_slots)
-	_set_items_grid(scene, scene.material_inventory_label, _material_items_snapshot(scene), "inventory_material", _material_capacity(scene))
-	_set_items_grid(scene, scene.home_storage_label, scene.get_active_storage_items_snapshot(), scene.get_active_storage_source_id(), _active_storage_capacity(scene))
-	_set_items_grid(scene, scene.loot_label, scene.opened_loot, "loot", maxi(scene.opened_loot.size(), 8))
+	if scene.inventory_panel.visible:
+		_set_items_grid(scene, scene.inventory_label, scene.run_director.inventory_component.get_items_snapshot(), "inventory", scene.run_director.inventory_component.max_slots)
+		_set_items_grid(scene, scene.material_inventory_label, _material_items_snapshot(scene), "inventory_material", _material_capacity(scene))
+	if scene.home_storage_panel.visible:
+		_set_items_grid(scene, scene.home_storage_label, scene.get_active_storage_items_snapshot(), scene.get_active_storage_source_id(), _active_storage_capacity(scene))
+	if scene.loot_panel.visible:
+		_set_items_grid(scene, scene.loot_label, scene.opened_loot, "loot", maxi(scene.opened_loot.size(), 8))
 
 func outpost_material_pickup_prompt(scene, outpost_id: String = "") -> String:
 	var target_id := outpost_id if not outpost_id.is_empty() else _objective_target_outpost_id(scene)
@@ -330,13 +334,16 @@ func _build_outpost_status_hud(scene) -> void:
 	scene.outpost_hud_root.add_theme_stylebox_override("panel", _panel_style(Color(0.055, 0.052, 0.046, 0.88), Color(0.92, 0.74, 0.18, 0.96), 2))
 	scene.ui_root.add_child(scene.outpost_hud_root)
 
-	scene.objective_title_label = _make_objective_label("ObjectiveTitle", Vector2(18, 16), Vector2(320, 30), 16, Color(0.96, 0.86, 0.48))
+	scene.objective_task_title_label = _make_objective_label("ObjectiveTaskTitle", Vector2(18, 14), Vector2(394, 32), 18, Color(0.98, 0.82, 0.30))
+	scene.outpost_hud_root.add_child(scene.objective_task_title_label)
+
+	scene.objective_title_label = _make_objective_label("ObjectiveTitle", Vector2(18, 56), Vector2(394, 30), 16, Color(0.96, 0.86, 0.48))
 	scene.outpost_hud_root.add_child(scene.objective_title_label)
 
-	scene.objective_next_step_label = _make_objective_label("ObjectiveNextStep", Vector2(18, 62), Vector2(320, 28), 15, Color(0.84, 0.80, 0.70))
+	scene.objective_next_step_label = _make_objective_label("ObjectiveNextStep", Vector2(18, 96), Vector2(394, 28), 15, Color(0.84, 0.80, 0.70))
 	scene.outpost_hud_root.add_child(scene.objective_next_step_label)
 
-	scene.objective_extraction_label = _make_objective_label("ObjectiveExtraction", Vector2(18, 100), Vector2(320, 24), 15, Color(0.64, 0.62, 0.56))
+	scene.objective_extraction_label = _make_objective_label("ObjectiveExtraction", Vector2(18, 132), Vector2(394, 24), 15, Color(0.64, 0.62, 0.56))
 	scene.outpost_hud_root.add_child(scene.objective_extraction_label)
 
 	scene.outpost_count_label = scene.objective_title_label
@@ -674,6 +681,7 @@ func _refresh_outpost_status_hud(scene) -> void:
 	if scene.outpost_hud_root == null:
 		return
 	var view := _objective_chain_view(scene)
+	scene.objective_task_title_label.text = String(view.get("task_title", ""))
 	scene.objective_title_label.text = String(view.get("title", ""))
 	scene.objective_next_step_label.text = String(view.get("next_step", ""))
 	scene.objective_extraction_label.text = String(view.get("extraction", ""))
@@ -685,15 +693,19 @@ func _refresh_outpost_status_hud(scene) -> void:
 	)
 	match String(view.get("stage", "")):
 		"repairable":
+			scene.objective_task_title_label.add_theme_color_override("font_color", Color(1.0, 0.82, 0.30))
 			scene.objective_title_label.add_theme_color_override("font_color", Color(1.0, 0.86, 0.42))
 			scene.objective_next_step_label.add_theme_color_override("font_color", Color(1.0, 0.86, 0.42))
 		"repairing":
+			scene.objective_task_title_label.add_theme_color_override("font_color", Color(1.0, 0.70, 0.30))
 			scene.objective_title_label.add_theme_color_override("font_color", Color(0.95, 0.58, 0.34))
 			scene.objective_next_step_label.add_theme_color_override("font_color", Color(0.95, 0.74, 0.46))
 		"extract_ready":
+			scene.objective_task_title_label.add_theme_color_override("font_color", Color(0.70, 1.0, 0.58))
 			scene.objective_title_label.add_theme_color_override("font_color", Color(0.56, 0.94, 0.58))
 			scene.objective_next_step_label.add_theme_color_override("font_color", Color(0.82, 0.90, 0.76))
 		_:
+			scene.objective_task_title_label.add_theme_color_override("font_color", Color(0.98, 0.82, 0.30))
 			scene.objective_title_label.add_theme_color_override("font_color", Color(0.96, 0.86, 0.48))
 			scene.objective_next_step_label.add_theme_color_override("font_color", Color(0.84, 0.80, 0.70))
 	scene.objective_extraction_label.add_theme_color_override(
@@ -708,8 +720,10 @@ func _refresh_minimap(scene) -> void:
 func _objective_chain_view(scene) -> Dictionary:
 	var context = scene.run_director.context
 	var extraction_text := _objective_extraction_text(scene)
+	var task_title := _objective_task_title_text(scene)
 	if bool(context.is_extraction_unlocked):
 		return {
+			"task_title": task_title,
 			"title": "当前目标：撤离已解锁",
 			"next_step": "下一步：长按 E 撤离" if String(context.active_safe_zone_id) == "home" else "下一步：返回家中撤离",
 			"extraction": extraction_text,
@@ -718,6 +732,7 @@ func _objective_chain_view(scene) -> Dictionary:
 	var repair_progress := _active_outpost_repair_progress(scene)
 	if bool(repair_progress.get("active", false)):
 		return {
+			"task_title": task_title,
 			"title": "当前目标：修复前哨站 %d%%" % int(round(float(repair_progress.get("progress", 0.0)) * 100.0)),
 			"next_step": "下一步：保持按住直到完成",
 			"extraction": extraction_text,
@@ -726,6 +741,7 @@ func _objective_chain_view(scene) -> Dictionary:
 	var target_id := _objective_target_outpost_id(scene)
 	if target_id.is_empty():
 		return {
+			"task_title": task_title,
 			"title": "当前目标：寻找前哨站",
 			"next_step": "下一步：确认前哨位置",
 			"extraction": extraction_text,
@@ -736,12 +752,14 @@ func _objective_chain_view(scene) -> Dictionary:
 	var required := int(counts.get("required", 0))
 	if required > 0 and covered >= required:
 		return {
+			"task_title": task_title,
 			"title": "当前目标：前往前哨站",
 			"next_step": "下一步：长按修复前哨站",
 			"extraction": extraction_text,
 			"stage": "repairable",
 		}
 	return {
+		"task_title": task_title,
 		"title": "当前目标：收集前哨站材料（菱形） %d/%d" % [covered, required],
 		"next_step": "下一步：前哨站修复",
 		"extraction": extraction_text,
@@ -755,6 +773,13 @@ func _objective_extraction_text(scene) -> String:
 	if String(context.active_safe_zone_id) == "home":
 		return "解锁撤离：可撤离"
 	return "解锁撤离：已解锁"
+
+func _objective_task_title_text(scene) -> String:
+	var context = scene.run_director.context
+	var repaired_count := _objective_repaired_outpost_count(scene)
+	if bool(context.is_extraction_unlocked) or repaired_count >= 2:
+		return "任务标题：携带物资返回家中撤离"
+	return "任务标题：修复两座前哨站（%d/2）" % repaired_count
 
 func _objective_target_outpost_id(scene) -> String:
 	var context = scene.run_director.context
@@ -773,6 +798,18 @@ func _objective_outpost_repaired(scene, outpost_id: String) -> bool:
 	if station != null:
 		return bool(station.get("payload").get("repaired", false))
 	return String(scene.run_director.context.outpost_states.get(outpost_id, "")) == "repaired"
+
+func _objective_repaired_outpost_count(scene) -> int:
+	var context = scene.run_director.context
+	var repaired_count := 0
+	var outpost_ids := [
+		String(context.selected_first_outpost_id),
+		String(context.selected_second_outpost_id),
+	]
+	for outpost_id in outpost_ids:
+		if not outpost_id.is_empty() and _objective_outpost_repaired(scene, outpost_id):
+			repaired_count += 1
+	return mini(repaired_count, 2)
 
 func _objective_material_counts(scene, outpost_id: String) -> Dictionary:
 	var station = _find_outpost_station(scene, outpost_id)
@@ -1084,10 +1121,14 @@ func _set_panel_title(panel: Panel, title: String) -> void:
 		label.text = title
 
 func _set_items_grid(scene, grid_root: Control, items: Array, source_id: String, capacity: int) -> void:
+	capacity = maxi(capacity, items.size())
+	var signature := _items_grid_signature(scene, grid_root, items, source_id, capacity)
+	if grid_root.has_meta(ITEM_GRID_SIGNATURE_META) and String(grid_root.get_meta(ITEM_GRID_SIGNATURE_META)) == signature:
+		return
+	grid_root.set_meta(ITEM_GRID_SIGNATURE_META, signature)
 	for child in grid_root.get_children():
 		grid_root.remove_child(child)
 		child.queue_free()
-	capacity = maxi(capacity, items.size())
 	var columns := INVENTORY_GRID_COLUMNS
 	var gap := INVENTORY_GRID_SLOT_GAP
 	var display_slots := _display_slot_count(source_id, capacity)
@@ -1110,6 +1151,30 @@ func _set_items_grid(scene, grid_root: Control, items: Array, source_id: String,
 		else:
 			grid_root.add_child(_make_empty_slot(scene, slot_pos, Vector2(slot_size, slot_size), index >= capacity, source_id, index))
 	_add_grid_footer(scene, grid_root, items, capacity, source_id)
+
+func _items_grid_signature(scene, grid_root: Control, items: Array, source_id: String, capacity: int) -> String:
+	var parts := PackedStringArray()
+	parts.append(source_id)
+	parts.append(str(capacity))
+	parts.append("%d:%d" % [roundi(grid_root.size.x), roundi(grid_root.size.y)])
+	parts.append(str(_display_slot_count(source_id, capacity)))
+	if source_id == "inventory":
+		parts.append(str(int(scene.selected_inventory_index)))
+		parts.append("%.1f:%.1f" % [float(scene.run_director.context.current_weight), float(scene.run_director.context.weight_limit)])
+	for item in items:
+		if item is Dictionary:
+			parts.append(_item_signature(item))
+		else:
+			parts.append("_")
+	return "|".join(parts)
+
+func _item_signature(item: Dictionary) -> String:
+	var keys := item.keys()
+	keys.sort()
+	var parts := PackedStringArray()
+	for key in keys:
+		parts.append("%s=%s" % [str(key), var_to_str(item[key])])
+	return ",".join(parts)
 
 func _display_slot_count(source_id: String, capacity: int) -> int:
 	if source_id == "inventory":

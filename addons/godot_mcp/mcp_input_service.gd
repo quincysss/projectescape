@@ -10,6 +10,10 @@ var _sequence_frames_waited: int = 0
 
 
 func _ready() -> void:
+	if OS.has_feature("web"):
+		set_process(false)
+		queue_free()
+		return
 	process_mode = Node.PROCESS_MODE_ALWAYS
 
 

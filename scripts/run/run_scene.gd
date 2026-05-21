@@ -113,6 +113,7 @@ var outpost_first_progress_bar: ProgressBar
 var outpost_second_icon: Panel
 var outpost_second_status_label: Label
 var outpost_second_progress_bar: ProgressBar
+var objective_task_title_label: Label
 var objective_title_label: Label
 var objective_next_step_label: Label
 var objective_extraction_label: Label

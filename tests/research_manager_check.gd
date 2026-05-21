@@ -130,7 +130,20 @@ func _verify_base_research_tab(registry, game_state: Node) -> bool:
 		printerr("Expected research panel to list move speed research.")
 		base_root.queue_free()
 		return false
-	base_root._on_research_meta_clicked("research:move_speed")
+	var research_tree_root := base_root.get_node_or_null("BaseUIRoot/ResearchPanel/ResearchTreeScroll/ResearchTreeRoot") as Control
+	var move_speed_node: Button = null
+	if research_tree_root != null:
+		move_speed_node = research_tree_root.get_node_or_null("ResearchNode_move_speed_3") as Button
+	if move_speed_node == null:
+		printerr("Expected move speed level 3 research tree node.")
+		base_root.queue_free()
+		return false
+	move_speed_node.emit_signal("button_up")
+	await process_frame
+	if String(base_root._selected_research_id) != "move_speed":
+		printerr("Expected research tree node click to sync selected research id.")
+		base_root.queue_free()
+		return false
 	if research_button.disabled:
 		printerr("Expected research button to enable for affordable level 3.")
 		base_root.queue_free()

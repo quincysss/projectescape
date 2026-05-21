@@ -33,7 +33,7 @@ func hide_all() -> void:
 		right_portrait.modulate = Color(1.0, 1.0, 1.0, 0.0)
 
 func _apply_active_portrait(speaker_id: String, speaker: Dictionary) -> void:
-	var view := right_portrait
+	var view := left_portrait
 	if view == null:
 		return
 	var portrait_path := String(speaker.get("portrait_path", PLACEHOLDER_PORTRAIT_PATH))

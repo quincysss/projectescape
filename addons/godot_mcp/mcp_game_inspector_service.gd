@@ -53,6 +53,10 @@ var _moveto_keys_held: Array = []  # Track injected keys for guaranteed release
 
 
 func _ready() -> void:
+	if OS.has_feature("web"):
+		set_process(false)
+		queue_free()
+		return
 	process_mode = Node.PROCESS_MODE_ALWAYS
 
 

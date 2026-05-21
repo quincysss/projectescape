@@ -69,6 +69,11 @@ func _verify_item_catalog_collection() -> bool:
 	return true
 
 func _verify_base_catalog_ui(registry, game_state: Node) -> bool:
+	if game_state.has_method("mark_first_return_dialogue_seen_and_activate_chapter"):
+		var unlock_result: Dictionary = game_state.mark_first_return_dialogue_seen_and_activate_chapter()
+		if not bool(unlock_result.get("ok", false)):
+			printerr("Expected first return chapter activation to unlock catalog UI: %s" % unlock_result)
+			return false
 	var base_scene := load("res://scenes/base/BaseScene.tscn")
 	if base_scene == null:
 		printerr("Expected BaseScene to load.")

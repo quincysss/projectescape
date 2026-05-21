@@ -83,12 +83,13 @@ func advance_surface_day(game_state: Node) -> Dictionary:
 func force_chapter_complete(game_state: Node, manufacturing_unlock_cost: int) -> Dictionary:
 	if game_state == null:
 		return _failure("GameState 不可用。")
-	if game_state.has_method("activate_chapter_1_goal_debug"):
-		game_state.activate_chapter_1_goal_debug()
-	var missing := maxi(0, manufacturing_unlock_cost - game_state.get_currency_amount("mine_coin"))
-	if missing > 0:
-		game_state.add_currency("mine_coin", missing, "debug_force_chapter")
-	var result: Dictionary = game_state.unlock_manufacturing_station()
+	var result: Dictionary = {}
+	if game_state.has_method("force_complete_first_shop_tutorial_debug"):
+		result = game_state.force_complete_first_shop_tutorial_debug()
+	else:
+		if game_state.has_method("activate_chapter_1_goal_debug"):
+			game_state.activate_chapter_1_goal_debug()
+		result = game_state.unlock_manufacturing_station()
 	return _message(String(result.get("message", "强制完成第一章成功。")), String(result.get("message", "强制完成第一章失败。")), result)
 
 func force_monster_next_run(game_state: Node) -> Dictionary:

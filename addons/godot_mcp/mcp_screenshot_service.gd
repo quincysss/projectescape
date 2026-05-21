@@ -7,6 +7,10 @@ const SCREENSHOT_PATH := "user://mcp_screenshot.png"
 
 
 func _ready() -> void:
+	if OS.has_feature("web"):
+		set_process(false)
+		queue_free()
+		return
 	process_mode = Node.PROCESS_MODE_ALWAYS
 
 

@@ -17,10 +17,11 @@ func _verify_objective_chain_hud() -> bool:
 	await process_frame
 
 	var panel := root.get_node_or_null("RunUIRoot/ObjectiveChainHUD") as Panel
+	var task_title := panel.get_node_or_null("ObjectiveTaskTitle") as Label if panel != null else null
 	var title := panel.get_node_or_null("ObjectiveTitle") as Label if panel != null else null
 	var next_step := panel.get_node_or_null("ObjectiveNextStep") as Label if panel != null else null
 	var extraction := panel.get_node_or_null("ObjectiveExtraction") as Label if panel != null else null
-	if panel == null or title == null or next_step == null or extraction == null:
+	if panel == null or task_title == null or title == null or next_step == null or extraction == null:
 		printerr("Expected objective chain HUD labels.")
 		return false
 	if panel.get_node_or_null("OutpostOneStatus") != null or panel.get_node_or_null("OutpostTwoStatus") != null:
@@ -29,11 +30,17 @@ func _verify_objective_chain_hud() -> bool:
 	if not title.text.contains("当前目标") or not title.text.contains("前哨站材料") or not title.text.contains("菱形") or title.text.contains("◇"):
 		printerr("Expected objective title to guide material collection, got: %s" % title.text)
 		return false
-	if title.autowrap_mode != TextServer.AUTOWRAP_OFF or next_step.autowrap_mode != TextServer.AUTOWRAP_OFF or extraction.autowrap_mode != TextServer.AUTOWRAP_OFF:
+	if not task_title.text.contains("任务标题") or not task_title.text.contains("修复两座前哨站（0/2）"):
+		printerr("Expected task title to show two-outpost repair progress, got: %s" % task_title.text)
+		return false
+	if task_title.autowrap_mode != TextServer.AUTOWRAP_OFF or title.autowrap_mode != TextServer.AUTOWRAP_OFF or next_step.autowrap_mode != TextServer.AUTOWRAP_OFF or extraction.autowrap_mode != TextServer.AUTOWRAP_OFF:
 		printerr("Expected objective chain HUD labels to stay on one line.")
 		return false
-	if panel.size.x < 340.0 or panel.size.y > 150.0:
-		printerr("Expected objective chain HUD box to be wide and compact, got: %s" % panel.size)
+	if panel.size.x < 420.0 or panel.size.y > 190.0:
+		printerr("Expected objective chain HUD box to fit the task title and remain compact, got: %s" % panel.size)
+		return false
+	if task_title.get_minimum_size().x > task_title.size.x:
+		printerr("Expected objective task title to fit on one line, min=%s size=%s text=%s" % [task_title.get_minimum_size(), task_title.size, task_title.text])
 		return false
 	if title.get_minimum_size().x > title.size.x:
 		printerr("Expected objective title to fit on one line, min=%s size=%s text=%s" % [title.get_minimum_size(), title.size, title.text])
@@ -90,12 +97,34 @@ func _verify_objective_chain_hud() -> bool:
 		printerr("Expected objective chain to switch to outpost repair when materials are ready. title=%s next=%s" % [title.text, next_step.text])
 		return false
 
+	first_outpost.payload.repaired = true
+	root.run_director.context.outpost_states[first_outpost.interact_id] = "repaired"
+	root.run_director.context.repaired_outpost_count = 1
+	root._refresh_ui()
+	await process_frame
+	if not task_title.text.contains("修复两座前哨站（1/2）"):
+		printerr("Expected task title to count one repaired outpost, got: %s" % task_title.text)
+		return false
+
+	var second_outpost = _find_interactable(root, "outpost", String(root.run_director.context.selected_second_outpost_id))
+	if second_outpost == null:
+		printerr("Expected selected second outpost.")
+		return false
+	second_outpost.payload.repaired = true
+	root.run_director.context.outpost_states[second_outpost.interact_id] = "repaired"
+	root.run_director.context.repaired_outpost_count = 2
+	root._refresh_ui()
+	await process_frame
+	if not task_title.text.contains("携带物资返回家中撤离"):
+		printerr("Expected task title to switch after two repaired outposts, got: %s" % task_title.text)
+		return false
+
 	root.run_director.context.is_extraction_unlocked = true
 	root.run_director.context.active_safe_zone_id = "home"
 	root._refresh_ui()
 	await process_frame
-	if not title.text.contains("撤离已解锁") or not next_step.text.contains("长按 E") or not extraction.text.contains("可撤离"):
-		printerr("Expected objective chain to switch to extraction when unlocked. title=%s next=%s extraction=%s" % [title.text, next_step.text, extraction.text])
+	if not task_title.text.contains("携带物资返回家中撤离") or not title.text.contains("撤离已解锁") or not next_step.text.contains("长按 E") or not extraction.text.contains("可撤离"):
+		printerr("Expected objective chain to switch to extraction when unlocked. task=%s title=%s next=%s extraction=%s" % [task_title.text, title.text, next_step.text, extraction.text])
 		return false
 
 	root.queue_free()

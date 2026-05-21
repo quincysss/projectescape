@@ -3,14 +3,37 @@ extends SceneTree
 const BASE_SCENE := preload("res://scenes/base/BaseScene.tscn")
 
 func _initialize() -> void:
-	var ok := await _verify_early_finish_direct_departure()
-	ok = await _verify_settlement_direct_departure() and ok
+	var ok := await _verify_prologue_departure_dialogue_then_loading()
+	ok = await _verify_early_finish_settlement_then_departure_loading() and ok
+	ok = await _verify_timer_finish_settlement_then_departure_loading() and ok
+	ok = await _verify_reopen_from_departure_middle_state_restores_ui() and ok
 	await _shutdown_audio()
-	print("Base direct shop departure verified." if ok else "Base direct shop departure failed.")
+	print("Base first departure and shop settlement departure flow verified." if ok else "Base first departure flow failed.")
 	quit(0 if ok else 1)
 
-func _verify_early_finish_direct_departure() -> bool:
-	var setup := await _prepare_base("FlowFast")
+func _verify_prologue_departure_dialogue_then_loading() -> bool:
+	var setup := await _prepare_base("FlowPrologue", false)
+	if not bool(setup.get("ok", false)):
+		return false
+	var game_state: Node = setup.get("game_state")
+	var original_profile: Dictionary = setup.get("original_profile", {})
+	var base: Node = setup.get("base")
+
+	base._request_start_run()
+	await process_frame
+	var dialogue := _first_dialogue_panel(base)
+	if dialogue == null:
+		return await _fail_with_restore("Expected first prologue departure click to open mission dialogue.", game_state, original_profile)
+	if bool(game_state.first_departure_outpost_dialogue_seen):
+		return await _fail_with_restore("Expected first departure flag to wait for dialogue completion.", game_state, original_profile)
+	dialogue.emit_signal("dialogue_finished", "first_departure_outpost_dialogue", false)
+	await process_frame
+	if not bool(game_state.first_departure_outpost_dialogue_seen):
+		return await _fail_with_restore("Expected dialogue completion to mark first departure as seen.", game_state, original_profile)
+	return await _verify_loading_started_and_enter_run(base, game_state, original_profile)
+
+func _verify_early_finish_settlement_then_departure_loading() -> bool:
+	var setup := await _prepare_base("FlowEarly", true)
 	if not bool(setup.get("ok", false)):
 		return false
 	var game_state: Node = setup.get("game_state")
@@ -21,15 +44,28 @@ func _verify_early_finish_direct_departure() -> bool:
 	await process_frame
 	if game_state.get_outgame_phase() != "SHOP_OPEN":
 		return await _fail_with_restore("Expected day-prep start button to open shop.", game_state, original_profile)
-	var finish_button := _find_button_by_text(base, "提前结束并出击")
+	var finish_button := _find_button_by_text(base, "提前结束营业")
 	if finish_button == null:
-		return await _fail_with_restore("Expected early-finish direct departure button.", game_state, original_profile)
+		return await _fail_with_restore("Expected early-finish shop button.", game_state, original_profile)
 	finish_button.emit_signal("pressed")
 	await process_frame
+	if _first_loading_screen(base) != null:
+		return await _fail_with_restore("Expected early-finish shop button to wait on settlement before loading.", game_state, original_profile)
+	if game_state.get_outgame_phase() != "SHOP_SETTLEMENT":
+		return await _fail_with_restore("Expected early-finish shop button to show settlement.", game_state, original_profile)
+	if _find_label_containing(base, "总收入") == null:
+		return await _fail_with_restore("Expected early-finish settlement to show total income summary.", game_state, original_profile)
+	var depart_button := _find_button_by_text(base, "出发")
+	if depart_button == null:
+		return await _fail_with_restore("Expected settlement panel to provide departure button.", game_state, original_profile)
+	depart_button.emit_signal("pressed")
+	await process_frame
+	if _first_loading_screen(base) == null:
+		return await _fail_with_restore("Expected settlement departure button to load the next run.", game_state, original_profile)
 	return await _verify_loading_started_and_enter_run(base, game_state, original_profile)
 
-func _verify_settlement_direct_departure() -> bool:
-	var setup := await _prepare_base("FlowSettle")
+func _verify_timer_finish_settlement_then_departure_loading() -> bool:
+	var setup := await _prepare_base("FlowTimer", true)
 	if not bool(setup.get("ok", false)):
 		return false
 	var game_state: Node = setup.get("game_state")
@@ -39,20 +75,59 @@ func _verify_settlement_direct_departure() -> bool:
 	base._request_start_run()
 	await process_frame
 	if game_state.get_outgame_phase() != "SHOP_OPEN":
-		return await _fail_with_restore("Expected shop to open before settlement setup.", game_state, original_profile)
-	game_state.finish_shop_open("manual")
+		return await _fail_with_restore("Expected day-prep start button to open shop.", game_state, original_profile)
+	game_state.advance_shop_open(999.0)
 	base._refresh()
 	await process_frame
 	if game_state.get_outgame_phase() != "SHOP_SETTLEMENT":
-		return await _fail_with_restore("Expected manual finish to show settlement panel.", game_state, original_profile)
-	var settle_button := _find_button_by_text(base, "收款并出击")
+		return await _fail_with_restore("Expected timer finish to show settlement panel.", game_state, original_profile)
+	if _first_loading_screen(base) != null:
+		return await _fail_with_restore("Expected timer finish to wait on settlement before loading.", game_state, original_profile)
+	if _find_label_containing(base, "总收入") == null:
+		return await _fail_with_restore("Expected timer-finish settlement to show total income summary.", game_state, original_profile)
+	var settle_button := _find_button_by_text(base, "出发")
 	if settle_button == null:
-		return await _fail_with_restore("Expected settlement direct departure button.", game_state, original_profile)
+		return await _fail_with_restore("Expected timer-finish settlement departure button.", game_state, original_profile)
 	settle_button.emit_signal("pressed")
 	await process_frame
+	if _first_loading_screen(base) == null:
+		return await _fail_with_restore("Expected timer-finish settlement departure button to load the next run.", game_state, original_profile)
 	return await _verify_loading_started_and_enter_run(base, game_state, original_profile)
 
-func _prepare_base(profile_name: String) -> Dictionary:
+func _verify_reopen_from_departure_middle_state_restores_ui() -> bool:
+	var setup := await _prepare_base("FlowResume", true)
+	if not bool(setup.get("ok", false)):
+		return false
+	var game_state: Node = setup.get("game_state")
+	var original_profile: Dictionary = setup.get("original_profile", {})
+	var base: Node = setup.get("base")
+	base.queue_free()
+	current_scene = null
+	await process_frame
+
+	game_state.set_outgame_phase("LOADOUT")
+	game_state.load_profile()
+	if game_state.get_outgame_phase() != "NIGHT":
+		return await _fail_with_restore("Expected reopened loadout saves to return to the night departure gate.", game_state, original_profile)
+
+	var commit_result: Dictionary = game_state.commit_run_start(false)
+	if not bool(commit_result.get("ok", false)) or game_state.get_outgame_phase() != "LOADING_TO_RUN":
+		return await _fail_with_restore("Expected run start to save the loading phase before simulating reopen.", game_state, original_profile)
+	game_state.load_profile()
+	if game_state.get_outgame_phase() != "NIGHT":
+		return await _fail_with_restore("Expected reopened loading saves to return to the night departure gate.", game_state, original_profile)
+
+	var reopened_base = BASE_SCENE.instantiate()
+	root.add_child(reopened_base)
+	current_scene = reopened_base
+	await process_frame
+	var start_button := reopened_base.get_node_or_null("BaseUIRoot/StartRunButton") as Button
+	if start_button == null or not start_button.visible or start_button.disabled or start_button.text != "出击":
+		return await _fail_with_restore("Expected reopened base to show the departure button after recovering loading state.", game_state, original_profile)
+	_restore_profile(game_state, original_profile)
+	return true
+
+func _prepare_base(profile_name: String, unlock_shop_loop: bool) -> Dictionary:
 	var game_state = root.get_node_or_null("GameState")
 	if game_state == null:
 		printerr("Expected GameState autoload.")
@@ -66,6 +141,14 @@ func _prepare_base(profile_name: String) -> Dictionary:
 		return {"ok": false}
 	game_state.mark_intro_cinematic_seen()
 	game_state.mark_world_intro_dialogue_seen()
+	if unlock_shop_loop:
+		game_state.mark_first_departure_outpost_dialogue_seen()
+		game_state.pending_first_return_dialogue = true
+		var return_result: Dictionary = game_state.mark_first_return_dialogue_seen_and_activate_chapter()
+		if not bool(return_result.get("ok", false)):
+			printerr("Expected first return setup to unlock shop loop: %s" % return_result)
+			_restore_profile(game_state, original_profile)
+			return {"ok": false}
 
 	var base = BASE_SCENE.instantiate()
 	root.add_child(base)
@@ -79,15 +162,9 @@ func _prepare_base(profile_name: String) -> Dictionary:
 	}
 
 func _verify_loading_started_and_enter_run(base: Node, game_state: Node, original_profile: Dictionary) -> bool:
-	if game_state.get_outgame_phase() != "NIGHT":
-		return await _fail_with_restore("Expected direct departure to settle shop and leave phase at NIGHT until loading commits.", game_state, original_profile)
-	if not bool(game_state.first_departure_outpost_dialogue_seen):
-		return await _fail_with_restore("Expected direct departure to skip and mark first departure story as seen.", game_state, original_profile)
-	if _first_dialogue_panel(base) != null:
-		return await _fail_with_restore("Expected direct departure to skip first departure dialogue.", game_state, original_profile)
 	var loading := _first_loading_screen(base)
 	if loading == null:
-		return await _fail_with_restore("Expected loading screen after direct shop departure.", game_state, original_profile)
+		return await _fail_with_restore("Expected loading screen after first departure dialogue.", game_state, original_profile)
 	for _index in range(220):
 		if loading.is_ready_to_continue():
 			break
@@ -110,6 +187,13 @@ func _find_button_by_text(node: Node, text: String) -> Button:
 		var button := child as Button
 		if button != null and button.text == text:
 			return button
+	return null
+
+func _find_label_containing(node: Node, text: String) -> Label:
+	for child in node.find_children("*", "Label", true, false):
+		var label := child as Label
+		if label != null and label.text.contains(text):
+			return label
 	return null
 
 func _first_dialogue_panel(node: Node) -> DialoguePanel:

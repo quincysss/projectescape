@@ -72,8 +72,14 @@ func default_profile(username: String) -> Dictionary:
 		"second_day_black_tide_reveal_seen": false,
 		"merchant_unlocked": false,
 		"research_station_unlocked": false,
+		"shop_loop_unlocked": false,
+		"starter_shop_supply_granted": false,
+		"first_sale_good_crafted": false,
+		"first_sale_good_shelved": false,
+		"first_shop_settlement_completed": false,
+		"first_shop_tutorial_completed": false,
 		"chapter_1_goal_active": false,
-		"manufacturing_station_unlocked": false,
+		"manufacturing_station_unlocked": true,
 		"chapter_1_completed": false,
 		"currencies": {DEFAULT_CURRENCY_ID: 0},
 		"warehouse_items": [],
@@ -84,7 +90,8 @@ func default_profile(username: String) -> Dictionary:
 		"ss_roll_state": {},
 		"selected_character_id": "male_01",
 		"selected_night_location_id": "abandoned_house",
-		"outgame_phase": "DAY_PREP",
+		"last_run_result_type": "",
+		"outgame_phase": "NIGHT",
 		"daily_demand_day": 0,
 		"daily_demand_entries": [],
 		"shop_shelf_items": [],
@@ -106,6 +113,8 @@ func _with_defaults(profile: Dictionary) -> Dictionary:
 	var had_first_departure := profile.has("first_departure_outpost_dialogue_seen")
 	var had_merchant_unlocked := profile.has("merchant_unlocked")
 	var had_research_station_unlocked := profile.has("research_station_unlocked")
+	var had_shop_loop_unlocked := profile.has("shop_loop_unlocked")
+	var had_manufacturing_station_unlocked := profile.has("manufacturing_station_unlocked")
 	var merged := default_profile(String(profile.get("username", "玩家")))
 	for key in profile.keys():
 		merged[key] = profile[key]
@@ -119,6 +128,15 @@ func _with_defaults(profile: Dictionary) -> Dictionary:
 		merged["merchant_unlocked"] = bool(merged.get("first_return_dialogue_seen", false))
 	if not had_research_station_unlocked:
 		merged["research_station_unlocked"] = bool(merged.get("first_return_dialogue_seen", false))
+	if not had_shop_loop_unlocked:
+		merged["shop_loop_unlocked"] = bool(merged.get("first_return_dialogue_seen", false))
+	if not had_manufacturing_station_unlocked or bool(merged.get("shop_loop_unlocked", false)):
+		merged["manufacturing_station_unlocked"] = true
+	merged["starter_shop_supply_granted"] = bool(merged.get("starter_shop_supply_granted", false))
+	merged["first_sale_good_crafted"] = bool(merged.get("first_sale_good_crafted", false))
+	merged["first_sale_good_shelved"] = bool(merged.get("first_sale_good_shelved", false))
+	merged["first_shop_settlement_completed"] = bool(merged.get("first_shop_settlement_completed", false))
+	merged["first_shop_tutorial_completed"] = bool(merged.get("first_shop_tutorial_completed", false))
 	merged["currencies"] = Dictionary(merged.get("currencies", {}))
 	if not merged["currencies"].has(DEFAULT_CURRENCY_ID):
 		merged["currencies"][DEFAULT_CURRENCY_ID] = 0

@@ -2,3 +2,13 @@ recipe_id	output_item_id	output_count	required_items	required_currency_id	requir
 recipe_repaired_filter	sale_good_repaired_filter	1	scrap_metal:1;cloth_dirty:1	mine_coin	0	把废金属和布条整理成可售卖的修复滤芯。	true
 recipe_emergency_wrap	sale_good_emergency_wrap	1	cloth_dirty:1;medicine_powder:1;duct_tape_roll:1	mine_coin	0	制作白天店铺可售卖的应急包扎卷。	true
 recipe_signal_lamp	sale_good_signal_lamp	1	wire_coil:1;battery_old:1;tool_parts:1	mine_coin	0	组装白天店铺可售卖的简易信号灯。	true
+recipe_gear_bundle	sale_good_gear_bundle	1	scrap_metal:1;rusted_bolts:1	mine_coin	0	把废金属和生锈螺栓整理成可售卖的连轴齿轮包。	true
+recipe_patch_roll	sale_good_patch_roll	1	cloth_dirty:1;duct_tape_roll:1	mine_coin	0	制作白天店铺可售卖的修补布卷。	true
+recipe_tie_hook_set	sale_good_tie_hook_set	1	scrap_metal:1;cloth_dirty:1;reinforced_strap:1	mine_coin	0	制作白天店铺可售卖的挂钩扎带组。	true
+recipe_lens_filter	sale_good_lens_filter	1	cracked_lens:1;duct_tape_roll:1	mine_coin	0	把裂纹镜片和旧胶带加工成可售卖的粗制滤光片。	true
+recipe_cookware_fix	sale_good_cookware_fix	1	scrap_metal:1;rusted_bolts:1;duct_tape_roll:1	mine_coin	0	制作白天店铺可售卖的炊具修补包。	true
+recipe_wire_hook	sale_good_wire_hook	1	scrap_metal:1;wire_coil:1	mine_coin	0	把废金属和旧线圈整理成可售卖的导线挂钩组。	true
+recipe_medical_fix_roll	sale_good_medical_fix_roll	1	medicine_powder:1;cloth_dirty:1;duct_tape_roll:1	mine_coin	0	制作白天店铺可售卖的医疗固定卷。	true
+recipe_work_lamp	sale_good_work_lamp	1	battery_old:1;wire_coil:1;cracked_lens:1;tool_parts:1	mine_coin	0	组装白天店铺可售卖的工作照明灯。	true
+recipe_signal_marker	sale_good_signal_marker	1	signal_resonator_coil:1;battery_old:1;scrap_metal:1	mine_coin	0	组装白天店铺可售卖的临时信标。	true
+recipe_power_adapter	sale_good_power_adapter	1	pulse_battery:1;wire_coil:1;rusted_bolts:1	mine_coin	0	制作白天店铺可售卖的应急电源转接器。	true

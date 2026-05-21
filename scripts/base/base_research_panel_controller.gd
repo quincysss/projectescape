@@ -1,6 +1,8 @@
 class_name BaseResearchPanelController
 extends RefCounted
 
+signal selection_changed(research_id: String)
+
 const RESEARCH_NODE_SIZE := 70.0
 const RESEARCH_NODE_GAP := 116.0
 const RESEARCH_ROW_HEIGHT := 106.0
@@ -71,7 +73,7 @@ func set_selected_research_id(research_id: String) -> void:
 
 
 func clear_selection() -> void:
-	selected_research_id = ""
+	_set_selected_research_id("", true)
 	update_selected_state()
 
 
@@ -120,7 +122,7 @@ func handle_meta_clicked(meta: Variant) -> bool:
 
 
 func select_research(research_id: String) -> void:
-	selected_research_id = research_id
+	_set_selected_research_id(research_id, true)
 	clear_result()
 	update_selected_state()
 	_set_research_tree(_query_research_items())
@@ -171,7 +173,7 @@ func confirm_research() -> Dictionary:
 	if research_result_label != null:
 		research_result_label.text = String(result.get("message", "研究失败。"))
 	if bool(result.get("ok", false)):
-		selected_research_id = ""
+		_set_selected_research_id("", true)
 	return result
 
 
@@ -248,6 +250,7 @@ func _make_research_node(research_id: String, row: Dictionary, current_level: in
 	var level := int(row.get("level", 0))
 	var max_level := int(row.get("max_level", level))
 	var button := Button.new()
+	button.name = "ResearchNode_%s_%d" % [research_id, level]
 	button.size = Vector2(RESEARCH_NODE_SIZE, RESEARCH_NODE_SIZE)
 	button.text = _roman_level(level)
 	button.tooltip_text = "%s\n%s\n%s" % [
@@ -280,6 +283,14 @@ func _make_research_node(research_id: String, row: Dictionary, current_level: in
 	button.add_theme_stylebox_override("pressed", _circle_style(Color("#121817"), Color("#D1B850"), 4))
 	button.button_up.connect(func(): select_research(research_id))
 	return button
+
+
+func _set_selected_research_id(research_id: String, notify: bool) -> void:
+	if selected_research_id == research_id:
+		return
+	selected_research_id = research_id
+	if notify:
+		selection_changed.emit(selected_research_id)
 
 
 func _make_research_arrow(pos: Vector2) -> Label:

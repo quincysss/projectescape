@@ -9,6 +9,8 @@ const DailyDemandServiceScript := preload("res://scripts/game/daily_demand_servi
 const ShelfInventoryServiceScript := preload("res://scripts/game/shelf_inventory_service.gd")
 const ShopSalesServiceScript := preload("res://scripts/game/shop_sales_service.gd")
 const CraftingManagerScript := preload("res://scripts/game/crafting_manager.gd")
+const StarterSupplyServiceScript := preload("res://scripts/game/starter_supply_service.gd")
+const ChapterProgressServiceScript := preload("res://scripts/game/chapter_progress_service.gd")
 const ProfileServiceScript := preload("res://scripts/profile/profile_service.gd")
 
 const BASE_INVENTORY_SLOTS := 8
@@ -48,8 +50,14 @@ var first_return_dialogue_seen: bool = false
 var second_day_black_tide_reveal_seen: bool = false
 var merchant_unlocked: bool = false
 var research_station_unlocked: bool = false
+var shop_loop_unlocked: bool = false
+var starter_shop_supply_granted: bool = false
+var first_sale_good_crafted: bool = false
+var first_sale_good_shelved: bool = false
+var first_shop_settlement_completed: bool = false
+var first_shop_tutorial_completed: bool = false
 var chapter_1_goal_active: bool = false
-var manufacturing_station_unlocked: bool = false
+var manufacturing_station_unlocked: bool = true
 var chapter_1_completed: bool = false
 var pending_first_return_dialogue: bool = false
 var _run_start_pending_result: bool = false
@@ -67,6 +75,7 @@ var ss_last_roll_day: int = 0
 var ss_last_roll_result: Dictionary = {}
 var forced_scene_events_next_run: Dictionary = {}
 var last_run_result: String = ""
+var last_run_result_type: String = ""
 var outgame_phase: String = OUTGAME_PHASE_DAY_PREP
 var daily_demand_day: int = 0
 var daily_demand_entries: Array[Dictionary] = []
@@ -94,6 +103,8 @@ var daily_demand_service = DailyDemandServiceScript.new()
 var shelf_inventory_service = ShelfInventoryServiceScript.new()
 var shop_sales_service = ShopSalesServiceScript.new()
 var crafting_manager = CraftingManagerScript.new()
+var starter_supply_service = StarterSupplyServiceScript.new()
+var chapter_progress_service = ChapterProgressServiceScript.new()
 var profile_service = ProfileServiceScript.new()
 
 func _ready() -> void:
@@ -117,6 +128,7 @@ func add_to_warehouse(items: Array) -> Array[Dictionary]:
 func apply_run_result(result: Dictionary) -> void:
 	_bind_warehouse_manager()
 	last_run_result = str(result.get("message", ""))
+	last_run_result_type = String(result.get("result_type", ""))
 	var accepted: Array[Dictionary] = warehouse_manager.add_items(result.get("warehouse_items", []))
 	_mark_items_collected(accepted, "run_result")
 	advance_day_after_run(result)
@@ -164,6 +176,14 @@ func commit_run_start(debug_run: bool = false) -> Dictionary:
 		return save_result
 	return {"ok": true, "surface_day": current_day}
 
+func recover_interrupted_departure_to_night() -> Dictionary:
+	if not _recover_departure_phase_to_night():
+		return {"ok": true, "changed": false, "phase": get_outgame_phase()}
+	var save_result := save_profile()
+	save_result["changed"] = true
+	save_result["phase"] = outgame_phase
+	return save_result
+
 func get_outgame_phase() -> String:
 	_normalize_outgame_phase()
 	return outgame_phase
@@ -192,6 +212,8 @@ func get_daily_demand_entries() -> Array[Dictionary]:
 	return result
 
 func start_shop_open() -> Dictionary:
+	if not is_shop_loop_unlocked():
+		return {"ok": false, "reason": "shop_loop_locked", "message": "Shop loop is not unlocked yet."}
 	_bind_shop_services()
 	_return_all_shelf_items_without_save()
 	ensure_daily_demand()
@@ -241,6 +263,8 @@ func close_shop_settlement_to_night() -> Dictionary:
 	if not bool(settlement_result.get("ok", false)):
 		return settlement_result
 	shop_settlement_applied = true
+	first_shop_settlement_completed = true
+	_update_first_shop_tutorial_completion()
 	outgame_phase = OUTGAME_PHASE_NIGHT
 	save_profile()
 	return {"ok": true, "phase": outgame_phase, "settlement": settlement_result}
@@ -273,6 +297,10 @@ func move_sale_good_to_shelf(shelf_group_id: String, slot_index: int) -> Diction
 	_bind_shop_services()
 	var result: Dictionary = shelf_inventory_service.move_group_to_shelf(shelf_group_id, slot_index)
 	if bool(result.get("ok", false)):
+		var shelved_item: Dictionary = result.get("item", {})
+		if chapter_progress_service.is_sale_good_item(shelved_item):
+			first_sale_good_shelved = true
+			_update_first_shop_tutorial_completion()
 		save_profile()
 	return result
 
@@ -354,7 +382,11 @@ func craft_recipe(recipe_id: String) -> Dictionary:
 	_bind_crafting_manager()
 	var result: Dictionary = crafting_manager.craft_recipe(recipe_id)
 	if bool(result.get("ok", false)):
-		_mark_items_collected(Array(result.get("crafted_items", [])), "crafting")
+		var crafted_items := Array(result.get("crafted_items", []))
+		if chapter_progress_service.contains_sale_good(crafted_items):
+			first_sale_good_crafted = true
+			_update_first_shop_tutorial_completion()
+		_mark_items_collected(crafted_items, "crafting")
 		save_profile()
 	return result
 
@@ -362,7 +394,37 @@ func _should_queue_first_return_dialogue(result: Dictionary) -> bool:
 	if first_return_dialogue_seen:
 		return false
 	var result_type := String(result.get("result_type", ""))
-	return ["EXTRACTED", "DEAD", "TIMEOUT_FAILED", "ABORTED"].has(result_type)
+	return _is_first_return_success_result(result_type) or _is_first_return_failure_result(result_type)
+
+func _grant_starter_shop_supply_if_needed() -> Dictionary:
+	if starter_shop_supply_granted:
+		return {"ok": true, "skipped": true, "reason": "already_granted", "granted_items": []}
+	if starter_supply_service == null:
+		starter_supply_service = StarterSupplyServiceScript.new()
+	_bind_warehouse_manager()
+	var result: Dictionary = starter_supply_service.grant_prologue_shop_starter_pack(warehouse_manager)
+	if not bool(result.get("ok", false)):
+		return result
+	starter_shop_supply_granted = true
+	for item in Array(result.get("granted_items", [])):
+		if item is Dictionary:
+			var item_id := String(item.get("item_id", ""))
+			if not item_id.is_empty():
+				collected_item_ids[item_id] = true
+	return result
+
+func _update_first_shop_tutorial_completion() -> void:
+	if chapter_progress_service == null:
+		chapter_progress_service = ChapterProgressServiceScript.new()
+	if first_shop_tutorial_completed:
+		return
+	if not chapter_1_goal_active or chapter_1_completed:
+		return
+	if not chapter_progress_service.is_first_shop_tutorial_complete(_chapter_progress_flags()):
+		return
+	first_shop_tutorial_completed = true
+	chapter_1_completed = true
+	chapter_1_goal_active = false
 
 func has_profile() -> bool:
 	return profile_service != null and profile_service.has_profile()
@@ -420,6 +482,12 @@ func _reset_runtime_to_empty_profile_state() -> void:
 	second_day_black_tide_reveal_seen = false
 	merchant_unlocked = false
 	research_station_unlocked = false
+	shop_loop_unlocked = false
+	starter_shop_supply_granted = false
+	first_sale_good_crafted = false
+	first_sale_good_shelved = false
+	first_shop_settlement_completed = false
+	first_shop_tutorial_completed = false
 	chapter_1_goal_active = false
 	manufacturing_station_unlocked = false
 	chapter_1_completed = false
@@ -438,6 +506,7 @@ func _reset_runtime_to_empty_profile_state() -> void:
 	ss_last_roll_result = {}
 	forced_scene_events_next_run.clear()
 	last_run_result = ""
+	last_run_result_type = ""
 	_reset_shop_day_state(OUTGAME_PHASE_DAY_PREP)
 	selected_night_location_id = "abandoned_house"
 	loadout_equipment_slots = {"HEAD": "", "BODY": "", "HAND": "", "FOOT": ""}
@@ -463,6 +532,9 @@ func should_play_world_intro_dialogue() -> bool:
 func mark_world_intro_dialogue_seen() -> Dictionary:
 	world_intro_dialogue_seen = true
 	first_intro_dialogue_seen = true
+	if not is_shop_loop_unlocked():
+		current_day = maxi(1, get_current_day())
+		_reset_shop_day_state(OUTGAME_PHASE_NIGHT)
 	return save_profile()
 
 func should_play_intro_dialogue() -> bool:
@@ -481,20 +553,43 @@ func mark_first_departure_outpost_dialogue_seen() -> Dictionary:
 func should_play_first_return_dialogue() -> bool:
 	return pending_first_return_dialogue and not first_return_dialogue_seen
 
+func get_first_return_dialogue_id() -> String:
+	return "first_return_success_dialogue" if _is_first_return_success_result(last_run_result_type) else "first_return_failed_dialogue"
+
 func mark_first_return_dialogue_seen_and_activate_chapter() -> Dictionary:
+	var supply_result := _grant_starter_shop_supply_if_needed()
+	if not bool(supply_result.get("ok", false)):
+		return supply_result
 	first_return_dialogue_seen = true
 	pending_first_return_dialogue = false
 	merchant_unlocked = true
 	research_station_unlocked = true
+	shop_loop_unlocked = true
+	manufacturing_station_unlocked = true
 	chapter_1_goal_active = true
 	current_chapter = 1
-	return save_profile()
+	_reset_shop_day_state(OUTGAME_PHASE_DAY_PREP)
+	var save_result := save_profile()
+	save_result["starter_supply"] = supply_result
+	return save_result
 
 func is_merchant_unlocked() -> bool:
 	return merchant_unlocked
 
 func is_research_station_unlocked() -> bool:
-	return research_station_unlocked
+	return research_station_unlocked or shop_loop_unlocked
+
+func is_shop_loop_unlocked() -> bool:
+	return shop_loop_unlocked
+
+func _chapter_progress_flags() -> Dictionary:
+	return {
+		"chapter_1_goal_active": chapter_1_goal_active,
+		"chapter_1_completed": chapter_1_completed,
+		"first_sale_good_crafted": first_sale_good_crafted,
+		"first_sale_good_shelved": first_sale_good_shelved,
+		"first_shop_settlement_completed": first_shop_settlement_completed,
+	}
 
 func should_play_second_day_black_tide_reveal(run_day_index: int = -1) -> bool:
 	var resolved_day := run_day_index
@@ -516,69 +611,69 @@ func reset_story_flags() -> void:
 	merchant_unlocked = false
 	research_station_unlocked = false
 	pending_first_return_dialogue = false
+	shop_loop_unlocked = false
+	starter_shop_supply_granted = false
+	first_sale_good_crafted = false
+	first_sale_good_shelved = false
+	first_shop_settlement_completed = false
+	first_shop_tutorial_completed = false
 	chapter_1_goal_active = false
 	chapter_1_completed = false
-	manufacturing_station_unlocked = false
-	_reset_shop_day_state(OUTGAME_PHASE_DAY_PREP)
+	manufacturing_station_unlocked = true
+	_reset_shop_day_state(OUTGAME_PHASE_NIGHT if world_intro_dialogue_seen else OUTGAME_PHASE_DAY_PREP)
 	save_profile()
+
+func _is_first_return_success_result(result_type: String) -> bool:
+	return ["EXTRACTED", "EXTRACTION_SUCCESS"].has(result_type)
+
+func _is_first_return_failure_result(result_type: String) -> bool:
+	return ["DEAD", "TIMEOUT_FAILED", "RUN_FAILED"].has(result_type)
 
 func activate_chapter_1_goal_debug() -> void:
 	current_chapter = 1
 	merchant_unlocked = true
 	research_station_unlocked = true
+	shop_loop_unlocked = true
+	manufacturing_station_unlocked = true
 	chapter_1_goal_active = true
 	chapter_1_completed = false
-	manufacturing_station_unlocked = false
+	first_shop_tutorial_completed = false
 	save_profile()
 
+func force_complete_first_shop_tutorial_debug() -> Dictionary:
+	current_chapter = 1
+	shop_loop_unlocked = true
+	research_station_unlocked = true
+	manufacturing_station_unlocked = true
+	chapter_1_goal_active = false
+	chapter_1_completed = true
+	first_sale_good_crafted = true
+	first_sale_good_shelved = true
+	first_shop_settlement_completed = true
+	first_shop_tutorial_completed = true
+	return save_profile()
+
 func get_chapter_goal_snapshot() -> Dictionary:
-	return {
-		"chapter_id": "chapter_1",
-		"title": "第一章：解锁制造所",
-		"active": chapter_1_goal_active and not chapter_1_completed,
-		"completed": chapter_1_completed,
-		"feature_id": "manufacturing_station",
-		"currency_id": "mine_coin",
-		"current_currency": get_currency_amount("mine_coin"),
-		"required_currency": MANUFACTURING_UNLOCK_COST,
-		"manufacturing_station_unlocked": manufacturing_station_unlocked,
-		"surface_day": get_current_day(),
-	}
+	return chapter_progress_service.build_chapter_1_snapshot({
+		"chapter_1_goal_active": chapter_1_goal_active,
+		"chapter_1_completed": chapter_1_completed,
+		"first_sale_good_crafted": first_sale_good_crafted,
+		"first_sale_good_shelved": first_sale_good_shelved,
+		"first_shop_settlement_completed": first_shop_settlement_completed,
+	})
 
 func can_unlock_manufacturing_station() -> bool:
-	return (
-		current_chapter == 1
-		and chapter_1_goal_active
-		and not manufacturing_station_unlocked
-		and get_currency_amount("mine_coin") >= MANUFACTURING_UNLOCK_COST
-	)
+	return false
 
 func unlock_manufacturing_station() -> Dictionary:
-	if manufacturing_station_unlocked:
-		return {"ok": false, "reason": "already_unlocked", "message": "制造所已经解锁。"}
-	if not chapter_1_goal_active:
-		return {"ok": false, "reason": "goal_inactive", "message": "第一章目标尚未激活。"}
-	if get_currency_amount("mine_coin") < MANUFACTURING_UNLOCK_COST:
-		return {"ok": false, "reason": "not_enough_currency", "message": "矿币不足，无法解锁制造所。"}
-	_bind_currency_wallet()
-	var spend_result: Dictionary = currency_wallet.spend_currency("mine_coin", MANUFACTURING_UNLOCK_COST, "manufacturing_unlock")
-	if not bool(spend_result.get("ok", false)):
-		return {"ok": false, "reason": spend_result.get("reason", "currency_failed"), "message": "矿币扣除失败。"}
 	manufacturing_station_unlocked = true
-	chapter_1_completed = true
-	chapter_1_goal_active = false
-	var save_result := save_profile()
-	if not bool(save_result.get("ok", true)):
-		currency_wallet.add_currency("mine_coin", MANUFACTURING_UNLOCK_COST, "manufacturing_unlock_rollback")
-		manufacturing_station_unlocked = false
-		chapter_1_completed = false
-		chapter_1_goal_active = true
-		return {"ok": false, "reason": "save_failed", "message": "保存失败，制造所未解锁。"}
+	var default_save_result := save_profile()
 	return {
 		"ok": true,
-		"message": "制造所已解锁。",
+		"deprecated": true,
+		"message": "Manufacturing is available by default; no currency unlock is required.",
 		"surface_day": get_current_day(),
-		"currency_spent": MANUFACTURING_UNLOCK_COST,
+		"save": default_save_result,
 	}
 
 func get_ss_roll_state() -> Dictionary:
@@ -649,6 +744,7 @@ func clear_warehouse() -> void:
 	_bind_warehouse_manager()
 	warehouse_manager.clear()
 	last_run_result = ""
+	last_run_result_type = ""
 	save_profile()
 
 func get_warehouse_text() -> String:
@@ -852,6 +948,7 @@ func _bind_warehouse_manager() -> void:
 func _apply_profile_to_runtime(loaded_profile: Dictionary) -> void:
 	if loaded_profile.is_empty():
 		return
+	var should_save_repaired_profile := false
 	username = String(loaded_profile.get("username", ""))
 	current_chapter = maxi(1, int(loaded_profile.get("current_chapter", 1)))
 	current_day = maxi(0, int(loaded_profile.get("surface_day", 0)))
@@ -864,14 +961,25 @@ func _apply_profile_to_runtime(loaded_profile: Dictionary) -> void:
 	second_day_black_tide_reveal_seen = bool(loaded_profile.get("second_day_black_tide_reveal_seen", false))
 	merchant_unlocked = bool(loaded_profile.get("merchant_unlocked", first_return_dialogue_seen))
 	research_station_unlocked = bool(loaded_profile.get("research_station_unlocked", first_return_dialogue_seen))
+	shop_loop_unlocked = bool(loaded_profile.get("shop_loop_unlocked", first_return_dialogue_seen))
+	starter_shop_supply_granted = bool(loaded_profile.get("starter_shop_supply_granted", false))
+	first_sale_good_crafted = bool(loaded_profile.get("first_sale_good_crafted", false))
+	first_sale_good_shelved = bool(loaded_profile.get("first_sale_good_shelved", false))
+	first_shop_settlement_completed = bool(loaded_profile.get("first_shop_settlement_completed", false))
+	first_shop_tutorial_completed = bool(loaded_profile.get("first_shop_tutorial_completed", false))
 	chapter_1_goal_active = bool(loaded_profile.get("chapter_1_goal_active", false))
-	manufacturing_station_unlocked = bool(loaded_profile.get("manufacturing_station_unlocked", false))
+	manufacturing_station_unlocked = bool(loaded_profile.get("manufacturing_station_unlocked", true)) or shop_loop_unlocked
 	chapter_1_completed = bool(loaded_profile.get("chapter_1_completed", false))
+	if first_shop_tutorial_completed:
+		chapter_1_completed = true
+		chapter_1_goal_active = false
 	pending_first_return_dialogue = bool(loaded_profile.get("pending_first_return_dialogue", false))
 	_run_start_pending_result = bool(loaded_profile.get("run_start_pending_result", false))
 	selected_character_id = String(loaded_profile.get("selected_character_id", DEFAULT_CHARACTER_ID))
 	selected_night_location_id = String(loaded_profile.get("selected_night_location_id", "abandoned_house"))
 	outgame_phase = String(loaded_profile.get("outgame_phase", OUTGAME_PHASE_DAY_PREP))
+	if _recover_departure_phase_to_night():
+		should_save_repaired_profile = true
 	_repair_legacy_first_run_return_state()
 
 	warehouse_items.clear()
@@ -910,6 +1018,7 @@ func _apply_profile_to_runtime(loaded_profile: Dictionary) -> void:
 	var loaded_ss_result: Dictionary = ss_state.get("last_roll_result", loaded_profile.get("ss_last_roll_result", {}))
 	ss_last_roll_result = loaded_ss_result.duplicate(true)
 	last_run_result = String(loaded_profile.get("last_run_result", ""))
+	last_run_result_type = String(loaded_profile.get("last_run_result_type", ""))
 
 	daily_demand_day = maxi(0, int(loaded_profile.get("daily_demand_day", 0)))
 	daily_demand_entries.clear()
@@ -937,6 +1046,12 @@ func _apply_profile_to_runtime(loaded_profile: Dictionary) -> void:
 	_normalize_outgame_phase()
 	_normalize_loadout_slots()
 	_bind_shop_services()
+	if first_return_dialogue_seen and not starter_shop_supply_granted:
+		var grant_result := _grant_starter_shop_supply_if_needed()
+		if bool(grant_result.get("ok", false)):
+			should_save_repaired_profile = true
+	if should_save_repaired_profile:
+		save_profile()
 
 func _repair_legacy_first_run_return_state() -> void:
 	if first_return_dialogue_seen or pending_first_return_dialogue or _run_start_pending_result:
@@ -965,6 +1080,12 @@ func _sync_runtime_to_profile() -> void:
 	profile["second_day_black_tide_reveal_seen"] = second_day_black_tide_reveal_seen
 	profile["merchant_unlocked"] = merchant_unlocked
 	profile["research_station_unlocked"] = research_station_unlocked
+	profile["shop_loop_unlocked"] = shop_loop_unlocked
+	profile["starter_shop_supply_granted"] = starter_shop_supply_granted
+	profile["first_sale_good_crafted"] = first_sale_good_crafted
+	profile["first_sale_good_shelved"] = first_sale_good_shelved
+	profile["first_shop_settlement_completed"] = first_shop_settlement_completed
+	profile["first_shop_tutorial_completed"] = first_shop_tutorial_completed
 	profile["chapter_1_goal_active"] = chapter_1_goal_active
 	profile["manufacturing_station_unlocked"] = manufacturing_station_unlocked
 	profile["chapter_1_completed"] = chapter_1_completed
@@ -986,6 +1107,7 @@ func _sync_runtime_to_profile() -> void:
 		"last_roll_result": ss_last_roll_result.duplicate(true),
 	}
 	profile["last_run_result"] = last_run_result
+	profile["last_run_result_type"] = last_run_result_type
 	profile["daily_demand_day"] = daily_demand_day
 	profile["daily_demand_entries"] = daily_demand_entries.duplicate(true)
 	profile["shop_shelf_items"] = shop_shelf_items.duplicate(true)
@@ -1063,8 +1185,26 @@ func _return_all_shelf_items_without_save() -> void:
 func _normalize_outgame_phase() -> void:
 	if not _is_valid_outgame_phase(outgame_phase):
 		outgame_phase = OUTGAME_PHASE_DAY_PREP
+	if (
+		not shop_loop_unlocked
+		and world_intro_dialogue_seen
+		and not pending_first_return_dialogue
+		and outgame_phase == OUTGAME_PHASE_DAY_PREP
+	):
+		outgame_phase = OUTGAME_PHASE_NIGHT
 	if outgame_phase == OUTGAME_PHASE_LOADING_TO_RUN and not _run_start_pending_result:
-		outgame_phase = OUTGAME_PHASE_DAY_PREP
+		outgame_phase = OUTGAME_PHASE_NIGHT
+
+func _recover_departure_phase_to_night() -> bool:
+	if not [
+		OUTGAME_PHASE_LOADING_TO_RUN,
+		OUTGAME_PHASE_NIGHT_PLAN,
+		OUTGAME_PHASE_LOADOUT,
+	].has(outgame_phase):
+		return false
+	_run_start_pending_result = false
+	outgame_phase = OUTGAME_PHASE_NIGHT
+	return true
 
 func _is_valid_outgame_phase(phase: String) -> bool:
 	return [

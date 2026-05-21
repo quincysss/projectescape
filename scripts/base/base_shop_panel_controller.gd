@@ -35,7 +35,7 @@ func set_game_state(p_game_state: Node) -> void:
 func update_view(phase: String) -> void:
 	if day_panel == null:
 		return
-	day_panel.visible = phase == PHASE_DAY_PREP
+	day_panel.visible = phase == PHASE_DAY_PREP and _is_shop_loop_unlocked()
 	open_panel.visible = phase == PHASE_SHOP_OPEN
 	settlement_panel.visible = phase == PHASE_SHOP_SETTLEMENT
 	if day_panel.visible:
@@ -49,7 +49,10 @@ func update_view(phase: String) -> void:
 func _build_surfaces() -> void:
 	if ui_root == null or day_panel != null:
 		return
-	day_panel = _make_panel("ShopDayPrepPanel", DAY_PANEL_POSITION, Vector2(244, 500), "今日需求")
+	day_panel = _make_panel("ShopDayPrepPanel", DAY_PANEL_POSITION, Vector2(244, 500), "今日订单")
+	var day_title := day_panel.get_node_or_null("PanelTitle") as Label
+	if day_title != null:
+		day_title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	ui_root.add_child(day_panel)
 	open_panel = _make_panel("ShopOpenPanel", Vector2(24, 154), Vector2(980, 500), "店铺营业")
 	open_panel.visible = false
@@ -66,9 +69,12 @@ func _render_day_panel() -> void:
 		return
 	var demand_entries: Array = game_state.ensure_daily_demand() if game_state.has_method("ensure_daily_demand") else []
 	var demand_text := _format_demand(demand_entries)
-	var label := _make_label(demand_text, Vector2(16, 58), Vector2(204, 280), 14)
+	var label := _make_label(demand_text, Vector2(18, 58), Vector2(208, 280), 14)
+	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	day_panel.add_child(label)
-	var hint := _make_label("只有制作出的局外商品可以上架销售；原材料不会出现在货台列表。", Vector2(16, 342), Vector2(204, 70), 13)
+	var hint := _make_label("在制造所制造货物。", Vector2(18, 342), Vector2(208, 70), 13)
+	hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	hint.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	day_panel.add_child(hint)
 	var button := Button.new()
 	button.text = "开店营业"
@@ -92,11 +98,11 @@ func _render_open_panel() -> void:
 	_render_shelf_slots(open_panel)
 	open_panel.add_child(_make_label("可上架商品", Vector2(24, 236), Vector2(180, 26), 18))
 	_render_shelfable_goods(open_panel)
-	open_panel.add_child(_make_label("今日需求", Vector2(704, 58), Vector2(180, 26), 18))
+	open_panel.add_child(_make_label("今日订单", Vector2(704, 58), Vector2(180, 26), 18))
 	open_panel.add_child(_make_label(_format_demand(game_state.get_daily_demand_entries()), Vector2(704, 94), Vector2(232, 210), 14))
 	open_panel.add_child(_make_label(_format_sales_log(game_state.get_shop_sales_records()), Vector2(704, 322), Vector2(232, 92), 13))
 	var close_button := Button.new()
-	close_button.text = "提前结束并出击"
+	close_button.text = "提前结束营业"
 	close_button.position = Vector2(744, 430)
 	close_button.size = Vector2(172, 42)
 	close_button.pressed.connect(_on_finish_shop_pressed)
@@ -133,7 +139,7 @@ func _render_settlement_panel() -> void:
 	var total_label := _make_label("总收入：%d 矿币" % int(snapshot.get("total_earned", 0)), Vector2(34, 364), Vector2(300, 34), 22)
 	settlement_panel.add_child(total_label)
 	var close_button := Button.new()
-	close_button.text = "收款并出击"
+	close_button.text = "出发"
 	close_button.position = Vector2(724, 418)
 	close_button.size = Vector2(180, 44)
 	close_button.pressed.connect(_on_close_settlement_pressed)
@@ -209,7 +215,7 @@ func _on_finish_shop_pressed() -> void:
 	if game_state != null and game_state.has_method("finish_shop_open"):
 		var finish_result: Dictionary = game_state.finish_shop_open("manual")
 		if bool(finish_result.get("ok", false)):
-			_close_settlement_and_depart()
+			_call_refresh()
 			return
 	_call_refresh()
 
@@ -283,6 +289,14 @@ func _format_sales_log(records: Array) -> String:
 func _call_refresh() -> void:
 	if refresh_callback.is_valid():
 		refresh_callback.call()
+
+
+func _is_shop_loop_unlocked() -> bool:
+	if game_state == null:
+		return false
+	if game_state.has_method("is_shop_loop_unlocked"):
+		return bool(game_state.is_shop_loop_unlocked())
+	return bool(game_state.get("shop_loop_unlocked"))
 
 
 func _clear_panel_body(panel: Panel) -> void:

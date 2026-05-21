@@ -32,7 +32,8 @@ const COMPETITION_DIRECT_DEPARTURE := true
 const BASE_BACKGROUND_PATH := "res://assets/originalphoto/basementphoto.png"
 const WORLD_INTRO_DIALOGUE_PATH := "res://setting/dialogues.tab#world_intro_dialogue"
 const FIRST_DEPARTURE_DIALOGUE_PATH := "res://setting/dialogues.tab#first_departure_outpost_dialogue"
-const FIRST_RETURN_DIALOGUE_PATH := "res://setting/dialogues.tab#first_return_chapter_1"
+const FIRST_RETURN_SUCCESS_DIALOGUE_PATH := "res://setting/dialogues.tab#first_return_success_dialogue"
+const FIRST_RETURN_FAILED_DIALOGUE_PATH := "res://setting/dialogues.tab#first_return_failed_dialogue"
 const MANUFACTURING_UNLOCK_COST := 100
 @onready var warehouse_tab_button: Button = %WarehouseTabButton
 @onready var merchant_tab_button: Button = %MerchantTabButton
@@ -245,6 +246,12 @@ func _request_start_run() -> void:
 			_refresh()
 		return
 	if phase == PHASE_NIGHT:
+		if not _is_shop_loop_unlocked():
+			if _game_state != null and _game_state.has_method("should_play_first_departure_outpost_dialogue") and _game_state.should_play_first_departure_outpost_dialogue():
+				_play_dialogue(FIRST_DEPARTURE_DIALOGUE_PATH, Callable(self, "_on_first_departure_dialogue_finished"))
+				return
+			_begin_run_loading()
+			return
 		if COMPETITION_DIRECT_DEPARTURE:
 			_begin_competition_direct_departure()
 			return
@@ -266,8 +273,6 @@ func _on_first_departure_dialogue_finished(_dialogue_id: String = "", _skipped: 
 
 func _begin_competition_direct_departure() -> void:
 	# 临时比赛版本：跳过夜间角色/地点选择与携行配置，点出击后直接进地表加载。
-	if _game_state != null and _game_state.has_method("mark_first_departure_outpost_dialogue_seen"):
-		_game_state.mark_first_departure_outpost_dialogue_seen()
 	_begin_run_loading()
 
 func _begin_run_loading() -> void:
@@ -301,6 +306,8 @@ func _on_run_loading_completed(run_scene: PackedScene) -> void:
 
 func _on_run_loading_failed(reason: String) -> void:
 	_active_run_loading_screen = null
+	if _game_state != null and _game_state.has_method("recover_interrupted_departure_to_night"):
+		_game_state.recover_interrupted_departure_to_night()
 	_refresh()
 	result_label.visible = true
 	result_label.text = "地表通道同步失败，请返回哨所重试。(%s)" % reason
@@ -326,11 +333,20 @@ func _maybe_show_first_return_dialogue() -> void:
 		return
 	if not _game_state.should_play_first_return_dialogue():
 		return
-	_play_dialogue(FIRST_RETURN_DIALOGUE_PATH, Callable(self, "_on_first_return_dialogue_finished"))
+	_play_dialogue(_first_return_dialogue_path(), Callable(self, "_on_first_return_dialogue_finished"))
+
+func _first_return_dialogue_path() -> String:
+	if _game_state != null and _game_state.has_method("get_first_return_dialogue_id"):
+		var dialogue_id := String(_game_state.get_first_return_dialogue_id())
+		if dialogue_id == "first_return_success_dialogue":
+			return FIRST_RETURN_SUCCESS_DIALOGUE_PATH
+	return FIRST_RETURN_FAILED_DIALOGUE_PATH
 
 func _on_first_return_dialogue_finished(_dialogue_id: String = "", _skipped: bool = false) -> void:
 	if _game_state != null and _game_state.has_method("mark_first_return_dialogue_seen_and_activate_chapter"):
-		_game_state.mark_first_return_dialogue_seen_and_activate_chapter()
+		var result: Dictionary = _game_state.mark_first_return_dialogue_seen_and_activate_chapter()
+		if bool(result.get("ok", true)):
+			_show_chapter_goal_popup()
 	_refresh()
 
 func _play_dialogue(path: String, finished_callback: Callable) -> void:
@@ -375,26 +391,42 @@ func _is_day_prep_phase() -> bool:
 	return _get_outgame_phase() == PHASE_DAY_PREP
 
 func _show_chapter_goal_popup() -> void:
-	var popup := _make_overlay_popup("第一章目标", "解锁制造所\n\n出售可售物资，积攒 100 矿币。\n制造所解锁后，也许妹妹还有救。")
+	var popup := _make_overlay_popup(
+		"第一章目标",
+		"重启杂货店\n\n在制造所制作可售物资，查看今日订单，把货物上架后完成首次营业结算。",
+		Vector2(680, 360)
+	)
 	var panel := popup.get_node("PopupPanel") as Panel
-	var ok_button := _make_popup_button("知道了", Vector2(176, 258), func(): popup.queue_free())
-	var merchant_button := _make_popup_button("前往商人", Vector2(332, 258), func():
+	var ok_button := _make_popup_button("知道了", Vector2(132, 282), func(): popup.queue_free())
+	var crafting_button := _make_popup_button("前往制造所", Vector2(274, 282), func():
 		popup.queue_free()
-		_show_tab(TAB_MERCHANT)
+		_show_tab(TAB_CRAFTING)
+	)
+	var demand_button := _make_popup_button("查看今日订单", Vector2(416, 282), func():
+		popup.queue_free()
+		_show_tab(TAB_WAREHOUSE)
 	)
 	panel.add_child(ok_button)
-	panel.add_child(merchant_button)
+	panel.add_child(crafting_button)
+	panel.add_child(demand_button)
 	add_child(popup)
 
 func _show_chapter_complete_popup(surface_day: int) -> void:
-	var text := "你用了 %d 天，成功购买了旧时代制造机。\n也许，一切都还来得及。\n\n第一章节结束，后续章节开发中" % surface_day
+	var text := "杂货店重新开门了。\n\n避难所开始知道，这里不只收废料，也能把废料变成他们真正需要的东西。\n\n接下来，白天经营店铺，晚上前往地表。"
 	var popup := _make_overlay_popup("第一章结束", text, Vector2(680, 380))
 	var panel := popup.get_node("PopupPanel") as Panel
-	var continue_button := _make_popup_button("继续游戏", Vector2(200, 300), func(): popup.queue_free())
-	var reset_button := _make_popup_button("重新开始", Vector2(356, 300), func():
+	var continue_button := _make_popup_button("继续游戏", Vector2(128, 300), func(): popup.queue_free())
+	var night_button := _make_popup_button("前往夜间计划", Vector2(284, 300), func():
+		popup.queue_free()
+		if _game_state != null and _game_state.has_method("go_to_night_plan") and _get_outgame_phase() == PHASE_NIGHT:
+			_game_state.go_to_night_plan()
+			_refresh()
+	)
+	var reset_button := _make_popup_button("重新开始", Vector2(468, 300), func():
 		_reset_progress_and_show_notice(popup)
 	)
 	panel.add_child(continue_button)
+	panel.add_child(night_button)
 	panel.add_child(reset_button)
 	add_child(popup)
 
@@ -434,7 +466,7 @@ func _make_overlay_popup(title: String, body: String, panel_size: Vector2 = Vect
 	var body_label := _make_section_label(body, Vector2(58, 96), Vector2(panel_size.x - 116, panel_size.y - 198), 17)
 	body_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	body_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	body_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	body_label.autowrap_mode = TextServer.AUTOWRAP_ARBITRARY
 	panel.add_child(body_label)
 	return overlay
 
@@ -590,7 +622,7 @@ func _refresh() -> void:
 	base_crafting_panel.set_game_state(_game_state)
 	base_shop_panel.set_game_state(_game_state)
 	base_night_plan_panel.set_game_state(_game_state)
-	if _game_state.has_method("ensure_daily_demand"):
+	if _is_shop_loop_unlocked() and _game_state.has_method("ensure_daily_demand"):
 		_game_state.ensure_daily_demand()
 	day_label.text = _game_state.get_day_display_text()
 	currency_label.text = _game_state.get_currency_display_text("mine_coin")
@@ -602,7 +634,7 @@ func _refresh() -> void:
 	_update_chapter_goal_view()
 	base_crafting_panel.update_view()
 	if crafting_recipe_scroll != null:
-		crafting_recipe_scroll.visible = bool(_game_state.get("manufacturing_station_unlocked"))
+		crafting_recipe_scroll.visible = _is_crafting_tab_available()
 	base_merchant_panel.refresh_selection()
 	_update_selected_research_state()
 	base_shop_panel.update_view(_get_outgame_phase())
@@ -611,10 +643,15 @@ func _refresh() -> void:
 func _refresh_tabs() -> void:
 	_hide_item_tooltip("refresh_tabs")
 	var phase := _get_outgame_phase()
-	var base_tabs_visible := phase == PHASE_DAY_PREP
+	var shop_loop_unlocked := _is_shop_loop_unlocked()
+	var prologue_night := phase == PHASE_NIGHT and not shop_loop_unlocked
+	var base_tabs_visible := phase == PHASE_DAY_PREP or prologue_night
+	var advanced_tabs_visible := phase == PHASE_DAY_PREP and shop_loop_unlocked
 	var merchant_available := _is_merchant_tab_available()
 	var research_available := _is_research_tab_available()
 	var crafting_available := _is_crafting_tab_available()
+	if not advanced_tabs_visible and _active_tab != TAB_WAREHOUSE:
+		_active_tab = TAB_WAREHOUSE
 	if _active_tab == TAB_MERCHANT and not merchant_available:
 		_active_tab = TAB_WAREHOUSE
 	if _active_tab == TAB_RESEARCH and not research_available:
@@ -624,22 +661,22 @@ func _refresh_tabs() -> void:
 	warehouse_label.visible = false
 	if warehouse_panel != null:
 		warehouse_panel.visible = base_tabs_visible and _active_tab == TAB_WAREHOUSE
-	merchant_panel.visible = base_tabs_visible and _active_tab == TAB_MERCHANT
-	research_panel.visible = base_tabs_visible and _active_tab == TAB_RESEARCH
+	merchant_panel.visible = advanced_tabs_visible and _active_tab == TAB_MERCHANT
+	research_panel.visible = advanced_tabs_visible and _active_tab == TAB_RESEARCH
 	if crafting_panel != null:
-		crafting_panel.visible = base_tabs_visible and _active_tab == TAB_CRAFTING
+		crafting_panel.visible = advanced_tabs_visible and _active_tab == TAB_CRAFTING
 	if catalog_panel != null:
-		catalog_panel.visible = base_tabs_visible and _active_tab == TAB_CATALOG
+		catalog_panel.visible = advanced_tabs_visible and _active_tab == TAB_CATALOG
 	warehouse_tab_button.visible = base_tabs_visible
 	merchant_tab_button.visible = false
-	research_tab_button.visible = base_tabs_visible
-	crafting_tab_button.visible = base_tabs_visible
+	research_tab_button.visible = advanced_tabs_visible
+	crafting_tab_button.visible = advanced_tabs_visible
 	if catalog_tab_button != null:
-		catalog_tab_button.visible = base_tabs_visible
+		catalog_tab_button.visible = advanced_tabs_visible
 	start_button.visible = phase == PHASE_DAY_PREP or phase == PHASE_NIGHT
-	start_button.disabled = phase != PHASE_DAY_PREP and phase != PHASE_NIGHT
+	start_button.disabled = (phase != PHASE_DAY_PREP and phase != PHASE_NIGHT) or (phase == PHASE_DAY_PREP and not shop_loop_unlocked)
 	if phase == PHASE_DAY_PREP:
-		start_button.text = "开店营业"
+		start_button.text = "开店营业" if shop_loop_unlocked else "等待返回剧情"
 	elif phase == PHASE_NIGHT:
 		start_button.text = "出击"
 	warehouse_tab_button.button_pressed = _active_tab == TAB_WAREHOUSE
@@ -661,7 +698,7 @@ func _refresh_tabs() -> void:
 		catalog_tab_button.tooltip_text = ""
 	merchant_tab_button.tooltip_text = "" if merchant_available else "等待第一次地表回收后开放。"
 	research_tab_button.tooltip_text = "" if research_available else "等待第一次地表回收后开放。"
-	crafting_tab_button.tooltip_text = "" if crafting_available else "完成首次地面返回剧情后解锁制造所。"
+	crafting_tab_button.tooltip_text = "" if crafting_available else "完成序章返回剧情后开放制造所。"
 	_layout_top_navigation()
 
 func _is_merchant_tab_available() -> bool:
@@ -681,6 +718,13 @@ func _is_research_tab_available() -> bool:
 func _is_crafting_tab_available() -> bool:
 	return base_crafting_panel.is_tab_available()
 
+func _is_shop_loop_unlocked() -> bool:
+	if _game_state == null:
+		return false
+	if _game_state.has_method("is_shop_loop_unlocked"):
+		return bool(_game_state.is_shop_loop_unlocked())
+	return bool(_game_state.get("shop_loop_unlocked"))
+
 func _build_visual_surfaces() -> void:
 	var ui_root := get_node("BaseUIRoot") as Control
 	_ensure_catalog_tab_button()
@@ -695,14 +739,14 @@ func _build_visual_surfaces() -> void:
 	research_list.visible = false
 	research_list.mouse_filter = Control.MOUSE_FILTER_IGNORE
 
-	chapter_goal_label = _make_section_label("", Vector2.ZERO, Vector2(236, 82), 15)
+	chapter_goal_label = _make_section_label("", Vector2.ZERO, Vector2(260, 128), 14)
 	chapter_goal_label.name = "ChapterGoalLabel"
 	chapter_goal_label.anchor_left = 1.0
 	chapter_goal_label.anchor_right = 1.0
-	chapter_goal_label.offset_left = -260.0
+	chapter_goal_label.offset_left = -284.0
 	chapter_goal_label.offset_right = -24.0
 	chapter_goal_label.offset_top = 92.0
-	chapter_goal_label.offset_bottom = 174.0
+	chapter_goal_label.offset_bottom = 220.0
 	chapter_goal_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	chapter_goal_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	chapter_goal_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
@@ -714,7 +758,7 @@ func _build_visual_surfaces() -> void:
 	_build_research_surface()
 	_build_crafting_surface()
 	_build_catalog_surface()
-	base_shop_panel.setup(_game_state, ui_root, Callable(self, "_refresh"), Callable(self, "_begin_competition_direct_departure"))
+	base_shop_panel.setup(_game_state, ui_root, Callable(self, "_refresh"), Callable(self, "_begin_run_loading"))
 	base_night_plan_panel.setup(_game_state, ui_root, Callable(self, "_refresh"), Callable(self, "_begin_run_loading"))
 
 func _build_warehouse_surface(ui_root: Control) -> void:
@@ -832,7 +876,9 @@ func _build_research_surface() -> void:
 	research_panel.add_theme_stylebox_override("panel", _panel_style(Color(0.06, 0.06, 0.058, 0.93), Color(0.26, 0.25, 0.23, 0.95), 1))
 	research_panel.add_child(_make_section_label("研究所", Vector2(18, 12), Vector2(160, 30), 20))
 	research_scroll = _make_scroll_area(Vector2(18, 56), Vector2(730, 400), true)
+	research_scroll.name = "ResearchTreeScroll"
 	research_tree_root = Control.new()
+	research_tree_root.name = "ResearchTreeRoot"
 	research_scroll.add_child(research_tree_root)
 	research_panel.add_child(research_scroll)
 
@@ -873,6 +919,8 @@ func _build_research_surface() -> void:
 		research_requirement_grid_root,
 		research_currency_cost_label
 	)
+	if not base_research_panel.selection_changed.is_connected(_on_research_selection_changed):
+		base_research_panel.selection_changed.connect(_on_research_selection_changed)
 
 func _build_crafting_surface() -> void:
 	var ui_root := get_node("BaseUIRoot") as Control
@@ -1081,12 +1129,19 @@ func _update_chapter_goal_view() -> void:
 		return
 	var snapshot: Dictionary = _game_state.get_chapter_goal_snapshot()
 	if bool(snapshot.get("active", false)):
-		chapter_goal_label.text = "第一章：解锁制造所\n目标：购买制造机，解锁制造所\n矿币 %d / %d" % [
-			int(snapshot.get("current_currency", 0)),
-			int(snapshot.get("required_currency", MANUFACTURING_UNLOCK_COST)),
+		var lines: Array[String] = [
+			String(snapshot.get("title", "第一章：重启杂货店")),
+			"目标：" + String(snapshot.get("subtitle", "完成首次营业")),
 		]
+		for objective in Array(snapshot.get("objectives", [])):
+			if objective is Dictionary:
+				lines.append("%s %s" % [
+					"✓" if bool(objective.get("completed", false)) else "□",
+					String(objective.get("label", "")),
+				])
+		chapter_goal_label.text = "\n".join(lines)
 	elif bool(snapshot.get("completed", false)):
-		chapter_goal_label.text = "第一章已完成\n制造所已解锁"
+		chapter_goal_label.text = "第一章已完成\n杂货店已重启"
 	else:
 		chapter_goal_label.text = ""
 
@@ -1132,6 +1187,9 @@ func _on_shop_stock_meta_clicked(meta: Variant) -> void:
 func _on_research_meta_clicked(meta: Variant) -> void:
 	if base_research_panel.handle_meta_clicked(meta):
 		_selected_research_id = base_research_panel.selected_research_id
+
+func _on_research_selection_changed(research_id: String) -> void:
+	_selected_research_id = research_id
 
 func _on_sell_count_changed(_value: float) -> void:
 	base_merchant_panel.update_selected_sell_state()
