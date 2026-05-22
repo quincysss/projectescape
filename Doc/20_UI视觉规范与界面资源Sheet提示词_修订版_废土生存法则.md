@@ -880,7 +880,7 @@ V0.2 白天准备入口顺序为：仓库、制造所、研究所、图鉴。
 材料。
 装备。
 消耗品。
-图纸。
+配方开放。
 稀有物资。
 ```
 
@@ -1201,7 +1201,7 @@ Avoid: full menu screenshot, readable text, watermark, modern flat UI.
 Create a transparent PNG UI sprite sheet for research and crafting interface elements in a 2D wasteland extraction game.
 Grid: 5x5, one element per cell, no labels.
 Style: hand-drawn dark manga UI, old circuit diagram mixed with dirty paper and worn metal, grayscale base, blue-purple electronic accents, warm orange crafting lights.
-Elements: research node locked, research node available, research node completed, research connection line, material requirement badge, blueprint badge, recipe card frame, crafting output frame, missing material warning badge, craft button active, craft button disabled, progress strip, completed stamp without text, small tool icon frame, small circuit icon frame.
+Elements: research node locked, research node available, research node completed, research connection line, material requirement badge, prerequisite badge, recipe card frame, crafting output frame, missing material warning badge, craft button active, craft button disabled, progress strip, completed stamp without text, small tool icon frame, small circuit icon frame.
 Requirements: transparent background, no text, consistent line style, suitable for Godot slicing.
 Avoid: full interface mockup, readable labels, watermark, bright sci-fi UI.
 ```

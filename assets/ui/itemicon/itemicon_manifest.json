@@ -91,13 +91,6 @@
     "prompt": "Create a 128x128 inventory icon for a 2D wasteland extraction game. Subject: broken handheld scanner. Style: dark hand-drawn manga line art, thick black outline, rough dirty texture, grayscale and charcoal palette, small muted accent color by quality. Composition: centered object, transparent background, readable silhouette at small size. Requirements: no text, no watermark, no background scene, clean cutout edges."
   },
   {
-    "id": "bp_backpack_small",
-    "quality": "A",
-    "category": "blueprint",
-    "path": "res://assets/ui/itemicon/bp_backpack_small.png",
-    "prompt": "Create a 128x128 inventory icon for a 2D wasteland extraction game. Subject: small backpack blueprint. Style: dark hand-drawn manga line art, thick black outline, rough dirty texture, grayscale and charcoal palette, small muted accent color by quality. Composition: centered object, transparent background, readable silhouette at small size. Requirements: no text, no watermark, no background scene, clean cutout edges."
-  },
-  {
     "id": "keepsake_photo",
     "quality": "A",
     "category": "rare collectible",

@@ -23,7 +23,6 @@ field_bandage	consumable	临时绷带	C	false	1	0.08	res://assets/ui/itemicon/fi
 signal_injector	consumable	信号针剂	A	false	1	0.12	res://assets/ui/itemicon/signal_injector.png	true	mine_coin	48	短时增强感知和信号反馈的危险针剂。	consumable;stability;rare	v0.1
 backpack_small_reinforced	equipment	小型加固背包	C	false	1	1.00	res://assets/ui/itemicon/backpack_small_reinforced.png	true	mine_coin	45	加固过的小背包，能略微提高携带能力。	equipment;backpack;carry	v0.1
 scanner_broken	equipment	破损扫描器	B	false	1	0.80	res://assets/ui/itemicon/scanner_broken.png	true	mine_coin	35	旧城区常见的半坏扫描设备。	equipment;tool;electronic	v0.1
-bp_backpack_small	blueprint	小型背包图纸	A	false	1	0.02	res://assets/ui/itemicon/bp_backpack_small.png	true	mine_coin	60	记录小型加固背包制作方法的旧图纸。	blueprint;equipment;backpack	v0.1
 keepsake_photo	rare	褪色照片	A	false	1	0.01	res://assets/ui/itemicon/keepsake_photo.png	true	mine_coin	40	几乎没有实用价值，却能在结算中换来高价值。	rare;settlement;collectible	v0.1
 gold_data_chip	rare	金色数据芯片	S	false	1	0.03	res://assets/ui/itemicon/gold_data_chip.png	true	mine_coin	120	保存着稀缺旧城数据的高价值芯片。	rare;settlement;electronic	v0.1
 ration_bar	consumable	压缩口粮	C	false	1	0.12	res://assets/ui/itemicon/ration_bar.png	true	mine_coin	10	能快速补充体力的旧式压缩口粮。	consumable;food;common	v0.2

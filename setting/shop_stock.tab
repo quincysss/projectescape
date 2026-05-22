@@ -13,7 +13,6 @@ base_merchant	2	3	pulse_battery	1	2	18	mine_coin	8	true	v0.3	等级2高阶电力
 base_merchant	2	3	signal_resonator_coil	1	2	18	mine_coin	8	true	v0.3	等级2信号电子材料，前哨存储和高级背包升级常用。
 base_merchant	2	3	keepsake_photo	1	1	10	mine_coin	40	true	v0.4	等级2起概率投放的A级收藏道具。
 base_merchant	2	3	signal_injector	1	1	9	mine_coin	48	true	v0.4	等级2起概率投放的A级消耗道具。
-base_merchant	2	3	bp_backpack_small	1	1	8	mine_coin	60	true	v0.4	等级2起概率投放的A级图纸道具。
 base_merchant	2	3	sealed_medkit	1	1	7	mine_coin	70	true	v0.4	等级2起概率投放的A级医疗道具。
 base_merchant	2	3	survey_drone_core	1	1	5	mine_coin	85	true	v0.4	等级2起概率投放的A级稀有道具。
 base_merchant	2	3	thermal_scope_module	1	1	5	mine_coin	78	true	v0.4	等级2起概率投放的A级装备道具。

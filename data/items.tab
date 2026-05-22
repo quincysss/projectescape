@@ -7,4 +7,3 @@ sugar_pack	material	糖块	C	true	30	0.05	res://assets/icons/items/sugar_pack.pn
 medical_powder	material	药粉	B	true	20	0.05	res://assets/icons/items/medical_powder.png	false	mine_coin	0	来源不明的药粉，可用于制作稳定类消耗品。	material;medical;craft	v0.1
 stability_candy	consumable	安定糖	B	true	10	0.1	res://assets/icons/consumables/stability_candy.png	true	mine_coin	18	能短暂稳定情绪的小糖块。	consumable;stability	v0.1
 backpack_small_reinforced	equipment	小型加固背包	C	false	1	1.0	res://assets/icons/equipment/backpack_small_reinforced.png	true	mine_coin	45	加固过的小型背包，可略微提高负重。	equipment;backpack;crafted	v0.1
-bp_backpack_small	blueprint	小型加固背包图纸	B	false	1	0.05	res://assets/icons/blueprints/bp_backpack_small.png	true	mine_coin	60	记录了小型加固背包的制作方法。	blueprint;craft	v0.1

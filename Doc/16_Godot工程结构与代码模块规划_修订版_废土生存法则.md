@@ -37,7 +37,7 @@ project-escape/
     effects.tab
     research.tab
     recipes.tab
-    blueprints.tab
+    recipes.tab
   scenes/
     boot/
     game/

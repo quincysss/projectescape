@@ -20,7 +20,6 @@ QUALITY_ACCENTS = {
     "B": (76, 145, 210, 235),
     "A": (150, 92, 210, 240),
     "S": (218, 186, 82, 245),
-    "SS": (245, 105, 170, 248),
 }
 
 
@@ -38,7 +37,6 @@ ITEM_SPECS = {
     "signal_injector": ("signal injector syringe", "consumable"),
     "backpack_small_reinforced": ("small reinforced backpack", "equipment"),
     "scanner_broken": ("broken handheld scanner", "equipment"),
-    "bp_backpack_small": ("small backpack blueprint", "blueprint"),
     "keepsake_photo": ("faded keepsake photo", "rare collectible"),
     "gold_data_chip": ("gold data chip", "rare electronic"),
     "ration_bar": ("compressed ration bar", "consumable"),

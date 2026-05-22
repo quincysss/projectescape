@@ -1,6 +1,1 @@
-﻿item_id	weight	enabled	enabled_version	description
-ss_silverwing_engine_core	10	true	v0.3	银翼发动机核心，SS 超稀有展示与售卖道具。
-ss_pink_star	5	true	v0.3	粉星，SS 超稀有展示与售卖道具。
-ss_wanming_pocket_watch	3	true	v0.3	万鸣怀表，SS 超稀有展示与售卖道具。
-ss_old_world_gold_bar	5	true	v0.3	旧世金砖，SS 超稀有展示与售卖道具。
-ss_zero_master_control_board	5	true	v0.3	零号主控板，SS 超稀有展示与售卖道具。
+item_id	weight	enabled	version	notes
