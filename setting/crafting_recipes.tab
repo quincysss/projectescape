@@ -1,4 +1,16 @@
 recipe_id	output_item_id	output_count	required_items	required_currency_id	required_currency_amount	description	enabled
+recipe_scrap_bundle	sale_good_scrap_bundle	1	scrap_metal:1	mine_coin	0	把单个废金属整理成基础可售的废料五金包。	true
+recipe_cloth_wrap	sale_good_cloth_wrap	1	cloth_dirty:1	mine_coin	0	把单个脏布条整理成基础可售的简易包扎卷。	true
+recipe_wire_spool	sale_good_wire_spool	1	wire_coil:1	mine_coin	0	把单个旧线圈整理成基础可售的扎线小卷。	true
+recipe_battery_clip	sale_good_battery_clip	1	battery_old:1	mine_coin	0	把单个旧电池整理成基础可售的电池夹。	true
+recipe_medicine_sachet	sale_good_medicine_sachet	1	medicine_powder:1	mine_coin	0	把单个药粉整理成基础可售的苦味药包。	true
+recipe_tool_bit_box	sale_good_tool_bit_box	1	tool_parts:1	mine_coin	0	把单个工具零件整理成基础可售的工具齿盒。	true
+recipe_lens_tag	sale_good_lens_tag	1	cracked_lens:1	mine_coin	0	把单个裂纹镜片整理成基础可售的反光识别片。	true
+recipe_tape_strip	sale_good_tape_strip	1	duct_tape_roll:1	mine_coin	0	把单个旧胶带整理成基础可售的修补胶条。	true
+recipe_bolt_cup	sale_good_bolt_cup	1	rusted_bolts:1	mine_coin	0	把单个生锈螺栓整理成基础可售的螺栓小盒。	true
+recipe_strap_bundle	sale_good_strap_bundle	1	reinforced_strap:1	mine_coin	0	把单个加固背带整理成基础可售的背带束。	true
+recipe_charge_cell	sale_good_charge_cell	1	pulse_battery:1	mine_coin	0	把单个脉冲电池整理成基础可售的蓄能小芯。	true
+recipe_signal_tag	sale_good_signal_tag	1	signal_resonator_coil:1	mine_coin	0	把单个信号谐振线圈整理成基础可售的信号标牌。	true
 recipe_repaired_filter	sale_good_repaired_filter	1	scrap_metal:1;cloth_dirty:1	mine_coin	0	把废金属和布条整理成可售卖的修复滤芯。	true
 recipe_emergency_wrap	sale_good_emergency_wrap	1	cloth_dirty:1;medicine_powder:1;duct_tape_roll:1	mine_coin	0	制作白天店铺可售卖的应急包扎卷。	true
 recipe_signal_lamp	sale_good_signal_lamp	1	wire_coil:1;battery_old:1;tool_parts:1	mine_coin	0	组装白天店铺可售卖的简易信号灯。	true

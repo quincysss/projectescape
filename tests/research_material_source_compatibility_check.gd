@@ -18,7 +18,7 @@ func _verify_research_material_sources() -> bool:
 		printerr("Expected registry to load data tables: %s" % registry.load_errors)
 		return false
 
-	if not _verify_research_requirements_are_obtainable(registry):
+	if not _verify_research_requirements_are_empty(registry):
 		return false
 	if not _verify_outpost_materials_are_run_only(registry):
 		return false
@@ -26,28 +26,18 @@ func _verify_research_material_sources() -> bool:
 		return false
 	if not _verify_actual_shop_buy_marks_source(game_state):
 		return false
-	if not _verify_research_accepts_source(game_state, registry, "run_loot"):
+	if not _verify_research_ignores_warehouse_source(game_state, registry, "run_loot"):
 		return false
-	if not _verify_research_accepts_source(game_state, registry, "merchant_shop"):
+	if not _verify_research_ignores_warehouse_source(game_state, registry, "merchant_shop"):
 		return false
 	return true
 
-func _verify_research_requirements_are_obtainable(registry) -> bool:
-	var item_ids := _research_requirement_item_ids(registry)
-	var drop_ids := {}
-	for context in registry.drop_rows_by_context.keys():
-		for row in registry.drop_rows_by_context[context]:
-			drop_ids[String(row.get("item_id", ""))] = true
-
-	var ok := true
-	for item_id in item_ids.keys():
-		if registry.get_item(item_id).is_empty():
-			printerr("Research requires missing item: %s" % item_id)
-			ok = false
-		if not drop_ids.has(item_id):
-			printerr("Research item must be obtainable from in-run drops: %s" % item_id)
-			ok = false
-	return ok
+func _verify_research_requirements_are_empty(registry) -> bool:
+	for row in registry.get_research_rows():
+		if not String(row.get("required_items", "")).strip_edges().is_empty():
+			printerr("Research required_items must be empty or ignored: %s" % row)
+			return false
+	return true
 
 func _verify_shop_stock_level_pools(registry) -> bool:
 	var level_one_ids := _shop_item_id_set(registry.get_shop_stock_rows_for_level(1))
@@ -73,16 +63,6 @@ func _verify_shop_stock_level_pools(registry) -> bool:
 	if not level_three_qualities.has("S"):
 		printerr("Merchant level 3 must include S stock rows.")
 		return false
-	var research_resource_ids := {}
-	for item_id in _research_requirement_item_ids(registry).keys():
-		var item: Dictionary = registry.get_item(item_id)
-		var item_type := String(item.get("item_type", ""))
-		if item_type == "material":
-			research_resource_ids[item_id] = true
-	for item_id in research_resource_ids.keys():
-		if not level_three_ids.has(item_id):
-			printerr("Research resource should be purchasable by merchant level 3: %s" % item_id)
-			return false
 	for row in registry.shop_stock_rows:
 		var item_id := String(row.get("item_id", ""))
 		var item: Dictionary = registry.get_item(item_id)
@@ -93,13 +73,9 @@ func _verify_shop_stock_level_pools(registry) -> bool:
 
 func _verify_outpost_materials_are_run_only(registry) -> bool:
 	var ok := true
-	var research_item_ids := _research_requirement_item_ids(registry)
 	for material_id in registry.repair_materials_by_id.keys():
 		if not registry.get_item(String(material_id)).is_empty():
 			printerr("Repair material must not be defined in items.tab: %s" % material_id)
-			ok = false
-		if research_item_ids.has(String(material_id)):
-			printerr("Research must not consume run-only repair material: %s" % material_id)
 			ok = false
 	for row in registry.shop_stock_rows:
 		var item_id := String(row.get("item_id", ""))
@@ -139,37 +115,29 @@ func _verify_actual_shop_buy_marks_source(game_state: Node) -> bool:
 		return false
 	return true
 
-func _verify_research_accepts_source(game_state: Node, registry, source: String) -> bool:
+func _verify_research_ignores_warehouse_source(game_state: Node, registry, source: String) -> bool:
 	game_state.clear_warehouse()
 	game_state.clear_currencies()
 	game_state.reset_research()
 	_add_items_with_source(registry, game_state, "scrap_metal", 3, source)
 	_add_items_with_source(registry, game_state, "cloth_dirty", 2, source)
+	var before_count: int = game_state.get_warehouse_items_snapshot().size()
 	game_state.add_currency("mine_coin", 20, "test_research_source_%s" % source)
 	var quote: Dictionary = game_state.get_research_quote("move_speed")
 	if not bool(quote.get("ok", false)):
-		printerr("Expected research quote to accept %s source items: %s" % [source, quote])
+		printerr("Expected research quote to ignore %s source items and use mine_coin only: %s" % [source, quote])
+		return false
+	if not Array(quote.get("requirement_details", [])).is_empty() or not Dictionary(quote.get("required_items", {})).is_empty():
+		printerr("Expected research quote to expose no item requirements: %s" % quote)
 		return false
 	var result: Dictionary = game_state.complete_research("move_speed")
 	if not bool(result.get("ok", false)) or game_state.get_research_level("move_speed") != 1:
-		printerr("Expected research to consume %s source items: %s" % [source, result])
+		printerr("Expected research to complete with mine_coin only for %s source setup: %s" % [source, result])
 		return false
-	if not game_state.get_warehouse_items_snapshot().is_empty():
-		printerr("Expected research to consume all provided %s source items." % source)
+	if game_state.get_warehouse_items_snapshot().size() != before_count:
+		printerr("Expected research not to consume %s source items." % source)
 		return false
 	return true
-
-func _research_requirement_item_ids(registry) -> Dictionary:
-	var result := {}
-	for row in registry.get_research_rows():
-		for part in String(row.get("required_items", "")).split(";", false):
-			var cells := String(part).split(":", false, 1)
-			if cells.size() != 2:
-				continue
-			var item_id := String(cells[0]).strip_edges()
-			if not item_id.is_empty():
-				result[item_id] = true
-	return result
 
 func _shop_item_id_set(rows: Array) -> Dictionary:
 	var result := {}

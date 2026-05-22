@@ -1,0 +1,4 @@
+interface:
+  display_name: "Project Escape TAB Data Guardian"
+  short_description: "Guard Project Escape data config integrity."
+  default_prompt: "Maintain Project Escape TAB, TSV, JSON, manifest, and configuration data by discovering current repository conventions, preserving UTF-8 and references, validating data integrity, and reporting evidence."

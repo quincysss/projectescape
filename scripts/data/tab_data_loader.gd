@@ -21,7 +21,7 @@ func load_tab(path: String) -> Array[Dictionary]:
 		line_number += 1
 		if line.strip_edges().is_empty() or line.begins_with("#"):
 			continue
-		var cells := line.split("\t", false)
+		var cells := line.split("\t", true)
 		if headers.is_empty():
 			headers = cells
 			continue

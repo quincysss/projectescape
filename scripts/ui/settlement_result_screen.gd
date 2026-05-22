@@ -290,8 +290,6 @@ func _status_text(item: Dictionary) -> String:
 
 func _quality_rank(quality: String) -> int:
 	match quality:
-		"SS":
-			return 5
 		"S":
 			return 4
 		"A":
@@ -310,8 +308,6 @@ func _quality_color(item: Dictionary) -> Color:
 	if value is Color:
 		return value
 	match String(item.get("quality", "C")):
-		"SS":
-			return Color("#FF67D8")
 		"S":
 			return Color("#F1CA3A")
 		"A":

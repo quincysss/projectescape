@@ -1,0 +1,16 @@
+context	category_id	weight	quality_bias	notes	enabled_version
+container_cardboard	textile	35	C	纸箱偏向纺织和基础小件。	v0.5
+container_cardboard	hardware	30	C	纸箱可出少量五金。	v0.5
+container_cardboard	food	15	C	纸箱可补少量食物成品。	v0.5
+container_wooden	hardware	40	C/B	木箱偏向五金和维修件。	v0.5
+container_wooden	textile	25	C/B	木箱保留布料和携行材料。	v0.5
+container_tool	hardware	45	C/B	工具柜主产五金。	v0.5
+container_tool	electronic	35	B/A	工具柜次产电子件。	v0.5
+container_medical	medical	55	B	医疗柜主产医疗资源。	v0.5
+container_medical	textile	15	C/B	医疗柜可出包扎纺织材料。	v0.5
+container_small_safe	luxury	30	B/A	小保险箱偏贵重物。	v0.5
+container_small_safe	route_intel	25	B/A	小保险箱可出路线情报。	v0.5
+container_large_safe	luxury	35	A/S	大保险柜提高贵重物权重。	v0.5
+container_large_safe	electronic	30	A/S	大保险柜可出高级电子件。	v0.5
+container_anomaly	electronic	35	A/S	异常箱偏高阶电子和异常物。	v0.5
+container_anomaly	route_intel	30	A/S	异常箱可出路线/设施情报。	v0.5

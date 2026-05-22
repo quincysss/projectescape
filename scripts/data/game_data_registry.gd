@@ -15,9 +15,10 @@ const CRAFTING_RECIPES_PATH := "res://setting/crafting_recipes.tab"
 const SS_CHANCE_TIERS_PATH := "res://setting/ss_chance_tiers.tab"
 const SS_CONTAINER_CHANCES_PATH := "res://setting/ss_container_chances.tab"
 const SS_LOOT_POOL_PATH := "res://setting/ss_loot_pool.tab"
+const MAP_RESOURCE_PROFILES_PATH := "res://setting/map_resource_profiles.tab"
+const LOCATION_STATE_RULES_PATH := "res://setting/location_state_rules.tab"
 
 const QUALITY_ORDER := ["C", "B", "A", "S"]
-const SS_QUALITY := "SS"
 const RING_CONTAINER_TYPE_WEIGHTS := {
 	"inner": {
 		"cardboard_box": 60,
@@ -72,6 +73,8 @@ var crafting_recipe_rows: Array[Dictionary] = []
 var ss_chance_tier_rows: Array[Dictionary] = []
 var ss_container_chance_rows_by_type: Dictionary = {}
 var ss_loot_pool_rows: Array[Dictionary] = []
+var map_resource_profiles_by_id: Dictionary = {}
+var location_state_rules_by_id: Dictionary = {}
 var load_errors: Array[String] = []
 
 func load_all() -> bool:
@@ -87,6 +90,8 @@ func load_all() -> bool:
 	ss_chance_tier_rows = _load_rows(SS_CHANCE_TIERS_PATH)
 	ss_container_chance_rows_by_type = _index_rows(_load_rows(SS_CONTAINER_CHANCES_PATH), "type_id")
 	ss_loot_pool_rows = _load_rows(SS_LOOT_POOL_PATH)
+	map_resource_profiles_by_id = _index_rows(_load_rows(MAP_RESOURCE_PROFILES_PATH), "map_id")
+	location_state_rules_by_id = _index_rows(_load_rows(LOCATION_STATE_RULES_PATH), "state_id")
 	drop_rows_by_context.clear()
 	for row in _load_rows(DROP_TABLES_PATH):
 		var context := String(row.get("context", ""))
@@ -116,11 +121,32 @@ func get_repair_material_rows() -> Array[Dictionary]:
 	return result
 
 func get_item_quality_color(quality: String) -> Color:
-	var row: Dictionary = quality_colors_by_id.get(quality, {})
+	var row: Dictionary = quality_colors_by_id.get(_normalize_quality(quality), {})
 	return TabDataLoader.parse_color(String(row.get("text_color_hex", "")), Color.WHITE)
 
 func get_container_type(type_id: String) -> Dictionary:
 	return containers_by_id.get(type_id, {})
+
+func get_map_resource_profile(map_id: String) -> Dictionary:
+	var row: Dictionary = map_resource_profiles_by_id.get(map_id, {})
+	if row.is_empty() and map_resource_profiles_by_id.has("abandoned_house"):
+		row = map_resource_profiles_by_id.get("abandoned_house", {})
+	return row.duplicate(true)
+
+func get_map_resource_profiles() -> Array[Dictionary]:
+	var result: Array[Dictionary] = []
+	for row in map_resource_profiles_by_id.values():
+		if not TabDataLoader.parse_bool(String(row.get("enabled", "true")), true):
+			continue
+		result.append(row.duplicate(true))
+	result.sort_custom(func(a, b): return String(a.get("map_id", "")) < String(b.get("map_id", "")))
+	return result
+
+func get_location_state_rule(state_id: String) -> Dictionary:
+	var row: Dictionary = location_state_rules_by_id.get(state_id, {})
+	if row.is_empty() and location_state_rules_by_id.has("normal"):
+		row = location_state_rules_by_id.get("normal", {})
+	return row.duplicate(true)
 
 func get_container_types_for_ring(ring: String) -> Array[Dictionary]:
 	var normalized_ring := _normalize_ring(ring)
@@ -159,50 +185,19 @@ func get_crafting_recipe_rows() -> Array[Dictionary]:
 	return result
 
 func get_ss_chance_tier_rows() -> Array[Dictionary]:
-	var result: Array[Dictionary] = []
-	for row in ss_chance_tier_rows:
-		if not TabDataLoader.parse_bool(String(row.get("enabled", "true")), true):
-			continue
-		result.append(row.duplicate(true))
-	result.sort_custom(func(a, b): return int(a.get("tier", 0)) < int(b.get("tier", 0)))
-	return result
+	return []
 
 func get_ss_chance_for_tier(tier: int) -> float:
-	var rows := get_ss_chance_tier_rows()
-	if rows.is_empty():
-		return _fallback_ss_chance_for_tier(tier)
-	var normalized_tier: int = maxi(0, tier)
-	var selected: Dictionary = rows[0]
-	for row in rows:
-		if int(row.get("tier", 0)) <= normalized_tier:
-			selected = row
-		else:
-			break
-	return clampf(float(selected.get("hit_chance", 0.0)), 0.0, 1.0)
+	return 0.0
 
 func get_ss_container_chance(type_id: String) -> float:
-	var row: Dictionary = ss_container_chance_rows_by_type.get(type_id, {})
-	if row.is_empty() or not TabDataLoader.parse_bool(String(row.get("enabled", "true")), true):
-		return 0.0
-	return clampf(float(row.get("roll_chance", 0.0)), 0.0, 1.0)
+	return 0.0
 
 func is_ss_pity_container(type_id: String) -> bool:
-	var row: Dictionary = ss_container_chance_rows_by_type.get(type_id, {})
-	if row.is_empty() or not TabDataLoader.parse_bool(String(row.get("enabled", "true")), true):
-		return false
-	return TabDataLoader.parse_bool(String(row.get("pity_eligible", "false")), false)
+	return false
 
 func get_ss_loot_pool_rows() -> Array[Dictionary]:
-	var result: Array[Dictionary] = []
-	for row in ss_loot_pool_rows:
-		if not TabDataLoader.parse_bool(String(row.get("enabled", "true")), true):
-			continue
-		var item_id := String(row.get("item_id", ""))
-		var item := get_item(item_id)
-		if item.is_empty() or String(item.get("quality", "")) != SS_QUALITY:
-			continue
-		result.append(row.duplicate(true))
-	return result
+	return []
 
 func get_ss_loot_pool_item_ids() -> Array[String]:
 	var result: Array[String] = []
@@ -211,19 +206,7 @@ func get_ss_loot_pool_item_ids() -> Array[String]:
 	return result
 
 func pick_ss_item_stack(rng: RandomNumberGenerator) -> Dictionary:
-	var row := _pick_weighted_drop(get_ss_loot_pool_rows(), rng)
-	if row.is_empty():
-		return {}
-	var item_id := String(row.get("item_id", ""))
-	var item := get_item(item_id)
-	if item.is_empty() or String(item.get("quality", "")) != SS_QUALITY:
-		return {}
-	var stack := make_item_stack(item_id, 1)
-	if stack.is_empty():
-		return {}
-	stack["ss_rare"] = true
-	stack["source"] = "ss_container_loot"
-	return stack
+	return {}
 
 func pick_container_type_for_ring(ring: String, rng: RandomNumberGenerator) -> Dictionary:
 	var normalized_ring := _normalize_ring(ring)
@@ -233,6 +216,18 @@ func pick_container_type_for_ring(ring: String, rng: RandomNumberGenerator) -> D
 	if candidates.is_empty():
 		return {}
 	var weighted_candidate := _pick_weighted_container_type(candidates, normalized_ring, rng)
+	if not weighted_candidate.is_empty():
+		return weighted_candidate
+	return candidates[rng.randi_range(0, candidates.size() - 1)]
+
+func pick_container_type_for_profile(ring: String, map_profile: Dictionary, rng: RandomNumberGenerator) -> Dictionary:
+	var normalized_ring := _normalize_ring(ring)
+	var candidates := get_container_types_for_ring(normalized_ring)
+	if candidates.is_empty():
+		candidates = containers_by_id.values()
+	if candidates.is_empty():
+		return {}
+	var weighted_candidate := _pick_weighted_container_type(candidates, normalized_ring, rng, map_profile)
 	if not weighted_candidate.is_empty():
 		return weighted_candidate
 	return candidates[rng.randi_range(0, candidates.size() - 1)]
@@ -266,19 +261,22 @@ func _is_shop_stock_item(item: Dictionary) -> bool:
 		return false
 	return QUALITY_ORDER.has(String(item.get("quality", "")))
 
-func generate_container_loot(container_def: Dictionary, ring: String, rng: RandomNumberGenerator) -> Array[Dictionary]:
+func generate_container_loot(container_def: Dictionary, ring: String, rng: RandomNumberGenerator, generation_context: Dictionary = {}) -> Array[Dictionary]:
 	var context := String(container_def.get("loot_context", ""))
 	var rows: Array = _normal_drop_rows(drop_rows_by_context.get(context, []))
 	if rows.is_empty():
 		return []
 	var min_slots: int = max(1, int(container_def.get("loot_slots_min", 1)))
 	var max_slots: int = max(min_slots, int(container_def.get("loot_slots_max", min_slots)))
+	var quantity_multiplier := _context_quantity_multiplier(generation_context)
+	min_slots = max(1, int(round(float(min_slots) * quantity_multiplier)))
+	max_slots = max(min_slots, int(round(float(max_slots) * quantity_multiplier)))
 	var slot_count := rng.randi_range(min_slots, max_slots)
 	var result: Array[Dictionary] = []
 	for _index in range(slot_count):
-		var quality := _pick_loot_quality(rows, container_def, ring, rng)
+		var quality := _pick_loot_quality(rows, container_def, ring, rng, generation_context)
 		var candidate_rows := _drop_rows_for_quality(rows, quality)
-		var row := _pick_weighted_drop(candidate_rows, rng)
+		var row := _pick_weighted_drop(candidate_rows, rng, generation_context)
 		if row.is_empty():
 			continue
 		var item_id := String(row.get("item_id", ""))
@@ -298,13 +296,14 @@ func make_item_stack(item_id: String, amount: int = 1) -> Dictionary:
 	var item := get_item(item_id)
 	if item.is_empty():
 		return {}
-	var quality := String(item.get("quality", "C"))
+	var quality := _normalize_quality(String(item.get("quality", "C")))
 	return {
 		"item_id": StringName(item_id),
 		"display_name": String(item.get("name", item_id)),
-		"amount": 1,
+		"amount": maxi(1, amount),
 		"weight_per_unit": float(item.get("weight", 0.0)),
-		"stack_limit": 1,
+		"stackable": TabDataLoader.parse_bool(String(item.get("stackable", "false")), false),
+		"stack_limit": maxi(1, int(item.get("stack_limit", 1))),
 		"item_type": StringName(String(item.get("item_type", "material"))),
 		"quality": StringName(quality),
 		"quality_color": get_item_quality_color(quality),
@@ -348,49 +347,56 @@ func _index_rows(rows: Array[Dictionary], id_field: String) -> Dictionary:
 		indexed[id] = row
 	return indexed
 
-func _pick_weighted_drop(rows: Array, rng: RandomNumberGenerator) -> Dictionary:
-	var total_weight := 0
+func _pick_weighted_drop(rows: Array, rng: RandomNumberGenerator, generation_context: Dictionary = {}) -> Dictionary:
+	var total_weight := 0.0
 	for row in rows:
-		total_weight += max(0, int(row.get("weight", 0)))
+		total_weight += _drop_row_weight(row, generation_context)
 	if total_weight <= 0:
 		return {}
-	var roll := rng.randi_range(1, total_weight)
-	var cursor := 0
+	var roll := rng.randf_range(0.0, total_weight)
+	var cursor := 0.0
 	for row in rows:
-		cursor += max(0, int(row.get("weight", 0)))
+		cursor += _drop_row_weight(row, generation_context)
 		if roll <= cursor:
 			return row
 	return rows.back()
 
-func _pick_weighted_container_type(candidates: Array, ring: String, rng: RandomNumberGenerator) -> Dictionary:
+func _pick_weighted_container_type(candidates: Array, ring: String, rng: RandomNumberGenerator, map_profile: Dictionary = {}) -> Dictionary:
 	var weights: Dictionary = RING_CONTAINER_TYPE_WEIGHTS.get(ring, {})
 	if weights.is_empty():
 		return {}
-	var total_weight := 0
+	var overrides := _parse_weight_overrides(String(map_profile.get("container_type_weight_overrides", "")))
+	var total_weight := 0.0
 	for container in candidates:
 		var type_id := String(container.get("type_id", ""))
-		total_weight += max(0, int(weights.get(type_id, 0)))
+		total_weight += maxf(0.0, float(weights.get(type_id, 0)) * float(overrides.get(type_id, 1.0)))
 	if total_weight <= 0:
 		return {}
-	var roll := rng.randi_range(1, total_weight)
-	var cursor := 0
+	var roll := rng.randf_range(0.0, total_weight)
+	var cursor := 0.0
 	for container in candidates:
 		var type_id := String(container.get("type_id", ""))
-		cursor += max(0, int(weights.get(type_id, 0)))
+		cursor += maxf(0.0, float(weights.get(type_id, 0)) * float(overrides.get(type_id, 1.0)))
 		if roll <= cursor:
 			return container
 	return candidates.back()
 
-func _pick_loot_quality(rows: Array, container_def: Dictionary, ring: String, rng: RandomNumberGenerator) -> String:
+func _pick_loot_quality(rows: Array, container_def: Dictionary, ring: String, rng: RandomNumberGenerator, generation_context: Dictionary = {}) -> String:
 	var normalized_ring := _normalize_ring(ring)
 	var base_weights: Dictionary = RING_QUALITY_WEIGHTS.get(normalized_ring, RING_QUALITY_WEIGHTS.get("inner", {}))
 	var modifier_weights: Dictionary = CONTAINER_QUALITY_MODIFIERS.get(String(container_def.get("type_id", "")), {})
+	var rare_multiplier := _context_rare_multiplier(generation_context)
+	var low_tier_multiplier := _context_low_tier_multiplier(generation_context)
 	var quality_weights := {}
 	var total_weight := 0.0
 	for quality in QUALITY_ORDER:
 		if not _has_drop_rows_for_quality(rows, quality):
 			continue
 		var adjusted_weight := float(base_weights.get(quality, 0.0)) * float(modifier_weights.get(quality, 1.0))
+		if quality == "A" or quality == "S":
+			adjusted_weight *= rare_multiplier
+		elif quality == "C":
+			adjusted_weight *= low_tier_multiplier
 		if adjusted_weight <= 0.0:
 			continue
 		quality_weights[quality] = adjusted_weight
@@ -429,7 +435,7 @@ func _first_available_quality(rows: Array) -> String:
 func _normal_drop_rows(rows: Array) -> Array:
 	var result: Array = []
 	for row in rows:
-		if _drop_row_quality(row) == SS_QUALITY:
+		if not QUALITY_ORDER.has(_drop_row_quality(row)):
 			continue
 		result.append(row)
 	return result
@@ -438,22 +444,76 @@ func _drop_row_quality(row: Dictionary) -> String:
 	var item := get_item(String(row.get("item_id", "")))
 	if item.is_empty():
 		return ""
-	return String(item.get("quality", "C"))
+	return _normalize_quality(String(item.get("quality", "C")))
 
 func _fallback_ss_chance_for_tier(tier: int) -> float:
-	match maxi(0, tier):
-		0:
-			return 0.20
-		1:
-			return 0.10
-		2:
-			return 0.05
-		3:
-			return 0.025
-		_:
-			return 0.01
+	return 0.0
 
 func _normalize_ring(ring: String) -> String:
 	if ring == "deep_outer":
 		return "far_outer"
 	return ring
+
+func _normalize_quality(quality: String) -> String:
+	var normalized := quality.strip_edges().to_upper()
+	if QUALITY_ORDER.has(normalized):
+		return normalized
+	return "C"
+
+func _context_quantity_multiplier(generation_context: Dictionary) -> float:
+	var state_rule: Dictionary = generation_context.get("location_state_rule", {})
+	return maxf(0.10, float(state_rule.get("quantity_multiplier", 1.0)))
+
+func _context_rare_multiplier(generation_context: Dictionary) -> float:
+	var state_rule: Dictionary = generation_context.get("location_state_rule", {})
+	return maxf(0.0, float(state_rule.get("rare_multiplier", 1.0)))
+
+func _context_low_tier_multiplier(generation_context: Dictionary) -> float:
+	var state_rule: Dictionary = generation_context.get("location_state_rule", {})
+	return maxf(0.0, float(state_rule.get("low_tier_multiplier", 1.0)))
+
+func _drop_row_weight(row: Dictionary, generation_context: Dictionary) -> float:
+	var weight := maxf(0.0, float(row.get("weight", 0)))
+	if weight <= 0.0:
+		return 0.0
+	var map_profile: Dictionary = generation_context.get("map_profile", {})
+	if map_profile.is_empty():
+		return weight
+	var tags := _drop_row_tags(row)
+	var primary_multiplier := maxf(0.0, float(map_profile.get("primary_weight_multiplier", 1.75)))
+	var secondary_multiplier := maxf(0.0, float(map_profile.get("secondary_weight_multiplier", 1.25)))
+	if _tags_match_any(tags, TabDataLoader.split_list(String(map_profile.get("primary_categories", "")))):
+		weight *= primary_multiplier
+	elif _tags_match_any(tags, TabDataLoader.split_list(String(map_profile.get("secondary_categories", "")))):
+		weight *= secondary_multiplier
+	return weight
+
+func _drop_row_tags(row: Dictionary) -> Array[String]:
+	var result: Array[String] = []
+	result.append_array(TabDataLoader.split_list(String(row.get("required_tags", ""))))
+	var item := get_item(String(row.get("item_id", "")))
+	if not item.is_empty():
+		result.append(String(item.get("item_type", "")))
+		result.append_array(TabDataLoader.split_list(String(item.get("tags", ""))))
+	for index in range(result.size()):
+		result[index] = result[index].to_lower()
+	return result
+
+func _tags_match_any(tags: Array[String], categories: Array[String]) -> bool:
+	for category in categories:
+		var normalized := category.to_lower()
+		if tags.has(normalized):
+			return true
+	return false
+
+func _parse_weight_overrides(value: String) -> Dictionary:
+	var result := {}
+	for part in TabDataLoader.split_list(value):
+		var bits := part.split(":", false, 1)
+		if bits.size() != 2:
+			continue
+		var key := String(bits[0]).strip_edges()
+		if key.is_empty():
+			continue
+		result[key] = float(String(bits[1]).strip_edges())
+	return result

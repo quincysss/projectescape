@@ -95,8 +95,6 @@ func _ensure_data_loaded() -> bool:
 
 func _quality_rank(quality: String) -> int:
 	match quality:
-		"SS":
-			return 5
 		"S":
 			return 4
 		"A":

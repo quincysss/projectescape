@@ -10,8 +10,16 @@ func _verify_run_scene_uses_research_speed() -> bool:
 	if game_state == null:
 		printerr("Expected GameState autoload.")
 		return false
+	if game_state.profile.is_empty():
+		game_state.profile = {"username": "测试员"}
 	game_state.reset_research()
-	game_state.research_levels["move_speed"] = 3
+	game_state.clear_currencies()
+	game_state.add_currency("mine_coin", 145, "test_speed_research")
+	for _index in range(3):
+		var research_result: Dictionary = game_state.complete_research("move_speed")
+		if not bool(research_result.get("ok", false)):
+			printerr("Expected move_speed research to complete before run scene: %s" % research_result)
+			return false
 
 	var run_scene: Node = load("res://scenes/run/RunScene.tscn").instantiate()
 	root.add_child(run_scene)

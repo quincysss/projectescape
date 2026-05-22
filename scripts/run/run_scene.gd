@@ -229,6 +229,7 @@ func _ready() -> void:
 	_build_ui()
 	_connect_runtime()
 	run_director.start_new_run()
+	_configure_location_resource_context()
 	_spawn_selected_outposts()
 	_spawn_initial_containers()
 	_spawn_requirement_materials()
@@ -242,6 +243,8 @@ func _ready() -> void:
 	call_deferred("_maybe_start_run_story_gate")
 
 func _exit_tree() -> void:
+	if container_spawn_controller != null:
+		container_spawn_controller.clear_instance_containers()
 	run_story_gate_controller.cleanup()
 	run_simulation_pause_service.clear()
 	_audio_manager_call("stop_container_open_loop")
@@ -597,8 +600,34 @@ func _on_run_initialized(context) -> void:
 	if run_timer_controller == null or run_director == null:
 		return
 	run_timer_controller.setup(context, run_director.config.run_duration_seconds)
-	if container_spawn_controller != null and run_director.has_method("get_ss_loot_director"):
-		container_spawn_controller.setup_ss_loot_director(run_director.get_ss_loot_director())
+
+func _configure_location_resource_context() -> void:
+	if container_spawn_controller == null or run_director == null or run_director.context == null:
+		return
+	var selected_map_id := "abandoned_house"
+	var location_result := {
+		"map_id": selected_map_id,
+		"state": "rich",
+		"visit_count_before": 0,
+		"visit_count_after": 1,
+	}
+	if _game_state != null:
+		if _game_state.has_method("get_night_plan_snapshot"):
+			var snapshot: Dictionary = _game_state.get_night_plan_snapshot()
+			selected_map_id = String(snapshot.get("selected_location_id", selected_map_id))
+		if _game_state.has_method("begin_location_run"):
+			location_result = _game_state.begin_location_run(selected_map_id)
+	var context = run_director.context
+	context.map_id = String(location_result.get("map_id", selected_map_id))
+	context.location_state = String(location_result.get("state", "rich"))
+	context.location_visit_count_before = int(location_result.get("visit_count_before", 0))
+	context.location_visit_count_after = int(location_result.get("visit_count_after", 1))
+	container_spawn_controller.configure_location(
+		context.map_id,
+		context.location_state,
+		context.location_visit_count_before,
+		int(context.seed)
+	)
 
 func _prepare_initial_story_gate() -> void:
 	run_story_gate_controller.prepare_initial_gate(run_director.context if run_director != null else null)
@@ -689,6 +718,8 @@ func _spawn_initial_containers() -> void:
 	if container_spawn_controller == null:
 		return
 	container_spawn_controller.spawn_initial()
+	if run_director != null and run_director.context != null:
+		run_director.context.container_target_count = int(container_spawn_controller.target_container_count)
 
 func _spawn_container(pos: Vector2) -> void:
 	if container_spawn_controller == null:
@@ -1498,8 +1529,10 @@ func _item(id: String, display_name: String, amount: int, weight: float, _stack_
 		"display_name": display_name,
 		"amount": amount,
 		"weight_per_unit": weight,
-		"stack_limit": 1,
+		"stackable": _stack_limit > 1,
+		"stack_limit": maxi(1, _stack_limit),
 		"item_type": "material",
+		"quality": "C",
 	}
 
 func _random_container_position() -> Vector2:

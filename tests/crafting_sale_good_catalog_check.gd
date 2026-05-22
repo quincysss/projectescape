@@ -5,6 +5,18 @@ const GameDataRegistryScript := preload("res://scripts/data/game_data_registry.g
 const TabDataLoaderScript := preload("res://scripts/data/tab_data_loader.gd")
 
 const EXPECTED_GOODS := [
+	"sale_good_scrap_bundle",
+	"sale_good_cloth_wrap",
+	"sale_good_wire_spool",
+	"sale_good_battery_clip",
+	"sale_good_medicine_sachet",
+	"sale_good_tool_bit_box",
+	"sale_good_lens_tag",
+	"sale_good_tape_strip",
+	"sale_good_bolt_cup",
+	"sale_good_strap_bundle",
+	"sale_good_charge_cell",
+	"sale_good_signal_tag",
 	"sale_good_gear_bundle",
 	"sale_good_patch_roll",
 	"sale_good_tie_hook_set",
@@ -15,6 +27,21 @@ const EXPECTED_GOODS := [
 	"sale_good_work_lamp",
 	"sale_good_signal_marker",
 	"sale_good_power_adapter",
+]
+
+const DIRECT_BASIC_GOODS := [
+	"sale_good_scrap_bundle",
+	"sale_good_cloth_wrap",
+	"sale_good_wire_spool",
+	"sale_good_battery_clip",
+	"sale_good_medicine_sachet",
+	"sale_good_tool_bit_box",
+	"sale_good_lens_tag",
+	"sale_good_tape_strip",
+	"sale_good_bolt_cup",
+	"sale_good_strap_bundle",
+	"sale_good_charge_cell",
+	"sale_good_signal_tag",
 ]
 
 
@@ -44,12 +71,16 @@ func _verify_catalog_and_orders() -> bool:
 		if int(item.get("sell_value", 0)) <= 0:
 			printerr("Expected sale_good to have positive sell value: %s" % item_id)
 			ok = false
+		if int(item.get("base_sale_value", 0)) != int(item.get("sell_value", 0)):
+			printerr("Expected sale_good base_sale_value to mirror the current sell_value baseline: %s" % item_id)
+			ok = false
 		if not recipe_outputs.has(item_id):
 			printerr("Expected crafting recipe output for sale_good: %s" % item_id)
 			ok = false
 		if not ResourceLoader.exists(String(item.get("icon", ""))):
 			printerr("Expected icon resource to exist for sale_good: %s" % item_id)
 			ok = false
+	ok = _verify_direct_and_combo_recipes(registry) and ok
 
 	var demand_service = DailyDemandServiceScript.new()
 	var demand_entries: Array[Dictionary] = demand_service.generate_for_day(2)
@@ -63,10 +94,59 @@ func _verify_catalog_and_orders() -> bool:
 	return ok
 
 
+func _verify_direct_and_combo_recipes(registry) -> bool:
+	var ok := true
+	var recipes_by_output := _recipes_by_output(registry.get_crafting_recipe_rows())
+	for item_id in DIRECT_BASIC_GOODS:
+		var recipe: Dictionary = recipes_by_output.get(item_id, {})
+		if recipe.is_empty():
+			printerr("Expected direct basic recipe for: %s" % item_id)
+			ok = false
+			continue
+		var requirements := _parse_requirements(String(recipe.get("required_items", "")))
+		if requirements.size() != 1:
+			printerr("Direct basic recipe must consume exactly one item type: %s" % recipe)
+			ok = false
+			continue
+		for required_item_id in requirements.keys():
+			if int(requirements[required_item_id]) != 1:
+				printerr("Direct basic recipe must consume one carried-out item: %s" % recipe)
+				ok = false
+	var high_value_recipe: Dictionary = recipes_by_output.get("sale_good_work_lamp", {})
+	var high_value_item: Dictionary = registry.get_item("sale_good_work_lamp")
+	if _parse_requirements(String(high_value_recipe.get("required_items", ""))).size() < 3:
+		printerr("Expected work lamp to be a multi-material higher-value recipe.")
+		ok = false
+	if int(high_value_item.get("sell_value", 0)) <= int(registry.get_item("sale_good_wire_spool").get("sell_value", 0)):
+		printerr("Expected multi-material work lamp to have higher sell value than direct goods.")
+		ok = false
+	if int(high_value_item.get("base_sale_value", 0)) <= int(registry.get_item("sale_good_wire_spool").get("base_sale_value", 0)):
+		printerr("Expected multi-material work lamp to have higher base sale value than direct goods.")
+		ok = false
+	return ok
+
+
 func _recipe_outputs(rows: Array[Dictionary]) -> Dictionary:
 	var result := {}
 	for row in rows:
 		result[String(row.get("output_item_id", ""))] = true
+	return result
+
+
+func _recipes_by_output(rows: Array[Dictionary]) -> Dictionary:
+	var result := {}
+	for row in rows:
+		result[String(row.get("output_item_id", ""))] = row
+	return result
+
+
+func _parse_requirements(value: String) -> Dictionary:
+	var result := {}
+	for part in TabDataLoaderScript.split_list(value):
+		var cells := part.split(":", false, 1)
+		if cells.size() != 2:
+			continue
+		result[String(cells[0])] = int(cells[1])
 	return result
 
 

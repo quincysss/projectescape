@@ -10,7 +10,7 @@
 覆盖界面：
 - 白天准备阶段的仓库物品格。
 - 制造所材料需求和产物预览图标。
-- 研究所材料需求图标。
+- 研究所矿币消耗、前置条件和效果说明图标。
 - 货台已上架物资图标。
 - 当日需求排行榜中的物资图标。
 - 图鉴卡片中的道具图标。
@@ -251,7 +251,7 @@ func is_visible_for(item_id: String) -> bool
 | --- | --- |
 | A1 | 仓库物品图标 hover 后显示 Tooltip |
 | A2 | 制造所材料和产物图标 hover 后显示 Tooltip |
-| A3 | 研究所材料需求图标 hover 后显示 Tooltip |
+| A3 | 研究所矿币消耗、前置条件和效果说明图标 hover 后显示 Tooltip |
 | A4 | 货台物资图标 hover 后显示 Tooltip |
 | A5 | 图鉴卡片图标 hover 后显示 Tooltip |
 | A6 | 夜晚出发准备装备和消耗品图标 hover 后显示 Tooltip |

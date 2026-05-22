@@ -60,7 +60,7 @@ UI 资源分两层生成：
 | UI-00 | UI 风格基准板 | 统一按钮、面板、格子、功能色、描边强度 | 2048x2048 |
 | UI-01 | 局内 HUD 整体设计稿 | 确定局内信息层级和遮挡控制 | 1920x1080 |
 | UI-02 | 局内 HUD 拆分 sheet | 头像、稳定值、负重、快捷栏、提示框 | 2048x2048 |
-| UI-03 | 可交互与读条 VFX sheet | 描边风格、读条、容器倒计时、前哨提交反馈 | 2048x2048 |
+| UI-03 | 可交互与读条 VFX sheet | 描边风格、读条、前哨材料限时提示、前哨提交反馈 | 2048x2048 |
 | UI-04 | 背包/容器/安全格子整体稿 | 统一格子系统和面板结构 | 1920x1080 |
 | UI-05 | 背包/容器/安全格子拆分 sheet | 格子、装备槽、详情面板、关闭/确认按钮 | 2048x2048 |
 | UI-06 | 撤离与结算整体设计稿 | 成功撤离、入库、遗弃警告流程 | 1920x1080 |
@@ -72,8 +72,8 @@ UI 资源分两层生成：
 | UI-11 | 仓库系统拆分 sheet | 仓库专用格子、分类 chip、排序按钮、容量条 | 2048x2048 |
 | UI-12 | 店铺货台与需求整体稿 | 需求榜、货台格、可售物资、成交反馈、矿币栏 | 1920x1080 |
 | UI-13 | 店铺货台与货币拆分 sheet | 矿币 icon、货台格、需求榜、上架按钮、成交条目 | 2048x2048 |
-| UI-14 | 研究所整体稿 | 节点线路图、需求、进度、前置条件 | 1920x1080 |
-| UI-15 | 研究所拆分 sheet | 研究节点、连接线、完成标记、需求徽章 | 2048x2048 |
+| UI-14 | 研究所整体稿 | 节点线路图、矿币消耗、进度、前置条件 | 1920x1080 |
+| UI-15 | 研究所拆分 sheet | 研究节点、连接线、完成标记、矿币与前置徽章 | 2048x2048 |
 | UI-16 | 制作所整体稿 | 配方列表、产物预览、材料需求、制作状态 | 1920x1080 |
 | UI-17 | 制作所拆分 sheet | 配方卡、产物框、工具灯、制作按钮状态 | 2048x2048 |
 | UI-18 | 出发准备整体稿 | 角色预览、装备槽、背包选择、确认出发 | 1920x1080 |
@@ -329,7 +329,7 @@ Avoid: full shop screen, readable labels, watermark, bright fantasy gold, modern
 Create a full research lab interface mockup for a 2D wasteland extraction game.
 Canvas: 1920x1080.
 Style: dark hand-drawn manga UI, thick black outlines, old circuit diagram mixed with dirty paper and worn metal, grayscale base, blue-purple electronic accents, warm yellow completed node accents.
-Content: research node map, locked nodes, available nodes, completed nodes, connection lines, research category panel, research detail panel, material requirement area, current progress strip, submit button, prerequisite warning.
+Content: research node map, locked nodes, available nodes, completed nodes, connection lines, research category panel, research detail panel, mine coin cost area, prerequisite condition area, current progress strip, submit button, prerequisite warning.
 Layout rule: the research tree should feel like a hand-drawn old electrical circuit, readable and game-functional.
 Requirement: full interface visual design mockup for research layout reference only.
 Avoid: sliced sheet, bright sci-fi hologram UI, clean tech dashboard, photorealism, huge glowing effects, unreadable tiny nodes.
@@ -344,7 +344,7 @@ Create a transparent PNG UI sprite sheet for research interface elements in a 2D
 Canvas: 2048x2048.
 Grid: 5x5, evenly spaced cells, one UI element per cell, no labels.
 Style: hand-drawn dark manga UI, old circuit diagram, dirty paper, worn grey metal, thick black outlines, blue-purple electronic accents, warm yellow completed accents.
-Elements: research node locked, research node available, research node selected, research node completed, research node blocked, straight connection line, corner connection line, broken connection line, glowing completed connection line, material requirement badge, prerequisite badge, research progress strip empty, research progress strip filled, submit button active frame, submit button disabled frame, completed stamp without text, prerequisite badge, small circuit icon frame, research category chip, detail panel frame, warning mini badge, available pulse ring, locked grey overlay, node hover frame, compact tooltip frame.
+Elements: research node locked, research node available, research node selected, research node completed, research node blocked, straight connection line, corner connection line, broken connection line, glowing completed connection line, mine coin cost badge, prerequisite badge, research progress strip empty, research progress strip filled, submit button active frame, submit button disabled frame, completed stamp without text, prerequisite badge, small circuit icon frame, research category chip, detail panel frame, warning mini badge, available pulse ring, locked grey overlay, node hover frame, compact tooltip frame.
 Requirements: transparent background, clean cutout edges, consistent line style, no text, suitable for Godot slicing.
 Avoid: full interface mockup, readable labels, watermark, bright sci-fi UI, overlapping elements.
 ```

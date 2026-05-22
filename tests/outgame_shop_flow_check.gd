@@ -99,8 +99,10 @@ func _verify() -> bool:
 
 	game_state.go_to_night_plan()
 	var plan: Dictionary = game_state.get_night_plan_snapshot()
-	if Array(plan.get("characters", [])).size() != 1 or Array(plan.get("locations", [])).size() != 1:
-		printerr("Expected one character and one location in night plan.")
+	var plan_characters: Array = Array(plan.get("characters", []))
+	var plan_locations: Array = Array(plan.get("locations", []))
+	if plan_characters.is_empty() or plan_locations.is_empty() or String(plan.get("selected_location_id", "")).is_empty():
+		printerr("Expected night plan to expose characters, locations, and a selected location.")
 		_restore_profile(game_state, original_profile)
 		return false
 	game_state.go_to_loadout()

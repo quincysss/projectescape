@@ -1,0 +1,4 @@
+map_id	display_name	map_type	primary_categories	secondary_categories	container_count_min	container_count_max	primary_weight_multiplier	secondary_weight_multiplier	container_type_weight_overrides	default_state	enabled
+abandoned_house	废弃民居	residential	food;textile	medical;hardware	7	9	1.70	1.20	cardboard_box:1.25;wooden_crate:1.20;medical_cabinet:0.85;tool_cabinet:0.90	rich	true
+clinic_small	街角诊所	clinic	medical;textile	food;luxury	8	10	2.20	1.25	medical_cabinet:4.00;cardboard_box:0.95;wooden_crate:0.80;tool_cabinet:0.45;small_safe:0.70;large_safe:0.55	rich	true
+industrial_yard	废旧工院	industrial	hardware;electronic	textile;route_intel	9	11	2.00	1.35	tool_cabinet:3.50;wooden_crate:1.45;medical_cabinet:0.35;small_safe:1.15;large_safe:1.10	rich	true

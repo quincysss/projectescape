@@ -35,6 +35,20 @@ const DEFAULT_CHARACTER_HUD_ASSETS := {
 	"portrait_path": "res://assets/ui/run_character_hud/character_status/components/ui_run_character_portrait_male_01.png",
 	"portrait_frame_path": "res://assets/ui/run_character_hud/character_status/components/ui_run_character_portrait_frame_empty_ref_01.png",
 }
+const NIGHT_LOCATIONS := {
+	"abandoned_house": {
+		"display_name": "废弃民居",
+		"description": "住宅区资源，偏食物、布料和生活用品。",
+	},
+	"clinic_small": {
+		"display_name": "街角诊所",
+		"description": "医疗地点，偏药品、绷带和稳定补给。",
+	},
+	"industrial_yard": {
+		"display_name": "旧工业区",
+		"description": "工业地点，偏五金、工具和电子组件。",
+	},
+}
 
 var warehouse_items: Array[Dictionary] = []
 var currencies: Dictionary = {}
@@ -87,6 +101,7 @@ var shop_duration_seconds: float = SHOP_DURATION_SECONDS
 var shop_settlement_applied: bool = false
 var shop_ended_by: String = ""
 var selected_night_location_id: String = "abandoned_house"
+var location_resource_states: Dictionary = {}
 var loadout_equipment_slots: Dictionary = {
 	"HEAD": "",
 	"BODY": "",
@@ -343,23 +358,66 @@ func get_night_plan_snapshot() -> Dictionary:
 				"selected": get_selected_character_id() == DEFAULT_CHARACTER_ID,
 			},
 		],
-		"locations": [
-			{
-				"location_id": "abandoned_house",
-				"display_name": "废弃民居",
-				"description": "当前开放的夜间探索地点。",
-				"selected": selected_night_location_id == "abandoned_house",
-			},
-		],
+		"locations": _night_locations_snapshot(),
 	}
 
 func set_night_plan_selection(character_id: String, location_id: String) -> Dictionary:
 	if not character_id.is_empty():
 		set_selected_character(character_id)
 	if not location_id.is_empty():
-		selected_night_location_id = "abandoned_house" if location_id != "abandoned_house" else location_id
+		selected_night_location_id = _normalize_location_id(location_id)
 	save_profile()
 	return {"ok": true, "snapshot": get_night_plan_snapshot()}
+
+func begin_location_run(location_id: String = "") -> Dictionary:
+	var normalized_id := _normalize_location_id(location_id if not location_id.is_empty() else selected_night_location_id)
+	var record := _location_resource_record(normalized_id)
+	var visit_count_before := maxi(0, int(record.get("visit_count", 0)))
+	var state := _state_for_visit_count(visit_count_before)
+	if not String(record.get("forced_state", "")).is_empty():
+		state = String(record.get("forced_state", state))
+	record["visit_count"] = visit_count_before + 1
+	record["state"] = _state_for_visit_count(visit_count_before + 1)
+	record["last_visit_day"] = get_current_day()
+	location_resource_states[normalized_id] = record
+	save_profile()
+	return {
+		"map_id": normalized_id,
+		"state": state,
+		"visit_count_before": visit_count_before,
+		"visit_count_after": int(record.get("visit_count", visit_count_before + 1)),
+	}
+
+func get_location_resource_state(location_id: String = "") -> Dictionary:
+	var normalized_id := _normalize_location_id(location_id if not location_id.is_empty() else selected_night_location_id)
+	var record := _location_resource_record(normalized_id)
+	var visit_count := maxi(0, int(record.get("visit_count", 0)))
+	var state := String(record.get("forced_state", ""))
+	if state.is_empty():
+		state = _state_for_visit_count(visit_count)
+	return {
+		"map_id": normalized_id,
+		"state": state,
+		"visit_count": visit_count,
+		"last_visit_day": int(record.get("last_visit_day", 0)),
+	}
+
+func get_location_resource_snapshot() -> Dictionary:
+	var snapshot := {}
+	for location_id in NIGHT_LOCATIONS.keys():
+		snapshot[location_id] = get_location_resource_state(location_id)
+	return snapshot
+
+func debug_set_location_resource_state(location_id: String, state: String, visit_count: int = 0) -> void:
+	var normalized_id := _normalize_location_id(location_id)
+	var normalized_state := state if ["rich", "normal", "poor", "recovering"].has(state) else _state_for_visit_count(visit_count)
+	location_resource_states[normalized_id] = {
+		"visit_count": maxi(0, visit_count),
+		"state": normalized_state,
+		"forced_state": normalized_state,
+		"last_visit_day": get_current_day(),
+	}
+	save_profile()
 
 func get_loadout_snapshot() -> Dictionary:
 	_normalize_loadout_slots()
@@ -507,6 +565,7 @@ func _reset_runtime_to_empty_profile_state() -> void:
 	forced_scene_events_next_run.clear()
 	last_run_result = ""
 	last_run_result_type = ""
+	location_resource_states.clear()
 	_reset_shop_day_state(OUTGAME_PHASE_DAY_PREP)
 	selected_night_location_id = "abandoned_house"
 	loadout_equipment_slots = {"HEAD": "", "BODY": "", "HAND": "", "FOOT": ""}
@@ -729,6 +788,45 @@ func get_selected_character_id() -> String:
 		selected_character_id = DEFAULT_CHARACTER_ID
 	return selected_character_id
 
+func _night_locations_snapshot() -> Array[Dictionary]:
+	var result: Array[Dictionary] = []
+	for location_id in NIGHT_LOCATIONS.keys():
+		var location: Dictionary = NIGHT_LOCATIONS.get(location_id, {})
+		var resource_state := get_location_resource_state(location_id)
+		result.append({
+			"location_id": location_id,
+			"display_name": String(location.get("display_name", location_id)),
+			"description": String(location.get("description", "")),
+			"resource_state": String(resource_state.get("state", "rich")),
+			"visit_count": int(resource_state.get("visit_count", 0)),
+			"selected": selected_night_location_id == location_id,
+		})
+	return result
+
+func _normalize_location_id(location_id: String) -> String:
+	if NIGHT_LOCATIONS.has(location_id):
+		return location_id
+	return "abandoned_house"
+
+func _location_resource_record(location_id: String) -> Dictionary:
+	var normalized_id := _normalize_location_id(location_id)
+	var record: Dictionary = location_resource_states.get(normalized_id, {})
+	if record.is_empty():
+		return {
+			"visit_count": 0,
+			"state": "rich",
+			"forced_state": "",
+			"last_visit_day": 0,
+		}
+	return record.duplicate(true)
+
+func _state_for_visit_count(visit_count: int) -> String:
+	if visit_count <= 0:
+		return "rich"
+	if visit_count == 1:
+		return "normal"
+	return "poor"
+
 func register_character_hud_assets(character_id: String, assets: Dictionary) -> void:
 	if character_id.is_empty():
 		return
@@ -754,6 +852,25 @@ func get_warehouse_text() -> String:
 func get_warehouse_items_snapshot() -> Array[Dictionary]:
 	_bind_warehouse_manager()
 	return warehouse_manager.get_items_snapshot()
+
+func query_warehouse_items(filters: Dictionary = {}) -> Array[Dictionary]:
+	_bind_warehouse_manager()
+	return warehouse_manager.query_items(filters)
+
+func get_warehouse_item_count(item_id: String) -> int:
+	_bind_warehouse_manager()
+	return warehouse_manager.get_item_count(item_id)
+
+func has_warehouse_materials(requirements: Dictionary) -> bool:
+	_bind_warehouse_manager()
+	return warehouse_manager.has_materials(requirements)
+
+func consume_warehouse_materials(requirements: Dictionary) -> Dictionary:
+	_bind_warehouse_manager()
+	var result: Dictionary = warehouse_manager.consume_materials(requirements)
+	if bool(result.get("ok", false)):
+		save_profile()
+	return result
 
 func select_warehouse_item(index: int) -> Dictionary:
 	_bind_warehouse_manager()
@@ -976,7 +1093,14 @@ func _apply_profile_to_runtime(loaded_profile: Dictionary) -> void:
 	pending_first_return_dialogue = bool(loaded_profile.get("pending_first_return_dialogue", false))
 	_run_start_pending_result = bool(loaded_profile.get("run_start_pending_result", false))
 	selected_character_id = String(loaded_profile.get("selected_character_id", DEFAULT_CHARACTER_ID))
-	selected_night_location_id = String(loaded_profile.get("selected_night_location_id", "abandoned_house"))
+	selected_night_location_id = _normalize_location_id(String(loaded_profile.get("selected_night_location_id", "abandoned_house")))
+	location_resource_states.clear()
+	var loaded_location_resource_states: Dictionary = loaded_profile.get("location_resource_states", {})
+	for key in loaded_location_resource_states.keys():
+		var normalized_key := _normalize_location_id(String(key))
+		var value = loaded_location_resource_states.get(key, {})
+		if value is Dictionary:
+			location_resource_states[normalized_key] = Dictionary(value).duplicate(true)
 	outgame_phase = String(loaded_profile.get("outgame_phase", OUTGAME_PHASE_DAY_PREP))
 	if _recover_departure_phase_to_night():
 		should_save_repaired_profile = true
@@ -1093,6 +1217,7 @@ func _sync_runtime_to_profile() -> void:
 	profile["run_start_pending_result"] = _run_start_pending_result
 	profile["selected_character_id"] = get_selected_character_id()
 	profile["selected_night_location_id"] = selected_night_location_id
+	profile["location_resource_states"] = location_resource_states.duplicate(true)
 	profile["outgame_phase"] = get_outgame_phase()
 	profile["currencies"] = currencies.duplicate(true)
 	profile["warehouse_items"] = warehouse_items.duplicate(true)
@@ -1137,7 +1262,7 @@ func _bind_research_manager() -> void:
 	_bind_currency_wallet()
 	if research_manager == null:
 		research_manager = ResearchManagerScript.new()
-	research_manager.bind_dependencies(warehouse_manager, currency_wallet, research_levels)
+	research_manager.bind_dependencies(warehouse_manager, currency_wallet, research_levels, _get_research_condition_state())
 
 func _bind_item_catalog_service() -> void:
 	if item_catalog_service == null:
@@ -1240,6 +1365,28 @@ func _get_research_effect_value(effect_type: String, default_value: float) -> fl
 		research_manager = ResearchManagerScript.new()
 	research_manager.research_levels = research_levels
 	return research_manager.get_effect_value(effect_type, default_value)
+
+func _get_research_condition_state() -> Dictionary:
+	return {
+		"current_chapter": current_chapter,
+		"shop_level": clampi(merchant_shop_level, 1, 3),
+		"completed_tasks": {
+			"first_shop_tutorial": first_shop_tutorial_completed,
+			"chapter_1": chapter_1_completed,
+		},
+		"installed_fixtures": {},
+		"conditions": {
+			"chapter_1_goal_active": chapter_1_goal_active,
+			"chapter_1_completed": chapter_1_completed,
+			"first_sale_good_crafted": first_sale_good_crafted,
+			"first_sale_good_shelved": first_sale_good_shelved,
+			"first_shop_settlement_completed": first_shop_settlement_completed,
+			"first_shop_tutorial_completed": first_shop_tutorial_completed,
+			"research_station_unlocked": is_research_station_unlocked(),
+			"shop_loop_unlocked": shop_loop_unlocked,
+			"manufacturing_station_unlocked": manufacturing_station_unlocked,
+		},
+	}
 
 func _apply_warehouse_capacity() -> void:
 	if warehouse_manager == null:

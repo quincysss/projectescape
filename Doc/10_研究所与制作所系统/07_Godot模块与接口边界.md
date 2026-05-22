@@ -1,4 +1,4 @@
-# 07_Godot模块与接口边界
+﻿# 07_Godot模块与接口边界
 
 > 对应母版章节：13
 > 本文件定义研究、配方可用性和制作接口。不存在配方道具或配方来源物管理器。
@@ -59,7 +59,7 @@ CraftingManager.craft(recipe_id) -> CraftResult
 
 ```text
 ResearchManager 只处理研究状态和矿币消耗。
-RecipeService 只处理配方开放条件。
+RecipeService 只处理配方可用条件。
 CraftingManager 只处理材料扣除、产物生成和入库。
 WarehouseManager 不负责学习配方。
 ```

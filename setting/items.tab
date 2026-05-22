@@ -1,49 +1,61 @@
-id	item_type	name	quality	stackable	stack_limit	weight	icon	sellable	sell_currency_id	sell_value	description	tags	enabled_version
-scrap_metal	material	废金属	C	false	1	0.10	res://assets/ui/itemicon/scrap_metal.png	true	mine_coin	3	常见金属废料，可用于修复和制作。	material;craft;common	v0.1
-cloth_dirty	material	脏布条	C	false	1	0.05	res://assets/ui/itemicon/cloth_dirty.png	true	mine_coin	2	从旧衣物和包扎残留中拆出的布条。	material;craft;common	v0.1
-wire_coil	material	旧线圈	B	false	1	0.12	res://assets/ui/itemicon/wire_coil.png	true	mine_coin	5	还能导电的旧线圈，适合修设备。	material;electronic;craft	v0.1
-battery_old	material	旧电池	B	false	1	0.20	res://assets/ui/itemicon/battery_old.png	true	mine_coin	6	容量不稳定的旧电池。	material;electronic;power	v0.1
-medicine_powder	material	药粉	B	false	1	0.08	res://assets/ui/itemicon/medicine_powder.png	true	mine_coin	5	未标记来源的药粉，可用于制作稳定类消耗品。	material;medical;craft	v0.1
-tool_parts	material	工具零件	B	false	1	0.18	res://assets/ui/itemicon/tool_parts.png	true	mine_coin	6	来自旧工具的齿轮、螺丝和卡扣。	material;tool;craft	v0.1
-sale_good_repaired_filter	sale_good	修复滤芯	C	false	1	0.14	res://assets/ui/itemicon/duct_tape_roll.png	true	mine_coin	36	把旧滤芯和布料重新封装后的日用品，白天店铺可出售。	sale_good;tool;common	v0.4
-sale_good_emergency_wrap	sale_good	应急包扎卷	C	false	1	0.10	res://assets/ui/itemicon/field_bandage.png	true	mine_coin	44	用脏布条、药粉和胶带整理出的包扎卷，白天店铺可出售。	sale_good;medical;common	v0.4
-sale_good_signal_lamp	sale_good	简易信号灯	B	false	1	0.24	res://assets/ui/itemicon/battery_old.png	true	mine_coin	72	用旧电池和线圈组装的小信号灯，白天店铺可出售。	sale_good;electronic;tool	v0.4
-sale_good_gear_bundle	sale_good	连轴齿轮包	C	false	1	0.16	res://assets/ui/itemicon/tool_parts.png	true	mine_coin	38	把废金属和旧螺栓配成可直接维修门轴、货架和炉具的小五金包。	sale_good;tool;hardware;common	v0.4
-sale_good_patch_roll	sale_good	修补布卷	C	false	1	0.09	res://assets/ui/itemicon/cloth_dirty.png	true	mine_coin	40	用清理过的布条和胶带卷成的便携修补卷，避难所居民常备。	sale_good;cloth;tool;common	v0.4
-sale_good_tie_hook_set	sale_good	挂钩扎带组	C	false	1	0.12	res://assets/ui/itemicon/reinforced_strap.png	true	mine_coin	42	由金属片和布带整理出的挂钩扎带，用于临时固定包裹和管线。	sale_good;carry;tool;common	v0.4
-sale_good_lens_filter	sale_good	粗制滤光片	C	false	1	0.08	res://assets/ui/itemicon/cracked_lens.png	true	mine_coin	46	把裂纹镜片重新磨边并封胶后的滤光片，可用于低功耗照明。	sale_good;optical;tool;common	v0.4
-sale_good_cookware_fix	sale_good	炊具修补包	C	false	1	0.20	res://assets/ui/itemicon/scrap_metal.png	true	mine_coin	56	用金属片、螺栓和旧胶带拼成的炊具修补包，适合修锅炉和热水罐。	sale_good;tool;food;common	v0.4
-sale_good_wire_hook	sale_good	导线挂钩组	C	false	1	0.15	res://assets/ui/itemicon/wire_coil.png	true	mine_coin	58	把旧线圈和废金属整理成的布线挂钩，能快速恢复小型线路。	sale_good;electronic;tool;common	v0.4
-sale_good_medical_fix_roll	sale_good	医疗固定卷	B	false	1	0.11	res://assets/ui/itemicon/sterile_patch.png	true	mine_coin	64	将药粉、布条和旧胶带封成的医疗固定卷，适合处理轻伤和扭伤。	sale_good;medical;stability	v0.4
-sale_good_work_lamp	sale_good	工作照明灯	B	false	1	0.30	res://assets/ui/itemicon/battery_old.png	true	mine_coin	82	由旧电池、线圈、镜片和工具零件组装的维修用小灯。	sale_good;electronic;tool;signal	v0.4
-sale_good_signal_marker	sale_good	临时信标	B	false	1	0.26	res://assets/ui/itemicon/signal_resonator_coil.png	true	mine_coin	88	使用谐振线圈和旧电池拼出的临时信标，能标记短程安全路线。	sale_good;signal;electronic;route	v0.4
-sale_good_power_adapter	sale_good	应急电源转接器	B	false	1	0.32	res://assets/ui/itemicon/pulse_battery.png	true	mine_coin	92	把脉冲电池、线圈和固定件接成的电源转接器，可抢救旧设备。	sale_good;power;electronic;tool	v0.4
-stability_candy	consumable	安定糖	C	false	1	0.05	res://assets/ui/itemicon/stability_candy.png	true	mine_coin	18	短时间内帮助角色稳住情绪的小糖块。	consumable;stability	v0.1
-field_bandage	consumable	临时绷带	C	false	1	0.08	res://assets/ui/itemicon/field_bandage.png	true	mine_coin	14	粗糙但能应急处理伤口的绷带。	consumable;medical	v0.1
-signal_injector	consumable	信号针剂	A	false	1	0.12	res://assets/ui/itemicon/signal_injector.png	true	mine_coin	48	短时增强感知和信号反馈的危险针剂。	consumable;stability;rare	v0.1
-backpack_small_reinforced	equipment	小型加固背包	C	false	1	1.00	res://assets/ui/itemicon/backpack_small_reinforced.png	true	mine_coin	45	加固过的小背包，能略微提高携带能力。	equipment;backpack;carry	v0.1
-scanner_broken	equipment	破损扫描器	B	false	1	0.80	res://assets/ui/itemicon/scanner_broken.png	true	mine_coin	35	旧城区常见的半坏扫描设备。	equipment;tool;electronic	v0.1
-keepsake_photo	rare	褪色照片	A	false	1	0.01	res://assets/ui/itemicon/keepsake_photo.png	true	mine_coin	40	几乎没有实用价值，却能在结算中换来高价值。	rare;settlement;collectible	v0.1
-gold_data_chip	rare	金色数据芯片	S	false	1	0.03	res://assets/ui/itemicon/gold_data_chip.png	true	mine_coin	120	保存着稀缺旧城数据的高价值芯片。	rare;settlement;electronic	v0.1
-ration_bar	consumable	压缩口粮	C	false	1	0.12	res://assets/ui/itemicon/ration_bar.png	true	mine_coin	10	能快速补充体力的旧式压缩口粮。	consumable;food;common	v0.2
-cracked_lens	material	裂纹镜片	C	false	1	0.06	res://assets/ui/itemicon/cracked_lens.png	true	mine_coin	3	表面有裂纹的镜片，仍可拆作光学材料。	material;optical;common	v0.2
-duct_tape_roll	material	旧胶带	C	false	1	0.10	res://assets/ui/itemicon/duct_tape_roll.png	true	mine_coin	4	粘性所剩不多的旧胶带，适合临时固定。	material;tool;common	v0.2
-cracked_compass	rare	裂壳指南针	C	false	1	0.10	res://assets/ui/itemicon/cracked_compass.png	true	mine_coin	22	外壳裂开的指南针，指针偶尔仍会摆动。	rare;collectible;common	v0.2
-rusted_bolts	material	生锈螺栓	C	false	1	0.08	res://assets/ui/itemicon/rusted_bolts.png	true	mine_coin	3	锈蚀严重但还能用于加固的螺栓。	material;tool;common	v0.2
-reinforced_strap	material	加固背带	B	false	1	0.18	res://assets/ui/itemicon/reinforced_strap.png	true	mine_coin	7	可承受较高拉力的背带材料。	material;carry	v0.2
-pulse_battery	material	脉冲电池	B	false	1	0.28	res://assets/ui/itemicon/pulse_battery.png	true	mine_coin	8	输出不稳定但瞬时功率很高的电池。	material;power	v0.2
-signal_resonator_coil	material	信号谐振线圈	B	false	1	0.16	res://assets/ui/itemicon/signal_resonator_coil.png	true	mine_coin	8	用于放大异常信号的精密线圈。	material;signal;electronic	v0.2
-sterile_patch	consumable	无菌贴片	B	false	1	0.05	res://assets/ui/itemicon/sterile_patch.png	true	mine_coin	26	密封保存的医疗贴片，适合处理轻伤。	consumable;medical	v0.2
-sealed_medkit	consumable	密封医疗包	A	false	1	0.35	res://assets/ui/itemicon/sealed_medkit.png	true	mine_coin	70	未开封的医疗包，内部耗材保存完好。	consumable;medical;rare	v0.2
-street_map_fragment	rare	街区地图残片	B	false	1	0.02	res://assets/ui/itemicon/street_map_fragment.png	true	mine_coin	32	残缺的旧城区地图，仍有研究价值。	rare;map	v0.2
-survey_drone_core	rare	勘测无人机核心	A	false	1	0.42	res://assets/ui/itemicon/survey_drone_core.png	true	mine_coin	85	旧式勘测无人机留下的核心模块。	rare;electronic;signal	v0.2
-prefall_access_key	rare	旧世代通行钥	S	false	1	0.03	res://assets/ui/itemicon/prefall_access_key.png	true	mine_coin	180	封存设施中使用过的高级通行钥。	rare;access;legendary	v0.2
-thermal_scope_module	equipment	热成像模块	A	false	1	0.32	res://assets/ui/itemicon/thermal_scope_module.png	true	mine_coin	78	能在低能耗下捕捉热源轮廓的模块。	equipment;signal;rare	v0.2
-blackbox_memory_core	rare	黑箱记忆核心	S	false	1	0.18	res://assets/ui/itemicon/blackbox_memory_core.png	true	mine_coin	160	记录着灾前关键片段的黑箱核心。	rare;electronic;legendary	v0.2
-sanctuary_nav_chip	rare	避难所导航芯片	S	false	1	0.04	res://assets/ui/itemicon/sanctuary_nav_chip.png	true	mine_coin	175	疑似指向旧避难设施的导航芯片。	rare;map;legendary	v0.2
-anomaly_heart_shard	rare	异常心核碎片	S	false	1	0.20	res://assets/ui/itemicon/anomaly_heart_shard.png	true	mine_coin	190	从异常区域深处取得的高能碎片。	rare;anomaly;legendary	v0.2
-ss_silverwing_engine_core	rare	银翼发动机核心	SS	false	1	0.60	res://assets/ui/itemicon/ss_silverwing_engine_core.png	true	mine_coin	420	旧世高端载具遗留的微型动力核心，收藏价值和售卖价值都极高。	ss_rare;showcase;sellable;vehicle;legendary	v0.3
-ss_pink_star	rare	粉星	SS	false	1	0.08	res://assets/ui/itemicon/ss_pink_star.png	true	mine_coin	360	散发粉色微光的旧世纪念晶体，几乎只在异常深处留下记录。	ss_rare;showcase;sellable;crystal;legendary	v0.3
-ss_wanming_pocket_watch	rare	万鸣怀表	SS	false	1	0.12	res://assets/ui/itemicon/ss_wanming_pocket_watch.png	true	mine_coin	480	指针仍在低声作响的旧世精密怀表，被视作极稀有收藏品。	ss_rare;showcase;sellable;keepsake;legendary	v0.3
-ss_old_world_gold_bar	rare	旧世金砖	SS	false	1	0.95	res://assets/ui/itemicon/ss_old_world_gold_bar.png	true	mine_coin	520	带有旧世铸印的高纯度金砖，沉重、醒目，并且非常值钱。	ss_rare;showcase;sellable;precious_metal;legendary	v0.3
-ss_zero_master_control_board	rare	零号主控板	SS	false	1	0.36	res://assets/ui/itemicon/ss_zero_master_control_board.png	true	mine_coin	500	疑似来自零号设施的核心控制板，技术价值远高于普通电子遗物。	ss_rare;showcase;sellable;electronic;legendary	v0.3
+id	item_type	material_category	name	quality	stackable	stack_limit	weight	icon	sellable	sell_currency_id	sell_value	base_sale_value	description	tags	enabled_version
+scrap_metal	material	hardware	废金属	C	true	20	0.10	res://assets/ui/itemicon/scrap_metal.png	true	mine_coin	3	0	常见金属废料，可用于修复和制作。	material;craft;common	v0.1
+cloth_dirty	material	textile	脏布条	C	true	20	0.05	res://assets/ui/itemicon/cloth_dirty.png	true	mine_coin	2	0	从旧衣物和包扎残留中拆出的布条。	material;craft;common	v0.1
+wire_coil	material	electronic	旧线圈	B	true	20	0.12	res://assets/ui/itemicon/wire_coil.png	true	mine_coin	5	0	还能导电的旧线圈，适合修设备。	material;electronic;craft	v0.1
+battery_old	material	electronic	旧电池	B	true	20	0.20	res://assets/ui/itemicon/battery_old.png	true	mine_coin	6	0	容量不稳定的旧电池。	material;electronic;power	v0.1
+medicine_powder	material	medical	药粉	B	true	20	0.08	res://assets/ui/itemicon/medicine_powder.png	true	mine_coin	5	0	未标记来源的药粉，可用于制作稳定类消耗品。	material;medical;craft	v0.1
+tool_parts	material	hardware	工具零件	B	true	20	0.18	res://assets/ui/itemicon/tool_parts.png	true	mine_coin	6	0	来自旧工具的齿轮、螺丝和卡扣。	material;tool;craft	v0.1
+sale_good_repaired_filter	sale_good		修复滤芯	C	true	10	0.14	res://assets/ui/itemicon/duct_tape_roll.png	true	mine_coin	36	36	把旧滤芯和布料重新封装后的日用品，白天店铺可出售。	sale_good;tool;common	v0.4
+sale_good_emergency_wrap	sale_good		应急包扎卷	C	true	10	0.10	res://assets/ui/itemicon/field_bandage.png	true	mine_coin	44	44	用脏布条、药粉和胶带整理出的包扎卷，白天店铺可出售。	sale_good;medical;common	v0.4
+sale_good_signal_lamp	sale_good		简易信号灯	B	true	10	0.24	res://assets/ui/itemicon/battery_old.png	true	mine_coin	72	72	用旧电池和线圈组装的小信号灯，白天店铺可出售。	sale_good;electronic;tool	v0.4
+sale_good_scrap_bundle	sale_good		废料五金包	C	true	20	0.12	res://assets/ui/itemicon/scrap_metal.png	true	mine_coin	16	16	把废金属拆选成可直接维修门扣和货架的小五金包，白天店铺可出售。	sale_good;tool;hardware;common;direct_basic	v0.5
+sale_good_cloth_wrap	sale_good		简易包扎卷	C	true	20	0.07	res://assets/ui/itemicon/cloth_dirty.png	true	mine_coin	14	14	把脏布条裁齐后卷成的应急包扎材料，白天店铺可出售。	sale_good;medical;cloth;common;direct_basic	v0.5
+sale_good_wire_spool	sale_good		扎线小卷	C	true	20	0.10	res://assets/ui/itemicon/wire_coil.png	true	mine_coin	18	18	把旧线圈整理成便于维修小电器的扎线卷，白天店铺可出售。	sale_good;electronic;tool;common;direct_basic	v0.5
+sale_good_battery_clip	sale_good		旧电池夹	C	true	20	0.18	res://assets/ui/itemicon/battery_old.png	true	mine_coin	20	20	把旧电池整理成可替换的低功率电池夹，白天店铺可出售。	sale_good;power;electronic;common;direct_basic	v0.5
+sale_good_medicine_sachet	sale_good		苦味药包	C	true	20	0.07	res://assets/ui/itemicon/medicine_powder.png	true	mine_coin	18	18	把零散药粉分装成小剂量药包，白天店铺可出售。	sale_good;medical;common;direct_basic	v0.5
+sale_good_tool_bit_box	sale_good		工具齿盒	C	true	20	0.16	res://assets/ui/itemicon/tool_parts.png	true	mine_coin	20	20	把工具零件按规格装成维修齿盒，白天店铺可出售。	sale_good;tool;hardware;common;direct_basic	v0.5
+sale_good_lens_tag	sale_good		反光识别片	C	true	20	0.05	res://assets/ui/itemicon/cracked_lens.png	true	mine_coin	16	16	把裂纹镜片磨成可挂载的反光识别片，白天店铺可出售。	sale_good;optical;common;direct_basic	v0.5
+sale_good_tape_strip	sale_good		旧胶带条	C	true	20	0.08	res://assets/ui/itemicon/duct_tape_roll.png	true	mine_coin	16	16	把旧胶带裁成可直接使用的固定条，白天店铺可出售。	sale_good;tool;common;direct_basic	v0.5
+sale_good_bolt_cup	sale_good		螺栓小杯	C	true	20	0.09	res://assets/ui/itemicon/rusted_bolts.png	true	mine_coin	16	16	把生锈螺栓挑拣成小杯装维修件，白天店铺可出售。	sale_good;tool;hardware;common;direct_basic	v0.5
+sale_good_strap_bundle	sale_good		背带束	C	true	20	0.15	res://assets/ui/itemicon/reinforced_strap.png	true	mine_coin	22	22	把加固背带束成可直接替换的绑带件，白天店铺可出售。	sale_good;carry;tool;common;direct_basic	v0.5
+sale_good_charge_cell	sale_good		脉冲充能芯	C	true	20	0.24	res://assets/ui/itemicon/pulse_battery.png	true	mine_coin	24	24	把脉冲电池封成小型充能芯，白天店铺可出售。	sale_good;power;electronic;common;direct_basic	v0.5
+sale_good_signal_tag	sale_good		信号标记片	C	true	20	0.13	res://assets/ui/itemicon/signal_resonator_coil.png	true	mine_coin	24	24	把信号谐振线圈整理成短程标记片，白天店铺可出售。	sale_good;signal;electronic;common;direct_basic	v0.5
+sale_good_gear_bundle	sale_good		连轴齿轮包	C	true	10	0.16	res://assets/ui/itemicon/tool_parts.png	true	mine_coin	38	38	把废金属和旧螺栓配成可直接维修门轴、货架和炉具的小五金包。	sale_good;tool;hardware;common	v0.4
+sale_good_patch_roll	sale_good		修补布卷	C	true	10	0.09	res://assets/ui/itemicon/cloth_dirty.png	true	mine_coin	40	40	用清理过的布条和胶带卷成的便携修补卷，避难所居民常备。	sale_good;cloth;tool;common	v0.4
+sale_good_tie_hook_set	sale_good		挂钩扎带组	C	true	10	0.12	res://assets/ui/itemicon/reinforced_strap.png	true	mine_coin	42	42	由金属片和布带整理出的挂钩扎带，用于临时固定包裹和管线。	sale_good;carry;tool;common	v0.4
+sale_good_lens_filter	sale_good		粗制滤光片	C	true	10	0.08	res://assets/ui/itemicon/cracked_lens.png	true	mine_coin	46	46	把裂纹镜片重新磨边并封胶后的滤光片，可用于低功耗照明。	sale_good;optical;tool;common	v0.4
+sale_good_cookware_fix	sale_good		炊具修补包	C	true	10	0.20	res://assets/ui/itemicon/scrap_metal.png	true	mine_coin	56	56	用金属片、螺栓和旧胶带拼成的炊具修补包，适合修锅炉和热水罐。	sale_good;tool;food;common	v0.4
+sale_good_wire_hook	sale_good		导线挂钩组	C	true	10	0.15	res://assets/ui/itemicon/wire_coil.png	true	mine_coin	58	58	把旧线圈和废金属整理成的布线挂钩，能快速恢复小型线路。	sale_good;electronic;tool;common	v0.4
+sale_good_medical_fix_roll	sale_good		医疗固定卷	B	true	10	0.11	res://assets/ui/itemicon/sterile_patch.png	true	mine_coin	64	64	将药粉、布条和旧胶带封成的医疗固定卷，适合处理轻伤和扭伤。	sale_good;medical;stability	v0.4
+sale_good_work_lamp	sale_good		工作照明灯	B	true	10	0.30	res://assets/ui/itemicon/battery_old.png	true	mine_coin	82	82	由旧电池、线圈、镜片和工具零件组装的维修用小灯。	sale_good;electronic;tool;signal	v0.4
+sale_good_signal_marker	sale_good		临时信标	B	true	10	0.26	res://assets/ui/itemicon/signal_resonator_coil.png	true	mine_coin	88	88	使用谐振线圈和旧电池拼出的临时信标，能标记短程安全路线。	sale_good;signal;electronic;route	v0.4
+sale_good_power_adapter	sale_good		应急电源转接器	B	true	10	0.32	res://assets/ui/itemicon/pulse_battery.png	true	mine_coin	92	92	把脉冲电池、线圈和固定件接成的电源转接器，可抢救旧设备。	sale_good;power;electronic;tool	v0.4
+stability_candy	consumable		安定糖	C	true	5	0.05	res://assets/ui/itemicon/stability_candy.png	true	mine_coin	18	0	短时间内帮助角色稳住情绪的小糖块。	consumable;stability	v0.1
+field_bandage	consumable		临时绷带	C	true	5	0.08	res://assets/ui/itemicon/field_bandage.png	true	mine_coin	14	0	粗糙但能应急处理伤口的绷带。	consumable;medical	v0.1
+signal_injector	consumable		信号针剂	A	true	3	0.12	res://assets/ui/itemicon/signal_injector.png	true	mine_coin	48	0	短时增强感知和信号反馈的危险针剂。	consumable;stability;rare	v0.1
+backpack_small_reinforced	equipment		小型加固背包	C	false	1	1.00	res://assets/ui/itemicon/backpack_small_reinforced.png	true	mine_coin	45	0	加固过的小背包，能略微提高携带能力。	equipment;backpack;carry	v0.1
+scanner_broken	equipment		破损扫描器	B	false	1	0.80	res://assets/ui/itemicon/scanner_broken.png	true	mine_coin	35	0	旧城区常见的半坏扫描设备。	equipment;tool;electronic	v0.1
+keepsake_photo	rare		褪色照片	A	false	1	0.01	res://assets/ui/itemicon/keepsake_photo.png	true	mine_coin	40	0	几乎没有实用价值，却能在结算中换来高价值。	rare;settlement;collectible	v0.1
+gold_data_chip	rare		金色数据芯片	S	false	1	0.03	res://assets/ui/itemicon/gold_data_chip.png	true	mine_coin	120	0	保存着稀缺旧城数据的高价值芯片。	rare;settlement;electronic	v0.1
+ration_bar	consumable		压缩口粮	C	true	5	0.12	res://assets/ui/itemicon/ration_bar.png	true	mine_coin	10	0	能快速补充体力的旧式压缩口粮。	consumable;food;common	v0.2
+cracked_lens	material	electronic	裂纹镜片	C	true	20	0.06	res://assets/ui/itemicon/cracked_lens.png	true	mine_coin	3	0	表面有裂纹的镜片，仍可拆作光学材料。	material;optical;common	v0.2
+duct_tape_roll	material	hardware	旧胶带	C	true	20	0.10	res://assets/ui/itemicon/duct_tape_roll.png	true	mine_coin	4	0	粘性所剩不多的旧胶带，适合临时固定。	material;tool;common	v0.2
+cracked_compass	rare		裂壳指南针	C	false	1	0.10	res://assets/ui/itemicon/cracked_compass.png	true	mine_coin	22	0	外壳裂开的指南针，指针偶尔仍会摆动。	rare;collectible;common	v0.2
+rusted_bolts	material	hardware	生锈螺栓	C	true	20	0.08	res://assets/ui/itemicon/rusted_bolts.png	true	mine_coin	3	0	锈蚀严重但还能用于加固的螺栓。	material;tool;common	v0.2
+reinforced_strap	material	textile	加固背带	B	true	20	0.18	res://assets/ui/itemicon/reinforced_strap.png	true	mine_coin	7	0	可承受较高拉力的背带材料。	material;carry	v0.2
+pulse_battery	material	electronic	脉冲电池	B	true	20	0.28	res://assets/ui/itemicon/pulse_battery.png	true	mine_coin	8	0	输出不稳定但瞬时功率很高的电池。	material;power	v0.2
+signal_resonator_coil	material	electronic	信号谐振线圈	B	true	20	0.16	res://assets/ui/itemicon/signal_resonator_coil.png	true	mine_coin	8	0	用于放大异常信号的精密线圈。	material;signal;electronic	v0.2
+sterile_patch	consumable		无菌贴片	B	true	5	0.05	res://assets/ui/itemicon/sterile_patch.png	true	mine_coin	26	0	密封保存的医疗贴片，适合处理轻伤。	consumable;medical	v0.2
+sealed_medkit	consumable		密封医疗包	A	true	3	0.35	res://assets/ui/itemicon/sealed_medkit.png	true	mine_coin	70	0	未开封的医疗包，内部耗材保存完好。	consumable;medical;rare	v0.2
+street_map_fragment	rare		街区地图残片	B	false	1	0.02	res://assets/ui/itemicon/street_map_fragment.png	true	mine_coin	32	0	残缺的旧城区地图，仍有研究价值。	rare;map	v0.2
+survey_drone_core	rare		勘测无人机核心	A	false	1	0.42	res://assets/ui/itemicon/survey_drone_core.png	true	mine_coin	85	0	旧式勘测无人机留下的核心模块。	rare;electronic;signal	v0.2
+prefall_access_key	rare		旧世代通行钥	S	false	1	0.03	res://assets/ui/itemicon/prefall_access_key.png	true	mine_coin	180	0	封存设施中使用过的高级通行钥。	rare;access;legendary	v0.2
+thermal_scope_module	equipment		热成像模块	A	false	1	0.32	res://assets/ui/itemicon/thermal_scope_module.png	true	mine_coin	78	0	能在低能耗下捕捉热源轮廓的模块。	equipment;signal;rare	v0.2
+blackbox_memory_core	rare		黑箱记忆核心	S	false	1	0.18	res://assets/ui/itemicon/blackbox_memory_core.png	true	mine_coin	160	0	记录着灾前关键片段的黑箱核心。	rare;electronic;legendary	v0.2
+sanctuary_nav_chip	rare		避难所导航芯片	S	false	1	0.04	res://assets/ui/itemicon/sanctuary_nav_chip.png	true	mine_coin	175	0	疑似指向旧避难设施的导航芯片。	rare;map;legendary	v0.2
+anomaly_heart_shard	rare		异常心核碎片	S	false	1	0.20	res://assets/ui/itemicon/anomaly_heart_shard.png	true	mine_coin	190	0	从异常区域深处取得的高能碎片。	rare;anomaly;legendary	v0.2
+rare_silverwing_engine_core	rare		银翼发动机核心	S	false	1	0.60		true	mine_coin	420	0	旧世高端载具遗留的微型动力核心，收藏价值和售卖价值都极高。	showcase;sellable;vehicle;legendary	v0.3
+rare_pink_star	rare		粉星	S	false	1	0.08		true	mine_coin	360	0	散发粉色微光的旧世纪念晶体，几乎只在异常深处留下记录。	showcase;sellable;crystal;legendary	v0.3
+rare_wanming_pocket_watch	rare		万鸣怀表	S	false	1	0.12		true	mine_coin	480	0	指针仍在低声作响的旧世精密怀表，被视作极稀有收藏品。	showcase;sellable;keepsake;legendary	v0.3
+rare_old_world_gold_bar	rare		旧世金砖	S	false	1	0.95		true	mine_coin	520	0	带有旧世铸印的高纯度金砖，沉重、醒目，并且非常值钱。	showcase;sellable;precious_metal;legendary	v0.3
+rare_zero_master_control_board	rare		零号主控板	S	false	1	0.36		true	mine_coin	500	0	疑似来自零号设施的核心控制板，技术价值远高于普通电子遗物。	showcase;sellable;electronic;legendary	v0.3

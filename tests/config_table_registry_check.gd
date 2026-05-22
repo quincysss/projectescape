@@ -2,6 +2,7 @@ extends SceneTree
 
 const GameDataRegistryScript := preload("res://scripts/data/game_data_registry.gd")
 const TabDataLoader := preload("res://scripts/data/tab_data_loader.gd")
+const VALID_ITEM_QUALITIES := ["C", "B", "A", "S"]
 
 func _initialize() -> void:
 	var ok := _verify_registry()
@@ -21,11 +22,28 @@ func _verify_registry() -> bool:
 		printerr("Expected exactly six repair material rows.")
 		ok = false
 	for item in registry.items_by_id.values():
-		if String(item.get("stackable", "")) != "false" or int(item.get("stack_limit", 0)) != 1:
-			printerr("Item %s must be single-slot and non-stackable." % item.get("id", ""))
+		var item_id := String(item.get("id", ""))
+		var item_type := String(item.get("item_type", ""))
+		var quality := String(item.get("quality", ""))
+		if not VALID_ITEM_QUALITIES.has(quality):
+			printerr("Item %s uses invalid quality: %s" % [item_id, quality])
 			ok = false
-		if String(item.get("item_type", "")) == "outpost_material":
-			printerr("Outpost repair materials must not live in items.tab: %s" % item.get("id", ""))
+		if item_type == "material":
+			if String(item.get("material_category", "")).is_empty():
+				printerr("Material item must declare material_category: %s" % item_id)
+				ok = false
+			if String(item.get("stackable", "")) != "true" or int(item.get("stack_limit", 0)) <= 1:
+				printerr("Material item must be stackable for resource-loop carryout: %s" % item_id)
+				ok = false
+		if item_type == "sale_good":
+			if String(item.get("stackable", "")) != "true" or int(item.get("stack_limit", 0)) <= 1:
+				printerr("Sale good must be stackable for shop stocking: %s" % item_id)
+				ok = false
+			if int(item.get("base_sale_value", 0)) <= 0:
+				printerr("Sale good must declare positive base_sale_value: %s" % item_id)
+				ok = false
+		if item_type == "outpost_material":
+			printerr("Outpost repair materials must not live in items.tab: %s" % item_id)
 			ok = false
 	for material in registry.repair_materials_by_id.values():
 		var material_id := String(material.get("id", ""))
@@ -53,16 +71,11 @@ func _verify_registry() -> bool:
 		ok = false
 	for row in registry.get_research_rows():
 		var requirements := String(row.get("required_items", ""))
-		if requirements.is_empty():
-			printerr("Research row must declare required_items: %s" % row.get("research_id", ""))
+		if not requirements.is_empty():
+			printerr("Research row must not consume warehouse items: %s" % row.get("research_id", ""))
 			ok = false
-		for part in requirements.split(";", false):
-			var cells := String(part).split(":", false, 1)
-			if cells.size() != 2 or registry.get_item(String(cells[0])).is_empty() or int(cells[1]) <= 0:
-				printerr("Research row has invalid required item: %s" % part)
-				ok = false
-		if String(row.get("required_currency_id", "")).is_empty() or int(row.get("required_currency_amount", 0)) <= 0:
-			printerr("Research row must require a positive currency cost: %s" % row.get("research_id", ""))
+		if String(row.get("required_currency_id", "")) != "mine_coin" or int(row.get("required_currency_amount", 0)) <= 0:
+			printerr("Research row must require a positive mine_coin cost: %s" % row.get("research_id", ""))
 			ok = false
 		if String(row.get("effect_type", "")) == "player_move_speed_multiplier" and float(row.get("effect_value", 0.0)) <= 1.0:
 			printerr("Move speed research must increase speed multiplier.")
@@ -116,7 +129,7 @@ func _verify_registry() -> bool:
 		if not item.has("quality") or not item.has("quality_color"):
 			printerr("Generated item lacks quality display fields.")
 			ok = false
-		if int(item.get("amount", 0)) != 1 or int(item.get("stack_limit", 0)) != 1:
-			printerr("Generated loot must be split into single non-stackable items.")
+		if not VALID_ITEM_QUALITIES.has(String(item.get("quality", ""))):
+			printerr("Generated loot uses invalid quality: %s" % item)
 			ok = false
 	return ok

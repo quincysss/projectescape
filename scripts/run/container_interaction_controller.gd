@@ -60,6 +60,8 @@ func open(container) -> Dictionary:
 			"reason": REASON_OPEN_REJECTED,
 			"message": loot_interaction_controller.last_prompt,
 		}
+	container.payload["has_been_opened"] = true
+	container.payload["opened_by_player_id"] = "local_player"
 	set_lifetime_paused(container, true)
 	return {"accepted": true}
 

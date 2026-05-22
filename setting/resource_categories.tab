@@ -1,0 +1,8 @@
+category_id	display_name	stack_policy	default_stack_limit	primary_outlet	quality_strategy	source_hint	enabled_version
+hardware	五金	material_stack	20	sale	C/B/A/S	工具箱、木箱、维修厂、工业区	v0.5
+textile	纺织	material_stack	20	sale	C/B/A/S	住宅、纸箱、衣物堆、商店后仓	v0.5
+electronic	电子	material_stack	12	sale	C/B/A/S	工具柜、保险箱、信号设施、封存设施	v0.5
+medical	医疗	material_stack	12	sale	C/B/A/S	医疗柜、诊所、急救点、住宅药箱	v0.5
+food	食物	small_stack	10	craft	C/B/A/S	住宅、商店、冷藏点、补给箱	v0.5
+luxury	贵重物	small_stack	5	order	C/B/A/S	商业街、保险箱、住宅收藏点	v0.5
+route_intel	路线情报	instance_only	1	order	C/B/A/S	保险箱、异常点、检查站、地图事件	v0.5

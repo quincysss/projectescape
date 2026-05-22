@@ -1,0 +1,7 @@
+room_profile_id	room_type	category_bias	container_bias	rare_tag_bias	enabled_version
+room_home_storage	bedroom	textile;food;luxury	cardboard_box;wooden_crate	collectible;family_storage	v0.5
+room_kitchen	kitchen	food;hardware;medical	cardboard_box;wooden_crate	preserved_food	v0.5
+room_workshop	workshop	hardware;electronic	tool_cabinet;wooden_crate	tool;machine_parts	v0.5
+room_clinic	clinic_room	medical;textile	medical_cabinet;small_safe	medical_order;sealed	v0.5
+room_office	office	electronic;route_intel;luxury	small_safe;large_safe	map;access;data	v0.5
+room_checkpoint_armory	armory	electronic;hardware;route_intel	large_safe;tool_cabinet	military;locked_cache	v0.5

@@ -57,11 +57,11 @@ ITEM_SPECS = {
     "prefall_access_key": ("pre-fall access key", "rare access item"),
     "anomaly_heart_shard": ("anomaly heart crystal shard", "rare anomaly"),
     "sanctuary_nav_chip": ("sanctuary navigation chip", "rare map chip"),
-    "ss_silverwing_engine_core": ("silverwing miniature engine core", "SS showcase"),
-    "ss_pink_star": ("pink star crystal", "SS showcase"),
-    "ss_wanming_pocket_watch": ("Wanming pocket watch", "SS showcase"),
-    "ss_old_world_gold_bar": ("old world gold bar", "SS showcase"),
-    "ss_zero_master_control_board": ("zero facility master control board", "SS showcase"),
+    "rare_silverwing_engine_core": ("silverwing miniature engine core", "S showcase"),
+    "rare_pink_star": ("pink star crystal", "S showcase"),
+    "rare_wanming_pocket_watch": ("Wanming pocket watch", "S showcase"),
+    "rare_old_world_gold_bar": ("old world gold bar", "S showcase"),
+    "rare_zero_master_control_board": ("zero facility master control board", "S showcase"),
 }
 
 
@@ -105,13 +105,8 @@ def add_texture(img: Image.Image, mask: Image.Image, rng: random.Random):
 
 def accent_mark(draw: ImageDraw.ImageDraw, quality: str, rng: random.Random):
     color = QUALITY_ACCENTS.get(quality, QUALITY_ACCENTS["C"])
-    if quality == "SS":
-        rough_ellipse(draw, (92, 91, 116, 115), (45, 38, 43, 210), color, 3, rng)
-        draw.line((98, 103, 110, 103), fill=color, width=2)
-        draw.line((104, 97, 104, 109), fill=color, width=2)
-    else:
-        pts = [(103, 94), (117, 105), (105, 118), (92, 106)]
-        rough_polygon(draw, pts, (34, 34, 34, 210), color, 3, rng)
+    pts = [(103, 94), (117, 105), (105, 118), (92, 106)]
+    rough_polygon(draw, pts, (34, 34, 34, 210), color, 3, rng)
 
 
 def scratches(draw: ImageDraw.ImageDraw, rng: random.Random, count=9):
@@ -276,7 +271,7 @@ def draw_icon(item_id: str, quality: str) -> Image.Image:
         poly([(64, 19), (91, 48), (80, 101), (42, 96), (32, 50)], (95, 86, 103, 242))
         rough_line(d, [(50, 42), (68, 63), (54, 88)], accent, 3, rng)
         rough_line(d, [(70, 32), (81, 49)], accent, 2, rng)
-    elif item_id == "ss_silverwing_engine_core":
+    elif item_id == "rare_silverwing_engine_core":
         ell((35, 34, 93, 92), (86, 90, 92, 245))
         ell((50, 49, 78, 77), (31, 34, 35, 230))
         for a in range(0, 360, 45):
@@ -284,7 +279,7 @@ def draw_icon(item_id: str, quality: str) -> Image.Image:
             y = 64 + math.sin(math.radians(a)) * 42
             rough_line(d, [(64, 64), (x, y)], (160, 165, 166, 185), 2, rng)
         rough_line(d, [(48, 64), (80, 64)], (155, 205, 245, 245), 3, rng)
-    elif item_id == "ss_pink_star":
+    elif item_id == "rare_pink_star":
         pts = []
         for i in range(10):
             r = 42 if i % 2 == 0 else 19
@@ -292,17 +287,17 @@ def draw_icon(item_id: str, quality: str) -> Image.Image:
             pts.append((64 + math.cos(a) * r, 64 + math.sin(a) * r))
         poly(pts, (128, 88, 116, 242))
         rough_line(d, [(47, 64), (81, 64)], accent, 3, rng)
-    elif item_id == "ss_wanming_pocket_watch":
+    elif item_id == "rare_wanming_pocket_watch":
         ell((34, 35, 94, 95), (120, 112, 91, 242))
         ell((45, 46, 83, 84), (65, 64, 58, 230))
         rect((56, 24, 72, 38), (104, 96, 80, 238), 3)
         rough_line(d, [(64, 65), (64, 51)], accent, 2, rng)
         rough_line(d, [(64, 65), (75, 72)], accent, 2, rng)
-    elif item_id == "ss_old_world_gold_bar":
+    elif item_id == "rare_old_world_gold_bar":
         poly([(34, 65), (52, 41), (94, 48), (106, 75), (88, 96), (45, 89)], (156, 124, 55, 245))
         rough_line(d, [(49, 47), (63, 69), (57, 91)], dark, 2, rng)
         rough_line(d, [(88, 50), (78, 72), (87, 94)], dark, 2, rng)
-    elif item_id == "ss_zero_master_control_board":
+    elif item_id == "rare_zero_master_control_board":
         rect((29, 38, 99, 91), (58, 62, 62, 245))
         for x, y in [(43, 52), (61, 68), (83, 55), (79, 78)]:
             ell((x - 4, y - 4, x + 4, y + 4), accent)

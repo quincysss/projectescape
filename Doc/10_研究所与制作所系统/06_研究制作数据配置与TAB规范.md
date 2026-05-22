@@ -1,4 +1,4 @@
-# 06_研究制作数据配置与TAB规范
+﻿# 06_研究制作数据配置与TAB规范
 
 > 对应母版章节：14
 > 本文件只定义研究与制作配方数据。不存在配方道具或配方学习物品。
@@ -105,6 +105,6 @@ recipes.tab.required_conditions 非空时必须使用受支持的条件类型。
 ```text
 请实现研究制作数据配置与 TAB 校验。
 读取 Doc/10_研究所与制作所系统/06_研究制作数据配置与TAB规范.md。
-research.tab 只允许矿币消耗；recipes.tab 通过 required_research 和 required_conditions 控制配方开放。
+research.tab 只允许矿币消耗；recipes.tab 通过 required_research 和 required_conditions 控制配方可用条件。
 不要实现配方道具、配方学习或重复配方道具处理。
 ```

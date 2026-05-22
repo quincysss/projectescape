@@ -127,44 +127,66 @@ func _verify_inventory_weight_storage(director) -> bool:
 	if not director.debug_add_item(_item("scrap_metal", 3, 2.0, 5)):
 		printerr("Expected three scrap items to pass.")
 		return false
-	if inventory.items.size() != 3:
-		printerr("Expected three independent scrap slots.")
+	if inventory.items.size() != 1:
+		printerr("Expected stackable scrap to occupy one slot, got %s." % inventory.items.size())
 		return false
-	for item in inventory.items:
-		if int(item.amount) != 1 or int(item.stack_limit) != 1:
-			printerr("Expected inventory items to be single, non-stackable entries.")
-			return false
+	var scrap_stack: Dictionary = inventory.items[0]
+	if int(scrap_stack.amount) != 3 or int(scrap_stack.stack_limit) != 5 or not bool(scrap_stack.stackable):
+		printerr("Expected scrap stack amount 3 with stack limit 5.")
+		return false
 	if not is_equal_approx(weight.current_weight, 6.0):
 		printerr("Expected weight 6, got %s" % weight.current_weight)
 		return false
 
-	if not director.debug_add_item(_item("heavy_battery", 1, 12.0, 1)):
+	if not is_equal_approx(weight.speed_multiplier, 1.0):
+		printerr("Expected <=100%% load to keep speed multiplier 1.0, got %s" % weight.speed_multiplier)
+		return false
+
+	if not director.debug_add_item(_item("heavy_battery", 1, 16.0, 1)):
 		printerr("Expected heavy battery add to pass.")
 		return false
+	if not is_equal_approx(weight.current_weight, 22.0):
+		printerr("Expected >100%% load to raise weight to 22, got %s" % weight.current_weight)
+		return false
 	if weight.current_stage != weight.WeightStage.HEAVY:
-		printerr("Expected HEAVY stage, got %s" % weight.current_stage)
+		printerr("Expected >100%% load to enter HEAVY stage, got %s" % weight.current_stage)
 		return false
-	if director.debug_add_item(_item("heavy_battery", 1, 12.0, 1)):
-		printerr("Expected over-weight item add to fail.")
+	if not is_equal_approx(weight.speed_multiplier, 0.8):
+		printerr("Expected >100%% load to set speed multiplier 0.8, got %s" % weight.speed_multiplier)
 		return false
-	if not is_equal_approx(weight.current_weight, 18.0):
-		printerr("Expected failed add to preserve weight 18, got %s" % weight.current_weight)
+	if not director.debug_add_item(_item("heavy_battery", 1, 16.0, 1)):
+		printerr("Expected over-weight item add to pass and apply speed penalty.")
+		return false
+	if not is_equal_approx(weight.current_weight, 38.0):
+		printerr("Expected >150%% load to raise weight to 38, got %s" % weight.current_weight)
+		return false
+	if weight.current_stage != weight.WeightStage.OVERLOADED:
+		printerr("Expected >150%% load to enter OVERLOADED stage, got %s" % weight.current_stage)
+		return false
+	if not is_equal_approx(weight.speed_multiplier, 0.55):
+		printerr("Expected >150%% load to set speed multiplier 0.55, got %s" % weight.speed_multiplier)
 		return false
 
 	if not director.deposit_inventory_item_to_home(0):
-		printerr("Expected deposit first item to pass.")
+		printerr("Expected deposit scrap stack to pass.")
 		return false
-	if inventory.items.size() != 3:
-		printerr("Expected inventory item removed after deposit.")
+	if inventory.items.size() != 2:
+		printerr("Expected scrap stack removed after deposit, leaving two batteries.")
 		return false
 	if storage.items.size() != 1:
 		printerr("Expected one home storage item.")
 		return false
-	if int(storage.items[0].amount) != 1 or int(storage.items[0].stack_limit) != 1:
-		printerr("Expected home storage item to be a single, non-stackable entry.")
+	if int(storage.items[0].amount) != 3 or int(storage.items[0].stack_limit) != 5 or not bool(storage.items[0].stackable):
+		printerr("Expected home storage to keep the deposited scrap stack.")
 		return false
-	if not is_equal_approx(weight.current_weight, 16.0):
-		printerr("Expected weight 16 after depositing one scrap, got %s" % weight.current_weight)
+	if not is_equal_approx(weight.current_weight, 32.0):
+		printerr("Expected weight 32 after depositing scrap stack, got %s" % weight.current_weight)
+		return false
+	if weight.current_stage != weight.WeightStage.OVERLOADED:
+		printerr("Expected remaining batteries to keep OVERLOADED stage, got %s" % weight.current_stage)
+		return false
+	if not is_equal_approx(weight.speed_multiplier, 0.55):
+		printerr("Expected remaining batteries to keep speed multiplier 0.55, got %s" % weight.speed_multiplier)
 		return false
 
 	inventory.setup(1, 100.0)
@@ -202,8 +224,10 @@ func _item(item_id: String, amount: int, weight_per_unit: float, stack_limit: in
 		"display_name": item_id,
 		"amount": amount,
 		"weight_per_unit": weight_per_unit,
-		"stack_limit": stack_limit,
+		"stackable": stack_limit > 1,
+		"stack_limit": maxi(1, stack_limit),
 		"item_type": "material",
+		"quality": "C",
 	}
 
 func _verify_safe_zone_and_stability(director) -> bool:

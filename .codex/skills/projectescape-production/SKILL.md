@@ -1,6 +1,6 @@
 ---
 name: projectescape-production
-description: Use this skill for any Project Escape / 废土生存法则 documentation maintenance, Godot implementation, asset specification, map editing, gameplay system work, validation, or production planning. Before changing code, scenes, assets, or docs, read the required project documents and follow the module acceptance checklist.
+description: Use this skill for any Project Escape / 废土生存法则 documentation maintenance, Godot implementation, data configuration, asset specification, map editing, gameplay system work, validation, or production planning. Before changing code, scenes, data, assets, or docs, read the required project documents and follow the module acceptance checklist.
 metadata:
   short-description: Project Escape production rules
 ---
@@ -39,6 +39,7 @@ For all tasks:
 ## Execution Discipline
 
 - Use `Doc/00_AI开工入口.md` and `Doc/系统文档索引表.md` to route work before reading long documents.
+- For design, rule, requirements, BDD, acceptance, index, AI prompt, or documentation synchronization work, use `projectescape-doc-bdd-sync` when available. Prefer updating existing authoritative docs before creating new docs.
 - Future requirements documentation must be organized with BDD. Use `Doc/00_BDD需求文档规范.md`, and express key behavior with `Feature`, `Scenario`, `Given`, `When`, and `Then`.
 - Treat split documents under `Doc/02_*` to `Doc/10_*` as the operational source for implementation tasks.
 - Treat module `00_AI开工入口.md` files as routing documents only; do not copy full system rules into them.
@@ -104,8 +105,8 @@ Mandatory rules:
 
 - Container types, information tiers, loot tables, spawn points, circle weights, and refresh behavior must be data-driven.
 - A refresh manager owns refresh rounds and point selection; individual containers should not invent their own global spawning rules.
-- Container lifecycle must follow the documented states for unsearched, opening, opened, locked, expired, or reserved behavior.
-- Opening uses the documented interaction/read-bar flow and must respect interruption, lock, multiplayer-reservation boundaries, and expiry rules where applicable.
+- Container lifecycle must follow the documented states for unsearched, opening, opened, locked, or reserved behavior. Ordinary containers do not expire or despawn on a countdown.
+- Opening uses the documented interaction/read-bar flow and must respect interruption, lock, and multiplayer-reservation boundaries where applicable.
 - Loot generation hands items to the backpack/load interface; containers must not bypass inventory rules or silently create persistent meta items.
 
 ### Outposts, Materials, And Repair
@@ -127,8 +128,8 @@ Required docs: `Doc/07_背包_存储与负重系统_修订版_废土生存法则
 Mandatory rules:
 
 - Item definition, size, quality, stackability, tags, and value must come from item data, not hardcoded scene logic.
-- Backpack placement follows grid occupancy and stacking rules; pickup, transfer, split, merge, discard, and sort must use shared inventory interfaces.
-- Load is calculated from carried items and equipment, then mapped to documented load stages and penalties.
+- Backpack placement follows grid occupancy and stacking rules; ordinary resources can stack according to item data, and pickup, transfer, split, merge, discard, and sort must use shared inventory interfaces.
+- Load is calculated from carried items and equipment, then mapped to documented load stages, speed multipliers, and penalties. Load does not block ordinary resource pickup by itself.
 - Home storage, outpost storage, container leftovers, carried backpack, and meta warehouse are separate scopes with documented transfer boundaries.
 - Death, extraction, and settlement must call the documented inventory/warehouse interfaces rather than directly moving arbitrary item nodes.
 - Item selection and transfer must operate on a single item instance by list index; new UI surfaces must not merge, sell, consume, or transfer by `item_id` unless the user explicitly chooses a batch action that internally iterates single-item transfers.
@@ -168,9 +169,10 @@ Required docs: `Doc/10_研究所与制作所系统_修订版_废土生存法则.
 Mandatory rules:
 
 - Research and crafting must be data-driven through documented TAB fields where the docs require table configuration.
-- Research costs and crafting costs consume items from the meta warehouse through documented warehouse interfaces.
+- Research consumes `mine_coin` and documented `required_conditions` only; it must not consume meta warehouse materials.
+- Crafting costs may consume items from the meta warehouse through documented warehouse interfaces.
 - Warehouse capacity research currently uses the 80 -> 120 capacity line: unresearched 80, then 80 / 90 / 100 / 110 / 120.
-- Blueprints unlock crafting recipes through documented blueprint and recipe relationships; do not hardcode title, detail, or recipe text in code.
+- There is no blueprint system, blueprint item, or blueprint unlock path in this round; recipe availability must come from documented data/configuration and required conditions.
 - Crafting outputs must enter the meta warehouse through the same capacity, stack, overflow, and item-instance rules used by warehouse and settlement systems.
 - Manufacturing/crafting unlocks tied to chapter progress must remain synchronized with the player profile and chapter goal documents.
 
@@ -193,7 +195,11 @@ Every final response must include:
 - The validation performed, or the reason validation was not run.
 - Any remaining mismatch between docs, implementation, and user intent.
 
-For Godot work, run the narrowest relevant check available. If no automated check exists, perform a scene/file inspection and say so.
+For Godot work, use `projectescape-godot-validation` when available to discover and run the narrowest relevant check from repository evidence. If no automated check exists, perform a scene/file inspection and say so.
+
+For TAB, TSV, JSON, manifest, or other data configuration work, use `projectescape-tab-data-guardian` when available to discover current data conventions, protect references and UTF-8 text, and select relevant data validation evidence.
+
+For documentation-only or design-rule work, use `projectescape-doc-bdd-sync` when available to verify existing-doc-first maintenance, BDD or acceptance coverage, routing/index synchronization, and stale wording searches.
 
 ## Reference
 

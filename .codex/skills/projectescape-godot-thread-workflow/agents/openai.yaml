@@ -1,0 +1,4 @@
+interface:
+  display_name: "ProjectEscape Godot Thread Workflow"
+  short_description: "Guide ProjectEscape Godot thread delivery."
+  default_prompt: "Use ProjectEscape multi-thread Godot delivery workflow: declare agent identity, write boundaries, Godot MCP connection and port protocol, current resource-loop red lines, validation report, and integration risks."

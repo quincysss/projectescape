@@ -1,0 +1,4 @@
+interface:
+  display_name: "Project Escape Godot Validation"
+  short_description: "Discover and run Project Escape Godot validation checks."
+  default_prompt: "Validate Project Escape changes by discovering relevant Godot checks from repository evidence, running them, diagnosing failures, and reporting completion evidence."

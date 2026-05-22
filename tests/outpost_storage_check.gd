@@ -115,14 +115,14 @@ func _verify_outpost_storage() -> bool:
 		printerr("Expected extraction result to include outpost storage item.")
 		return false
 	var death_result: Dictionary = root.run_end_controller.result_builder.build_death_result(root.run_director, "test")
-	if not _has_item(death_result.get("lost_items", []), "scrap_metal"):
-		printerr("Expected death result to lose outpost storage item.")
+	if not _has_item(death_result.get("warehouse_items", []), "scrap_metal"):
+		printerr("Expected death result to retain outpost storage item.")
 		return false
 	if game_state != null:
 		game_state.clear_warehouse()
 		game_state.apply_run_result(death_result)
-		if _has_item(game_state.get_warehouse_items_snapshot(), "scrap_metal"):
-			printerr("Expected failed extraction/death to not bring outpost storage into meta warehouse.")
+		if not _has_item(game_state.get_warehouse_items_snapshot(), "scrap_metal"):
+			printerr("Expected failed extraction/death to bring outpost storage into meta warehouse.")
 			return false
 
 	root._on_home_storage_item_meta_clicked("storage:0")

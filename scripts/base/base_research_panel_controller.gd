@@ -6,10 +6,10 @@ signal selection_changed(research_id: String)
 const RESEARCH_NODE_SIZE := 70.0
 const RESEARCH_NODE_GAP := 116.0
 const RESEARCH_ROW_HEIGHT := 106.0
-const MATERIAL_SLOT_WIDTH := 64.0
-const MATERIAL_SLOT_HEIGHT := 58.0
-const MATERIAL_SLOT_GAP := 14.0
-const MATERIAL_ROW_GAP := 14.0
+const CONDITION_SLOT_WIDTH := 64.0
+const CONDITION_SLOT_HEIGHT := 58.0
+const CONDITION_SLOT_GAP := 14.0
+const CONDITION_ROW_GAP := 14.0
 
 var game_state: Node
 var data_registry
@@ -99,7 +99,7 @@ func set_items_text(items: Array) -> void:
 			var max_level := int(item.get("max_level", 0))
 			var effect_text := _format_effect(String(item.get("effect_type", "")), float(item.get("effect_value", 0.0)))
 			var status := String(item.get("status", "LOCKED"))
-			var status_text := "可研究" if bool(item.get("can_research", false)) else "材料不足"
+			var status_text := "可研究" if bool(item.get("can_research", false)) else "矿币/条件不足"
 			if status == "COMPLETED":
 				status_text = "已满级"
 			lines.append("[url=research:%s]- %s Lv.%d/%d  %s  %s[/url]" % [
@@ -161,7 +161,7 @@ func request_research() -> bool:
 		update_selected_state()
 		return false
 	if research_confirm_dialog != null:
-		research_confirm_dialog.dialog_text = "%s\n\n确认后将消耗上列材料与矿币，无法撤销。" % format_quote(quote)
+		research_confirm_dialog.dialog_text = "%s\n\n确认后仅消耗矿币，不会消耗仓库材料。" % format_quote(quote)
 		research_confirm_dialog.popup_centered()
 	return true
 
@@ -178,23 +178,25 @@ func confirm_research() -> Dictionary:
 
 
 func format_quote(quote: Dictionary) -> String:
-	var material_parts: Array[String] = []
-	for detail in Array(quote.get("requirement_details", [])):
-		if detail is Dictionary:
-			material_parts.append("%s %d/%d" % [
-				String(detail.get("display_name", detail.get("item_id", ""))),
-				int(detail.get("owned", 0)),
-				int(detail.get("required", 0)),
-			])
 	var currency_need := int(quote.get("required_currency_amount", 0))
 	var currency_owned := int(quote.get("current_currency_amount", 0))
 	var effect_text := _format_effect(String(quote.get("effect_type", "")), float(quote.get("effect_value", 0.0)))
-	return "%s Lv.%d：%s；矿币 %d/%d；完成后%s。" % [
+	var condition_parts: Array[String] = []
+	for condition_detail in Array(quote.get("condition_details", [])):
+		if condition_detail is Dictionary:
+			condition_parts.append("%s %d/%d" % [
+				String(condition_detail.get("display_name", condition_detail.get("id", ""))),
+				int(condition_detail.get("current", 0)),
+				int(condition_detail.get("required", 0)),
+			])
+	if condition_parts.is_empty():
+		condition_parts.append("无")
+	return "%s Lv.%d；矿币 %d/%d；前置条件：%s；效果：%s。" % [
 		String(quote.get("display_name", "")),
 		int(quote.get("next_level", 0)),
-		"、".join(material_parts),
 		currency_owned,
 		currency_need,
+		", ".join(condition_parts),
 		effect_text,
 	]
 
@@ -321,7 +323,7 @@ func _update_detail(quote: Dictionary) -> void:
 	var description := String(row.get("description", quote.get("description", ""))) if not row.is_empty() else String(quote.get("description", ""))
 	detail_title_label.text = title
 	detail_description_label.text = description
-	_set_requirement_slots(Array(quote.get("requirement_details", [])))
+	_set_requirement_slots(Array(quote.get("condition_details", [])))
 	if String(quote.get("error", "")) == "max_level":
 		currency_cost_label.text = "已满级"
 		currency_cost_label.add_theme_color_override("font_color", Color("#D1B850"))
@@ -350,54 +352,40 @@ func _set_requirement_slots(details: Array) -> void:
 		var row := int(index / 3)
 		var col := index % 3
 		var slots_in_row := mini(3, visible_details.size() - row * 3)
-		var row_width := float(slots_in_row) * MATERIAL_SLOT_WIDTH + float(slots_in_row - 1) * MATERIAL_SLOT_GAP
+		var row_width := float(slots_in_row) * CONDITION_SLOT_WIDTH + float(slots_in_row - 1) * CONDITION_SLOT_GAP
 		var start_x := (requirement_grid_root.size.x - row_width) * 0.5
 		var slot_pos := Vector2(
-			start_x + float(col) * (MATERIAL_SLOT_WIDTH + MATERIAL_SLOT_GAP),
-			float(row) * (MATERIAL_SLOT_HEIGHT + MATERIAL_ROW_GAP)
+			start_x + float(col) * (CONDITION_SLOT_WIDTH + CONDITION_SLOT_GAP),
+			float(row) * (CONDITION_SLOT_HEIGHT + CONDITION_ROW_GAP)
 		)
-		requirement_grid_root.add_child(_make_material_slot(detail_dict, slot_pos))
+		requirement_grid_root.add_child(_make_condition_slot(detail_dict, slot_pos))
 
 
-func _make_material_slot(detail: Dictionary, pos: Vector2) -> Panel:
+func _make_condition_slot(detail: Dictionary, pos: Vector2) -> Panel:
 	var panel := Panel.new()
 	panel.position = pos
-	panel.size = Vector2(MATERIAL_SLOT_WIDTH, MATERIAL_SLOT_HEIGHT)
+	panel.size = Vector2(CONDITION_SLOT_WIDTH, CONDITION_SLOT_HEIGHT)
 	panel.mouse_filter = Control.MOUSE_FILTER_STOP
 	var enough := bool(detail.get("enough", false))
 	panel.add_theme_stylebox_override("panel", _slot_style(Color("#071116"), Color("#35C9D7") if enough else Color("#8B4F4F"), 1))
-	var material_name := String(detail.get("display_name", detail.get("item_id", "")))
-	panel.tooltip_text = ""
-	var item_id := String(detail.get("item_id", ""))
-	var item_def: Dictionary = data_registry.get_item(item_id) if _ensure_data_loaded() and data_registry != null and data_registry.has_method("get_item") else {}
-	var icon_path := String(item_def.get("icon", ""))
-	var texture := _icon_texture(icon_path)
-	if texture != null:
-		var icon := TextureRect.new()
-		icon.name = "ResearchMaterialIcon"
-		icon.position = Vector2((panel.size.x - 28.0) * 0.5, 4.0)
-		icon.size = Vector2(28.0, 28.0)
-		icon.texture = texture
-		icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-		icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-		icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		panel.add_child(icon)
-	else:
-		var name_label := Label.new()
-		name_label.position = Vector2(4, 6)
-		name_label.size = Vector2(panel.size.x - 8.0, 22)
-		name_label.text = material_name
-		name_label.clip_text = true
-		name_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		name_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-		name_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		_style_label(name_label, 10, Color("#D8D6CE"))
-		panel.add_child(name_label)
+	var condition_name := String(detail.get("display_name", detail.get("id", "")))
+	panel.tooltip_text = condition_name
+	var name_label := Label.new()
+	name_label.position = Vector2(4, 6)
+	name_label.size = Vector2(panel.size.x - 8.0, 22)
+	name_label.text = condition_name
+	name_label.clip_text = true
+	name_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	name_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	name_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_style_label(name_label, 10, Color("#D8D6CE"))
+	panel.add_child(name_label)
 
 	var count_label := Label.new()
 	count_label.position = Vector2(4, 34)
 	count_label.size = Vector2(panel.size.x - 8.0, 20)
-	count_label.text = "%d/%d" % [int(detail.get("owned", 0)), int(detail.get("required", 0))]
+	var owned_count := int(detail.get("owned", detail.get("current", 0)))
+	count_label.text = "%d/%d" % [owned_count, int(detail.get("required", 0))]
 	count_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	count_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	count_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -405,11 +393,11 @@ func _make_material_slot(detail: Dictionary, pos: Vector2) -> Panel:
 	panel.add_child(count_label)
 	if tooltip_view != null:
 		tooltip_view.bind(panel, {
-			"item_id": item_id,
-			"display_name": material_name,
+			"item_id": "",
+			"display_name": condition_name,
 		}, "research", {
 			"context": "research",
-			"owned_count": int(detail.get("owned", 0)),
+			"owned_count": owned_count,
 			"required_count": int(detail.get("required", 0)),
 			"show_requirement_state": true,
 		})

@@ -47,6 +47,11 @@ var ss_next_chance_tier: int = 0
 var ss_next_miss_count: int = 0
 var ss_debug_events: Array = []
 var run_day_index: int = 1
+var map_id: String = "abandoned_house"
+var location_state: String = "rich"
+var location_visit_count_before: int = 0
+var location_visit_count_after: int = 1
+var container_target_count: int = 0
 var scene_events: Array[Dictionary] = []
 var active_time_event_id: String = ""
 var monster_event_active: bool = false
@@ -109,6 +114,11 @@ func to_debug_dictionary() -> Dictionary:
 		},
 		"scene_events": {
 			"run_day_index": run_day_index,
+			"map_id": map_id,
+			"location_state": location_state,
+			"location_visit_count_before": location_visit_count_before,
+			"location_visit_count_after": location_visit_count_after,
+			"container_target_count": container_target_count,
 			"events": scene_events,
 			"active_time_event_id": active_time_event_id,
 			"monster_event_active": monster_event_active,

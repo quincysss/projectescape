@@ -1,268 +1,268 @@
-[
-  {
-    "id": "scrap_metal",
-    "quality": "C",
-    "category": "material",
-    "path": "res://assets/ui/itemicon/scrap_metal.png",
-    "prompt": "Create a 128x128 inventory icon for a 2D wasteland extraction game. Subject: scrap metal sheets. Style: dark hand-drawn manga line art, thick black outline, rough dirty texture, grayscale and charcoal palette, small muted accent color by quality. Composition: centered object, transparent background, readable silhouette at small size. Requirements: no text, no watermark, no background scene, clean cutout edges."
-  },
-  {
-    "id": "cloth_dirty",
-    "quality": "C",
-    "category": "material",
-    "path": "res://assets/ui/itemicon/cloth_dirty.png",
-    "prompt": "Create a 128x128 inventory icon for a 2D wasteland extraction game. Subject: dirty torn cloth strip. Style: dark hand-drawn manga line art, thick black outline, rough dirty texture, grayscale and charcoal palette, small muted accent color by quality. Composition: centered object, transparent background, readable silhouette at small size. Requirements: no text, no watermark, no background scene, clean cutout edges."
-  },
-  {
-    "id": "wire_coil",
-    "quality": "B",
-    "category": "electronic material",
-    "path": "res://assets/ui/itemicon/wire_coil.png",
-    "prompt": "Create a 128x128 inventory icon for a 2D wasteland extraction game. Subject: old wire coil. Style: dark hand-drawn manga line art, thick black outline, rough dirty texture, grayscale and charcoal palette, small muted accent color by quality. Composition: centered object, transparent background, readable silhouette at small size. Requirements: no text, no watermark, no background scene, clean cutout edges."
-  },
-  {
-    "id": "battery_old",
-    "quality": "B",
-    "category": "power material",
-    "path": "res://assets/ui/itemicon/battery_old.png",
-    "prompt": "Create a 128x128 inventory icon for a 2D wasteland extraction game. Subject: old leaking battery. Style: dark hand-drawn manga line art, thick black outline, rough dirty texture, grayscale and charcoal palette, small muted accent color by quality. Composition: centered object, transparent background, readable silhouette at small size. Requirements: no text, no watermark, no background scene, clean cutout edges."
-  },
-  {
-    "id": "medicine_powder",
-    "quality": "B",
-    "category": "medical material",
-    "path": "res://assets/ui/itemicon/medicine_powder.png",
-    "prompt": "Create a 128x128 inventory icon for a 2D wasteland extraction game. Subject: sealed medicine powder pouch. Style: dark hand-drawn manga line art, thick black outline, rough dirty texture, grayscale and charcoal palette, small muted accent color by quality. Composition: centered object, transparent background, readable silhouette at small size. Requirements: no text, no watermark, no background scene, clean cutout edges."
-  },
-  {
-    "id": "tool_parts",
-    "quality": "B",
-    "category": "tool material",
-    "path": "res://assets/ui/itemicon/tool_parts.png",
-    "prompt": "Create a 128x128 inventory icon for a 2D wasteland extraction game. Subject: gears screws and tool parts. Style: dark hand-drawn manga line art, thick black outline, rough dirty texture, grayscale and charcoal palette, small muted accent color by quality. Composition: centered object, transparent background, readable silhouette at small size. Requirements: no text, no watermark, no background scene, clean cutout edges."
-  },
-  {
-    "id": "outpost_fuse",
-    "quality": "B",
-    "category": "outpost material",
-    "path": "res://assets/ui/itemicon/outpost_fuse.png",
-    "prompt": "Create a 128x128 inventory icon for a 2D wasteland extraction game. Subject: outpost repair fuse. Style: dark hand-drawn manga line art, thick black outline, rough dirty texture, grayscale and charcoal palette, small muted accent color by quality. Composition: centered object, transparent background, readable silhouette at small size. Requirements: no text, no watermark, no background scene, clean cutout edges."
-  },
-  {
-    "id": "outpost_filter",
-    "quality": "A",
-    "category": "outpost material",
-    "path": "res://assets/ui/itemicon/outpost_filter.png",
-    "prompt": "Create a 128x128 inventory icon for a 2D wasteland extraction game. Subject: purification filter cartridge. Style: dark hand-drawn manga line art, thick black outline, rough dirty texture, grayscale and charcoal palette, small muted accent color by quality. Composition: centered object, transparent background, readable silhouette at small size. Requirements: no text, no watermark, no background scene, clean cutout edges."
-  },
-  {
-    "id": "stability_candy",
-    "quality": "C",
-    "category": "consumable",
-    "path": "res://assets/ui/itemicon/stability_candy.png",
-    "prompt": "Create a 128x128 inventory icon for a 2D wasteland extraction game. Subject: wrapped calming candy. Style: dark hand-drawn manga line art, thick black outline, rough dirty texture, grayscale and charcoal palette, small muted accent color by quality. Composition: centered object, transparent background, readable silhouette at small size. Requirements: no text, no watermark, no background scene, clean cutout edges."
-  },
-  {
-    "id": "field_bandage",
-    "quality": "C",
-    "category": "consumable",
-    "path": "res://assets/ui/itemicon/field_bandage.png",
-    "prompt": "Create a 128x128 inventory icon for a 2D wasteland extraction game. Subject: temporary field bandage roll. Style: dark hand-drawn manga line art, thick black outline, rough dirty texture, grayscale and charcoal palette, small muted accent color by quality. Composition: centered object, transparent background, readable silhouette at small size. Requirements: no text, no watermark, no background scene, clean cutout edges."
-  },
-  {
-    "id": "signal_injector",
-    "quality": "A",
-    "category": "consumable",
-    "path": "res://assets/ui/itemicon/signal_injector.png",
-    "prompt": "Create a 128x128 inventory icon for a 2D wasteland extraction game. Subject: signal injector syringe. Style: dark hand-drawn manga line art, thick black outline, rough dirty texture, grayscale and charcoal palette, small muted accent color by quality. Composition: centered object, transparent background, readable silhouette at small size. Requirements: no text, no watermark, no background scene, clean cutout edges."
-  },
-  {
-    "id": "backpack_small_reinforced",
-    "quality": "C",
-    "category": "equipment",
-    "path": "res://assets/ui/itemicon/backpack_small_reinforced.png",
-    "prompt": "Create a 128x128 inventory icon for a 2D wasteland extraction game. Subject: small reinforced backpack. Style: dark hand-drawn manga line art, thick black outline, rough dirty texture, grayscale and charcoal palette, small muted accent color by quality. Composition: centered object, transparent background, readable silhouette at small size. Requirements: no text, no watermark, no background scene, clean cutout edges."
-  },
-  {
-    "id": "scanner_broken",
-    "quality": "B",
-    "category": "equipment",
-    "path": "res://assets/ui/itemicon/scanner_broken.png",
-    "prompt": "Create a 128x128 inventory icon for a 2D wasteland extraction game. Subject: broken handheld scanner. Style: dark hand-drawn manga line art, thick black outline, rough dirty texture, grayscale and charcoal palette, small muted accent color by quality. Composition: centered object, transparent background, readable silhouette at small size. Requirements: no text, no watermark, no background scene, clean cutout edges."
-  },
-  {
-    "id": "keepsake_photo",
-    "quality": "A",
-    "category": "rare collectible",
-    "path": "res://assets/ui/itemicon/keepsake_photo.png",
-    "prompt": "Create a 128x128 inventory icon for a 2D wasteland extraction game. Subject: faded keepsake photo. Style: dark hand-drawn manga line art, thick black outline, rough dirty texture, grayscale and charcoal palette, small muted accent color by quality. Composition: centered object, transparent background, readable silhouette at small size. Requirements: no text, no watermark, no background scene, clean cutout edges."
-  },
-  {
-    "id": "gold_data_chip",
-    "quality": "S",
-    "category": "rare electronic",
-    "path": "res://assets/ui/itemicon/gold_data_chip.png",
-    "prompt": "Create a 128x128 inventory icon for a 2D wasteland extraction game. Subject: gold data chip. Style: dark hand-drawn manga line art, thick black outline, rough dirty texture, grayscale and charcoal palette, small muted accent color by quality. Composition: centered object, transparent background, readable silhouette at small size. Requirements: no text, no watermark, no background scene, clean cutout edges."
-  },
-  {
-    "id": "ration_bar",
-    "quality": "C",
-    "category": "consumable",
-    "path": "res://assets/ui/itemicon/ration_bar.png",
-    "prompt": "Create a 128x128 inventory icon for a 2D wasteland extraction game. Subject: compressed ration bar. Style: dark hand-drawn manga line art, thick black outline, rough dirty texture, grayscale and charcoal palette, small muted accent color by quality. Composition: centered object, transparent background, readable silhouette at small size. Requirements: no text, no watermark, no background scene, clean cutout edges."
-  },
-  {
-    "id": "cracked_lens",
-    "quality": "C",
-    "category": "material",
-    "path": "res://assets/ui/itemicon/cracked_lens.png",
-    "prompt": "Create a 128x128 inventory icon for a 2D wasteland extraction game. Subject: cracked optical lens. Style: dark hand-drawn manga line art, thick black outline, rough dirty texture, grayscale and charcoal palette, small muted accent color by quality. Composition: centered object, transparent background, readable silhouette at small size. Requirements: no text, no watermark, no background scene, clean cutout edges."
-  },
-  {
-    "id": "duct_tape_roll",
-    "quality": "C",
-    "category": "material",
-    "path": "res://assets/ui/itemicon/duct_tape_roll.png",
-    "prompt": "Create a 128x128 inventory icon for a 2D wasteland extraction game. Subject: half roll of duct tape. Style: dark hand-drawn manga line art, thick black outline, rough dirty texture, grayscale and charcoal palette, small muted accent color by quality. Composition: centered object, transparent background, readable silhouette at small size. Requirements: no text, no watermark, no background scene, clean cutout edges."
-  },
-  {
-    "id": "rusted_bolts",
-    "quality": "C",
-    "category": "material",
-    "path": "res://assets/ui/itemicon/rusted_bolts.png",
-    "prompt": "Create a 128x128 inventory icon for a 2D wasteland extraction game. Subject: rusted bolts and nuts. Style: dark hand-drawn manga line art, thick black outline, rough dirty texture, grayscale and charcoal palette, small muted accent color by quality. Composition: centered object, transparent background, readable silhouette at small size. Requirements: no text, no watermark, no background scene, clean cutout edges."
-  },
-  {
-    "id": "cracked_compass",
-    "quality": "C",
-    "category": "rare collectible",
-    "path": "res://assets/ui/itemicon/cracked_compass.png",
-    "prompt": "Create a 128x128 inventory icon for a 2D wasteland extraction game. Subject: cracked old compass. Style: dark hand-drawn manga line art, thick black outline, rough dirty texture, grayscale and charcoal palette, small muted accent color by quality. Composition: centered object, transparent background, readable silhouette at small size. Requirements: no text, no watermark, no background scene, clean cutout edges."
-  },
-  {
-    "id": "sterile_patch",
-    "quality": "B",
-    "category": "consumable",
-    "path": "res://assets/ui/itemicon/sterile_patch.png",
-    "prompt": "Create a 128x128 inventory icon for a 2D wasteland extraction game. Subject: sealed sterile hemostatic patch. Style: dark hand-drawn manga line art, thick black outline, rough dirty texture, grayscale and charcoal palette, small muted accent color by quality. Composition: centered object, transparent background, readable silhouette at small size. Requirements: no text, no watermark, no background scene, clean cutout edges."
-  },
-  {
-    "id": "reinforced_strap",
-    "quality": "B",
-    "category": "material",
-    "path": "res://assets/ui/itemicon/reinforced_strap.png",
-    "prompt": "Create a 128x128 inventory icon for a 2D wasteland extraction game. Subject: reinforced backpack strap. Style: dark hand-drawn manga line art, thick black outline, rough dirty texture, grayscale and charcoal palette, small muted accent color by quality. Composition: centered object, transparent background, readable silhouette at small size. Requirements: no text, no watermark, no background scene, clean cutout edges."
-  },
-  {
-    "id": "pulse_battery",
-    "quality": "B",
-    "category": "material",
-    "path": "res://assets/ui/itemicon/pulse_battery.png",
-    "prompt": "Create a 128x128 inventory icon for a 2D wasteland extraction game. Subject: unstable pulse battery pack. Style: dark hand-drawn manga line art, thick black outline, rough dirty texture, grayscale and charcoal palette, small muted accent color by quality. Composition: centered object, transparent background, readable silhouette at small size. Requirements: no text, no watermark, no background scene, clean cutout edges."
-  },
-  {
-    "id": "street_map_fragment",
-    "quality": "B",
-    "category": "rare map",
-    "path": "res://assets/ui/itemicon/street_map_fragment.png",
-    "prompt": "Create a 128x128 inventory icon for a 2D wasteland extraction game. Subject: torn street map fragment. Style: dark hand-drawn manga line art, thick black outline, rough dirty texture, grayscale and charcoal palette, small muted accent color by quality. Composition: centered object, transparent background, readable silhouette at small size. Requirements: no text, no watermark, no background scene, clean cutout edges."
-  },
-  {
-    "id": "signal_resonator_coil",
-    "quality": "B",
-    "category": "electronic material",
-    "path": "res://assets/ui/itemicon/signal_resonator_coil.png",
-    "prompt": "Create a 128x128 inventory icon for a 2D wasteland extraction game. Subject: signal resonator coil. Style: dark hand-drawn manga line art, thick black outline, rough dirty texture, grayscale and charcoal palette, small muted accent color by quality. Composition: centered object, transparent background, readable silhouette at small size. Requirements: no text, no watermark, no background scene, clean cutout edges."
-  },
-  {
-    "id": "sealed_medkit",
-    "quality": "A",
-    "category": "consumable",
-    "path": "res://assets/ui/itemicon/sealed_medkit.png",
-    "prompt": "Create a 128x128 inventory icon for a 2D wasteland extraction game. Subject: sealed emergency medkit. Style: dark hand-drawn manga line art, thick black outline, rough dirty texture, grayscale and charcoal palette, small muted accent color by quality. Composition: centered object, transparent background, readable silhouette at small size. Requirements: no text, no watermark, no background scene, clean cutout edges."
-  },
-  {
-    "id": "survey_drone_core",
-    "quality": "A",
-    "category": "rare electronic",
-    "path": "res://assets/ui/itemicon/survey_drone_core.png",
-    "prompt": "Create a 128x128 inventory icon for a 2D wasteland extraction game. Subject: survey drone core module. Style: dark hand-drawn manga line art, thick black outline, rough dirty texture, grayscale and charcoal palette, small muted accent color by quality. Composition: centered object, transparent background, readable silhouette at small size. Requirements: no text, no watermark, no background scene, clean cutout edges."
-  },
-  {
-    "id": "outpost_servo_pack",
-    "quality": "A",
-    "category": "outpost material",
-    "path": "res://assets/ui/itemicon/outpost_servo_pack.png",
-    "prompt": "Create a 128x128 inventory icon for a 2D wasteland extraction game. Subject: outpost servo component pack. Style: dark hand-drawn manga line art, thick black outline, rough dirty texture, grayscale and charcoal palette, small muted accent color by quality. Composition: centered object, transparent background, readable silhouette at small size. Requirements: no text, no watermark, no background scene, clean cutout edges."
-  },
-  {
-    "id": "thermal_scope_module",
-    "quality": "A",
-    "category": "equipment",
-    "path": "res://assets/ui/itemicon/thermal_scope_module.png",
-    "prompt": "Create a 128x128 inventory icon for a 2D wasteland extraction game. Subject: thermal scope module. Style: dark hand-drawn manga line art, thick black outline, rough dirty texture, grayscale and charcoal palette, small muted accent color by quality. Composition: centered object, transparent background, readable silhouette at small size. Requirements: no text, no watermark, no background scene, clean cutout edges."
-  },
-  {
-    "id": "blackbox_memory_core",
-    "quality": "S",
-    "category": "rare electronic",
-    "path": "res://assets/ui/itemicon/blackbox_memory_core.png",
-    "prompt": "Create a 128x128 inventory icon for a 2D wasteland extraction game. Subject: blackbox memory core. Style: dark hand-drawn manga line art, thick black outline, rough dirty texture, grayscale and charcoal palette, small muted accent color by quality. Composition: centered object, transparent background, readable silhouette at small size. Requirements: no text, no watermark, no background scene, clean cutout edges."
-  },
-  {
-    "id": "prefall_access_key",
-    "quality": "S",
-    "category": "rare access item",
-    "path": "res://assets/ui/itemicon/prefall_access_key.png",
-    "prompt": "Create a 128x128 inventory icon for a 2D wasteland extraction game. Subject: pre-fall access key. Style: dark hand-drawn manga line art, thick black outline, rough dirty texture, grayscale and charcoal palette, small muted accent color by quality. Composition: centered object, transparent background, readable silhouette at small size. Requirements: no text, no watermark, no background scene, clean cutout edges."
-  },
-  {
-    "id": "anomaly_heart_shard",
-    "quality": "S",
-    "category": "rare anomaly",
-    "path": "res://assets/ui/itemicon/anomaly_heart_shard.png",
-    "prompt": "Create a 128x128 inventory icon for a 2D wasteland extraction game. Subject: anomaly heart crystal shard. Style: dark hand-drawn manga line art, thick black outline, rough dirty texture, grayscale and charcoal palette, small muted accent color by quality. Composition: centered object, transparent background, readable silhouette at small size. Requirements: no text, no watermark, no background scene, clean cutout edges."
-  },
-  {
-    "id": "sanctuary_nav_chip",
-    "quality": "S",
-    "category": "rare map chip",
-    "path": "res://assets/ui/itemicon/sanctuary_nav_chip.png",
-    "prompt": "Create a 128x128 inventory icon for a 2D wasteland extraction game. Subject: sanctuary navigation chip. Style: dark hand-drawn manga line art, thick black outline, rough dirty texture, grayscale and charcoal palette, small muted accent color by quality. Composition: centered object, transparent background, readable silhouette at small size. Requirements: no text, no watermark, no background scene, clean cutout edges."
-  },
-  {
-    "id": "ss_silverwing_engine_core",
-    "quality": "SS",
-    "category": "SS showcase",
-    "path": "res://assets/ui/itemicon/ss_silverwing_engine_core.png",
-    "prompt": "Create a 128x128 inventory icon for a 2D wasteland extraction game. Subject: silverwing miniature engine core. Style: dark hand-drawn manga line art, thick black outline, rough dirty texture, grayscale and charcoal palette, small muted accent color by quality. Composition: centered object, transparent background, readable silhouette at small size. Requirements: no text, no watermark, no background scene, clean cutout edges."
-  },
-  {
-    "id": "ss_pink_star",
-    "quality": "SS",
-    "category": "SS showcase",
-    "path": "res://assets/ui/itemicon/ss_pink_star.png",
-    "prompt": "Create a 128x128 inventory icon for a 2D wasteland extraction game. Subject: pink star crystal. Style: dark hand-drawn manga line art, thick black outline, rough dirty texture, grayscale and charcoal palette, small muted accent color by quality. Composition: centered object, transparent background, readable silhouette at small size. Requirements: no text, no watermark, no background scene, clean cutout edges."
-  },
-  {
-    "id": "ss_wanming_pocket_watch",
-    "quality": "SS",
-    "category": "SS showcase",
-    "path": "res://assets/ui/itemicon/ss_wanming_pocket_watch.png",
-    "prompt": "Create a 128x128 inventory icon for a 2D wasteland extraction game. Subject: Wanming pocket watch. Style: dark hand-drawn manga line art, thick black outline, rough dirty texture, grayscale and charcoal palette, small muted accent color by quality. Composition: centered object, transparent background, readable silhouette at small size. Requirements: no text, no watermark, no background scene, clean cutout edges."
-  },
-  {
-    "id": "ss_old_world_gold_bar",
-    "quality": "SS",
-    "category": "SS showcase",
-    "path": "res://assets/ui/itemicon/ss_old_world_gold_bar.png",
-    "prompt": "Create a 128x128 inventory icon for a 2D wasteland extraction game. Subject: old world gold bar. Style: dark hand-drawn manga line art, thick black outline, rough dirty texture, grayscale and charcoal palette, small muted accent color by quality. Composition: centered object, transparent background, readable silhouette at small size. Requirements: no text, no watermark, no background scene, clean cutout edges."
-  },
-  {
-    "id": "ss_zero_master_control_board",
-    "quality": "SS",
-    "category": "SS showcase",
-    "path": "res://assets/ui/itemicon/ss_zero_master_control_board.png",
-    "prompt": "Create a 128x128 inventory icon for a 2D wasteland extraction game. Subject: zero facility master control board. Style: dark hand-drawn manga line art, thick black outline, rough dirty texture, grayscale and charcoal palette, small muted accent color by quality. Composition: centered object, transparent background, readable silhouette at small size. Requirements: no text, no watermark, no background scene, clean cutout edges."
-  }
+﻿[
+    {
+        "id":  "scrap_metal",
+        "quality":  "C",
+        "category":  "material",
+        "path":  "res://assets/ui/itemicon/scrap_metal.png",
+        "prompt":  "Create a 128x128 inventory icon for a 2D wasteland extraction game. Subject: scrap metal sheets. Style: dark hand-drawn manga line art, thick black outline, rough dirty texture, grayscale and charcoal palette, small muted accent color by quality. Composition: centered object, transparent background, readable silhouette at small size. Requirements: no text, no watermark, no background scene, clean cutout edges."
+    },
+    {
+        "id":  "cloth_dirty",
+        "quality":  "C",
+        "category":  "material",
+        "path":  "res://assets/ui/itemicon/cloth_dirty.png",
+        "prompt":  "Create a 128x128 inventory icon for a 2D wasteland extraction game. Subject: dirty torn cloth strip. Style: dark hand-drawn manga line art, thick black outline, rough dirty texture, grayscale and charcoal palette, small muted accent color by quality. Composition: centered object, transparent background, readable silhouette at small size. Requirements: no text, no watermark, no background scene, clean cutout edges."
+    },
+    {
+        "id":  "wire_coil",
+        "quality":  "B",
+        "category":  "electronic material",
+        "path":  "res://assets/ui/itemicon/wire_coil.png",
+        "prompt":  "Create a 128x128 inventory icon for a 2D wasteland extraction game. Subject: old wire coil. Style: dark hand-drawn manga line art, thick black outline, rough dirty texture, grayscale and charcoal palette, small muted accent color by quality. Composition: centered object, transparent background, readable silhouette at small size. Requirements: no text, no watermark, no background scene, clean cutout edges."
+    },
+    {
+        "id":  "battery_old",
+        "quality":  "B",
+        "category":  "power material",
+        "path":  "res://assets/ui/itemicon/battery_old.png",
+        "prompt":  "Create a 128x128 inventory icon for a 2D wasteland extraction game. Subject: old leaking battery. Style: dark hand-drawn manga line art, thick black outline, rough dirty texture, grayscale and charcoal palette, small muted accent color by quality. Composition: centered object, transparent background, readable silhouette at small size. Requirements: no text, no watermark, no background scene, clean cutout edges."
+    },
+    {
+        "id":  "medicine_powder",
+        "quality":  "B",
+        "category":  "medical material",
+        "path":  "res://assets/ui/itemicon/medicine_powder.png",
+        "prompt":  "Create a 128x128 inventory icon for a 2D wasteland extraction game. Subject: sealed medicine powder pouch. Style: dark hand-drawn manga line art, thick black outline, rough dirty texture, grayscale and charcoal palette, small muted accent color by quality. Composition: centered object, transparent background, readable silhouette at small size. Requirements: no text, no watermark, no background scene, clean cutout edges."
+    },
+    {
+        "id":  "tool_parts",
+        "quality":  "B",
+        "category":  "tool material",
+        "path":  "res://assets/ui/itemicon/tool_parts.png",
+        "prompt":  "Create a 128x128 inventory icon for a 2D wasteland extraction game. Subject: gears screws and tool parts. Style: dark hand-drawn manga line art, thick black outline, rough dirty texture, grayscale and charcoal palette, small muted accent color by quality. Composition: centered object, transparent background, readable silhouette at small size. Requirements: no text, no watermark, no background scene, clean cutout edges."
+    },
+    {
+        "id":  "outpost_fuse",
+        "quality":  "B",
+        "category":  "outpost material",
+        "path":  "res://assets/ui/itemicon/outpost_fuse.png",
+        "prompt":  "Create a 128x128 inventory icon for a 2D wasteland extraction game. Subject: outpost repair fuse. Style: dark hand-drawn manga line art, thick black outline, rough dirty texture, grayscale and charcoal palette, small muted accent color by quality. Composition: centered object, transparent background, readable silhouette at small size. Requirements: no text, no watermark, no background scene, clean cutout edges."
+    },
+    {
+        "id":  "outpost_filter",
+        "quality":  "A",
+        "category":  "outpost material",
+        "path":  "res://assets/ui/itemicon/outpost_filter.png",
+        "prompt":  "Create a 128x128 inventory icon for a 2D wasteland extraction game. Subject: purification filter cartridge. Style: dark hand-drawn manga line art, thick black outline, rough dirty texture, grayscale and charcoal palette, small muted accent color by quality. Composition: centered object, transparent background, readable silhouette at small size. Requirements: no text, no watermark, no background scene, clean cutout edges."
+    },
+    {
+        "id":  "stability_candy",
+        "quality":  "C",
+        "category":  "consumable",
+        "path":  "res://assets/ui/itemicon/stability_candy.png",
+        "prompt":  "Create a 128x128 inventory icon for a 2D wasteland extraction game. Subject: wrapped calming candy. Style: dark hand-drawn manga line art, thick black outline, rough dirty texture, grayscale and charcoal palette, small muted accent color by quality. Composition: centered object, transparent background, readable silhouette at small size. Requirements: no text, no watermark, no background scene, clean cutout edges."
+    },
+    {
+        "id":  "field_bandage",
+        "quality":  "C",
+        "category":  "consumable",
+        "path":  "res://assets/ui/itemicon/field_bandage.png",
+        "prompt":  "Create a 128x128 inventory icon for a 2D wasteland extraction game. Subject: temporary field bandage roll. Style: dark hand-drawn manga line art, thick black outline, rough dirty texture, grayscale and charcoal palette, small muted accent color by quality. Composition: centered object, transparent background, readable silhouette at small size. Requirements: no text, no watermark, no background scene, clean cutout edges."
+    },
+    {
+        "id":  "signal_injector",
+        "quality":  "A",
+        "category":  "consumable",
+        "path":  "res://assets/ui/itemicon/signal_injector.png",
+        "prompt":  "Create a 128x128 inventory icon for a 2D wasteland extraction game. Subject: signal injector syringe. Style: dark hand-drawn manga line art, thick black outline, rough dirty texture, grayscale and charcoal palette, small muted accent color by quality. Composition: centered object, transparent background, readable silhouette at small size. Requirements: no text, no watermark, no background scene, clean cutout edges."
+    },
+    {
+        "id":  "backpack_small_reinforced",
+        "quality":  "C",
+        "category":  "equipment",
+        "path":  "res://assets/ui/itemicon/backpack_small_reinforced.png",
+        "prompt":  "Create a 128x128 inventory icon for a 2D wasteland extraction game. Subject: small reinforced backpack. Style: dark hand-drawn manga line art, thick black outline, rough dirty texture, grayscale and charcoal palette, small muted accent color by quality. Composition: centered object, transparent background, readable silhouette at small size. Requirements: no text, no watermark, no background scene, clean cutout edges."
+    },
+    {
+        "id":  "scanner_broken",
+        "quality":  "B",
+        "category":  "equipment",
+        "path":  "res://assets/ui/itemicon/scanner_broken.png",
+        "prompt":  "Create a 128x128 inventory icon for a 2D wasteland extraction game. Subject: broken handheld scanner. Style: dark hand-drawn manga line art, thick black outline, rough dirty texture, grayscale and charcoal palette, small muted accent color by quality. Composition: centered object, transparent background, readable silhouette at small size. Requirements: no text, no watermark, no background scene, clean cutout edges."
+    },
+    {
+        "id":  "keepsake_photo",
+        "quality":  "A",
+        "category":  "rare collectible",
+        "path":  "res://assets/ui/itemicon/keepsake_photo.png",
+        "prompt":  "Create a 128x128 inventory icon for a 2D wasteland extraction game. Subject: faded keepsake photo. Style: dark hand-drawn manga line art, thick black outline, rough dirty texture, grayscale and charcoal palette, small muted accent color by quality. Composition: centered object, transparent background, readable silhouette at small size. Requirements: no text, no watermark, no background scene, clean cutout edges."
+    },
+    {
+        "id":  "gold_data_chip",
+        "quality":  "S",
+        "category":  "rare electronic",
+        "path":  "res://assets/ui/itemicon/gold_data_chip.png",
+        "prompt":  "Create a 128x128 inventory icon for a 2D wasteland extraction game. Subject: gold data chip. Style: dark hand-drawn manga line art, thick black outline, rough dirty texture, grayscale and charcoal palette, small muted accent color by quality. Composition: centered object, transparent background, readable silhouette at small size. Requirements: no text, no watermark, no background scene, clean cutout edges."
+    },
+    {
+        "id":  "ration_bar",
+        "quality":  "C",
+        "category":  "consumable",
+        "path":  "res://assets/ui/itemicon/ration_bar.png",
+        "prompt":  "Create a 128x128 inventory icon for a 2D wasteland extraction game. Subject: compressed ration bar. Style: dark hand-drawn manga line art, thick black outline, rough dirty texture, grayscale and charcoal palette, small muted accent color by quality. Composition: centered object, transparent background, readable silhouette at small size. Requirements: no text, no watermark, no background scene, clean cutout edges."
+    },
+    {
+        "id":  "cracked_lens",
+        "quality":  "C",
+        "category":  "material",
+        "path":  "res://assets/ui/itemicon/cracked_lens.png",
+        "prompt":  "Create a 128x128 inventory icon for a 2D wasteland extraction game. Subject: cracked optical lens. Style: dark hand-drawn manga line art, thick black outline, rough dirty texture, grayscale and charcoal palette, small muted accent color by quality. Composition: centered object, transparent background, readable silhouette at small size. Requirements: no text, no watermark, no background scene, clean cutout edges."
+    },
+    {
+        "id":  "duct_tape_roll",
+        "quality":  "C",
+        "category":  "material",
+        "path":  "res://assets/ui/itemicon/duct_tape_roll.png",
+        "prompt":  "Create a 128x128 inventory icon for a 2D wasteland extraction game. Subject: half roll of duct tape. Style: dark hand-drawn manga line art, thick black outline, rough dirty texture, grayscale and charcoal palette, small muted accent color by quality. Composition: centered object, transparent background, readable silhouette at small size. Requirements: no text, no watermark, no background scene, clean cutout edges."
+    },
+    {
+        "id":  "rusted_bolts",
+        "quality":  "C",
+        "category":  "material",
+        "path":  "res://assets/ui/itemicon/rusted_bolts.png",
+        "prompt":  "Create a 128x128 inventory icon for a 2D wasteland extraction game. Subject: rusted bolts and nuts. Style: dark hand-drawn manga line art, thick black outline, rough dirty texture, grayscale and charcoal palette, small muted accent color by quality. Composition: centered object, transparent background, readable silhouette at small size. Requirements: no text, no watermark, no background scene, clean cutout edges."
+    },
+    {
+        "id":  "cracked_compass",
+        "quality":  "C",
+        "category":  "rare collectible",
+        "path":  "res://assets/ui/itemicon/cracked_compass.png",
+        "prompt":  "Create a 128x128 inventory icon for a 2D wasteland extraction game. Subject: cracked old compass. Style: dark hand-drawn manga line art, thick black outline, rough dirty texture, grayscale and charcoal palette, small muted accent color by quality. Composition: centered object, transparent background, readable silhouette at small size. Requirements: no text, no watermark, no background scene, clean cutout edges."
+    },
+    {
+        "id":  "sterile_patch",
+        "quality":  "B",
+        "category":  "consumable",
+        "path":  "res://assets/ui/itemicon/sterile_patch.png",
+        "prompt":  "Create a 128x128 inventory icon for a 2D wasteland extraction game. Subject: sealed sterile hemostatic patch. Style: dark hand-drawn manga line art, thick black outline, rough dirty texture, grayscale and charcoal palette, small muted accent color by quality. Composition: centered object, transparent background, readable silhouette at small size. Requirements: no text, no watermark, no background scene, clean cutout edges."
+    },
+    {
+        "id":  "reinforced_strap",
+        "quality":  "B",
+        "category":  "material",
+        "path":  "res://assets/ui/itemicon/reinforced_strap.png",
+        "prompt":  "Create a 128x128 inventory icon for a 2D wasteland extraction game. Subject: reinforced backpack strap. Style: dark hand-drawn manga line art, thick black outline, rough dirty texture, grayscale and charcoal palette, small muted accent color by quality. Composition: centered object, transparent background, readable silhouette at small size. Requirements: no text, no watermark, no background scene, clean cutout edges."
+    },
+    {
+        "id":  "pulse_battery",
+        "quality":  "B",
+        "category":  "material",
+        "path":  "res://assets/ui/itemicon/pulse_battery.png",
+        "prompt":  "Create a 128x128 inventory icon for a 2D wasteland extraction game. Subject: unstable pulse battery pack. Style: dark hand-drawn manga line art, thick black outline, rough dirty texture, grayscale and charcoal palette, small muted accent color by quality. Composition: centered object, transparent background, readable silhouette at small size. Requirements: no text, no watermark, no background scene, clean cutout edges."
+    },
+    {
+        "id":  "street_map_fragment",
+        "quality":  "B",
+        "category":  "rare map",
+        "path":  "res://assets/ui/itemicon/street_map_fragment.png",
+        "prompt":  "Create a 128x128 inventory icon for a 2D wasteland extraction game. Subject: torn street map fragment. Style: dark hand-drawn manga line art, thick black outline, rough dirty texture, grayscale and charcoal palette, small muted accent color by quality. Composition: centered object, transparent background, readable silhouette at small size. Requirements: no text, no watermark, no background scene, clean cutout edges."
+    },
+    {
+        "id":  "signal_resonator_coil",
+        "quality":  "B",
+        "category":  "electronic material",
+        "path":  "res://assets/ui/itemicon/signal_resonator_coil.png",
+        "prompt":  "Create a 128x128 inventory icon for a 2D wasteland extraction game. Subject: signal resonator coil. Style: dark hand-drawn manga line art, thick black outline, rough dirty texture, grayscale and charcoal palette, small muted accent color by quality. Composition: centered object, transparent background, readable silhouette at small size. Requirements: no text, no watermark, no background scene, clean cutout edges."
+    },
+    {
+        "id":  "sealed_medkit",
+        "quality":  "A",
+        "category":  "consumable",
+        "path":  "res://assets/ui/itemicon/sealed_medkit.png",
+        "prompt":  "Create a 128x128 inventory icon for a 2D wasteland extraction game. Subject: sealed emergency medkit. Style: dark hand-drawn manga line art, thick black outline, rough dirty texture, grayscale and charcoal palette, small muted accent color by quality. Composition: centered object, transparent background, readable silhouette at small size. Requirements: no text, no watermark, no background scene, clean cutout edges."
+    },
+    {
+        "id":  "survey_drone_core",
+        "quality":  "A",
+        "category":  "rare electronic",
+        "path":  "res://assets/ui/itemicon/survey_drone_core.png",
+        "prompt":  "Create a 128x128 inventory icon for a 2D wasteland extraction game. Subject: survey drone core module. Style: dark hand-drawn manga line art, thick black outline, rough dirty texture, grayscale and charcoal palette, small muted accent color by quality. Composition: centered object, transparent background, readable silhouette at small size. Requirements: no text, no watermark, no background scene, clean cutout edges."
+    },
+    {
+        "id":  "outpost_servo_pack",
+        "quality":  "A",
+        "category":  "outpost material",
+        "path":  "res://assets/ui/itemicon/outpost_servo_pack.png",
+        "prompt":  "Create a 128x128 inventory icon for a 2D wasteland extraction game. Subject: outpost servo component pack. Style: dark hand-drawn manga line art, thick black outline, rough dirty texture, grayscale and charcoal palette, small muted accent color by quality. Composition: centered object, transparent background, readable silhouette at small size. Requirements: no text, no watermark, no background scene, clean cutout edges."
+    },
+    {
+        "id":  "thermal_scope_module",
+        "quality":  "A",
+        "category":  "equipment",
+        "path":  "res://assets/ui/itemicon/thermal_scope_module.png",
+        "prompt":  "Create a 128x128 inventory icon for a 2D wasteland extraction game. Subject: thermal scope module. Style: dark hand-drawn manga line art, thick black outline, rough dirty texture, grayscale and charcoal palette, small muted accent color by quality. Composition: centered object, transparent background, readable silhouette at small size. Requirements: no text, no watermark, no background scene, clean cutout edges."
+    },
+    {
+        "id":  "blackbox_memory_core",
+        "quality":  "S",
+        "category":  "rare electronic",
+        "path":  "res://assets/ui/itemicon/blackbox_memory_core.png",
+        "prompt":  "Create a 128x128 inventory icon for a 2D wasteland extraction game. Subject: blackbox memory core. Style: dark hand-drawn manga line art, thick black outline, rough dirty texture, grayscale and charcoal palette, small muted accent color by quality. Composition: centered object, transparent background, readable silhouette at small size. Requirements: no text, no watermark, no background scene, clean cutout edges."
+    },
+    {
+        "id":  "prefall_access_key",
+        "quality":  "S",
+        "category":  "rare access item",
+        "path":  "res://assets/ui/itemicon/prefall_access_key.png",
+        "prompt":  "Create a 128x128 inventory icon for a 2D wasteland extraction game. Subject: pre-fall access key. Style: dark hand-drawn manga line art, thick black outline, rough dirty texture, grayscale and charcoal palette, small muted accent color by quality. Composition: centered object, transparent background, readable silhouette at small size. Requirements: no text, no watermark, no background scene, clean cutout edges."
+    },
+    {
+        "id":  "anomaly_heart_shard",
+        "quality":  "S",
+        "category":  "rare anomaly",
+        "path":  "res://assets/ui/itemicon/anomaly_heart_shard.png",
+        "prompt":  "Create a 128x128 inventory icon for a 2D wasteland extraction game. Subject: anomaly heart crystal shard. Style: dark hand-drawn manga line art, thick black outline, rough dirty texture, grayscale and charcoal palette, small muted accent color by quality. Composition: centered object, transparent background, readable silhouette at small size. Requirements: no text, no watermark, no background scene, clean cutout edges."
+    },
+    {
+        "id":  "sanctuary_nav_chip",
+        "quality":  "S",
+        "category":  "rare map chip",
+        "path":  "res://assets/ui/itemicon/sanctuary_nav_chip.png",
+        "prompt":  "Create a 128x128 inventory icon for a 2D wasteland extraction game. Subject: sanctuary navigation chip. Style: dark hand-drawn manga line art, thick black outline, rough dirty texture, grayscale and charcoal palette, small muted accent color by quality. Composition: centered object, transparent background, readable silhouette at small size. Requirements: no text, no watermark, no background scene, clean cutout edges."
+    },
+    {
+        "id":  "rare_silverwing_engine_core",
+        "quality":  "S",
+        "category":  "S rare showcase",
+        "path":  "res://assets/ui/itemicon/ss_silverwing_engine_core.png",
+        "prompt":  "Create a 128x128 inventory icon for a 2D wasteland extraction game. Subject: silverwing miniature engine core. Style: dark hand-drawn manga line art, thick black outline, rough dirty texture, grayscale and charcoal palette, small muted accent color by quality. Composition: centered object, transparent background, readable silhouette at small size. Requirements: no text, no watermark, no background scene, clean cutout edges."
+    },
+    {
+        "id":  "rare_pink_star",
+        "quality":  "S",
+        "category":  "S rare showcase",
+        "path":  "res://assets/ui/itemicon/ss_pink_star.png",
+        "prompt":  "Create a 128x128 inventory icon for a 2D wasteland extraction game. Subject: pink star crystal. Style: dark hand-drawn manga line art, thick black outline, rough dirty texture, grayscale and charcoal palette, small muted accent color by quality. Composition: centered object, transparent background, readable silhouette at small size. Requirements: no text, no watermark, no background scene, clean cutout edges."
+    },
+    {
+        "id":  "rare_wanming_pocket_watch",
+        "quality":  "S",
+        "category":  "S rare showcase",
+        "path":  "res://assets/ui/itemicon/ss_wanming_pocket_watch.png",
+        "prompt":  "Create a 128x128 inventory icon for a 2D wasteland extraction game. Subject: Wanming pocket watch. Style: dark hand-drawn manga line art, thick black outline, rough dirty texture, grayscale and charcoal palette, small muted accent color by quality. Composition: centered object, transparent background, readable silhouette at small size. Requirements: no text, no watermark, no background scene, clean cutout edges."
+    },
+    {
+        "id":  "rare_old_world_gold_bar",
+        "quality":  "S",
+        "category":  "S rare showcase",
+        "path":  "res://assets/ui/itemicon/ss_old_world_gold_bar.png",
+        "prompt":  "Create a 128x128 inventory icon for a 2D wasteland extraction game. Subject: old world gold bar. Style: dark hand-drawn manga line art, thick black outline, rough dirty texture, grayscale and charcoal palette, small muted accent color by quality. Composition: centered object, transparent background, readable silhouette at small size. Requirements: no text, no watermark, no background scene, clean cutout edges."
+    },
+    {
+        "id":  "rare_zero_master_control_board",
+        "quality":  "S",
+        "category":  "S rare showcase",
+        "path":  "res://assets/ui/itemicon/ss_zero_master_control_board.png",
+        "prompt":  "Create a 128x128 inventory icon for a 2D wasteland extraction game. Subject: zero facility master control board. Style: dark hand-drawn manga line art, thick black outline, rough dirty texture, grayscale and charcoal palette, small muted accent color by quality. Composition: centered object, transparent background, readable silhouette at small size. Requirements: no text, no watermark, no background scene, clean cutout edges."
+    }
 ]

@@ -4,10 +4,6 @@ extends RefCounted
 const GameDataRegistryScript := preload("res://scripts/data/game_data_registry.gd")
 
 const INITIAL_SPAWN_COUNT := 6
-const RESPAWN_INTERVAL_SECONDS := 12.0
-const RESPAWN_MIN_COUNT := 1
-const RESPAWN_MAX_COUNT := 3
-const CONTAINER_LIFETIME_SECONDS := 45.0
 
 var container_root: Node
 var get_spawn_points: Callable
@@ -17,11 +13,16 @@ var remove_interactable: Callable
 var unit: float = 64.0
 
 var container_index: int = 0
-var respawn_timer: float = 0.0
 var last_spawn_point_index: int = 0
 var data_registry
-var ss_loot_director
 var rng := RandomNumberGenerator.new()
+var map_id: String = "abandoned_house"
+var location_state: String = "rich"
+var visit_count_before: int = 0
+var map_profile: Dictionary = {}
+var location_state_rule: Dictionary = {}
+var target_container_count: int = INITIAL_SPAWN_COUNT
+var run_seed: int = 0
 
 func setup(
 	p_container_root: Node,
@@ -40,45 +41,55 @@ func setup(
 	rng.randomize()
 	data_registry = GameDataRegistryScript.new()
 	data_registry.load_all()
+	_refresh_resource_profile()
 
-func setup_ss_loot_director(director) -> void:
-	ss_loot_director = director
+func setup_ss_loot_director(_director) -> void:
+	pass
+
+func configure_location(p_map_id: String, p_location_state: String, p_visit_count_before: int, p_run_seed: int) -> void:
+	map_id = p_map_id if not p_map_id.is_empty() else "abandoned_house"
+	location_state = p_location_state if not p_location_state.is_empty() else "normal"
+	visit_count_before = maxi(0, p_visit_count_before)
+	run_seed = p_run_seed
+	if run_seed != 0:
+		rng.seed = run_seed
+	_refresh_resource_profile()
 
 func spawn_initial() -> void:
-	for _index in range(INITIAL_SPAWN_COUNT):
+	clear_instance_containers()
+	target_container_count = _target_container_count_for_current_location()
+	for _index in range(target_container_count):
 		if spawn_next_container() != null:
 			continue
 		else:
 			return
 
 func update(delta: float, interactables: Array) -> void:
-	update_lifetimes(delta, interactables)
-	respawn_timer += delta
-	if respawn_timer < RESPAWN_INTERVAL_SECONDS:
-		return
-	respawn_timer = 0.0
-	spawn_refresh_round()
+	pass
 
 func update_lifetimes(delta: float, interactables: Array) -> void:
-	for interactable in interactables.duplicate():
-		if not is_instance_valid(interactable) or interactable.interact_type != "container":
-			continue
-		if bool(interactable.payload.get("lifetime_paused", false)):
-			continue
-		if not _should_count_down(interactable.payload):
-			continue
-		interactable.payload.lifetime = float(interactable.payload.get("lifetime", 0.0)) - delta
-		if interactable.payload.lifetime <= 0.0:
-			remove_interactable.call(interactable)
+	pass
 
-func spawn_container(pos: Vector2, container_type_id: String = "", ring: String = "inner"):
+func clear_instance_containers() -> void:
+	if container_root == null:
+		return
+	for child in container_root.get_children().duplicate():
+		if not is_instance_valid(child) or child.get("interact_type") != "container":
+			continue
+		if remove_interactable.is_valid():
+			remove_interactable.call(child)
+		if is_instance_valid(child) and child.get_parent() != null:
+			child.get_parent().remove_child(child)
+		if is_instance_valid(child) and not child.is_queued_for_deletion():
+			child.free()
+
+func spawn_container(pos: Vector2, container_type_id: String = "", ring: String = "inner", spawn_point_id: String = ""):
 	if _is_position_occupied(pos):
 		return null
 	container_index += 1
 	var container_def := _container_definition(container_type_id, ring)
 	var type_id := String(container_def.get("type_id", "cardboard_box"))
 	var display_name := String(container_def.get("display_name", "容器"))
-	var lifetime := float(container_def.get("lifetime_seconds", CONTAINER_LIFETIME_SECONDS))
 	var visual_color := _container_color(container_def)
 	var visual_size_units := _container_visual_size_units(container_def)
 	var open_time := rng.randf_range(
@@ -101,12 +112,17 @@ func spawn_container(pos: Vector2, container_type_id: String = "", ring: String 
 		"container_def": container_def.duplicate(true),
 		"container_color": visual_color,
 		"ring": ring,
+		"map_id": map_id,
+		"location_state": location_state,
+		"spawn_point_id": spawn_point_id,
 		"loot_seed": loot_seed,
 		"loot_generated": false,
-		"lifetime": lifetime,
-		"lifetime_max": lifetime,
 		"open_time": open_time,
 		"rewards": [],
+		"has_been_opened": false,
+		"owner_player_id": "local_player",
+		"opened_by_player_id": "",
+		"locked_by_player_id": "",
 	}
 	container_root.add_child(container)
 	return container
@@ -115,7 +131,7 @@ func spawn_container_for_point(spawn_point: Node2D):
 	if spawn_point == null:
 		return null
 	var ring := _ring_for_spawn_point(spawn_point)
-	return spawn_container(spawn_point.global_position, "", ring)
+	return spawn_container(spawn_point.global_position, "", ring, _spawn_point_id(spawn_point))
 
 func spawn_next_container():
 	var spawn_point: Node2D = next_spawn_point()
@@ -124,14 +140,7 @@ func spawn_next_container():
 	return spawn_container_for_point(spawn_point)
 
 func spawn_refresh_round() -> Array:
-	var spawned: Array = []
-	var spawn_count := rng.randi_range(RESPAWN_MIN_COUNT, RESPAWN_MAX_COUNT)
-	for _index in range(spawn_count):
-		var container = spawn_next_container()
-		if container == null:
-			break
-		spawned.append(container)
-	return spawned
+	return []
 
 func ensure_container_rewards(container) -> Array[Dictionary]:
 	if not is_instance_valid(container):
@@ -200,8 +209,6 @@ func rarity_color(rarity: String) -> Color:
 			return Color(0.78, 0.58, 1.0)
 		"S":
 			return Color(1.0, 0.84, 0.36)
-		"SS":
-			return Color("#FF4A4A")
 		_:
 			return Color.WHITE
 
@@ -219,7 +226,7 @@ func _is_position_occupied(pos: Vector2) -> bool:
 	if container_root == null:
 		return false
 	for child in container_root.get_children():
-		if not is_instance_valid(child) or not (child is Node2D):
+		if not is_instance_valid(child) or child.is_queued_for_deletion() or not (child is Node2D):
 			continue
 		if child.get("interact_type") != "container":
 			continue
@@ -232,10 +239,6 @@ func _is_position_occupied(pos: Vector2) -> bool:
 			return true
 	return false
 
-func _should_count_down(payload: Dictionary) -> bool:
-	var state := String(payload.get("state", ""))
-	return state == "available" or state == "opened"
-
 func _container_definition(container_type_id: String, ring: String) -> Dictionary:
 	if data_registry == null:
 		return {}
@@ -243,16 +246,14 @@ func _container_definition(container_type_id: String, ring: String) -> Dictionar
 		var explicit_def: Dictionary = data_registry.get_container_type(container_type_id)
 		if not explicit_def.is_empty():
 			return explicit_def
+	if data_registry.has_method("pick_container_type_for_profile"):
+		return data_registry.pick_container_type_for_profile(ring, map_profile, rng)
 	return data_registry.pick_container_type_for_ring(ring, rng)
 
 func _generate_rewards(container_def: Dictionary, ring: String, reward_rng: RandomNumberGenerator) -> Array[Dictionary]:
 	var rewards: Array[Dictionary] = []
-	if ss_loot_director != null and ss_loot_director.has_method("try_generate_ss"):
-		var ss_stack: Dictionary = ss_loot_director.try_generate_ss(container_def, ring, reward_rng)
-		if not ss_stack.is_empty():
-			rewards.append(ss_stack)
 	if data_registry != null and not container_def.is_empty():
-		var generated: Array[Dictionary] = data_registry.generate_container_loot(container_def, ring, reward_rng)
+		var generated: Array[Dictionary] = data_registry.generate_container_loot(container_def, ring, reward_rng, _generation_context())
 		if not generated.is_empty():
 			rewards.append_array(generated)
 	if not rewards.is_empty():
@@ -285,3 +286,54 @@ func _ring_for_spawn_point(spawn_point: Node) -> String:
 	if value == null:
 		return "inner"
 	return String(value)
+
+func _spawn_point_id(spawn_point: Node) -> String:
+	if spawn_point == null:
+		return ""
+	if spawn_point.has_method("get_point_id"):
+		return String(spawn_point.get_point_id())
+	return String(spawn_point.name)
+
+func _refresh_resource_profile() -> void:
+	if data_registry == null:
+		map_profile = {}
+		location_state_rule = {}
+		return
+	map_profile = data_registry.get_map_resource_profile(map_id)
+	location_state_rule = data_registry.get_location_state_rule(location_state)
+
+func _target_container_count_for_current_location() -> int:
+	var min_count := int(map_profile.get("container_count_min", INITIAL_SPAWN_COUNT))
+	var max_count := int(map_profile.get("container_count_max", min_count))
+	max_count = maxi(min_count, max_count)
+	var base_count := rng.randi_range(min_count, max_count)
+	var multiplier := maxf(0.10, float(location_state_rule.get("quantity_multiplier", 1.0)))
+	return maxi(1, int(round(float(base_count) * multiplier)))
+
+func _generation_context() -> Dictionary:
+	return {
+		"map_id": map_id,
+		"location_state": location_state,
+		"map_profile": map_profile,
+		"location_state_rule": location_state_rule,
+	}
+
+func get_debug_snapshot() -> Dictionary:
+	return {
+		"map_id": map_id,
+		"location_state": location_state,
+		"visit_count_before": visit_count_before,
+		"target_container_count": target_container_count,
+		"active_container_count": _active_container_count(),
+		"map_profile": map_profile.duplicate(true),
+		"location_state_rule": location_state_rule.duplicate(true),
+	}
+
+func _active_container_count() -> int:
+	var count := 0
+	if container_root == null:
+		return count
+	for child in container_root.get_children():
+		if is_instance_valid(child) and not child.is_queued_for_deletion() and child.get("interact_type") == "container":
+			count += 1
+	return count

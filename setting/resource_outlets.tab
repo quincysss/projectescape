@@ -1,0 +1,15 @@
+item_id	category_id	outlet_type	target_id	min_chapter	priority	enabled_version
+scrap_metal	hardware	basic_sale	recipe_scrap_bundle	1	10	v0.5
+cloth_dirty	textile	basic_sale	recipe_cloth_wrap	1	10	v0.5
+wire_coil	electronic	basic_sale	recipe_wire_spool	1	10	v0.5
+battery_old	electronic	basic_sale	recipe_battery_clip	1	20	v0.5
+medicine_powder	medical	basic_sale	recipe_medicine_sachet	1	10	v0.5
+tool_parts	hardware	basic_sale	recipe_tool_bit_box	1	20	v0.5
+cracked_lens	electronic	basic_sale	recipe_lens_tag	1	20	v0.5
+duct_tape_roll	hardware	basic_sale	recipe_tape_strip	1	20	v0.5
+rusted_bolts	hardware	basic_sale	recipe_bolt_cup	1	20	v0.5
+reinforced_strap	textile	basic_sale	recipe_strap_bundle	1	30	v0.5
+pulse_battery	electronic	basic_sale	recipe_charge_cell	1	30	v0.5
+signal_resonator_coil	electronic	basic_sale	recipe_signal_tag	1	30	v0.5
+street_map_fragment	route_intel	order	route_unlock_or_discount	2	40	v0.5
+cracked_compass	route_intel	order	route_unlock_or_discount	2	50	v0.5

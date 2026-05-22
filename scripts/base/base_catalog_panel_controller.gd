@@ -202,8 +202,6 @@ func _icon_texture(icon_path: String) -> Texture2D:
 
 func _quality_name_color(quality: String) -> Color:
 	match quality:
-		"SS":
-			return Color("#D84B55")
 		"S":
 			return Color("#D1B850")
 		"A":

@@ -9,7 +9,6 @@ var shelf_items: Array[Dictionary] = []
 var slot_count := DEFAULT_SLOT_COUNT
 var demand_service = DailyDemandServiceScript.new()
 
-
 func bind_dependencies(
 	bound_warehouse_manager: WarehouseManager,
 	bound_shelf_items: Array[Dictionary],
@@ -20,14 +19,12 @@ func bind_dependencies(
 	slot_count = maxi(1, bound_slot_count)
 	_ensure_slots()
 
-
 func get_shelf_items() -> Array[Dictionary]:
 	_ensure_slots()
 	var result: Array[Dictionary] = []
 	for item in shelf_items:
 		result.append(item.duplicate(true) if item is Dictionary else {})
 	return result
-
 
 func query_shelfable_sale_goods() -> Array[Dictionary]:
 	if warehouse_manager == null:
@@ -55,7 +52,7 @@ func query_shelfable_sale_goods() -> Array[Dictionary]:
 				"count": 0,
 				"warehouse_indexes": [],
 			}
-		groups[group_id].count += 1
+		groups[group_id].count += maxi(1, int(item.get("amount", 1)))
 		groups[group_id].warehouse_indexes.append(index)
 	var result: Array[Dictionary] = []
 	for group in groups.values():
@@ -68,58 +65,43 @@ func query_shelfable_sale_goods() -> Array[Dictionary]:
 	)
 	return result
 
-
 func move_group_to_shelf(shelf_group_id: String, slot_index: int) -> Dictionary:
 	_ensure_slots()
 	if warehouse_manager == null:
-		return _fail("service_unavailable", "货台服务不可用。")
+		return _fail("service_unavailable", "Shelf service unavailable.")
 	if slot_index < 0 or slot_index >= slot_count:
-		return _fail("invalid_slot", "货台槽位不存在。")
+		return _fail("invalid_slot", "Shelf slot does not exist.")
 	if not _slot_is_empty(slot_index):
-		return _fail("slot_occupied", "该货台槽位已有商品。")
+		return _fail("slot_occupied", "Shelf slot is occupied.")
 	var group := _find_group(shelf_group_id)
 	if group.is_empty():
-		return _fail("item_not_found", "仓库中没有可上架的局外商品。")
+		return _fail("item_not_found", "No shelfable warehouse item found.")
 	var indexes: Array = Array(group.get("warehouse_indexes", []))
 	if indexes.is_empty():
-		return _fail("item_not_found", "仓库中没有可上架的局外商品。")
-	var removed := warehouse_manager.remove_items_at_indexes([indexes[0]])
-	if removed.size() != 1:
-		warehouse_manager.restore_removed_items(removed)
-		return _fail("remove_failed", "上架失败，仓库道具未被移出。")
-	var item: Dictionary = Dictionary(removed[0].get("item", {})).duplicate(true)
+		return _fail("item_not_found", "No shelfable warehouse item found.")
+	var item: Dictionary = warehouse_manager.remove_item_quantity_at_index(int(indexes[0]), 1)
+	if item.is_empty():
+		return _fail("remove_failed", "Shelf remove failed.")
 	item["shelf_slot_index"] = slot_index
 	item["amount"] = 1
 	shelf_items[slot_index] = item
-	return {
-		"ok": true,
-		"slot_index": slot_index,
-		"item": item.duplicate(true),
-		"message": "已上架：%s。" % String(item.get("display_name", item.get("item_id", ""))),
-	}
-
+	return {"ok": true, "slot_index": slot_index, "item": item.duplicate(true), "message": "Shelved %s." % String(item.get("display_name", item.get("item_id", "")))}
 
 func return_slot_to_warehouse(slot_index: int) -> Dictionary:
 	_ensure_slots()
 	if warehouse_manager == null:
-		return _fail("service_unavailable", "货台服务不可用。")
+		return _fail("service_unavailable", "Shelf service unavailable.")
 	if slot_index < 0 or slot_index >= slot_count:
-		return _fail("invalid_slot", "货台槽位不存在。")
+		return _fail("invalid_slot", "Shelf slot does not exist.")
 	if _slot_is_empty(slot_index):
-		return _fail("empty_slot", "该货台槽位为空。")
+		return _fail("empty_slot", "Shelf slot is empty.")
 	var item: Dictionary = shelf_items[slot_index].duplicate(true)
 	item.erase("shelf_slot_index")
 	var accepted := warehouse_manager.add_items([item])
 	if accepted.size() != 1:
-		return _fail("warehouse_full", "仓库空间不足，无法下架商品。")
+		return _fail("warehouse_full", "Warehouse has no space.")
 	shelf_items[slot_index] = {}
-	return {
-		"ok": true,
-		"slot_index": slot_index,
-		"item": item,
-		"message": "已下架：%s。" % String(item.get("display_name", item.get("item_id", ""))),
-	}
-
+	return {"ok": true, "slot_index": slot_index, "item": item, "message": "Returned %s." % String(item.get("display_name", item.get("item_id", "")))}
 
 func pop_slot_for_sale(slot_index: int) -> Dictionary:
 	_ensure_slots()
@@ -129,11 +111,10 @@ func pop_slot_for_sale(slot_index: int) -> Dictionary:
 	shelf_items[slot_index] = {}
 	return item
 
-
 func return_all_to_warehouse() -> Dictionary:
 	_ensure_slots()
 	if warehouse_manager == null:
-		return _fail("service_unavailable", "货台服务不可用。")
+		return _fail("service_unavailable", "Shelf service unavailable.")
 	var returned := 0
 	for slot_index in range(slot_count):
 		if _slot_is_empty(slot_index):
@@ -144,7 +125,6 @@ func return_all_to_warehouse() -> Dictionary:
 		returned += 1
 	return {"ok": true, "returned": returned}
 
-
 func has_shelf_goods() -> bool:
 	_ensure_slots()
 	for item in shelf_items:
@@ -152,10 +132,8 @@ func has_shelf_goods() -> bool:
 			return true
 	return false
 
-
 func has_warehouse_sale_goods() -> bool:
 	return not query_shelfable_sale_goods().is_empty()
-
 
 func _ensure_slots() -> void:
 	while shelf_items.size() < slot_count:
@@ -166,17 +144,14 @@ func _ensure_slots() -> void:
 			tail.erase("shelf_slot_index")
 			warehouse_manager.add_items([tail])
 
-
 func _find_group(group_id: String) -> Dictionary:
 	for group in query_shelfable_sale_goods():
 		if String(group.get("shelf_group_id", "")) == group_id:
 			return group
 	return {}
 
-
 func _slot_is_empty(slot_index: int) -> bool:
 	return not (shelf_items[slot_index] is Dictionary) or Dictionary(shelf_items[slot_index]).is_empty()
-
 
 func _can_shelf_item(item: Dictionary) -> bool:
 	if String(item.get("item_id", "")).is_empty():
@@ -184,7 +159,6 @@ func _can_shelf_item(item: Dictionary) -> bool:
 	if int(item.get("sell_value", 0)) <= 0:
 		return false
 	return demand_service.is_sale_good_item(item)
-
 
 func _fail(code: String, message: String) -> Dictionary:
 	return {"ok": false, "error": code, "message": message}

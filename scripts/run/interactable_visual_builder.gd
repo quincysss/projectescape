@@ -8,10 +8,7 @@ const RESOURCE_SIZE_UNITS := Vector2(1.0, 1.0)
 const CONTAINER_VISUAL_SIZE_UNITS := Vector2(3.4, 3.4)
 const MATERIAL_VISUAL_SIZE_UNITS := Vector2(4.0, 4.0)
 const CONTAINER_NAME_FONT_SIZE := 72
-const CONTAINER_TIME_FONT_SIZE := 54
 const CONTAINER_NAME_COLOR := Color("#FFC547")
-const CONTAINER_TIME_COLOR := Color("#FEDC54")
-const CONTAINER_BAR_BACKGROUND_COLOR := Color(0.0, 0.0, 0.0, 0.92)
 const READABLE_OVERLAY_META := "_readable_world_overlay"
 const READABLE_BASE_POSITION_META := "_readable_world_overlay_base_position"
 const READABLE_BASE_SCALE_META := "_readable_world_overlay_base_scale"
@@ -158,10 +155,8 @@ func _add_container_formal_visual(parent: Node, label_text: String, size: Vector
 	var icon_size := _container_icon_display_size(size, visual_data)
 	var panel_width := clampf(icon_size.x * 1.55, 280.0, 500.0)
 	var name_size := Vector2(panel_width, 92.0)
-	var bar_size := Vector2(panel_width, 44.0)
 	var icon_half_y := icon_size.y * 0.5
-	var name_y := -icon_half_y - 158.0
-	var bar_y := -icon_half_y - 66.0
+	var name_y := -icon_half_y - 112.0
 
 	var name_label := Label.new()
 	name_label.name = "ContainerNameLabel"
@@ -175,35 +170,6 @@ func _add_container_formal_visual(parent: Node, label_text: String, size: Vector
 	_apply_text_shadow(name_label, 3)
 	name_label.z_index = 34
 	root.add_child(name_label)
-
-	var bar_background := ColorRect.new()
-	bar_background.name = "ContainerLifetimeBarBackground"
-	bar_background.color = CONTAINER_BAR_BACKGROUND_COLOR
-	bar_background.position = Vector2(-bar_size.x * 0.5, bar_y)
-	bar_background.size = bar_size
-	bar_background.z_index = 31
-	root.add_child(bar_background)
-
-	var fill := ColorRect.new()
-	fill.name = "ContainerLifetimeFill"
-	fill.color = color
-	fill.position = bar_background.position
-	fill.size = bar_size
-	fill.z_index = 32
-	root.add_child(fill)
-
-	var time_label := Label.new()
-	time_label.name = "ContainerLifetimeLabel"
-	time_label.text = "0s"
-	time_label.position = bar_background.position
-	time_label.size = bar_size
-	time_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	time_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	time_label.add_theme_font_size_override("font_size", CONTAINER_TIME_FONT_SIZE)
-	time_label.add_theme_color_override("font_color", CONTAINER_TIME_COLOR)
-	_apply_text_shadow(time_label, 2)
-	time_label.z_index = 35
-	root.add_child(time_label)
 
 	var icon := Sprite2D.new()
 	icon.name = "ContainerVisual"

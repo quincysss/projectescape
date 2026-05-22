@@ -43,13 +43,7 @@ func can_accept_item(item: Dictionary) -> Dictionary:
 		if material_required_slots > material_empty_slots:
 			return {"accepted": false, "reason": "no_material_slot"}
 		return {"accepted": true, "reason": ""}
-	var additional_weight := _stack_weight(normalized)
-	var weight_limit: float = weight_component.max_weight if weight_component else max_weight
-	var current_weight: float = get_current_weight()
-	if current_weight + additional_weight > weight_limit:
-		return {"accepted": false, "reason": "over_weight"}
-
-	var required_slots: int = normalized.amount
+	var required_slots: int = _required_new_slots(normalized, items)
 	var empty_slots: int = max_slots - items.size()
 	if required_slots > empty_slots:
 		return {"accepted": false, "reason": "no_slot"}
@@ -70,10 +64,10 @@ func add_item(item: Dictionary) -> bool:
 		return true
 
 	var added_amount: int = normalized.amount
-	_add_single_items_to(normalized, items)
+	_add_item_to_stacks(normalized, items)
 
 	_refresh_weight()
-	print("[InventoryComponent] Added %s x%s as single items." % [normalized.item_id, added_amount])
+	print("[InventoryComponent] Added %s x%s." % [normalized.item_id, added_amount])
 	inventory_changed.emit(get_items_snapshot())
 	return true
 
@@ -193,9 +187,10 @@ func _normalize_item(item: Dictionary) -> Dictionary:
 		"display_name": str(item.get("display_name", item.get("item_id", ""))),
 		"amount": int(item.get("amount", 1)),
 		"weight_per_unit": float(item.get("weight_per_unit", 0.0)),
-		"stack_limit": 1,
+		"stackable": _parse_bool(item.get("stackable", false)),
+		"stack_limit": maxi(1, int(item.get("stack_limit", 1))),
 		"item_type": StringName(str(item.get("item_type", ""))),
-		"quality": StringName(str(item.get("quality", "C"))),
+		"quality": StringName(_normalize_quality(str(item.get("quality", "C")))),
 		"quality_color": item.get("quality_color", Color.WHITE),
 		"tags": item.get("tags", []),
 		"icon": str(item.get("icon", "")),
@@ -218,6 +213,8 @@ func _normalize_item(item: Dictionary) -> Dictionary:
 	if is_repair_material and String(normalized.get("repair_material_id", "")).is_empty():
 		normalized["repair_material_id"] = normalized["item_id"]
 	if is_repair_material:
+		normalized["stackable"] = false
+		normalized["stack_limit"] = 1
 		normalized.erase("item_type")
 		normalized.erase("quality")
 		normalized.erase("quality_color")
@@ -228,7 +225,17 @@ func _normalize_item(item: Dictionary) -> Dictionary:
 	return normalized
 
 func _can_stack_together(a: Dictionary, b: Dictionary) -> bool:
-	return false
+	if not _parse_bool(a.get("stackable", false)) or not _parse_bool(b.get("stackable", false)):
+		return false
+	if String(a.get("item_id", "")) != String(b.get("item_id", "")):
+		return false
+	if String(a.get("item_type", "")) != String(b.get("item_type", "")):
+		return false
+	if String(a.get("quality", "")) != String(b.get("quality", "")):
+		return false
+	if String(a.get("repair_material_id", "")) != String(b.get("repair_material_id", "")):
+		return false
+	return true
 
 func _stack_weight(stack: Dictionary) -> float:
 	if _is_repair_material(stack):
@@ -242,6 +249,51 @@ func _add_single_items_to(normalized: Dictionary, target: Array[Dictionary]) -> 
 		stack.amount = 1
 		stack.stack_limit = 1
 		target.append(stack)
+
+func _add_item_to_stacks(normalized: Dictionary, target: Array[Dictionary]) -> void:
+	var remaining: int = maxi(0, int(normalized.get("amount", 0)))
+	if remaining <= 0:
+		return
+	var stack_limit: int = _stack_limit(normalized)
+	if _parse_bool(normalized.get("stackable", false)):
+		for index in range(target.size()):
+			if remaining <= 0:
+				break
+			if not _can_stack_together(target[index], normalized):
+				continue
+			var available := maxi(0, stack_limit - int(target[index].get("amount", 0)))
+			if available <= 0:
+				continue
+			var moved := mini(remaining, available)
+			target[index]["amount"] = int(target[index].get("amount", 0)) + moved
+			remaining -= moved
+	while remaining > 0:
+		var moved := mini(remaining, stack_limit)
+		var stack := normalized.duplicate(true)
+		stack["amount"] = moved
+		stack["stack_limit"] = stack_limit
+		target.append(stack)
+		remaining -= moved
+
+func _required_new_slots(normalized: Dictionary, target: Array[Dictionary]) -> int:
+	var remaining: int = maxi(0, int(normalized.get("amount", 0)))
+	if remaining <= 0:
+		return 0
+	var stack_limit := _stack_limit(normalized)
+	if _parse_bool(normalized.get("stackable", false)):
+		for stack in target:
+			if remaining <= 0:
+				break
+			if not (stack is Dictionary) or not _can_stack_together(stack, normalized):
+				continue
+			var available := maxi(0, stack_limit - int(stack.get("amount", 0)))
+			remaining -= mini(remaining, available)
+	return int(ceil(float(remaining) / float(stack_limit)))
+
+func _stack_limit(item: Dictionary) -> int:
+	if not _parse_bool(item.get("stackable", false)):
+		return 1
+	return maxi(1, int(item.get("stack_limit", 1)))
 
 func _is_repair_material(item: Dictionary) -> bool:
 	if not String(item.get("repair_material_id", "")).is_empty():
@@ -263,3 +315,9 @@ func _parse_bool(value: Variant) -> bool:
 		return value
 	var normalized := String(value).strip_edges().to_lower()
 	return normalized == "true" or normalized == "1" or normalized == "yes"
+
+func _normalize_quality(value: String) -> String:
+	var normalized := value.strip_edges().to_upper()
+	if ["C", "B", "A", "S"].has(normalized):
+		return normalized
+	return "C"

@@ -52,8 +52,9 @@ func query_sellable_items(_filters: Dictionary = {}) -> Array[Dictionary]:
 				"total_value": 0,
 				"warehouse_indexes": [],
 			}
-		groups[group_id].count += 1
-		groups[group_id].total_value += unit_value
+		var stack_count := maxi(1, int(item.get("amount", 1)))
+		groups[group_id].count += stack_count
+		groups[group_id].total_value += unit_value * stack_count
 		groups[group_id].warehouse_indexes.append(index)
 
 	var result: Array[Dictionary] = []

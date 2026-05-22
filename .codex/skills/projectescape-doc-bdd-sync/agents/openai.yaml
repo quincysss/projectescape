@@ -1,0 +1,4 @@
+interface:
+  display_name: "Project Escape Doc BDD Sync"
+  short_description: "Sync Project Escape docs and BDD."
+  default_prompt: "Maintain Project Escape design docs by updating existing authoritative documents first, synchronizing BDD, acceptance, indexes, entries, skills, and stale wording evidence."

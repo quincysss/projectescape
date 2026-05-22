@@ -30,6 +30,7 @@ func _verify_run_only_outpost_materials_are_filtered() -> bool:
 	director.inventory_component.add_item(_item("scrap_metal"))
 	director.inventory_component.add_item(_repair_material("outpost_fuse"))
 	director.home_storage_component.add_item(_repair_material("outpost_filter"))
+	director.outpost_storage_items.append(_item("wire_coil"))
 	director.outpost_storage_items.append(_repair_material("outpost_servo_pack"))
 
 	var builder = RunResultBuilderScript.new()
@@ -46,6 +47,9 @@ func _verify_run_only_outpost_materials_are_filtered() -> bool:
 	var dead: Dictionary = builder.build_death_result(director)
 	if _has_item(dead.get("warehouse_items", []), "outpost_filter"):
 		printerr("Expected home-stored outpost material to be filtered from retained warehouse items.")
+		return false
+	if not _has_item(dead.get("warehouse_items", []), "wire_coil"):
+		printerr("Expected ordinary outpost storage item to be retained on death.")
 		return false
 	if not _has_item(dead.get("lost_items", []), "outpost_fuse"):
 		printerr("Expected backpack outpost material to be listed as lost on death.")

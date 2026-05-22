@@ -24,7 +24,7 @@ func _verify_merchant_service_and_base_entry() -> bool:
 	game_state.clear_currencies()
 	game_state.add_to_warehouse([
 		registry.make_item_stack("gold_data_chip"),
-		registry.make_item_stack("ss_old_world_gold_bar"),
+		registry.make_item_stack("blackbox_memory_core"),
 		registry.make_item_stack("field_bandage"),
 		registry.make_item_stack("field_bandage"),
 		registry.make_item_stack("scrap_metal"),
@@ -32,10 +32,10 @@ func _verify_merchant_service_and_base_entry() -> bool:
 
 	var sellable_items: Array = game_state.query_sellable_items()
 	var chip_group := _find_group_by_item_id(sellable_items, "gold_data_chip")
-	var ss_group := _find_group_by_item_id(sellable_items, "ss_old_world_gold_bar")
+	var high_value_group := _find_group_by_item_id(sellable_items, "blackbox_memory_core")
 	var bandage_group := _find_group_by_item_id(sellable_items, "field_bandage")
 	var material_group := _find_group_by_item_id(sellable_items, "scrap_metal")
-	if chip_group.is_empty() or ss_group.is_empty() or bandage_group.is_empty():
+	if chip_group.is_empty() or high_value_group.is_empty() or bandage_group.is_empty():
 		printerr("Expected legacy merchant service to remain compatible with sellable inventory.")
 		return false
 	if not material_group.is_empty():
@@ -49,9 +49,9 @@ func _verify_merchant_service_and_base_entry() -> bool:
 	if not bool(quote.get("ok", false)) or int(quote.get("total_value", 0)) != 120:
 		printerr("Expected gold_data_chip quote to pay 120 mine_coin.")
 		return false
-	var ss_quote: Dictionary = game_state.get_sell_quote(String(ss_group.get("warehouse_item_id", "")), 1)
-	if not bool(ss_quote.get("ok", false)) or int(ss_quote.get("total_value", 0)) <= 0:
-		printerr("Expected SS item quote to pay mine_coin.")
+	var high_value_quote: Dictionary = game_state.get_sell_quote(String(high_value_group.get("warehouse_item_id", "")), 1)
+	if not bool(high_value_quote.get("ok", false)) or int(high_value_quote.get("total_value", 0)) <= 0:
+		printerr("Expected S item quote to pay mine_coin.")
 		return false
 	var before_currency: int = game_state.get_currency_amount("mine_coin")
 	var before_warehouse_count: int = game_state.get_warehouse_items_snapshot().size()

@@ -1,0 +1,5 @@
+state_id	display_name	container_count_multiplier	quantity_multiplier	rare_multiplier	low_tier_multiplier	regen_hours_multiplier	notes	enabled_version	unique_drop_policy
+rich	富集	1.00	1.00	1.00	1.00	0.00	资源未被明显搜刮，容器与掉落保持基准。	v0.5	allow_once
+normal	常规	0.70	0.70	0.55	1.20	48.00	地点进入常规再生状态，高价值掉落下降。	v0.5	blocked
+poor	贫瘠	0.30	0.30	0.20	1.45	96.00	地点已被反复搜刮，主要产出低阶材料。	v0.5	blocked
+recovering	恢复中	0.60	0.60	0.35	1.35	72.00	地点仍在恢复，少量基础资源回流。	v0.5	blocked

@@ -1,6 +1,2 @@
-﻿tier	hit_chance	miss_keep_count	enabled	enabled_version	description
-0	0.4	2	true	v0.3	初始与保底恢复概率，首次每日探索使用。
-1	0.2	2	true	v0.3	命中一次后的下一档概率。
-2	0.15	2	true	v0.3	连续命中衰减后的低概率档。
-3	0.25	2	true	v0.3	高价值稀有控制档。
-4	0.1	2	true	v0.3	第四次及以后命中后的最低概率档。
+tier	hit_chance	miss_keep_count	enabled	enabled_version	description
+0	0.0	0	false	disabled	Legacy high-tier chance table is disabled; resource loop only allows C/B/A/S.

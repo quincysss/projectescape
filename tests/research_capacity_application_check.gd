@@ -138,5 +138,5 @@ func _verify_locked_warehouse_slots() -> bool:
 func _make_items(registry, count: int) -> Array[Dictionary]:
 	var items: Array[Dictionary] = []
 	for _index in range(count):
-		items.append(registry.make_item_stack("scrap_metal"))
+		items.append(registry.make_item_stack("keepsake_photo"))
 	return items

@@ -107,7 +107,6 @@ func _split_single_items(item: Dictionary) -> Array[Dictionary]:
 	for _index in range(amount):
 		var single := item.duplicate(true)
 		single.amount = 1
-		single.stack_limit = 1
 		result.append(single)
 	return result
 
@@ -116,7 +115,6 @@ func _merge_loot_for_source(loot: Array[Dictionary]) -> Dictionary:
 		return {}
 	var merged := loot[0].duplicate(true)
 	merged.amount = loot.size()
-	merged.stack_limit = 1
 	return merged
 
 func _transfer_reason_text(reason: String) -> String:

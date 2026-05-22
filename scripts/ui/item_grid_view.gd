@@ -227,8 +227,6 @@ func _quality_color(item: Dictionary) -> Color:
 	if value is Color:
 		return value
 	match String(item.get("quality", "C")):
-		"SS":
-			return Color("#D84B55")
 		"S":
 			return Color("#D1B850")
 		"A":

@@ -92,12 +92,11 @@ func _verify_run_loop() -> bool:
 
 	var expiring_container = _find_interactable(root, "container")
 	if expiring_container == null:
-		printerr("Expected another container for lifetime check")
+		printerr("Expected another container for persistence check")
 		return false
-	expiring_container.payload.lifetime = 0.01
-	root._update_container_lifetimes(1.0)
-	if root.interactables.has(expiring_container) or (is_instance_valid(expiring_container) and expiring_container.visible):
-		printerr("Expected expired container to disappear")
+	root._update_container_lifetimes(999.0)
+	if not root.interactables.has(expiring_container) or not (is_instance_valid(expiring_container) and expiring_container.visible):
+		printerr("Expected ordinary container to remain instead of expiring")
 		return false
 
 	root.run_director.on_safe_zone_exited("home")

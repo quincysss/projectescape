@@ -4,46 +4,36 @@ extends RefCounted
 func build_extraction_result(run_director) -> Dictionary:
 	var gained: Array[Dictionary] = []
 	if run_director != null and run_director.inventory_component != null:
-		gained.append_array(_tag_items(run_director.inventory_component.get_items_snapshot(), "背包", "已带回", false))
+		gained.append_array(_tag_items(run_director.inventory_component.get_items_snapshot(), "backpack", "carried_out", false))
 	if run_director != null and run_director.home_storage_component != null:
-		gained.append_array(_tag_items(run_director.home_storage_component.get_items_snapshot(), "安全屋", "已带回", false))
+		gained.append_array(_tag_items(run_director.home_storage_component.get_items_snapshot(), "home_storage", "carried_out", false))
 	if run_director != null and run_director.has_method("get_all_outpost_storage_items_snapshot"):
-		gained.append_array(_tag_items(run_director.get_all_outpost_storage_items_snapshot(), "前哨站", "已带回", false))
+		gained.append_array(_tag_items(run_director.get_all_outpost_storage_items_snapshot(), "outpost_storage", "carried_out", false))
 	return {
 		"result_type": "EXTRACTED",
-		"message": "撤离成功：带回 %s 组物品。" % gained.size(),
+		"message": "Extraction success: %s warehouse item stacks." % gained.size(),
 		"warehouse_items": gained,
 		"lost_items": [],
 		"stats": _build_stats(run_director),
 	}
 
 func build_death_result(run_director, reason: String = "stability_depleted") -> Dictionary:
-	return _build_failure_result(
-		run_director,
-		"DEAD",
-		reason,
-		"探索失败：稳定值耗尽。家中暂存物品已保留。"
-	)
+	return _build_failure_result(run_director, "DEAD", reason, "Run failed: backpack lost, safe storage retained.")
 
 func build_timeout_result(run_director, reason: String = "time_expired") -> Dictionary:
-	return _build_failure_result(
-		run_director,
-		"TIMEOUT_FAILED",
-		reason,
-		"探索失败：对局时间耗尽。家中暂存物品已保留。"
-	)
+	return _build_failure_result(run_director, "TIMEOUT_FAILED", reason, "Run timed out: backpack lost, safe storage retained.")
 
 func _build_failure_result(run_director, result_type: String, reason: String, message: String) -> Dictionary:
 	var kept: Array[Dictionary] = []
 	var lost: Array[Dictionary] = []
 	if run_director != null and run_director.home_storage_component != null:
-		kept.append_array(_tag_items(run_director.home_storage_component.get_items_snapshot(), "安全屋", "已保留", false))
+		kept.append_array(_tag_items(run_director.home_storage_component.get_items_snapshot(), "home_storage", "kept", false))
 	if run_director != null and run_director.inventory_component != null:
-		lost.append_array(_tag_items(run_director.inventory_component.get_items_snapshot(), "背包", "已遗失"))
+		lost.append_array(_tag_items(run_director.inventory_component.get_items_snapshot(), "backpack", "lost"))
 		if run_director.inventory_component.has_method("get_repair_material_items_snapshot"):
-			lost.append_array(_tag_items(run_director.inventory_component.get_repair_material_items_snapshot(), "前哨材料袋", "已遗失"))
+			lost.append_array(_tag_items(run_director.inventory_component.get_repair_material_items_snapshot(), "repair_material_bag", "lost"))
 	if run_director != null and run_director.has_method("get_all_outpost_storage_items_snapshot"):
-		lost.append_array(_tag_items(run_director.get_all_outpost_storage_items_snapshot(), "前哨站", "已遗失", false))
+		kept.append_array(_tag_items(run_director.get_all_outpost_storage_items_snapshot(), "outpost_storage", "kept", false))
 	return {
 		"result_type": result_type,
 		"reason": reason,

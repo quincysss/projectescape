@@ -82,13 +82,15 @@ func _verify_research_tooltip(base_root) -> bool:
 	await process_frame
 	var requirement_slot := _first_panel(base_root.research_requirement_grid_root)
 	if requirement_slot == null:
-		printerr("Expected research material requirement slot.")
-		return false
+		if not base_root.research_currency_cost_label.text.contains("20"):
+			printerr("Expected mine_coin-only research to show currency cost, got %s." % base_root.research_currency_cost_label.text)
+			return false
+		return true
 	requirement_slot.emit_signal("mouse_entered")
 	await create_timer(0.22).timeout
 	var panel := base_root.item_tooltip_view.tooltip_panel as Panel
 	if panel == null or not panel.visible:
-		printerr("Expected research material hover to show tooltip.")
+		printerr("Expected research requirement hover to show tooltip.")
 		return false
 	if base_root.item_tooltip_view.tooltip_name_label.text.is_empty():
 		printerr("Expected research tooltip item name.")
