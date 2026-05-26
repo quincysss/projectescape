@@ -139,6 +139,27 @@ func _add_item_slot_content(button: Button, slot_size: Vector2, item: Dictionary
 		8,
 		_quality_color(item)
 	)
+	_add_amount_badge(button, slot_size, item)
+
+
+func _add_amount_badge(button: Button, slot_size: Vector2, item: Dictionary) -> void:
+	var amount := maxi(1, int(item.get("amount", 1)))
+	if amount <= 1:
+		return
+	var badge := Label.new()
+	badge.name = "StackAmount"
+	badge.text = "x%d" % amount
+	badge.position = Vector2(slot_size.x - 30.0, 2.0)
+	badge.size = Vector2(27.0, 16.0)
+	badge.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	badge.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	badge.add_theme_font_size_override("font_size", 11)
+	badge.add_theme_color_override("font_color", Color("#F0ECE3"))
+	badge.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0.92))
+	badge.add_theme_constant_override("shadow_offset_x", 1)
+	badge.add_theme_constant_override("shadow_offset_y", 1)
+	badge.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	button.add_child(badge)
 
 
 func _add_slot_text_box(button: Button, text: String, pos: Vector2, box_size: Vector2, font_size: int, color: Color) -> void:
@@ -169,23 +190,37 @@ func _add_slot_text_box(button: Button, text: String, pos: Vector2, box_size: Ve
 func _slot_tooltip(item: Dictionary, source_id: String) -> String:
 	var name := String(item.get("display_name", item.get("item_id", "")))
 	var quality := String(item.get("quality", "C"))
+	var details := "\n".join(_stack_detail_lines(item, quality))
 	match source_id:
 		"sell":
-			return "%s\n品质：%s\n出售：%d %s" % [
+			return "%s\n%s\n出售：%d %s" % [
 				name,
-				quality,
+				details,
 				int(item.get("sell_value", 0)),
 				_currency_name(String(item.get("sell_currency_id", "mine_coin"))),
 			]
 		"buy":
-			return "%s\n品质：%s\n购买：%d %s" % [
+			return "%s\n%s\n购买：%d %s" % [
 				name,
-				quality,
+				details,
 				int(item.get("buy_price", 0)),
 				_currency_name(String(item.get("buy_currency_id", "mine_coin"))),
 			]
 		_:
-			return "%s\n品质：%s\n单格道具" % [name, quality]
+			return "%s\n%s" % [name, details]
+func _stack_detail_lines(item: Dictionary, quality: String) -> Array[String]:
+	var amount := maxi(1, int(item.get("amount", 1)))
+	var single_weight := maxf(0.0, float(item.get("weight_per_unit", item.get("weight", 0.0))))
+	var stack_limit := maxi(1, int(item.get("stack_limit", 1)))
+	var item_type := String(item.get("item_type", "material"))
+	return [
+		"数量：x%d" % amount,
+		"品质：%s" % quality,
+		"类别：%s" % item_type,
+		"单件重量：%.2f" % single_weight,
+		"总重量：%.2f" % (single_weight * float(amount)),
+		"堆叠上限：%d" % stack_limit,
+	]
 
 
 func _dispatch_slot(source_id: String, meta_id: String, index: int) -> void:

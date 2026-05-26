@@ -277,7 +277,7 @@ func _source_text(item: Dictionary) -> String:
 	if item.has("source"):
 		match String(item.get("source", "")):
 			"ss_container_loot":
-				return "稀有容器"
+				return "历史高阶来源"
 			_:
 				return String(item.get("source", "地表"))
 	return "地表"

@@ -179,6 +179,9 @@ func _can_shelf_sell_and_earn_coin(game_state: Node, registry) -> bool:
 	if not bool(shelf_result.get("ok", false)):
 		printerr("Expected sale_good to move to shelf: %s" % shelf_result)
 		return false
+	if _count_warehouse_item(game_state, "sale_good_scrap_bundle") != 1:
+		printerr("Expected one shelf slot to remove exactly one item from a stacked sale_good.")
+		return false
 	sale_group = _find_group(game_state.query_shelfable_sale_goods(), "sale_good_scrap_bundle")
 	shelf_result = game_state.move_sale_good_to_shelf(String(sale_group.get("shelf_group_id", "")), 1)
 	if not bool(shelf_result.get("ok", false)):

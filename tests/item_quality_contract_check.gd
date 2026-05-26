@@ -24,7 +24,7 @@ func _verify_quality_contract() -> bool:
 		if not ALLOWED_QUALITIES.has(String(stack.get("quality", ""))):
 			printerr("Invalid generated stack quality for %s: %s" % [item_id, stack])
 			return false
-	if not registry.get_ss_chance_tier_rows().is_empty() or registry.get_ss_chance_for_tier(0) != 0.0 or not registry.pick_ss_item_stack(RandomNumberGenerator.new()).is_empty():
-		printerr("SS loot path should be disabled; only C/B/A/S qualities are allowed.")
+	if not registry.get_legacy_high_tier_chance_rows().is_empty() or registry.get_legacy_high_tier_chance_for_tier(0) != 0.0 or not registry.pick_legacy_high_tier_item_stack(RandomNumberGenerator.new()).is_empty():
+		printerr("Legacy high-tier loot path should be disabled; only C/B/A/S qualities are allowed.")
 		return false
 	return true

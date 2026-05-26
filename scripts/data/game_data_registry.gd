@@ -12,11 +12,12 @@ const DROP_TABLES_PATH := "res://setting/drop_tables.tab"
 const SHOP_STOCK_PATH := "res://setting/shop_stock.tab"
 const RESEARCH_PATH := "res://setting/research.tab"
 const CRAFTING_RECIPES_PATH := "res://setting/crafting_recipes.tab"
-const SS_CHANCE_TIERS_PATH := "res://setting/ss_chance_tiers.tab"
-const SS_CONTAINER_CHANCES_PATH := "res://setting/ss_container_chances.tab"
-const SS_LOOT_POOL_PATH := "res://setting/ss_loot_pool.tab"
+const LEGACY_HIGH_TIER_CHANCE_TIERS_PATH := "res://setting/ss_chance_tiers.tab"
+const LEGACY_HIGH_TIER_CONTAINER_CHANCES_PATH := "res://setting/ss_container_chances.tab"
+const LEGACY_HIGH_TIER_LOOT_POOL_PATH := "res://setting/ss_loot_pool.tab"
 const MAP_RESOURCE_PROFILES_PATH := "res://setting/map_resource_profiles.tab"
 const LOCATION_STATE_RULES_PATH := "res://setting/location_state_rules.tab"
+const RESOURCE_CATEGORIES_PATH := "res://setting/resource_categories.tab"
 
 const QUALITY_ORDER := ["C", "B", "A", "S"]
 const RING_CONTAINER_TYPE_WEIGHTS := {
@@ -70,11 +71,12 @@ var drop_rows_by_context: Dictionary = {}
 var shop_stock_rows: Array[Dictionary] = []
 var research_rows: Array[Dictionary] = []
 var crafting_recipe_rows: Array[Dictionary] = []
-var ss_chance_tier_rows: Array[Dictionary] = []
-var ss_container_chance_rows_by_type: Dictionary = {}
-var ss_loot_pool_rows: Array[Dictionary] = []
+var legacy_high_tier_chance_rows: Array[Dictionary] = []
+var legacy_high_tier_container_chance_rows_by_type: Dictionary = {}
+var legacy_high_tier_loot_pool_rows: Array[Dictionary] = []
 var map_resource_profiles_by_id: Dictionary = {}
 var location_state_rules_by_id: Dictionary = {}
+var resource_categories_by_id: Dictionary = {}
 var load_errors: Array[String] = []
 
 func load_all() -> bool:
@@ -87,11 +89,12 @@ func load_all() -> bool:
 	shop_stock_rows = _load_rows(SHOP_STOCK_PATH)
 	research_rows = _load_rows(RESEARCH_PATH)
 	crafting_recipe_rows = _load_rows(CRAFTING_RECIPES_PATH)
-	ss_chance_tier_rows = _load_rows(SS_CHANCE_TIERS_PATH)
-	ss_container_chance_rows_by_type = _index_rows(_load_rows(SS_CONTAINER_CHANCES_PATH), "type_id")
-	ss_loot_pool_rows = _load_rows(SS_LOOT_POOL_PATH)
+	legacy_high_tier_chance_rows = _load_rows(LEGACY_HIGH_TIER_CHANCE_TIERS_PATH)
+	legacy_high_tier_container_chance_rows_by_type = _index_rows(_load_rows(LEGACY_HIGH_TIER_CONTAINER_CHANCES_PATH), "type_id")
+	legacy_high_tier_loot_pool_rows = _load_rows(LEGACY_HIGH_TIER_LOOT_POOL_PATH)
 	map_resource_profiles_by_id = _index_rows(_load_rows(MAP_RESOURCE_PROFILES_PATH), "map_id")
 	location_state_rules_by_id = _index_rows(_load_rows(LOCATION_STATE_RULES_PATH), "state_id")
+	resource_categories_by_id = _index_rows(_load_rows(RESOURCE_CATEGORIES_PATH), "category_id")
 	drop_rows_by_context.clear()
 	for row in _load_rows(DROP_TABLES_PATH):
 		var context := String(row.get("context", ""))
@@ -148,6 +151,39 @@ func get_location_state_rule(state_id: String) -> Dictionary:
 		row = location_state_rules_by_id.get("normal", {})
 	return row.duplicate(true)
 
+func get_resource_category(category_id: String) -> Dictionary:
+	var row: Dictionary = resource_categories_by_id.get(category_id, {})
+	return row.duplicate(true)
+
+func get_location_resource_briefing(map_id: String, state_id: String = "rich") -> Dictionary:
+	var profile := get_map_resource_profile(map_id)
+	if profile.is_empty():
+		return {}
+	var normalized_state := _normalize_location_state(state_id)
+	var state_rule := get_location_state_rule(normalized_state)
+	var count_range := _estimated_container_count_range(profile, state_rule)
+	var primary_categories := _category_briefings(TabDataLoader.split_list(String(profile.get("primary_categories", ""))))
+	var secondary_categories := _category_briefings(TabDataLoader.split_list(String(profile.get("secondary_categories", ""))))
+	var typical_containers := _typical_container_briefings(profile)
+	return {
+		"map_id": String(profile.get("map_id", map_id)),
+		"display_name": String(profile.get("display_name", map_id)),
+		"map_type": String(profile.get("map_type", "")),
+		"state_id": normalized_state,
+		"state_display_name": String(state_rule.get("display_name", normalized_state)),
+		"state_hint": _location_state_hint(normalized_state, state_rule),
+		"primary_categories": primary_categories,
+		"secondary_categories": secondary_categories,
+		"primary_category_names": _briefing_names(primary_categories),
+		"secondary_category_names": _briefing_names(secondary_categories),
+		"estimated_container_count_min": count_range.get("min", 0),
+		"estimated_container_count_max": count_range.get("max", 0),
+		"estimated_container_count_text": _count_range_text(count_range),
+		"typical_container_types": typical_containers,
+		"typical_container_type_names": _briefing_names(typical_containers),
+		"randomness_note": "仅显示资源类别和容器倾向，不显示精确掉落清单。",
+	}
+
 func get_container_types_for_ring(ring: String) -> Array[Dictionary]:
 	var normalized_ring := _normalize_ring(ring)
 	var result: Array[Dictionary] = []
@@ -184,28 +220,28 @@ func get_crafting_recipe_rows() -> Array[Dictionary]:
 	result.sort_custom(func(a, b): return String(a.get("recipe_id", "")) < String(b.get("recipe_id", "")))
 	return result
 
-func get_ss_chance_tier_rows() -> Array[Dictionary]:
+func get_legacy_high_tier_chance_rows() -> Array[Dictionary]:
 	return []
 
-func get_ss_chance_for_tier(tier: int) -> float:
+func get_legacy_high_tier_chance_for_tier(tier: int) -> float:
 	return 0.0
 
-func get_ss_container_chance(type_id: String) -> float:
+func get_legacy_high_tier_container_chance(type_id: String) -> float:
 	return 0.0
 
-func is_ss_pity_container(type_id: String) -> bool:
+func is_legacy_high_tier_pity_container(type_id: String) -> bool:
 	return false
 
-func get_ss_loot_pool_rows() -> Array[Dictionary]:
+func get_legacy_high_tier_loot_pool_rows() -> Array[Dictionary]:
 	return []
 
-func get_ss_loot_pool_item_ids() -> Array[String]:
+func get_legacy_high_tier_loot_pool_item_ids() -> Array[String]:
 	var result: Array[String] = []
-	for row in get_ss_loot_pool_rows():
+	for row in get_legacy_high_tier_loot_pool_rows():
 		result.append(String(row.get("item_id", "")))
 	return result
 
-func pick_ss_item_stack(rng: RandomNumberGenerator) -> Dictionary:
+func pick_legacy_high_tier_item_stack(rng: RandomNumberGenerator) -> Dictionary:
 	return {}
 
 func pick_container_type_for_ring(ring: String, rng: RandomNumberGenerator) -> Dictionary:
@@ -446,7 +482,7 @@ func _drop_row_quality(row: Dictionary) -> String:
 		return ""
 	return _normalize_quality(String(item.get("quality", "C")))
 
-func _fallback_ss_chance_for_tier(tier: int) -> float:
+func _fallback_legacy_high_tier_chance_for_tier(tier: int) -> float:
 	return 0.0
 
 func _normalize_ring(ring: String) -> String:
@@ -517,3 +553,81 @@ func _parse_weight_overrides(value: String) -> Dictionary:
 			continue
 		result[key] = float(String(bits[1]).strip_edges())
 	return result
+
+func _normalize_location_state(state_id: String) -> String:
+	var normalized := state_id.strip_edges().to_lower()
+	if ["rich", "normal", "poor", "recovering"].has(normalized):
+		return normalized
+	return "normal"
+
+func _estimated_container_count_range(profile: Dictionary, state_rule: Dictionary) -> Dictionary:
+	var min_count := int(profile.get("container_count_min", 0))
+	var max_count := maxi(min_count, int(profile.get("container_count_max", min_count)))
+	var multiplier := maxf(0.10, float(state_rule.get("container_count_multiplier", 1.0)))
+	var adjusted_min := maxi(1, int(round(float(min_count) * multiplier)))
+	var adjusted_max := maxi(adjusted_min, int(round(float(max_count) * multiplier)))
+	return {"min": adjusted_min, "max": adjusted_max}
+
+func _category_briefings(category_ids: Array[String]) -> Array[Dictionary]:
+	var result: Array[Dictionary] = []
+	for category_id in category_ids:
+		var category := get_resource_category(category_id)
+		result.append({
+			"category_id": category_id,
+			"display_name": String(category.get("display_name", category_id)),
+		})
+	return result
+
+func _typical_container_briefings(profile: Dictionary) -> Array[Dictionary]:
+	var overrides := _parse_weight_overrides(String(profile.get("container_type_weight_overrides", "")))
+	var ranked: Array[Dictionary] = []
+	for type_id in overrides.keys():
+		var container := get_container_type(String(type_id))
+		if container.is_empty():
+			continue
+		ranked.append({
+			"type_id": String(type_id),
+			"display_name": String(container.get("display_name", type_id)),
+			"_score": float(overrides.get(type_id, 0.0)),
+		})
+	ranked.sort_custom(func(a, b):
+		var score_a := float(a.get("_score", 0.0))
+		var score_b := float(b.get("_score", 0.0))
+		if score_a == score_b:
+			return String(a.get("type_id", "")) < String(b.get("type_id", ""))
+		return score_a > score_b
+	)
+	var result: Array[Dictionary] = []
+	for index in range(mini(3, ranked.size())):
+		result.append({
+			"type_id": String(ranked[index].get("type_id", "")),
+			"display_name": String(ranked[index].get("display_name", "")),
+		})
+	return result
+
+func _briefing_names(items: Array[Dictionary]) -> Array[String]:
+	var result: Array[String] = []
+	for item in items:
+		result.append(String(item.get("display_name", item.get("category_id", item.get("type_id", "")))))
+	return result
+
+func _count_range_text(count_range: Dictionary) -> String:
+	var min_count := int(count_range.get("min", 0))
+	var max_count := int(count_range.get("max", min_count))
+	if min_count == max_count:
+		return "%d" % min_count
+	return "%d-%d" % [min_count, max_count]
+
+func _location_state_hint(state_id: String, state_rule: Dictionary) -> String:
+	if state_id == "recovering":
+		return "恢复中：少量基础资源回流，高价值产出仍然偏低。"
+	var notes := String(state_rule.get("notes", ""))
+	if not notes.is_empty():
+		return notes
+	match state_id:
+		"rich":
+			return "资源富集，适合定向搜集。"
+		"poor":
+			return "重复搜刮后资源贫瘠，容器和产出都会减少。"
+		_:
+			return "资源处于普通水平。"

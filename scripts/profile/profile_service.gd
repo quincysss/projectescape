@@ -87,7 +87,6 @@ func default_profile(username: String) -> Dictionary:
 		"collected_item_ids": {},
 		"merchant_shop_level": 1,
 		"merchant_shop_offers": [],
-		"ss_roll_state": {},
 		"selected_character_id": "male_01",
 		"selected_night_location_id": "abandoned_house",
 		"last_run_result_type": "",

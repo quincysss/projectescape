@@ -12,7 +12,6 @@ extends Resource
 @export var run_duration_seconds: float = 300.0
 @export var first_outpost_candidate_count: int = 3
 @export var second_outpost_candidate_count: int = 4
-@export var container_refresh_interval: float = 30.0
 @export var use_random_seed: bool = true
 @export var fixed_run_seed: int = 1001
 

@@ -19,9 +19,6 @@ const RunStateMachineScript := preload("res://scripts/run/run_state_machine.gd")
 const WeightComponentScript := preload("res://scripts/inventory/weight_component.gd")
 const ItemTransferServiceScript := preload("res://scripts/inventory/item_transfer_service.gd")
 const OutpostStorageControllerScript := preload("res://scripts/outpost/outpost_storage_controller.gd")
-const GameDataRegistryScript := preload("res://scripts/data/game_data_registry.gd")
-const SSRunChanceDirectorScript := preload("res://scripts/run/ss_run_chance_director.gd")
-const SSLootDirectorScript := preload("res://scripts/run/ss_loot_director.gd")
 const SceneRandomEventDirectorScript := preload("res://scripts/events/scene_random_event_director.gd")
 
 @export var spawn_position: Vector2 = Vector2.ZERO
@@ -47,11 +44,7 @@ var weight_component
 var home_storage_component
 var item_transfer_service = ItemTransferServiceScript.new()
 var outpost_storage_controller = OutpostStorageControllerScript.new()
-var data_registry = GameDataRegistryScript.new()
-var ss_run_chance_director = SSRunChanceDirectorScript.new()
-var ss_loot_director = SSLootDirectorScript.new()
 var scene_random_event_director = SceneRandomEventDirectorScript.new()
-var _data_registry_loaded := false
 
 func _ready() -> void:
 	state_machine = get_node_or_null("RunStateMachine")
@@ -89,7 +82,6 @@ func start_new_run() -> bool:
 	if context == null:
 		return false
 
-	_initialize_ss_run()
 	_initialize_scene_random_events()
 	run_context_created.emit(context)
 	run_initialized.emit(context)
@@ -178,12 +170,8 @@ func get_debug_snapshot() -> Dictionary:
 	var snapshot := {
 		"state_machine": state_machine.get_state_snapshot() if state_machine else {},
 		"context": context.to_debug_dictionary() if context else {},
-		"ss_loot": ss_loot_director.get_debug_snapshot() if ss_loot_director != null else {},
 	}
 	return snapshot
-
-func get_ss_loot_director():
-	return ss_loot_director
 
 func apply_monster_stability_damage(damage: float, monster_id: String = "") -> void:
 	var safe_damage := maxf(0.0, damage)
@@ -214,10 +202,10 @@ func debug_deposit_first_inventory_item() -> bool:
 func debug_drop_first_inventory_item() -> bool:
 	return bool(discard_inventory_item_at(0).get("accepted", false))
 
-func discard_inventory_item_at(slot_index: int) -> Dictionary:
+func discard_inventory_item_at(slot_index: int, amount: int = 1) -> Dictionary:
 	if inventory_component == null:
 		return {"accepted": false, "reason": "missing_inventory", "item": {}}
-	var removed: Dictionary = inventory_component.remove_item_at(slot_index)
+	var removed: Dictionary = inventory_component.remove_item_at(slot_index, amount)
 	if removed.is_empty():
 		_log("No inventory item to discard.")
 		return {"accepted": false, "reason": "invalid_item", "item": {}}
@@ -226,7 +214,7 @@ func discard_inventory_item_at(slot_index: int) -> Dictionary:
 		"accepted": true,
 		"reason": "discarded",
 		"discarded_count": int(removed.get("amount", 1)),
-		"removed_stack": true,
+		"removed_stack": amount < 0,
 		"item": removed,
 	}
 
@@ -436,31 +424,6 @@ func _apply_meta_research_to_config() -> void:
 	if game_state.has_method("get_player_max_stability"):
 		config.max_stability = float(game_state.get_player_max_stability(config.max_stability))
 
-func _initialize_ss_run() -> void:
-	if context == null:
-		return
-	_ensure_data_registry_loaded()
-	ss_run_chance_director.setup(data_registry)
-	var game_state := get_node_or_null("/root/GameState")
-	var day := 1
-	if game_state != null and game_state.has_method("get_current_day"):
-		day = int(game_state.get_current_day())
-	var ss_rng := RandomNumberGenerator.new()
-	ss_rng.seed = maxi(1, int(abs(context.seed)) + day * 100003 + 99173)
-	var roll_result: Dictionary = ss_run_chance_director.roll_for_run(game_state, ss_rng)
-	ss_loot_director.setup(data_registry, context)
-	ss_loot_director.begin_run(roll_result)
-	_log("SS roll: active=%s chance=%.3f roll=%.3f budget=%d/%d tier=%d next=%d miss_next=%d" % [
-		bool(roll_result.get("active", false)),
-		float(roll_result.get("chance", 0.0)),
-		float(roll_result.get("roll_value", 0.0)),
-		int(roll_result.get("budget_used", 0)),
-		int(roll_result.get("budget_total", 0)),
-		int(roll_result.get("chance_tier", 0)),
-		int(roll_result.get("next_chance_tier", 0)),
-		int(roll_result.get("next_miss_count", 0)),
-	])
-
 func _initialize_scene_random_events() -> void:
 	if context == null:
 		return
@@ -490,14 +453,6 @@ func _initialize_scene_random_events() -> void:
 	config.run_duration_seconds = event_context.run_duration_seconds
 	scene_events_resolved.emit(context)
 	_log("Scene events: %s" % event_context.to_dictionary())
-
-func _ensure_data_registry_loaded() -> bool:
-	if _data_registry_loaded:
-		return true
-	_data_registry_loaded = data_registry.load_all()
-	if not _data_registry_loaded:
-		_log("Data registry load failed for SS rules: %s" % str(data_registry.load_errors))
-	return _data_registry_loaded
 
 func _connect_safe_zones() -> void:
 	for zone in get_tree().get_nodes_in_group("safe_zones"):

@@ -54,7 +54,7 @@ func select_inventory_item_at(index: int, run_director) -> Dictionary:
 func discard_selected_inventory_item(run_director, inventory_panel_visible: bool = true) -> Dictionary:
 	if not has_selected_inventory_item(run_director):
 		return _result(false, "请先选择背包道具。")
-	var result: Dictionary = run_director.discard_inventory_item_at(selected_inventory_index)
+	var result: Dictionary = run_director.discard_inventory_item_at(selected_inventory_index, 1)
 	if bool(result.get("accepted", false)):
 		selected_inventory_index = -1
 		var item: Dictionary = result.get("item", {})

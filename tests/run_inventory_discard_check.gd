@@ -17,8 +17,8 @@ func _verify_run_inventory_discard() -> bool:
 	await process_frame
 
 	root.run_director.inventory_component.setup(64, 100.0)
-	root.run_director.inventory_component.add_item(_item("scrap_metal", "废铁片", 2.0))
-	root.run_director.inventory_component.add_item(_item("wire_coil", "线圈", 3.0))
+	root.run_director.inventory_component.add_item(_item("scrap_metal", "Scrap Metal", 2.0, 3, 20))
+	root.run_director.inventory_component.add_item(_item("wire_coil", "Wire Coil", 3.0))
 	root.run_director.on_safe_zone_exited("home")
 	await process_frame
 	await process_frame
@@ -29,6 +29,17 @@ func _verify_run_inventory_discard() -> bool:
 		return false
 	if root.discard_button == null or not root.discard_button.disabled:
 		printerr("Expected discard button to start disabled without selection.")
+		return false
+	var first_slot := _first_button(root.inventory_label)
+	if first_slot == null:
+		printerr("Expected stacked backpack slot button.")
+		return false
+	var badge := first_slot.get_node_or_null("StackAmount") as Label
+	if badge == null or badge.text != "x3":
+		printerr("Expected stacked backpack slot to show x3.")
+		return false
+	if not first_slot.tooltip_text.contains("x3"):
+		printerr("Expected stacked backpack tooltip to include stack amount.")
 		return false
 	var interactable_count: int = root.interactables.size()
 	var weight_before: float = root.run_director.inventory_component.get_current_weight()
@@ -42,11 +53,14 @@ func _verify_run_inventory_discard() -> bool:
 		return false
 	root.discard_button.pressed.emit()
 	await process_frame
-	if root.run_director.inventory_component.items.size() != 1:
-		printerr("Expected selected item to be removed from backpack.")
+	if root.run_director.inventory_component.items.size() != 2:
+		printerr("Expected stack discard to keep the remaining stack in backpack.")
 		return false
-	if String(root.run_director.inventory_component.items[0].get("item_id", "")) != "wire_coil":
-		printerr("Expected discard to remove only the selected item.")
+	if String(root.run_director.inventory_component.items[0].get("item_id", "")) != "scrap_metal":
+		printerr("Expected discard to keep the selected stack slot.")
+		return false
+	if int(root.run_director.inventory_component.items[0].get("amount", 0)) != 2:
+		printerr("Expected discard to subtract one item from the selected stack.")
 		return false
 	if root.selected_inventory_index != -1 or not root.discard_button.disabled:
 		printerr("Expected discard to clear selection and disable the button.")
@@ -61,15 +75,25 @@ func _verify_run_inventory_discard() -> bool:
 	await process_frame
 	return true
 
-func _item(item_id: String, display_name: String, weight: float) -> Dictionary:
+func _item(item_id: String, display_name: String, weight: float, amount: int = 1, stack_limit: int = 1) -> Dictionary:
 	return {
 		"item_id": item_id,
 		"display_name": display_name,
-		"amount": 1,
+		"amount": amount,
 		"weight_per_unit": weight,
-		"stack_limit": 1,
+		"stackable": stack_limit > 1,
+		"stack_limit": stack_limit,
 		"item_type": "material",
+		"quality": "C",
 	}
+
+func _first_button(control: Control) -> Button:
+	if control == null:
+		return null
+	for child in control.get_children():
+		if child is Button:
+			return child
+	return null
 
 func _shutdown_audio() -> void:
 	var audio_manager := root.get_node_or_null("AudioManager")

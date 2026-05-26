@@ -35,15 +35,40 @@ func transfer_inventory_to_storage(inventory_component, slot_index: int, storage
 		return {"accepted": false, "reason": "storage_rejected", "item": item}
 	return {"accepted": true, "reason": "", "item": item}
 
-func transfer_storage_to_inventory(storage_component, slot_index: int, inventory_component) -> Dictionary:
+func transfer_storage_to_inventory(storage_component, slot_index: int, inventory_component, amount: int = 1) -> Dictionary:
 	if storage_component == null or inventory_component == null:
 		return {"accepted": false, "reason": "missing_inventory", "item": {}}
 	var item: Dictionary = storage_component.select_item_at(slot_index) if storage_component.has_method("select_item_at") else select_item(storage_component.items, slot_index)
 	if item.is_empty():
 		return {"accepted": false, "reason": "invalid_item", "item": {}}
-	if not inventory_component.add_item(item):
-		return {"accepted": false, "reason": "inventory_rejected", "item": item}
-	var removed: Dictionary = storage_component.remove_item_at(slot_index)
+	var move_amount := mini(maxi(1, amount), maxi(1, int(item.get("amount", 1))))
+	var moving_item := item.duplicate(true)
+	moving_item["amount"] = move_amount
+	if not inventory_component.add_item(moving_item):
+		return {"accepted": false, "reason": "inventory_rejected", "item": moving_item}
+	var removed: Dictionary
+	if storage_component.has_method("remove_item_at"):
+		removed = storage_component.remove_item_at(slot_index, move_amount)
+	else:
+		removed = item
+		removed["amount"] = move_amount
+		storage_component.items.remove_at(slot_index)
 	if removed.is_empty():
-		return {"accepted": false, "reason": "remove_failed", "item": item}
+		inventory_component.remove_item_at(_last_matching_inventory_index(inventory_component, moving_item), move_amount)
+		return {"accepted": false, "reason": "remove_failed", "item": moving_item}
 	return {"accepted": true, "reason": "", "item": removed}
+
+
+func _last_matching_inventory_index(inventory_component, item: Dictionary) -> int:
+	if inventory_component == null:
+		return -1
+	for index in range(inventory_component.items.size() - 1, -1, -1):
+		var stack: Dictionary = inventory_component.items[index]
+		if String(stack.get("item_id", "")) != String(item.get("item_id", "")):
+			continue
+		if String(stack.get("item_type", "")) != String(item.get("item_type", "")):
+			continue
+		if String(stack.get("quality", "")) != String(item.get("quality", "")):
+			continue
+		return index
+	return -1

@@ -43,7 +43,7 @@ func setup(
 	data_registry.load_all()
 	_refresh_resource_profile()
 
-func setup_ss_loot_director(_director) -> void:
+func setup_legacy_high_tier_director(_director) -> void:
 	pass
 
 func configure_location(p_map_id: String, p_location_state: String, p_visit_count_before: int, p_run_seed: int) -> void:

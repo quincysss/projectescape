@@ -19,6 +19,7 @@ func build_surface(ui_root: Control) -> Dictionary:
 	warehouse_panel.add_child(warehouse_scroll)
 	warehouse_status_label = _make_section_label("空仓位会显示为细框。每个格子只放一个道具。", Vector2(436, 62), Vector2(500, 96), 16)
 	warehouse_status_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	warehouse_status_label.text = "空仓位会显示为细框；可堆叠道具按 xN 合并显示。"
 	warehouse_panel.add_child(warehouse_status_label)
 	ui_root.add_child(warehouse_panel)
 	return {
@@ -48,6 +49,8 @@ func set_items(items: Array, capacity: int, max_capacity: int, source_id: String
 	_set_item_grid(warehouse_grid_root, items, max_capacity, source_id, capacity)
 	if warehouse_status_label != null:
 		warehouse_status_label.text = "仓库容量：%d/%d\n格子规则：每格 1 个道具，不堆叠。" % [items.size(), capacity]
+	if warehouse_status_label != null:
+		warehouse_status_label.text = "仓库容量：%d/%d\n堆叠：同 ID、类别、品质合并为一格，右上角显示 xN。" % [items.size(), capacity]
 	if warehouse_label == null:
 		return
 	if items.is_empty():
@@ -59,6 +62,16 @@ func set_items(items: Array, capacity: int, max_capacity: int, source_id: String
 		if item is Dictionary:
 			var name := String(item.get("display_name", item.get("item_id", "")))
 			var weight := float(item.get("weight_per_unit", 0.0))
+			var amount := maxi(1, int(item.get("amount", 1)))
+			lines.append("[url=warehouse:%d]- 第 %d 格：%s x%d  单重 %.2f  总重 %.2f[/url]" % [
+				index,
+				index + 1,
+				name,
+				amount,
+				weight,
+				weight * float(amount),
+			])
+			continue
 			lines.append("[url=warehouse:%d]- 第 %d 格：%s  单重 %.2f[/url]" % [index, index + 1, name, weight])
 	warehouse_label.append_text("\n".join(lines))
 
@@ -69,6 +82,19 @@ func show_selected_item(item: Dictionary) -> void:
 	warehouse_status_label.text = "已选择：%s\n品质：%s\n格子规则：每格 1 个道具，不堆叠。" % [
 		String(item.get("display_name", item.get("item_id", ""))),
 		String(item.get("quality", "C")),
+	]
+
+
+	var amount := maxi(1, int(item.get("amount", 1)))
+	var weight := maxf(0.0, float(item.get("weight_per_unit", item.get("weight", 0.0))))
+	warehouse_status_label.text = "已选择：%s x%d\n品质：%s\n类别：%s\n单件重量：%.2f\n总重量：%.2f\n堆叠上限：%d" % [
+		String(item.get("display_name", item.get("item_id", ""))),
+		amount,
+		String(item.get("quality", "C")),
+		String(item.get("item_type", "material")),
+		weight,
+		weight * float(amount),
+		maxi(1, int(item.get("stack_limit", 1))),
 	]
 
 

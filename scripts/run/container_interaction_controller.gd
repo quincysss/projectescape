@@ -24,10 +24,8 @@ func begin_open(container, interaction_progress_controller, on_completed: Callab
 		return validation
 	if interaction_progress_controller == null:
 		return {"accepted": false, "reason": REASON_PROGRESS_REJECTED}
-	set_lifetime_paused(container, true)
 	var open_seconds := float(container.payload.get("open_time", default_open_seconds))
 	if not interaction_progress_controller.begin("open_container", container, open_seconds, on_completed, on_cancelled):
-		set_lifetime_paused(container, false)
 		return {"accepted": false, "reason": REASON_PROGRESS_REJECTED}
 	return {"accepted": true, "held": true}
 
@@ -37,7 +35,7 @@ func complete_held_open(container) -> Dictionary:
 
 
 func cancel_held_open(container) -> void:
-	set_lifetime_paused(container, false)
+	pass
 
 
 func can_continue_open(container, hold_pressed: bool, nearest_interactable) -> bool:
@@ -51,10 +49,8 @@ func open(container) -> Dictionary:
 	if container_spawn_controller != null:
 		container_spawn_controller.ensure_container_rewards(container)
 	if loot_interaction_controller == null:
-		set_lifetime_paused(container, false)
 		return {"accepted": false, "reason": REASON_MISSING_LOOT_CONTROLLER}
 	if not loot_interaction_controller.open_container(container):
-		set_lifetime_paused(container, false)
 		return {
 			"accepted": false,
 			"reason": REASON_OPEN_REJECTED,
@@ -62,7 +58,6 @@ func open(container) -> Dictionary:
 		}
 	container.payload["has_been_opened"] = true
 	container.payload["opened_by_player_id"] = "local_player"
-	set_lifetime_paused(container, true)
 	return {"accepted": true}
 
 
@@ -74,14 +69,6 @@ func validate_open(container) -> Dictionary:
 	if _is_depleted(container):
 		return {"accepted": false, "reason": REASON_DEPLETED}
 	return {"accepted": true}
-
-
-func set_lifetime_paused(container, paused: bool) -> void:
-	if container == null or not is_instance_valid(container):
-		return
-	if container.get("interact_type") != "container":
-		return
-	container.payload["lifetime_paused"] = paused
 
 
 func _is_depleted(container) -> bool:

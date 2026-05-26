@@ -12,6 +12,8 @@ func refresh_container(container: Node) -> void:
 	if container == null or not is_instance_valid(container):
 		return
 	var payload: Dictionary = container.get("payload")
+	if not payload.has("lifetime") and not payload.has("lifetime_max"):
+		return
 	var lifetime_max: float = maxf(0.01, float(payload.get("lifetime_max", 45.0)))
 	var lifetime: float = clampf(float(payload.get("lifetime", lifetime_max)), 0.0, lifetime_max)
 	var ratio: float = lifetime / lifetime_max

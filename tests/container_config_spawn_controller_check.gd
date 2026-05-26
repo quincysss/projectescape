@@ -9,14 +9,14 @@ class FakeLegacyHighTierDirector:
 
 	var call_count := 0
 
-	func try_generate_ss(_container_def: Dictionary, _ring: String, _rng: RandomNumberGenerator) -> Dictionary:
+	func try_generate_legacy_high_tier(_container_def: Dictionary, _ring: String, _rng: RandomNumberGenerator) -> Dictionary:
 		call_count += 1
 		return {
 			"item_id": "legacy_high_tier_probe",
 			"display_name": "legacy_high_tier_probe",
 			"amount": 1,
 			"quality": "S",
-			"ss_generated": true,
+			"legacy_high_tier_generated": true,
 		}
 
 var container_root: Node2D
@@ -42,8 +42,8 @@ func _verify_config_driven_container_spawn() -> bool:
 		Callable(self, "_remove_interactable"),
 		64.0
 	)
-	var fake_ss_director := FakeLegacyHighTierDirector.new()
-	controller.setup_ss_loot_director(fake_ss_director)
+	var fake_legacy_high_tier_director := FakeLegacyHighTierDirector.new()
+	controller.setup_legacy_high_tier_director(fake_legacy_high_tier_director)
 	controller.configure_location("clinic_small", "rich", 0, 1001)
 	var container = controller.spawn_container(Vector2.ZERO, "large_safe", "far_outer")
 	await process_frame
@@ -73,14 +73,14 @@ func _verify_config_driven_container_spawn() -> bool:
 		printerr("Expected container payload to include map ecology context.")
 		ok = false
 	var rewards: Array = controller.ensure_container_rewards(container)
-	if fake_ss_director.call_count != 0:
+	if fake_legacy_high_tier_director.call_count != 0:
 		printerr("Expected ordinary container rewards not to call legacy high-tier director.")
 		ok = false
 	if rewards.size() < 2:
 		printerr("Expected large_safe loot to generate single-item rewards, got %s." % rewards.size())
 		ok = false
 	for item in rewards:
-		if bool(item.get("ss_generated", false)) or not ["C", "B", "A", "S"].has(String(item.get("quality", ""))):
+		if bool(item.get("legacy_high_tier_generated", false)) or not ["C", "B", "A", "S"].has(String(item.get("quality", ""))):
 			printerr("Expected ordinary container rewards to exclude legacy high-tier drops.")
 			ok = false
 		if not item.has("quality") or not item.has("quality_color"):

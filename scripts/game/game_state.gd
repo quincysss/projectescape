@@ -12,6 +12,7 @@ const CraftingManagerScript := preload("res://scripts/game/crafting_manager.gd")
 const StarterSupplyServiceScript := preload("res://scripts/game/starter_supply_service.gd")
 const ChapterProgressServiceScript := preload("res://scripts/game/chapter_progress_service.gd")
 const ProfileServiceScript := preload("res://scripts/profile/profile_service.gd")
+const GameDataRegistryScript := preload("res://scripts/data/game_data_registry.gd")
 
 const BASE_INVENTORY_SLOTS := 8
 const BASE_HOME_STORAGE_SLOTS := 1
@@ -83,10 +84,10 @@ var merchant_shop_level: int = 1
 var merchant_shop_offers: Array[Dictionary] = []
 var research_levels: Dictionary = {}
 var collected_item_ids: Dictionary = {}
-var ss_chance_tier: int = 0
-var ss_miss_count: int = 0
-var ss_last_roll_day: int = 0
-var ss_last_roll_result: Dictionary = {}
+var legacy_high_tier_chance_tier: int = 0
+var legacy_high_tier_miss_count: int = 0
+var legacy_high_tier_last_roll_day: int = 0
+var legacy_high_tier_last_roll_result: Dictionary = {}
 var forced_scene_events_next_run: Dictionary = {}
 var last_run_result: String = ""
 var last_run_result_type: String = ""
@@ -121,6 +122,8 @@ var crafting_manager = CraftingManagerScript.new()
 var starter_supply_service = StarterSupplyServiceScript.new()
 var chapter_progress_service = ChapterProgressServiceScript.new()
 var profile_service = ProfileServiceScript.new()
+var location_briefing_data_registry = GameDataRegistryScript.new()
+var location_briefing_data_loaded := false
 
 func _ready() -> void:
 	load_profile()
@@ -408,6 +411,24 @@ func get_location_resource_snapshot() -> Dictionary:
 		snapshot[location_id] = get_location_resource_state(location_id)
 	return snapshot
 
+func get_location_resource_briefing(location_id: String = "") -> Dictionary:
+	var normalized_id := _normalize_location_id(location_id if not location_id.is_empty() else selected_night_location_id)
+	var location: Dictionary = NIGHT_LOCATIONS.get(normalized_id, {})
+	var resource_state := get_location_resource_state(normalized_id)
+	var state_id := String(resource_state.get("state", "rich"))
+	var briefing := {}
+	if _ensure_location_briefing_data_loaded():
+		briefing = location_briefing_data_registry.get_location_resource_briefing(normalized_id, state_id)
+	if briefing.is_empty():
+		briefing = _fallback_location_resource_briefing(normalized_id, state_id)
+	briefing["location_id"] = normalized_id
+	briefing["description"] = String(location.get("description", ""))
+	briefing["resource_state"] = state_id
+	briefing["visit_count"] = int(resource_state.get("visit_count", 0))
+	briefing["last_visit_day"] = int(resource_state.get("last_visit_day", 0))
+	briefing["selected"] = selected_night_location_id == normalized_id
+	return briefing
+
 func debug_set_location_resource_state(location_id: String, state: String, visit_count: int = 0) -> void:
 	var normalized_id := _normalize_location_id(location_id)
 	var normalized_state := state if ["rich", "normal", "poor", "recovering"].has(state) else _state_for_visit_count(visit_count)
@@ -558,10 +579,10 @@ func _reset_runtime_to_empty_profile_state() -> void:
 	merchant_shop_offers.clear()
 	research_levels.clear()
 	collected_item_ids.clear()
-	ss_chance_tier = 0
-	ss_miss_count = 0
-	ss_last_roll_day = 0
-	ss_last_roll_result = {}
+	legacy_high_tier_chance_tier = 0
+	legacy_high_tier_miss_count = 0
+	legacy_high_tier_last_roll_day = 0
+	legacy_high_tier_last_roll_result = {}
 	forced_scene_events_next_run.clear()
 	last_run_result = ""
 	last_run_result_type = ""
@@ -735,34 +756,34 @@ func unlock_manufacturing_station() -> Dictionary:
 		"save": default_save_result,
 	}
 
-func get_ss_roll_state() -> Dictionary:
+func get_legacy_high_tier_roll_state() -> Dictionary:
 	return {
 		"current_day": get_current_day(),
-		"chance_tier": maxi(0, ss_chance_tier),
-		"miss_count": maxi(0, ss_miss_count),
-		"last_roll_day": maxi(0, ss_last_roll_day),
-		"last_roll_result": ss_last_roll_result.duplicate(true),
+		"chance_tier": maxi(0, legacy_high_tier_chance_tier),
+		"miss_count": maxi(0, legacy_high_tier_miss_count),
+		"last_roll_day": maxi(0, legacy_high_tier_last_roll_day),
+		"last_roll_result": legacy_high_tier_last_roll_result.duplicate(true),
 	}
 
-func apply_ss_roll_result(result: Dictionary) -> void:
-	ss_chance_tier = maxi(0, int(result.get("next_chance_tier", ss_chance_tier)))
-	ss_miss_count = maxi(0, int(result.get("next_miss_count", ss_miss_count)))
-	ss_last_roll_day = maxi(0, int(result.get("day", get_current_day())))
-	ss_last_roll_result = result.duplicate(true)
+func apply_legacy_high_tier_roll_result(result: Dictionary) -> void:
+	legacy_high_tier_chance_tier = 0
+	legacy_high_tier_miss_count = 0
+	legacy_high_tier_last_roll_day = maxi(0, int(result.get("day", get_current_day())))
+	legacy_high_tier_last_roll_result = {"legacy_disabled": true}
 	save_profile()
 
-func reset_ss_roll_state() -> void:
-	ss_chance_tier = 0
-	ss_miss_count = 0
-	ss_last_roll_day = 0
-	ss_last_roll_result = {}
+func reset_legacy_high_tier_roll_state() -> void:
+	legacy_high_tier_chance_tier = 0
+	legacy_high_tier_miss_count = 0
+	legacy_high_tier_last_roll_day = 0
+	legacy_high_tier_last_roll_result = {}
 	save_profile()
 
-func debug_set_ss_roll_state(chance_tier: int, miss_count: int = 0, last_roll_day: int = 0) -> void:
-	ss_chance_tier = maxi(0, chance_tier)
-	ss_miss_count = maxi(0, miss_count)
-	ss_last_roll_day = maxi(0, last_roll_day)
-	ss_last_roll_result = {}
+func debug_set_legacy_high_tier_roll_state(chance_tier: int, miss_count: int = 0, last_roll_day: int = 0) -> void:
+	legacy_high_tier_chance_tier = maxi(0, chance_tier)
+	legacy_high_tier_miss_count = maxi(0, miss_count)
+	legacy_high_tier_last_roll_day = maxi(0, last_roll_day)
+	legacy_high_tier_last_roll_result = {"legacy_disabled": true}
 
 func debug_force_scene_event_next_run(event_id: String, active: bool = true) -> void:
 	if event_id.is_empty():
@@ -791,16 +812,7 @@ func get_selected_character_id() -> String:
 func _night_locations_snapshot() -> Array[Dictionary]:
 	var result: Array[Dictionary] = []
 	for location_id in NIGHT_LOCATIONS.keys():
-		var location: Dictionary = NIGHT_LOCATIONS.get(location_id, {})
-		var resource_state := get_location_resource_state(location_id)
-		result.append({
-			"location_id": location_id,
-			"display_name": String(location.get("display_name", location_id)),
-			"description": String(location.get("description", "")),
-			"resource_state": String(resource_state.get("state", "rich")),
-			"visit_count": int(resource_state.get("visit_count", 0)),
-			"selected": selected_night_location_id == location_id,
-		})
+		result.append(get_location_resource_briefing(location_id))
 	return result
 
 func _normalize_location_id(location_id: String) -> String:
@@ -826,6 +838,48 @@ func _state_for_visit_count(visit_count: int) -> String:
 	if visit_count == 1:
 		return "normal"
 	return "poor"
+
+func _ensure_location_briefing_data_loaded() -> bool:
+	if location_briefing_data_loaded:
+		return true
+	if location_briefing_data_registry == null:
+		location_briefing_data_registry = GameDataRegistryScript.new()
+	location_briefing_data_loaded = location_briefing_data_registry.load_all()
+	return location_briefing_data_loaded
+
+func _fallback_location_resource_briefing(location_id: String, state_id: String) -> Dictionary:
+	var location: Dictionary = NIGHT_LOCATIONS.get(location_id, {})
+	return {
+		"map_id": location_id,
+		"display_name": String(location.get("display_name", location_id)),
+		"map_type": "",
+		"state_id": state_id,
+		"state_display_name": _fallback_location_state_display_name(state_id),
+		"state_hint": "仅显示资源类别和容器倾向，不显示精确掉落清单。",
+		"primary_categories": [],
+		"secondary_categories": [],
+		"primary_category_names": [],
+		"secondary_category_names": [],
+		"estimated_container_count_min": 0,
+		"estimated_container_count_max": 0,
+		"estimated_container_count_text": "?",
+		"typical_container_types": [],
+		"typical_container_type_names": [],
+		"randomness_note": "仅显示资源类别和容器倾向，不显示精确掉落清单。",
+	}
+
+func _fallback_location_state_display_name(state_id: String) -> String:
+	match state_id:
+		"rich":
+			return "富集"
+		"normal":
+			return "普通"
+		"poor":
+			return "贫瘠"
+		"recovering":
+			return "恢复中"
+		_:
+			return state_id
 
 func register_character_hud_assets(character_id: String, assets: Dictionary) -> void:
 	if character_id.is_empty():
@@ -1135,12 +1189,12 @@ func _apply_profile_to_runtime(loaded_profile: Dictionary) -> void:
 			var offer_dict: Dictionary = offer
 			merchant_shop_offers.append(offer_dict.duplicate(true))
 
-	var ss_state: Dictionary = loaded_profile.get("ss_roll_state", {})
-	ss_chance_tier = maxi(0, int(ss_state.get("chance_tier", loaded_profile.get("ss_chance_tier", 0))))
-	ss_miss_count = maxi(0, int(ss_state.get("miss_count", loaded_profile.get("ss_miss_count", 0))))
-	ss_last_roll_day = maxi(0, int(ss_state.get("last_roll_day", loaded_profile.get("ss_last_roll_day", 0))))
-	var loaded_ss_result: Dictionary = ss_state.get("last_roll_result", loaded_profile.get("ss_last_roll_result", {}))
-	ss_last_roll_result = loaded_ss_result.duplicate(true)
+	var legacy_high_tier_state: Dictionary = loaded_profile.get("legacy_high_tier_roll_state", loaded_profile.get("ss_roll_state", {}))
+	legacy_high_tier_chance_tier = maxi(0, int(legacy_high_tier_state.get("chance_tier", loaded_profile.get("ss_chance_tier", 0))))
+	legacy_high_tier_miss_count = maxi(0, int(legacy_high_tier_state.get("miss_count", loaded_profile.get("ss_miss_count", 0))))
+	legacy_high_tier_last_roll_day = maxi(0, int(legacy_high_tier_state.get("last_roll_day", loaded_profile.get("ss_last_roll_day", 0))))
+	var loaded_legacy_high_tier_result: Dictionary = legacy_high_tier_state.get("last_roll_result", loaded_profile.get("ss_last_roll_result", {}))
+	legacy_high_tier_last_roll_result = loaded_legacy_high_tier_result.duplicate(true)
 	last_run_result = String(loaded_profile.get("last_run_result", ""))
 	last_run_result_type = String(loaded_profile.get("last_run_result_type", ""))
 
@@ -1225,12 +1279,11 @@ func _sync_runtime_to_profile() -> void:
 	profile["collected_item_ids"] = collected_item_ids.duplicate(true)
 	profile["merchant_shop_level"] = merchant_shop_level
 	profile["merchant_shop_offers"] = merchant_shop_offers.duplicate(true)
-	profile["ss_roll_state"] = {
-		"chance_tier": ss_chance_tier,
-		"miss_count": ss_miss_count,
-		"last_roll_day": ss_last_roll_day,
-		"last_roll_result": ss_last_roll_result.duplicate(true),
-	}
+	profile.erase("ss_roll_state")
+	profile.erase("ss_chance_tier")
+	profile.erase("ss_miss_count")
+	profile.erase("ss_last_roll_day")
+	profile.erase("ss_last_roll_result")
 	profile["last_run_result"] = last_run_result
 	profile["last_run_result_type"] = last_run_result_type
 	profile["daily_demand_day"] = daily_demand_day

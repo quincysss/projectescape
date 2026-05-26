@@ -206,16 +206,36 @@ func _build_data(item: Dictionary, context: Dictionary = {}) -> Dictionary:
 	var sell_value := int(definition.get("sell_value", item.get("sell_value", 0)))
 	var currency_id := String(definition.get("sell_currency_id", item.get("sell_currency_id", "mine_coin")))
 	var description := String(definition.get("description", item.get("description", "")))
+	var amount := maxi(1, int(item.get("amount", 1)))
+	var single_weight := maxf(0.0, float(item.get("weight_per_unit", definition.get("weight", 0.0))))
+	var stack_limit := maxi(1, int(item.get("stack_limit", definition.get("stack_limit", 1))))
+	var quality := String(item.get("quality", definition.get("quality", "C")))
+	var item_type := String(item.get("item_type", definition.get("item_type", "material")))
+	var category := String(definition.get("material_category", item.get("material_category", "")))
+	if description.strip_edges().is_empty():
+		description = "暂无记录。"
+	var detail_lines: Array[String] = [
+		"数量：x%d" % amount,
+		"品质：%s" % quality,
+		"类别：%s" % item_type,
+		"单件重量：%.2f" % single_weight,
+		"总重量：%.2f" % (single_weight * float(amount)),
+		"堆叠上限：%d" % stack_limit,
+	]
+	if not category.is_empty():
+		detail_lines.append("用途分类：%s" % category)
+	detail_lines.append("")
+	detail_lines.append(description)
 	if description.strip_edges().is_empty():
 		description = "暂无记录。"
 	return {
 		"item_id": item_id,
 		"display_name": String(definition.get("name", item.get("display_name", item_id))),
-		"quality": String(definition.get("quality", item.get("quality", "C"))),
+		"quality": quality,
 		"icon": String(definition.get("icon", item.get("icon", ""))),
 		"price_text": "%d%s" % [sell_value, _currency_name(currency_id)] if sellable and sell_value > 0 else "不可出售",
 		"sellable": sellable and sell_value > 0,
-		"description": description,
+		"description": "\n".join(detail_lines),
 	}
 
 

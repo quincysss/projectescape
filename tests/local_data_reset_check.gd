@@ -143,7 +143,7 @@ func _make_dirty_local_data(game_state: Node) -> bool:
 	game_state.research_levels["move_speed"] = 2
 	game_state.set_merchant_shop_level(3)
 	game_state.refresh_shop_stock(42)
-	game_state.debug_set_ss_roll_state(3, 2, 5)
+	game_state.debug_set_legacy_high_tier_roll_state(3, 2, 5)
 	game_state.last_run_result = "dirty"
 	game_state.save_profile()
 	return true
@@ -200,9 +200,9 @@ func _expect_clean_runtime(game_state: Node, require_merchant_empty: bool) -> bo
 	if game_state.pending_first_return_dialogue:
 		printerr("Expected pending return dialogue to reset.")
 		ok = false
-	var ss_state: Dictionary = game_state.get_ss_roll_state()
-	if int(ss_state.get("chance_tier", -1)) != 0 or int(ss_state.get("miss_count", -1)) != 0 or int(ss_state.get("last_roll_day", -1)) != 0:
-		printerr("Expected SS roll state to reset.")
+	var legacy_high_tier_state: Dictionary = game_state.get_legacy_high_tier_roll_state()
+	if int(legacy_high_tier_state.get("chance_tier", -1)) != 0 or int(legacy_high_tier_state.get("miss_count", -1)) != 0 or int(legacy_high_tier_state.get("last_roll_day", -1)) != 0:
+		printerr("Expected legacy high-tier roll state to reset.")
 		ok = false
 	if game_state.last_run_result != "":
 		printerr("Expected last run result to reset.")

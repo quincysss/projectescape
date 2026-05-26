@@ -442,8 +442,8 @@ func _build_backpack_status_hud(scene) -> void:
 
 	scene.weight_value_label = Label.new()
 	scene.weight_value_label.name = "WeightValue"
-	scene.weight_value_label.position = Vector2(106, 106)
-	scene.weight_value_label.size = Vector2(210, 22)
+	scene.weight_value_label.position = Vector2(106, 104)
+	scene.weight_value_label.size = Vector2(220, 38)
 	scene.weight_value_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	scene.weight_value_label.add_theme_font_size_override("font_size", 15)
 	scene.weight_value_label.add_theme_color_override("font_color", Color(0.82, 0.80, 0.76))
@@ -934,6 +934,9 @@ func _refresh_backpack_status(scene) -> void:
 		material_max_slots = MATERIAL_BACKPACK_DISPLAY_SLOTS
 	var current_weight: float = maxf(0.0, float(scene.run_director.context.current_weight))
 	var max_weight: float = maxf(1.0, float(scene.run_director.context.weight_limit))
+	var speed_multiplier: float = float(scene.run_director.context.weight_speed_multiplier)
+	var weight_stage := String(scene.run_director.context.weight_stage)
+	var stage_text := _weight_stage_text(weight_stage)
 	scene.backpack_slot_label.text = "背包格  %d/%d" % [used_slots, max_slots]
 	scene.backpack_slot_label.text = "物资：%d/%d" % [used_slots, max_slots]
 	scene.backpack_material_slot_label.text = "材料：%d/%d" % [material_used_slots, material_max_slots]
@@ -946,6 +949,30 @@ func _refresh_backpack_status(scene) -> void:
 	elif current_weight >= max_weight * 0.75:
 		fill_color = Color(0.66, 0.48, 0.15, 0.96)
 	scene.weight_bar.add_theme_stylebox_override("fill", _progress_style(fill_color, fill_color, 0))
+	var stage_fill_color := _weight_stage_color(weight_stage)
+	scene.weight_value_label.text = "负重: %.1f/%.1f\n%s 速度 x%.2f" % [current_weight, max_weight, stage_text, speed_multiplier]
+	scene.weight_value_label.add_theme_color_override("font_color", stage_fill_color)
+	scene.weight_bar.add_theme_stylebox_override("fill", _progress_style(stage_fill_color, stage_fill_color, 0))
+
+func _weight_stage_text(stage: String) -> String:
+	match stage:
+		"OVERLOADED":
+			return "严重超重"
+		"HEAVY":
+			return "负重"
+		_:
+			return "正常"
+
+
+func _weight_stage_color(stage: String) -> Color:
+	match stage:
+		"OVERLOADED":
+			return Color(0.86, 0.18, 0.18, 0.98)
+		"HEAVY":
+			return Color(0.86, 0.60, 0.18, 0.98)
+		_:
+			return Color(0.52, 0.76, 0.90, 0.98)
+
 
 func _refresh_prompt(scene) -> void:
 	var is_home_safe_zone: bool = scene.run_director.context.active_safe_zone_id == "home"
@@ -1189,6 +1216,7 @@ func _make_item_slot(scene, pos: Vector2, slot_size: Vector2, item: Dictionary, 
 	button.size = slot_size
 	button.text = ""
 	button.clip_text = false
+	button.tooltip_text = _slot_tooltip(item)
 	button.set_meta("ui_click_sfx", "ui_item_click")
 	button.add_theme_font_size_override("font_size", 12)
 	button.add_theme_color_override("font_color", _quality_color(item))
@@ -1257,7 +1285,11 @@ func _add_grid_footer(scene, grid_root: Control, items: Array, capacity: int, so
 	if source_id == "inventory":
 		var current_weight_override: float = maxf(0.0, float(scene.run_director.context.current_weight))
 		var max_weight_override: float = maxf(1.0, float(scene.run_director.context.weight_limit))
-		footer.text = "物资: %d/%d    负重: %.1f/%.1f" % [used, capacity, current_weight_override, max_weight_override]
+		var stage_text := _weight_stage_text(String(scene.run_director.context.weight_stage))
+		var speed_multiplier := float(scene.run_director.context.weight_speed_multiplier)
+		footer.text = "物资: %d/%d    负重: %.1f/%.1f    %s x%.2f" % [used, capacity, current_weight_override, max_weight_override, stage_text, speed_multiplier]
+		footer.add_theme_color_override("font_color", _weight_stage_color(String(scene.run_director.context.weight_stage)))
+		footer.text = "物资: %d/%d    负重: %.1f/%.1f    %s x%.2f" % [used, capacity, current_weight_override, max_weight_override, stage_text, speed_multiplier]
 	elif source_id == "inventory_material":
 		footer.text = "材料: %d/%d" % [used, capacity]
 	grid_root.add_child(footer)
@@ -1322,6 +1354,7 @@ func _add_item_slot_content(button: Button, slot_size: Vector2, item: Dictionary
 		8,
 		_quality_color(item)
 	)
+	_add_amount_badge(button, slot_size, item)
 
 func _item_icon_texture(item: Dictionary) -> Texture2D:
 	var icon_path := String(item.get("icon", ""))
@@ -1353,6 +1386,47 @@ func _add_slot_text_box(button: Button, text: String, pos: Vector2, box_size: Ve
 	label.size = Vector2(box_size.x, box_size.y + 8.0)
 	label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	box.add_child(label)
+
+
+func _add_amount_badge(button: Button, slot_size: Vector2, item: Dictionary) -> void:
+	var amount := maxi(1, int(item.get("amount", 1)))
+	if amount <= 1:
+		return
+	var badge := Label.new()
+	badge.name = "StackAmount"
+	badge.text = "x%d" % amount
+	badge.position = Vector2(slot_size.x - 30.0, 2.0)
+	badge.size = Vector2(27.0, 16.0)
+	badge.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	badge.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	badge.add_theme_font_size_override("font_size", 11)
+	badge.add_theme_color_override("font_color", Color("#F0ECE3"))
+	badge.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0.92))
+	badge.add_theme_constant_override("shadow_offset_x", 1)
+	badge.add_theme_constant_override("shadow_offset_y", 1)
+	badge.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	button.add_child(badge)
+
+
+func _slot_tooltip(item: Dictionary) -> String:
+	var name := String(item.get("display_name", item.get("item_id", "")))
+	var amount := maxi(1, int(item.get("amount", 1)))
+	var quality := String(item.get("quality", "C"))
+	var item_type := String(item.get("item_type", "material"))
+	var single_weight := maxf(0.0, float(item.get("weight_per_unit", item.get("weight", 0.0))))
+	var stack_limit := maxi(1, int(item.get("stack_limit", 1)))
+	if _is_repair_material_item(item):
+		quality = "修复材料"
+		item_type = "outpost_material"
+	return "%s\n数量：x%d\n品质：%s\n类别：%s\n单件重量：%.2f\n总重量：%.2f\n堆叠上限：%d" % [
+		name,
+		amount,
+		quality,
+		item_type,
+		single_weight,
+		single_weight * float(amount),
+		stack_limit,
+	]
 
 func _compact_item_name(name: String) -> String:
 	if name.length() <= 4:

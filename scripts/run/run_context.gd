@@ -34,18 +34,6 @@ var active_safe_zone_id: String = "home"
 var active_safe_zone_type: String = "home"
 var stability_stage: String = "SAFE"
 var vision_radius: float = 0.0
-var ss_roll_day: int = 0
-var ss_roll_chance_tier: int = 0
-var ss_roll_chance: float = 0.0
-var ss_roll_value: float = 0.0
-var ss_run_active: bool = false
-var ss_budget_total: int = 0
-var ss_budget_used: int = 0
-var ss_opened_container_count: int = 0
-var ss_miss_count_before: int = 0
-var ss_next_chance_tier: int = 0
-var ss_next_miss_count: int = 0
-var ss_debug_events: Array = []
 var run_day_index: int = 1
 var map_id: String = "abandoned_house"
 var location_state: String = "rich"
@@ -98,20 +86,6 @@ func to_debug_dictionary() -> Dictionary:
 		"active_safe_zone_type": active_safe_zone_type,
 		"stability_stage": stability_stage,
 		"vision_radius": vision_radius,
-		"ss": {
-			"roll_day": ss_roll_day,
-			"chance_tier": ss_roll_chance_tier,
-			"chance": ss_roll_chance,
-			"roll_value": ss_roll_value,
-			"run_active": ss_run_active,
-			"budget_total": ss_budget_total,
-			"budget_used": ss_budget_used,
-			"opened_container_count": ss_opened_container_count,
-			"miss_count_before": ss_miss_count_before,
-			"next_chance_tier": ss_next_chance_tier,
-			"next_miss_count": ss_next_miss_count,
-			"debug_events": ss_debug_events,
-		},
 		"scene_events": {
 			"run_day_index": run_day_index,
 			"map_id": map_id,

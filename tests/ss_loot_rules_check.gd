@@ -30,21 +30,21 @@ func _verify_high_tier_quality_removed() -> bool:
 		if not VALID_ITEM_QUALITIES.has(quality):
 			printerr("Quality color table must only define C/B/A/S: %s" % row)
 			ok = false
-	for row in registry.ss_chance_tier_rows:
+	for row in registry.legacy_high_tier_chance_rows:
 		if TabDataLoaderScript.parse_bool(String(row.get("enabled", "false")), false):
 			printerr("Legacy high-tier chance rows must stay disabled: %s" % row)
 			ok = false
 		if float(row.get("hit_chance", 0.0)) > 0.0:
 			printerr("Legacy high-tier chance rows must have zero chance: %s" % row)
 			ok = false
-	for row in registry.ss_container_chance_rows_by_type.values():
+	for row in registry.legacy_high_tier_container_chance_rows_by_type.values():
 		if TabDataLoaderScript.parse_bool(String(row.get("enabled", "false")), false):
 			printerr("Legacy high-tier container rows must stay disabled: %s" % row)
 			ok = false
 		if float(row.get("roll_chance", 0.0)) > 0.0:
 			printerr("Legacy high-tier container rows must have zero chance: %s" % row)
 			ok = false
-	if not registry.get_ss_loot_pool_rows().is_empty():
+	if not registry.get_legacy_high_tier_loot_pool_rows().is_empty():
 		printerr("Legacy high-tier loot pool must resolve empty.")
 		ok = false
 	return ok

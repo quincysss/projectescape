@@ -131,14 +131,22 @@ func store_from_inventory_at(inventory, slot_index: int, target_slot: int, amoun
 		return false
 	return store_item_at(removed, target_slot)
 
-func remove_item_at(slot_index: int) -> Dictionary:
+func remove_item_at(slot_index: int, amount: int = -1) -> Dictionary:
 	if slot_index < 0 or slot_index >= slots.size():
 		return {}
 	var item = slots[slot_index]
 	if not item is Dictionary:
 		return {}
 	var removed: Dictionary = item.duplicate(true)
-	slots[slot_index] = null
+	var remove_amount := int(removed.get("amount", 1)) if amount < 0 else mini(amount, int(removed.get("amount", 1)))
+	if remove_amount <= 0:
+		return {}
+	removed["amount"] = remove_amount
+	item["amount"] = int(item.get("amount", 1)) - remove_amount
+	if int(item.get("amount", 0)) <= 0:
+		slots[slot_index] = null
+	else:
+		slots[slot_index] = item
 	_sync_items_from_slots()
 	home_storage_changed.emit(get_items_snapshot())
 	return removed

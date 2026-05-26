@@ -37,13 +37,17 @@ func query_sellable_items(_filters: Dictionary = {}) -> Array[Dictionary]:
 		if not _can_sell_item(item):
 			continue
 		var item_id := String(item.get("item_id", ""))
+		var item_type := String(item.get("item_type", ""))
+		var quality := String(item.get("quality", "C"))
 		var currency_id := _get_sell_currency_id(item)
 		var unit_value := int(item.get("sell_value", 0))
-		var group_id := _make_group_id(item_id, currency_id, unit_value)
+		var group_id := _make_group_id(item_id, item_type, quality, currency_id, unit_value)
 		if not groups.has(group_id):
 			groups[group_id] = {
 				"warehouse_item_id": group_id,
 				"item_id": item_id,
+				"item_type": item_type,
+				"quality": quality,
 				"display_name": String(item.get("display_name", item_id)),
 				"icon": String(item.get("icon", "")),
 				"sell_currency_id": currency_id,
@@ -71,17 +75,17 @@ func query_sellable_items(_filters: Dictionary = {}) -> Array[Dictionary]:
 func get_sell_quote(warehouse_item_id: String, count: int) -> Dictionary:
 	var group := _find_group(warehouse_item_id)
 	if group.is_empty():
-		return _fail("item_not_found", "没有可出售的仓库道具。")
+		return _fail("item_not_found", "No sellable warehouse item found.")
 	var available := int(group.get("count", 0))
 	if count <= 0:
-		return _fail("invalid_count", "出售数量必须大于 0。")
+		return _fail("invalid_count", "Sell count must be greater than 0.")
 	if count > available:
-		return _fail("not_enough_items", "仓库内该道具数量不足。")
+		return _fail("not_enough_items", "Not enough warehouse items.")
 
 	var unit_value := int(group.get("sell_value", 0))
 	var total_value := unit_value * count
 	if unit_value <= 0 or total_value <= 0:
-		return _fail("invalid_value", "该道具没有可出售价值。")
+		return _fail("invalid_value", "Item has no valid sell value.")
 	return {
 		"ok": true,
 		"warehouse_item_id": warehouse_item_id,
@@ -96,28 +100,27 @@ func get_sell_quote(warehouse_item_id: String, count: int) -> Dictionary:
 
 func sell_warehouse_item(warehouse_item_id: String, count: int) -> Dictionary:
 	if warehouse_manager == null or currency_wallet == null:
-		return _fail("service_unavailable", "商人系统不可用。")
+		return _fail("service_unavailable", "Merchant service unavailable.")
 
 	var quote := get_sell_quote(warehouse_item_id, count)
 	if not bool(quote.get("ok", false)):
 		return quote
 
 	var group := _find_group(warehouse_item_id)
-	var indexes: Array = Array(group.get("warehouse_indexes", [])).slice(0, count)
-	var removed := warehouse_manager.remove_items_at_indexes(indexes)
-	if removed.size() != count:
+	var removed := _remove_group_quantity(group, count)
+	if _count_removed_amount(removed) != count:
 		warehouse_manager.restore_removed_items(removed)
-		return _fail("remove_failed", "出售失败，仓库道具未被移除。")
+		return _fail("remove_failed", "Sale failed because warehouse removal failed.")
 
 	var currency_id := String(quote.get("sell_currency_id", DEFAULT_CURRENCY_ID))
 	var total_value := int(quote.get("total_value", 0))
 	var currency_result: Dictionary = currency_wallet.add_currency(currency_id, total_value, "merchant_sell")
 	if not bool(currency_result.get("ok", false)):
 		warehouse_manager.restore_removed_items(removed)
-		return _fail("currency_failed", String(currency_result.get("message", "货币结算失败。")))
+		return _fail("currency_failed", String(currency_result.get("message", "Currency settlement failed.")))
 
 	var result := quote.duplicate(true)
-	result["message"] = "已出售 %s x%d，获得 %d %s。" % [
+	result["message"] = "Sold %s x%d for %d %s." % [
 		String(quote.get("display_name", "")),
 		count,
 		total_value,
@@ -173,21 +176,21 @@ func refresh_shop_stock(seed: int = -1) -> Array[Dictionary]:
 func get_buy_quote(shop_offer_id: String, count: int) -> Dictionary:
 	var offer := _find_shop_offer(shop_offer_id)
 	if offer.is_empty():
-		return _fail("offer_not_found", "商人库存中没有该资源。")
+		return _fail("offer_not_found", "Merchant stock offer not found.")
 	var available := int(offer.get("count", 0))
 	if count <= 0:
-		return _fail("invalid_count", "购买数量必须大于 0。")
+		return _fail("invalid_count", "Buy count must be greater than 0.")
 	if count > available:
-		return _fail("not_enough_stock", "商人库存数量不足。")
+		return _fail("not_enough_stock", "Merchant stock is not enough.")
 
 	var unit_price := int(offer.get("buy_price", 0))
 	var total_price := unit_price * count
 	if unit_price <= 0 or total_price <= 0:
-		return _fail("invalid_price", "该资源没有有效购买价格。")
+		return _fail("invalid_price", "Offer has no valid buy price.")
 	var currency_id := String(offer.get("buy_currency_id", DEFAULT_CURRENCY_ID))
 	var current_amount := currency_wallet.get_currency_amount(currency_id) if currency_wallet != null else 0
 	if current_amount < total_price:
-		return _fail("not_enough_currency", "矿币不足。")
+		return _fail("not_enough_currency", "Not enough currency.")
 	return {
 		"ok": true,
 		"shop_offer_id": shop_offer_id,
@@ -203,38 +206,35 @@ func get_buy_quote(shop_offer_id: String, count: int) -> Dictionary:
 
 func buy_shop_item(shop_offer_id: String, count: int) -> Dictionary:
 	if warehouse_manager == null or currency_wallet == null:
-		return _fail("service_unavailable", "商人系统不可用。")
+		return _fail("service_unavailable", "Merchant service unavailable.")
 	var quote := get_buy_quote(shop_offer_id, count)
 	if not bool(quote.get("ok", false)):
 		return quote
 
 	_ensure_data_loaded()
 	var item_id := String(quote.get("item_id", ""))
-	var purchased_items: Array[Dictionary] = []
-	for _index in range(count):
-		var stack := data_registry.make_item_stack(item_id, 1)
-		if stack.is_empty():
-			return _fail("item_not_found", "购买资源配置不存在。")
-		stack["source"] = "merchant_shop"
-		purchased_items.append(stack)
+	var stack := data_registry.make_item_stack(item_id, count)
+	if stack.is_empty():
+		return _fail("item_not_found", "Item configuration missing.")
+	stack["source"] = "merchant_shop"
 
 	var currency_id := String(quote.get("buy_currency_id", DEFAULT_CURRENCY_ID))
 	var total_price := int(quote.get("total_price", 0))
 	var spend_result: Dictionary = currency_wallet.spend_currency(currency_id, total_price, "merchant_buy")
 	if not bool(spend_result.get("ok", false)):
-		return _fail(String(spend_result.get("reason", "currency_failed")), "矿币扣除失败。")
+		return _fail(String(spend_result.get("reason", "currency_failed")), "Currency spend failed.")
 
-	var accepted := warehouse_manager.add_items(purchased_items)
-	if accepted.size() != count:
+	var accepted := warehouse_manager.add_items([stack])
+	if accepted.size() != 1 or int(accepted[0].get("amount", 0)) != count:
 		currency_wallet.add_currency(currency_id, total_price, "merchant_buy_refund")
-		return _fail("warehouse_add_failed", "购买失败，资源未能进入仓库。")
+		return _fail("warehouse_add_failed", "Purchase failed because warehouse add failed.")
 
 	var offer := _find_shop_offer(shop_offer_id)
 	if not offer.is_empty():
 		offer["count"] = maxi(0, int(offer.get("count", 0)) - count)
 
 	var result := quote.duplicate(true)
-	result["message"] = "已购买 %s x%d，花费 %d %s。" % [
+	result["message"] = "Bought %s x%d for %d %s." % [
 		String(quote.get("display_name", "")),
 		count,
 		total_price,
@@ -254,6 +254,32 @@ func _find_shop_offer(shop_offer_id: String) -> Dictionary:
 		if String(offer.get("shop_offer_id", "")) == shop_offer_id:
 			return offer
 	return {}
+
+func _remove_group_quantity(group: Dictionary, count: int) -> Array[Dictionary]:
+	var removed: Array[Dictionary] = []
+	if warehouse_manager == null or count <= 0:
+		return removed
+	var indexes: Array = Array(group.get("warehouse_indexes", []))
+	indexes.sort_custom(func(a, b):
+		return int(a) > int(b)
+	)
+	var remaining := count
+	for raw_index in indexes:
+		if remaining <= 0:
+			break
+		var removed_item := warehouse_manager.remove_item_quantity_at_index(int(raw_index), remaining)
+		if removed_item.is_empty():
+			break
+		removed.append({"index": int(raw_index), "item": removed_item})
+		remaining -= int(removed_item.get("amount", 0))
+	return removed
+
+func _count_removed_amount(removed_entries: Array) -> int:
+	var count := 0
+	for entry in removed_entries:
+		if entry is Dictionary and entry.has("item") and entry.get("item", {}) is Dictionary:
+			count += maxi(1, int(Dictionary(entry.get("item", {})).get("amount", 1)))
+	return count
 
 func _make_shop_offer(row: Dictionary, rng: RandomNumberGenerator, offer_index: int) -> Dictionary:
 	var item_id := String(row.get("item_id", ""))
@@ -350,13 +376,13 @@ func _parse_bool(value: Variant) -> bool:
 	var normalized := String(value).strip_edges().to_lower()
 	return normalized == "true" or normalized == "1" or normalized == "yes"
 
-func _make_group_id(item_id: String, currency_id: String, unit_value: int) -> String:
-	return "%s__%s__%d" % [item_id, currency_id, unit_value]
+func _make_group_id(item_id: String, item_type: String, quality: String, currency_id: String, unit_value: int) -> String:
+	return "%s__%s__%s__%s__%d" % [item_id, item_type, quality, currency_id, unit_value]
 
 func _currency_name(currency_id: String) -> String:
 	match currency_id:
 		DEFAULT_CURRENCY_ID:
-			return "矿币"
+			return "mine_coin"
 		_:
 			return currency_id
 

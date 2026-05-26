@@ -2,6 +2,12 @@ extends SceneTree
 
 const GameDataRegistryScript := preload("res://scripts/data/game_data_registry.gd")
 
+class FailingCurrencyWallet:
+	extends CurrencyWallet
+
+	func add_currency(currency_id: String, amount: int, reason: String = "") -> Dictionary:
+		return {"ok": false, "reason": "forced_failure", "message": "forced failure"}
+
 func _initialize() -> void:
 	var ok := await _verify_merchant_service_and_base_entry()
 	print("Merchant service compatibility and new base entry verified." if ok else "Merchant service compatibility and new base entry failed.")
@@ -44,6 +50,12 @@ func _verify_merchant_service_and_base_entry() -> bool:
 	if int(bandage_group.get("count", 0)) != 2:
 		printerr("Expected merchant service to group two warehouse bandages.")
 		return false
+	if not _verify_merchant_stack_quantity_sales(registry):
+		return false
+	if not _verify_merchant_group_dimensions():
+		return false
+	if not _verify_merchant_buy_stacks_in_warehouse():
+		return false
 
 	var quote: Dictionary = game_state.get_sell_quote(String(chip_group.get("warehouse_item_id", "")), 1)
 	if not bool(quote.get("ok", false)) or int(quote.get("total_value", 0)) != 120:
@@ -75,6 +87,115 @@ func _verify_merchant_service_and_base_entry() -> bool:
 		return false
 
 	if not await _verify_base_uses_new_shop_entry(game_state, registry):
+		return false
+	return true
+
+
+func _verify_merchant_stack_quantity_sales(registry) -> bool:
+	var warehouse_items: Array[Dictionary] = []
+	var warehouse := WarehouseManager.new()
+	warehouse.bind_items(warehouse_items)
+	var currencies := {}
+	var wallet := CurrencyWallet.new()
+	wallet.bind_currencies(currencies)
+	var service := MerchantService.new()
+	service.bind_dependencies(warehouse, wallet)
+
+	warehouse.add_items([registry.make_item_stack("field_bandage", 5)])
+	var single_stack_group := _find_group_by_item_id(service.query_sellable_items(), "field_bandage")
+	var single_stack_sale: Dictionary = service.sell_warehouse_item(String(single_stack_group.get("warehouse_item_id", "")), 3)
+	if not bool(single_stack_sale.get("ok", false)):
+		printerr("Expected partial single-stack sale to succeed: %s" % single_stack_sale)
+		return false
+	if warehouse.get_item_count("field_bandage") != 2:
+		printerr("Expected selling 3 from amount=5 stack to leave 2, got %d." % warehouse.get_item_count("field_bandage"))
+		return false
+	if wallet.get_currency_amount("mine_coin") != 42:
+		printerr("Expected partial single-stack sale to pay 42 mine_coin.")
+		return false
+
+	warehouse.clear()
+	wallet.clear()
+	warehouse.add_items([registry.make_item_stack("field_bandage", 7)])
+	var multi_stack_group := _find_group_by_item_id(service.query_sellable_items(), "field_bandage")
+	var multi_stack_sale: Dictionary = service.sell_warehouse_item(String(multi_stack_group.get("warehouse_item_id", "")), 6)
+	if not bool(multi_stack_sale.get("ok", false)):
+		printerr("Expected multi-stack sale to succeed: %s" % multi_stack_sale)
+		return false
+	if warehouse.get_item_count("field_bandage") != 1:
+		printerr("Expected selling 6 across amount=5+2 stacks to leave 1, got %d." % warehouse.get_item_count("field_bandage"))
+		return false
+	if wallet.get_currency_amount("mine_coin") != 84:
+		printerr("Expected multi-stack sale to pay 84 mine_coin.")
+		return false
+
+	var rollback_items: Array[Dictionary] = []
+	var rollback_warehouse := WarehouseManager.new()
+	rollback_warehouse.bind_items(rollback_items)
+	rollback_warehouse.add_items([registry.make_item_stack("field_bandage", 5)])
+	var failing_wallet := FailingCurrencyWallet.new()
+	failing_wallet.bind_currencies({})
+	var failing_service := MerchantService.new()
+	failing_service.bind_dependencies(rollback_warehouse, failing_wallet)
+	var rollback_group := _find_group_by_item_id(failing_service.query_sellable_items(), "field_bandage")
+	var failed_sale: Dictionary = failing_service.sell_warehouse_item(String(rollback_group.get("warehouse_item_id", "")), 3)
+	if bool(failed_sale.get("ok", false)):
+		printerr("Expected forced currency failure to fail sale.")
+		return false
+	if rollback_warehouse.get_item_count("field_bandage") != 5:
+		printerr("Expected currency failure rollback to restore exactly 5 bandages, got %d." % rollback_warehouse.get_item_count("field_bandage"))
+		return false
+	return true
+
+
+func _verify_merchant_group_dimensions() -> bool:
+	var warehouse_items: Array[Dictionary] = [
+		_make_manual_sellable("field_bandage", "consumable", "C", 14),
+		_make_manual_sellable("field_bandage", "consumable", "B", 14),
+		_make_manual_sellable("field_bandage", "consumable", "C", 20),
+	]
+	var warehouse := WarehouseManager.new()
+	warehouse.bind_items(warehouse_items)
+	var wallet := CurrencyWallet.new()
+	wallet.bind_currencies({})
+	var service := MerchantService.new()
+	service.bind_dependencies(warehouse, wallet)
+	var groups := service.query_sellable_items()
+	if groups.size() != 3:
+		printerr("Expected item_id/item_type/quality/currency/sell_value grouping to keep 3 distinct groups: %s" % groups)
+		return false
+	for group in groups:
+		if int(group.get("count", 0)) != 1:
+			printerr("Expected distinct sellable dimensions to avoid accidental count merging: %s" % group)
+			return false
+	return true
+
+
+func _verify_merchant_buy_stacks_in_warehouse() -> bool:
+	var warehouse_items: Array[Dictionary] = []
+	var warehouse := WarehouseManager.new()
+	warehouse.bind_items(warehouse_items)
+	var currencies := {"mine_coin": 1000}
+	var wallet := CurrencyWallet.new()
+	wallet.bind_currencies(currencies)
+	var service := MerchantService.new()
+	service.bind_dependencies(warehouse, wallet, [{
+		"shop_offer_id": "test:field_bandage",
+		"item_id": "field_bandage",
+		"display_name": "field_bandage",
+		"count": 4,
+		"buy_currency_id": "mine_coin",
+		"buy_price": 14,
+	}])
+	var buy_result: Dictionary = service.buy_shop_item("test:field_bandage", 3)
+	if not bool(buy_result.get("ok", false)):
+		printerr("Expected merchant buy count > 1 to succeed: %s" % buy_result)
+		return false
+	if warehouse.get_item_count("field_bandage") != 3:
+		printerr("Expected merchant buy to add 3 bandages, got %d." % warehouse.get_item_count("field_bandage"))
+		return false
+	if warehouse.get_items_snapshot().size() != 1:
+		printerr("Expected merchant buy count > 1 to use one warehouse stack, got %d slots." % warehouse.get_items_snapshot().size())
 		return false
 	return true
 
@@ -151,6 +272,23 @@ func _find_group_by_item_id(items: Array, item_id: String) -> Dictionary:
 		if item is Dictionary and String(item.get("item_id", "")) == item_id:
 			return item
 	return {}
+
+
+func _make_manual_sellable(item_id: String, item_type: String, quality: String, sell_value: int) -> Dictionary:
+	return {
+		"item_id": StringName(item_id),
+		"display_name": item_id,
+		"amount": 1,
+		"weight_per_unit": 0.0,
+		"stackable": false,
+		"stack_limit": 1,
+		"item_type": StringName(item_type),
+		"quality": StringName(quality),
+		"tags": [],
+		"sellable": true,
+		"sell_currency_id": "mine_coin",
+		"sell_value": sell_value,
+	}
 
 
 func _verify_compact_top_navigation(

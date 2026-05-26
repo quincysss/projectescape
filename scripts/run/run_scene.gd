@@ -28,6 +28,7 @@ const WebVideoBridgeScript := preload("res://scripts/ui/web_video_bridge.gd")
 const RunSimulationPauseServiceScript := preload("res://scripts/flow/run_simulation_pause_service.gd")
 const RunStoryGateControllerScript := preload("res://scripts/flow/run_story_gate_controller.gd")
 const DialogueServiceScript := preload("res://scripts/dialogue/dialogue_service.gd")
+const GameDataRegistryScript := preload("res://scripts/data/game_data_registry.gd")
 const DialoguePanelScene := preload("res://scenes/ui/DialoguePanel.tscn")
 const UNIT := 64.0
 const MAP_UNITS := Vector2(280.0, 220.0)
@@ -78,6 +79,7 @@ var _blocked_rects: Array[Rect2] = []
 var _walkable_rects: Array[Rect2] = []
 var _walkable_polygons: Array[PackedVector2Array] = []
 var enterable_exception_rects: Array[Rect2] = []
+var run_data_registry = GameDataRegistryScript.new()
 
 var hud_label: Label
 var character_hud_root: Control
@@ -294,9 +296,16 @@ func _create_runtime_controllers() -> void:
 		Callable(self, "_item"),
 		Callable(self, "_remove_interactable"),
 		UNIT,
-		run_director.data_registry
+		_ensure_run_data_registry_loaded()
 	)
 	monster_spawn_controller = MonsterSpawnControllerScript.new()
+
+func _ensure_run_data_registry_loaded():
+	if run_data_registry == null:
+		run_data_registry = GameDataRegistryScript.new()
+	if run_data_registry.items_by_id.is_empty():
+		run_data_registry.load_all()
+	return run_data_registry
 
 func _configure_monster_spawn_controller() -> void:
 	if monster_spawn_controller == null:
@@ -983,7 +992,6 @@ func _take_all_loot() -> void:
 	if transfer_finished:
 		loot_panel.visible = false
 		inventory_panel.visible = false
-		_set_container_lifetime_paused(opened_container, false)
 	_refresh_ui()
 
 func _on_loot_item_meta_clicked(meta: Variant) -> void:
@@ -1019,7 +1027,6 @@ func _take_loot_item_at(index: int) -> void:
 		_status_prompt = "已放入背包：%s" % result.item.get("display_name", result.item.get("item_id", ""))
 		if bool(result.get("finished", false)):
 			loot_panel.visible = false
-			_set_container_lifetime_paused(opened_container, false)
 	else:
 		_status_prompt = loot_interaction_controller.last_prompt
 	_refresh_ui()
@@ -1130,12 +1137,10 @@ func _is_inventory_panel_visible() -> bool:
 	return inventory_panel != null and inventory_panel.visible
 
 func _open_loot_transfer_panels() -> void:
-	_set_container_lifetime_paused(opened_container, true)
 	loot_panel.visible = true
 	inventory_panel.visible = true
 
 func _close_loot_transfer() -> void:
-	_set_container_lifetime_paused(opened_container, false)
 	loot_interaction_controller.close()
 	_sync_loot_state()
 	loot_panel.visible = false
@@ -1144,11 +1149,6 @@ func _close_loot_transfer() -> void:
 func _save_opened_loot_to_source() -> void:
 	loot_interaction_controller.save_opened_loot_to_source()
 	_sync_loot_state()
-
-func _set_container_lifetime_paused(container, paused: bool) -> void:
-	if container_interaction_controller == null:
-		return
-	container_interaction_controller.set_lifetime_paused(container, paused)
 
 func _sync_loot_state() -> void:
 	if loot_interaction_controller == null:

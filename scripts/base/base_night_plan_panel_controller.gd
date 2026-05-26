@@ -57,6 +57,10 @@ func _render_plan_panel() -> void:
 		plan_panel.add_child(_make_label("GameState 不可用。", Vector2(24, 64), Vector2(260, 32), 15))
 		return
 	var snapshot: Dictionary = game_state.get_night_plan_snapshot()
+	_render_resource_briefing_plan(snapshot)
+
+
+func _render_resource_briefing_plan(snapshot: Dictionary) -> void:
 	plan_panel.add_child(_make_label("角色", Vector2(44, 72), Vector2(160, 28), 20))
 	var y := 112.0
 	for character in Array(snapshot.get("characters", [])):
@@ -69,21 +73,16 @@ func _render_plan_panel() -> void:
 				bool(character.get("selected", false))
 			))
 			y += 98.0
-	plan_panel.add_child(_make_label("地点", Vector2(520, 72), Vector2(160, 28), 20))
-	y = 112.0
+	plan_panel.add_child(_make_label("地图情报", Vector2(448, 60), Vector2(220, 28), 20))
+	plan_panel.add_child(_make_label("只显示类别和倾向，具体掉落保留随机性。", Vector2(448, 88), Vector2(420, 22), 13))
+	y = 116.0
 	for location in Array(snapshot.get("locations", [])):
 		if location is Dictionary:
-			plan_panel.add_child(_make_card(
-				String(location.get("display_name", "")),
-				String(location.get("description", "")),
-				Vector2(520, y),
-				Vector2(360, 82),
-				bool(location.get("selected", false))
-			))
-			y += 98.0
+			plan_panel.add_child(_make_location_card(location, Vector2(448, y), Vector2(492, 96)))
+			y += 108.0
 	var prepare_button := Button.new()
 	prepare_button.text = "准备携行"
-	prepare_button.position = Vector2(760, 418)
+	prepare_button.position = Vector2(236, 418)
 	prepare_button.size = Vector2(144, 42)
 	prepare_button.pressed.connect(_on_prepare_loadout_pressed)
 	_style_button(prepare_button, true)
@@ -133,6 +132,13 @@ func _on_begin_run_pressed() -> void:
 		begin_run_callback.call()
 
 
+func _on_location_card_pressed(location_id: String) -> void:
+	if game_state != null and game_state.has_method("set_night_plan_selection"):
+		game_state.set_night_plan_selection("", location_id)
+	_render_plan_panel()
+	_call_refresh()
+
+
 func _slot_detail(value: String) -> String:
 	return "空" if value.is_empty() else value
 
@@ -145,6 +151,39 @@ func _make_card(title: String, detail: String, pos: Vector2, card_size: Vector2,
 	card.add_child(_make_label(title, Vector2(12, 10), Vector2(card_size.x - 24.0, 24), 16))
 	card.add_child(_make_label(detail, Vector2(12, 40), Vector2(card_size.x - 24.0, card_size.y - 46.0), 13))
 	return card
+
+
+func _make_location_card(location: Dictionary, pos: Vector2, card_size: Vector2) -> Panel:
+	var location_id := String(location.get("location_id", location.get("map_id", "")))
+	var selected := bool(location.get("selected", false))
+	var card := Panel.new()
+	card.name = "LocationBriefing_%s" % location_id
+	card.position = pos
+	card.size = card_size
+	card.mouse_filter = Control.MOUSE_FILTER_STOP
+	card.add_theme_stylebox_override("panel", _panel_style(Color(0.035, 0.037, 0.037, 0.94), Color("#D1B850") if selected else Color("#35C9D7"), 2 if selected else 1))
+	card.gui_input.connect(func(event: InputEvent):
+		var mouse_event := event as InputEventMouseButton
+		if mouse_event != null and mouse_event.pressed and mouse_event.button_index == MOUSE_BUTTON_LEFT:
+			_on_location_card_pressed(location_id)
+	)
+	card.add_child(_make_label(String(location.get("display_name", location_id)), Vector2(12, 8), Vector2(196, 24), 16))
+	card.add_child(_make_label("状态：%s" % String(location.get("state_display_name", location.get("resource_state", ""))), Vector2(214, 8), Vector2(120, 22), 13))
+	card.add_child(_make_label("预计容器：%s" % String(location.get("estimated_container_count_text", "?")), Vector2(338, 8), Vector2(138, 22), 13))
+	card.add_child(_make_label("主要：%s" % _join_names(Array(location.get("primary_category_names", []))), Vector2(12, 34), Vector2(218, 22), 13))
+	card.add_child(_make_label("次要：%s" % _join_names(Array(location.get("secondary_category_names", []))), Vector2(246, 34), Vector2(220, 22), 13))
+	card.add_child(_make_label("容器倾向：%s" % _join_names(Array(location.get("typical_container_type_names", []))), Vector2(12, 58), Vector2(278, 22), 13))
+	card.add_child(_make_label(String(location.get("state_hint", "")), Vector2(246, 58), Vector2(224, 30), 12))
+	return card
+
+
+func _join_names(values: Array) -> String:
+	var names: Array[String] = []
+	for value in values:
+		var text := String(value)
+		if not text.is_empty():
+			names.append(text)
+	return " / ".join(names) if not names.is_empty() else "未知"
 
 
 func _call_refresh() -> void:
